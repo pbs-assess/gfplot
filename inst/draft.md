@@ -21,13 +21,13 @@ Science Response: Maritimes RV Summer Survey Trends:
 
 # Surveys 
 
-4: west coast Vancouver Island synoptic groundfish trawl surveys
-1: from the Biomass indices from the Queen Charlotte Sound synoptic groundfish trawl surveys
-3: Hecate Strait synoptic groundfish trawl surveys
+4:  west coast Vancouver Island synoptic groundfish trawl surveys
+1:  Queen Charlotte Sound synoptic groundfish trawl surveys
+3:  Hecate Strait synoptic groundfish trawl surveys
 16: west coast Haida Gwaii synoptic groundfish trawl surveys
-2: Hecate Strait assemblage groundfish trawl surveys
-7: west coast Vancouver Island shrimp trawl surveys
-6: Queen Charlotte Sound shrimp trawl surveys
+2:  Hecate Strait assemblage groundfish trawl surveys
+7:  west coast Vancouver Island shrimp trawl surveys
+6:  Queen Charlotte Sound shrimp trawl surveys
 14: International Pacific Halibut Commission longline surveys
 36: Pacific Halibut Management Association longline surveys (southern region)
 22: Pacific Halibut Management Association longline surveys (northern region)
