@@ -1,3 +1,9 @@
 .Rproj.user
 .Rhistory
 .RData
+
+*.pdf
+
+*.rda
+
+*.png
