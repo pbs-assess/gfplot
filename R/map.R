@@ -55,14 +55,14 @@ mpc <- ggplot2::map_data("world", "Canada") # low res
 dat <- filter(d_loc_cpue_pop, year %in% c(1400:2099))
 
 # hexagon bin size in lat/long degrees:
-bin_width <- 0.3
+bin_width <- 0.32
 
 # use ggplot to compute hexagons:
 g <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
-  stat_summary_hex(aes(x = X, y = Y, z = cpue), data = dat,
-    binwidth = bin_width, fun = median) +
-  viridis::scale_fill_viridis(trans = 'log') +
+  stat_summary_hex(aes(x = X, y = Y, z = log(cpue)), data = dat,
+    binwidth = bin_width, fun = mean) +
+  viridis::scale_fill_viridis() +
   geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
 
 g_count <- ggplot(dat, aes(X, Y)) +
@@ -76,14 +76,15 @@ gd <- ggplot_build(g) # extract data from ggplot
 gd1 <- gd$data[[1]] # hexagons
 gd2 <- gd$data[[2]] # map
 
+n_minimum_observations <- 5
 gd_count <- ggplot_build(g_count) # to count observations per cell
 assertthat::are_equal(nrow(gd$data[[1]]), nrow(gd_count$data[[1]]))
-gd1 <- gd1[gd_count$data[[1]]$value > 3, ] # remove low observation hexagons
+gd1 <- gd1[gd_count$data[[1]]$value > n_minimum_observations, ] # remove low observation hexagons
 
 n_col_bins <- 200L
 value_range <- range(gd1$value)
-vals <- seq(log(value_range[1]), log(value_range[2]), length.out = n_col_bins)
-gd1$custom_fill <- viridisLite::viridis(n_col_bins)[findInterval(log(gd1$value), vals)]
+vals <- seq((value_range[1]), (value_range[2]), length.out = n_col_bins)
+gd1$custom_fill <- viridisLite::viridis(n_col_bins)[findInterval((gd1$value), vals)]
 
 # legend data for later:
 leg <- data.frame(vals = vals, col = viridisLite::viridis(n_col_bins),
@@ -111,7 +112,7 @@ rect(xleft = -160, xright = -110, ybottom = 40, ytop = 60,
 dx <- ggplot2::resolution(gd1$x, FALSE)
 dy <- resolution(gd1$y, FALSE) / 2 * 1.15
 plyr::a_ply(gd1, 1, function(i)
-  hexagon(i$x, i$y, dx, dy, col = i$fill, border = i$custom_fill, lwd = 0.05))
+  hexagon(i$x, i$y, dx, dy, col = i$custom_fill, border = i$custom_fill, lwd = 0.01))
 
 # map:
 plyr::d_ply(gd2, "group", function(i)
