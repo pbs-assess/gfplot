@@ -1,4 +1,4 @@
-d <- readRDS("../../Dropbox/dfo/data/all-survey-dat.rds")
+d <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
 names(d) <- tolower(names(d))
 d$species_common_name <- tolower(d$species_common_name)
 d$species_science_name <- tolower(d$species_science_name)
@@ -11,8 +11,8 @@ mpc <- ggplot2::map_data("world", "Canada") # low res
 d$year <- lubridate::year(d$trip_start_date)
 
 sp <- filter(d, species_science_name %in% "squalus suckleyi") %>% 
-  filter(!is.na(catch_weight)) #%>% 
-# filter(year > 2006)
+  filter(!is.na(catch_weight)) %>% 
+  filter(year > 2003)
 
 g <- ggplot(sp, aes(start_lon, start_lat)) +
   coord_equal(
@@ -21,7 +21,7 @@ g <- ggplot(sp, aes(start_lon, start_lat)) +
   xlim = c(-128, -125),
   ylim = c(48, 50.3)) +
   stat_summary_hex(aes(z = catch_weight),
-    binwidth = 0.18, fun = function(x) mean(log(x))) +
+    binwidth = 0.05, fun = function(x) mean(log(x))) +
   viridis::scale_fill_viridis() +
   facet_wrap(~year) +
   geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
@@ -33,9 +33,10 @@ g <- ggplot(sp, aes(start_lon, start_lat)) +
     # ylim = range(sp$start_lat, na.rm = TRUE)) +
     xlim = c(-128, -125),
     ylim = c(48, 50.5)) +
-  geom_point(aes(col = log(catch_weight))) +
+  geom_point(aes(size = catch_weight), alpha = 0.5) +
   facet_wrap(~year) +
   viridis::scale_colour_viridis() +
+  scale_size_continuous(range = c(0.05, 6)) +
   geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
 g
 
