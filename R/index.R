@@ -6,20 +6,20 @@ d$species_science_name <- tolower(d$species_science_name)
 library(tidyverse)
 library(mapdata)
 library(lubridate)
-mpc <- ggplot2::map_data("worldHires", "Canada") # low res
+mpc <- ggplot2::map_data("world", "Canada") # low res
 
 d$year <- lubridate::year(d$trip_start_date)
 
 sp <- filter(d, species_science_name %in% "squalus suckleyi") %>% 
-  filter(!is.na(catch_weight)) %>% 
-  filter(year > 2006)
+  filter(!is.na(catch_weight)) #%>% 
+# filter(year > 2006)
 
 g <- ggplot(sp, aes(start_lon, start_lat)) +
   coord_equal(
-    xlim = range(sp$start_lon, na.rm = TRUE),
-    ylim = range(sp$start_lat, na.rm = TRUE)) +
-    # xlim = c(-128, -125),
-    # ylim = c(48, 50.5)) +
+    # xlim = range(sp$start_lon, na.rm = TRUE),
+    # ylim = range(sp$start_lat, na.rm = TRUE)) +
+  xlim = c(-128, -125),
+  ylim = c(48, 50.3)) +
   stat_summary_hex(aes(z = catch_weight),
     binwidth = 0.18, fun = function(x) mean(log(x))) +
   viridis::scale_fill_viridis() +
@@ -39,3 +39,97 @@ g <- ggplot(sp, aes(start_lon, start_lat)) +
   geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
 g
 
+#################
+
+devtools::load_all("../glmmfields/")
+options(mc.cores = parallel::detectCores())
+
+dat <- filter(sp, year %in% c(2003:2016),
+  start_lon > -128, start_lon < -125,
+  start_lat > 48, start_lat < 50.3)
+# ny <- data.frame(year = 2005:2016, joint_year = rep(seq(2005, 2016, 2), each = 2))
+# dat <- inner_join(dat, ny)
+
+dat$start_lon10 <- dat$start_lon * 10
+dat$start_lat10 <- dat$start_lat * 10
+
+m <- glmmfields(log(catch_weight) ~ as.factor(year), 
+  lon = "start_lon", lat = "start_lat",
+  data = dat, iter = 400,
+  prior_gp_theta = half_t(100, 0, 2),
+  prior_gp_sigma = half_t(100, 0, 2),
+  prior_intercept = half_t(100, 0, 5),
+  prior_beta = half_t(100, 0, 2),
+  nknots = 15, cluster = "kmeans", chains = 1,
+  estimate_ar = FALSE, estimate_df = FALSE, year_re = FALSE,
+  control = list(adapt_delta = 0.9))
+m
+plot(m) + viridis::scale_color_viridis()
+plot(m, type = "residual-vs-fitted")
+plot(m, type = "spatial-residual")
+
+dat$p <- predict(m)$estimate
+g <- ggplot(dat, aes(start_lon, start_lat)) +
+  coord_equal(
+    xlim = c(-128, -125),
+    ylim = c(48, 50.3)) +
+  stat_summary_hex(aes(z = p),
+    binwidth = 0.18, fun = function(x) mean((x))) +
+  viridis::scale_fill_viridis() +
+  facet_wrap(~year) +
+  geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
+g
+
+b <- rstan::extract(m$model, pars = "B")[[1]]
+b[,2:ncol(b)] <- b[,1] + b[,2:ncol(b)]
+matplot(exp(t(b[1:200,])), type = "l", lty = 1, col = "#00000020")
+lines(1:ncol(b), exp(apply(b,2,mean)), col = "red", lwd = 2)
+
+#############
+
+library(INLA)
+bnd <- inla.nonconvex.hull(subcoords, convex=80)
+mesh1 <- inla.mesh.2d(boundary=bnd,max.edge=c(60,1500),cutoff=59,offset=c(110,180))
+plot(mesh1)
+summary(mesh1)
+spde <- inla.spde2.matern(mesh1, alpha=3/2)
+iset <- inla.spde.make.index("i2D", n.spde=mesh1$n, n.group = k) 
+
+# Make the covariates
+X.1 <- dat[,-c(1:4)]
+Covar.names <- colnames(X.1)
+XX.list <- as.list(X.1)
+effect.list <- list()
+effect.list[[1]] <- c(iset)
+for (Z in 1:ncol(X.1)) effect.list[[Z+1]] <- XX.list[[Z]]
+names(effect.list) <- c("1", Covar.names)
+
+### Make data stack.
+A <- inla.spde.make.A(mesh=mesh1, loc=cbind(dat$xcoo, dat$ycoo), group = dat$time)
+A.list = list()
+A.list[[1]] = A
+for (Z in 1:ncol(X.1)) A.list[[Z+1]] <- 1
+
+### Make projection points stack.
+Ntrials <- rep(1,length(dat$y))
+
+sdat <- inla.stack(
+    tag = 'stdata',
+    data = list(
+      y = dat$y,
+      link = 1,
+      Ntrials = Ntrials),
+    A = A.list,
+    effects = effect.list)
+
+inlaModel <- inla(
+    formula,
+    family = "gamma",
+    data = inla.stack.data(sdat),
+    control.predictor = list(compute = TRUE, A = inla.stack.A(sdat)),
+    verbose = TRUE,
+    debug = TRUE,
+    keep = FALSE,
+    control.compute = list(dic = TRUE, cpo = TRUE, config = TRUE),
+    control.fixed = list(correlation.matrix = TRUE),
+    control.inla = list(lincomb.derived.correlation.matrix = TRUE))
