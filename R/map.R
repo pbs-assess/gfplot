@@ -4,7 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(mapdata)
 
-# Functions
+# functions
 hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
   polygon(
     hexbin::hexcoords(unitcell_x)$x + x,
@@ -12,16 +12,31 @@ hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
 }
 
 survey_spark <- function(x, y, ts_x, ts_y, scale_x = 1, scale_y = 1,
-  ts_y_upper = NULL, ts_y_lower = NULL, min_year = 1998, max_year = 2017, label_year = FALSE) {
+  ts_y_upper = NULL, ts_y_lower = NULL, min_year = 2000, max_year = 2016,
+  label_year = FALSE, survey_label = "") {
 
   # make years extend to min and max:
   # dx <- left_join(data.frame(ts_x = min_year:max_year), data.frame(ts_x, ts_y))
-  if (min(ts_x) > min_year) {ts_x <- c(min_year, ts_x);ts_y <- c(NA, ts_y)}
-  if (min(ts_x) < max_year) {ts_x <- c(ts_x, max_year);ts_y <- c(ts_y, NA)}
+  if (min(ts_x) > min_year) {
+    ts_x <- c(min_year, ts_x)
+    ts_y <- c(NA, ts_y)
+    ts_y_upper <- c(NA, ts_y_upper)
+    ts_y_lower <- c(NA, ts_y_lower)
+  }
+  if (min(ts_x) < max_year) {
+    ts_x <- c(ts_x, max_year)
+    ts_y <- c(ts_y, NA)
+    ts_y_upper <- c(ts_y_upper, NA)
+    ts_y_lower <- c(ts_y_lower, NA)
+  }
+  # sd_y <- sd(ts_y, na.rm = TRUE)
+  mean_y <- mean(ts_y, na.rm = TRUE)
+  max_y <- max(ts_y, na.rm = TRUE)
+  local_scale <- function(d) d/max_y - mean(d/max_y, na.rm = TRUE)
 
   a <- (ts_x - min(ts_x, na.rm = TRUE)) * scale_x
   local_x <- x - mean(a, na.rm = TRUE) + a
-  local_y <- y + as.numeric(scale(ts_y)) * scale_y
+  local_y <- y + local_scale(ts_y) * scale_y
 
   # base line at the mean:
   segments(x0 = min(local_x), x1 = max(local_x),
@@ -30,32 +45,45 @@ survey_spark <- function(x, y, ts_x, ts_y, scale_x = 1, scale_y = 1,
 
   # main spark:
   lines(local_x, local_y, lwd = 2.8, col = "grey15")
+  # points(local_x, local_y, cex = 0.5, col = "grey95", pch = 19)
 
   if (label_year)
     text(min(local_x), mean(local_y, na.rm = TRUE), labels = min_year,
-      cex = 0.8, pos = 1, offset = 0.3, col = "grey30")
+      cex = 0.7, pos = 1, offset = 0.4, col = "grey30")
+
+  if (survey_label != "")
+    text(max(local_x), mean(local_y, na.rm = TRUE), labels = survey_label,
+      cex = 0.7, pos = 4, offset = 0.3, col = "grey30")
 
   # CIs:
-  # if (!is.null(ts_y_upper)) {
-  #   local_y_upper <- y + scale(ts_y_upper) * scale_y
-  #   local_y_lower <- y + scale(ts_y_lower) * scale_y
-  #   polygon(c(local_x, rev(local_x)), c(local_y_upper, rev(local_y_lower)))
-  # }
+  if (!is.null(ts_y_upper)) {
+    local_y_upper <- y + local_scale(ts_y_upper) * scale_y
+    local_y_lower <- y + local_scale(ts_y_lower) * scale_y
+    local_x <- local_x[!is.na(local_y_upper)]
+    local_y_lower <- local_y_lower[!is.na(local_y_upper)]
+    local_y_upper <- local_y_upper[!is.na(local_y_upper)]
+    polygon(c(local_x, rev(local_x)), c(local_y_upper, rev(local_y_lower)),
+      col = "#00000025", border = NA)
+  }
 }
 
 pos <- tibble::tribble(
   ~lon, ~lat, ~survey_id,
   -127.1, 49.0,   "wcvi",
-  -130.2, 51.3,   "qcs",
-  -131.0, 53.2,   "hs_syn",
-  -132.1, 54.5,   "qchg")
+  -130.0, 51.4,   "qcs",
+  -130.8, 53.0,   "hs_syn",
+  -133.2, 53.4,   "wchg",
+  # -132.8, 51.0,   "phma_n",
+  -132.8, 49.7,   "phma_n",
+  -132.8, 48.6,   "phma_s"
+  )
 
-# mpc <- ggplot2::map_data("worldHires", "Canada")
-mpc <- ggplot2::map_data("world", "Canada") # low res
+mpc <- ggplot2::map_data("worldHires", ".")
+# mpc <- ggplot2::map_data("world", ".") # low res
 dat <- filter(d_loc_cpue_pop, year %in% c(1400:2099))
 
 # hexagon bin size in lat/long degrees:
-bin_width <- 0.32
+bin_width <- 0.07
 
 # use ggplot to compute hexagons:
 g <- ggplot(dat, aes(X, Y)) +
@@ -76,7 +104,7 @@ gd <- ggplot_build(g) # extract data from ggplot
 gd1 <- gd$data[[1]] # hexagons
 gd2 <- gd$data[[2]] # map
 
-n_minimum_observations <- 5
+n_minimum_observations <- 3
 gd_count <- ggplot_build(g_count) # to count observations per cell
 assertthat::are_equal(nrow(gd$data[[1]]), nrow(gd_count$data[[1]]))
 gd1 <- gd1[gd_count$data[[1]]$value > n_minimum_observations, ] # remove low observation hexagons
@@ -98,8 +126,8 @@ leg$i <- seq(0, 1, length.out = nrow(leg))
 
 pdf("pop-index-example.pdf", width = 4, height = 2.55)
 par(mar = c(0, 0, 0, 0), oma = c(.5, .5, .5, .5), cex = 0.6)
-xlim <-  c(-133.80, -123.15)
-ylim <- c(48.26, 54.75)
+xlim <-  c(-133.4, -123.8)
+ylim <- c(48.26, 54.55)
 plot(gd1$x, gd1$y, asp = 1, type = "n", xlab = "", ylab = "", axes = FALSE,
   xlim = xlim, ylim = ylim)
 rect(xleft = -160, xright = -110, ybottom = 40, ytop = 60,
@@ -116,32 +144,48 @@ plyr::a_ply(gd1, 1, function(i)
 
 # map:
 plyr::d_ply(gd2, "group", function(i)
-  polygon(i$x, i$y, col = "grey50", border = NA))
+  polygon(i$x, i$y, col = "grey55", border = NA))
 
 # spark lines:
-plyr::l_ply(c("wcvi", "qcs", "hs_syn", "qchg"), function(xx) {
+plyr::l_ply(pos$survey_id, function(xx) {
   dd <- filter(dat_indices, species == "sebastes alutus", survey_id == xx)
   dd <- left_join(dd, pos)
   dd <- arrange(dd, year) #%>% filter(biomass != 0)
   # dd <- left_join(expand.grid(year = min(dd$year):max(dd$year)), dd)
-  label_year <- ifelse(xx == "wcvi", TRUE, FALSE)
+  min_year_main <- 2000
+  # label_year <- ifelse(xx == "wcvi", TRUE, FALSE)
+  label_year <- TRUE
+  min_year <- ifelse(xx %in% c("phma_n", "phma_s"), 2006, min_year_main)
+  survey_label <- ifelse(xx %in% c("phma_n", "phma_s"),
+    toupper(gsub("_", " ", xx)), "")
   survey_spark(x = as.numeric(na.omit(unique(dd$lon))), y = as.numeric(na.omit(unique(dd$lat))),
-    ts_x = dd$year, ts_y = dd$biomass, scale_x = 0.17, scale_y = 0.3,
-    ts_y_upper = dd$lowerci, ts_y_lower = dd$upperci, label_year = label_year)
+    ts_x = dd$year, ts_y = dd$biomass, scale_x = 0.17, scale_y = 0.4,
+    ts_y_upper = dd$lowerci, ts_y_lower = dd$upperci, label_year = label_year,
+    min_year = min_year, survey_label = survey_label)
 })
 
 # colour legend:
 legend_image <- as.raster(matrix(leg$col, ncol = 1))
-leg_bottom <- ylim[[1]] - 0.15 # how far legend is from bottom
-leg_top <- leg_bottom + 2
-leg_left <- -133.9 # how far legend is from left
+leg_top <- ylim[[2]] - 0.55 # how far legend is from top
+leg_bottom <- leg_top - 2
+leg_left <- -125.0 # longitude of legend left point
 
 for (lab in c(1, 10, 100, 1000)) {
-  rasterImage(legend_image, leg_left, leg_top, leg_left + 0.4, leg_bottom)
+  rasterImage(legend_image, leg_left, leg_top, leg_left + 0.35, leg_bottom)
   text_y <- leg_bottom + (leg_top-leg_bottom) * (leg[leg$raw_vals >= lab, "i"][1])
-  text(leg_left + 0.3, text_y, lab, cex = 0.8, col = "grey30", pos = 4)
+  text(leg_left + 0.3, text_y, lab, cex = 0.8, col = "grey88", pos = 4)
   # segments(-133.7, text_y, -133.8, text_y, lwd = 0.2, col = "white") # tick marks
 }
-text(leg_left - 0.2, leg_top + 0.2, "CPUE (kg/hr)", cex = 0.8, col = "grey30", pos = 4)
-text(-126.2, 53.35, "British Columbia", cex = 1.1, col = "grey78", pos = 4)
+text(leg_left - 0.2, leg_top + 0.2, "CPUE (kg/hr)", cex = 0.8, col = "grey88", pos = 4)
+# text(-128.2, leg_top + 0.2, "British Columbia", cex = 1, col = "grey85", pos = 4)
+rect(xleft = xlim[[1]] - 20, xright = xlim[[1]] + 2.6,
+  ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 2.5, col = NA, border = "grey60",
+  lwd = 0.7)
 dev.off()
+
+# ##
+#
+# library(mgcv)
+# ctrl <- gam.control(nthreads = 4L)
+# m1 <- gam(log(cpue) ~ te(X, Y) + s(year), data = dat, method = 'REML',
+#   control = ctrl)
