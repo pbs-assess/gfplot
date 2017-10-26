@@ -33,7 +33,7 @@ g <- ggplot(sp, aes(start_lon, start_lat)) +
     # ylim = range(sp$start_lat, na.rm = TRUE)) +
     xlim = c(-128, -125),
     ylim = c(48, 50.5)) +
-  geom_point(aes(size = catch_weight), alpha = 0.5) +
+  geom_point(aes(colour = log(catch_weight), size = catch_weight), alpha = 0.5) +
   facet_wrap(~year) +
   viridis::scale_colour_viridis() +
   scale_size_continuous(range = c(0.05, 6)) +
@@ -45,29 +45,47 @@ g
 devtools::load_all("../glmmfields/")
 options(mc.cores = parallel::detectCores())
 
-dat <- filter(sp, year %in% c(2003:2016),
+dat <- filter(sp, year %in% c(2008, 2010, 2012),
   start_lon > -128, start_lon < -125,
   start_lat > 48, start_lat < 50.3)
 # ny <- data.frame(year = 2005:2016, joint_year = rep(seq(2005, 2016, 2), each = 2))
 # dat <- inner_join(dat, ny)
+dat <- mutate(dat, depth = ifelse(!is.na(fe_modal_bottom_depth), fe_modal_bottom_depth, fe_bottom_water_temp_depth))
+dat <- filter(dat, !is.na(depth), !is.na(fe_bottom_water_temperature))
+nrow(dat)
 
 dat$start_lon10 <- dat$start_lon * 10
 dat$start_lat10 <- dat$start_lat * 10
 
-m <- glmmfields(log(catch_weight) ~ as.factor(year), 
+dat$log_depth_scaled <- as.numeric(scale(log(dat$depth)))
+dat$temperature_scaled <- as.numeric(scale(dat$fe_bottom_water_temperature))
+
+m <- glmmfields(log(catch_weight) ~ as.factor(year) + 
+    log_depth_scaled + 
+    temperature_scaled +
+    I(temperature_scaled^2) +
+    I(log_depth_scaled^2), 
   lon = "start_lon", lat = "start_lat",
+  time = "year",
   data = dat, iter = 400,
   prior_gp_theta = half_t(100, 0, 2),
   prior_gp_sigma = half_t(100, 0, 2),
   prior_intercept = half_t(100, 0, 5),
   prior_beta = half_t(100, 0, 2),
-  nknots = 15, cluster = "kmeans", chains = 1,
+  nknots = 10, chains = 1,
   estimate_ar = FALSE, estimate_df = FALSE, year_re = FALSE,
-  control = list(adapt_delta = 0.9))
+  control = list(adapt_delta = 0.95, max_treedepth = 20))
 m
 plot(m) + viridis::scale_color_viridis()
 plot(m, type = "residual-vs-fitted")
 plot(m, type = "spatial-residual")
+e <- rstan::extract(m$model)
+par(mfrow = c(2, 2))
+plot(density(e$B[,4]), xlim = c(-1, 1))
+plot(density(e$B[,5]), xlim = c(-1, 1))
+plot(density(e$B[,6]), xlim = c(-1, 1))
+plot(density(e$B[,7]), xlim = c(-1, 1))
+
 
 dat$p <- predict(m)$estimate
 g <- ggplot(dat, aes(start_lon, start_lat)) +
@@ -75,16 +93,16 @@ g <- ggplot(dat, aes(start_lon, start_lat)) +
     xlim = c(-128, -125),
     ylim = c(48, 50.3)) +
   stat_summary_hex(aes(z = p),
-    binwidth = 0.18, fun = function(x) mean((x))) +
+    binwidth = 0.1, fun = function(x) mean((x))) +
   viridis::scale_fill_viridis() +
   facet_wrap(~year) +
   geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
 g
 
 b <- rstan::extract(m$model, pars = "B")[[1]]
-b[,2:ncol(b)] <- b[,1] + b[,2:ncol(b)]
-matplot(exp(t(b[1:200,])), type = "l", lty = 1, col = "#00000020")
-lines(1:ncol(b), exp(apply(b,2,mean)), col = "red", lwd = 2)
+b[,2:3] <- b[,1] + b[,2:3]
+matplot(exp(t(b[1:200,1:3])), type = "l", lty = 1, col = "#00000020")
+lines(1:3, exp(apply(b[,1:3],2,mean)), col = "red", lwd = 2)
 
 #############
 
