@@ -23,7 +23,7 @@ nrow(dat)
 
 ## depth map:
 library(sp)
-library(gstat)
+# library(gstat)
 library(marmap)
 mm <- getNOAA.bathy(lon1 = -128,lon2 = -125,lat1=48,lat2=50, resolution=1) 
 plot(mm, image=TRUE)
@@ -98,8 +98,8 @@ ggplot(dat, aes(start_lon, start_lat,
 
 g <- ggplot(dat, aes(start_lon, start_lat)) +
   coord_equal(
-  xlim = c(-128, -125),
-  ylim = c(48, 50.3)) +
+    xlim = c(-128, -125),
+    ylim = c(48, 50.3)) +
   stat_summary_hex(aes(z = catch_weight),
     binwidth = 0.05, fun = function(x) mean(log(x))) +
   viridis::scale_fill_viridis() +
@@ -158,20 +158,38 @@ m_temp_scaled <- gam(temp_scaled ~ te(start_lon, start_lat, k = 10),
   data = dat)
 plot(m_temp_scaled)
 
+initf <- function(n_time, n_knots, n_beta) {
+  list(
+    phi      = array(runif(1, 0.4, 0.7), dim = 1), 
+    gp_sigma = rlnorm(1, log(0.8), 0.05), 
+    gp_theta = rlnorm(1, log(0.1), 0.05), 
+    B        = c(mean(log(dat$catch_weight)), rnorm(n_beta, 0, 0.05)),
+    sigma    = array(rlnorm(1, log(1.0), 0.05), dim = 1),
+    spatialEffectsKnots = 
+      matrix(runif(n_time * n_knots, -0.05, 0.05), nrow = n_time, ncol = n_knots))
+}
+
 load_all("../glmmfields/")
+
+n_knots <- 30L
+n_beta <- 6L
+
 m <- glmmfields(log(catch_weight) ~ as.factor(year) + 
     depth_scaled + depth_scaled2 #+
-    # temp_scaled + temp_scaled2
+  # temp_scaled + temp_scaled2
   # + cpue_gam_scaled
   ,
   time = "year",
   lon = "start_lon", lat = "start_lat",
-  data = dat, iter = 500,
+  data = dat, iter = 600,
   prior_gp_theta = half_t(100, 0, 2),
   prior_gp_sigma = half_t(100, 0, 2),
   prior_intercept = half_t(100, 0, 5),
   prior_beta = half_t(100, 0, 2),
-  nknots = 15, cluster = "kmeans", chains = 4,
+  nknots = n_knots, cluster = "pam", chains = 3, cores = 3,
+  seed = 1,
+  thin = 1, covariance = "squared-exponential",
+  init = function() {initf(length(unique(dat$year)), n_knots, n_beta)},
   estimate_ar = TRUE, estimate_df = FALSE, year_re = FALSE,
   control = list(adapt_delta = 0.99, max_treedepth = 20))
 m
@@ -190,7 +208,6 @@ coords <- rbind(coords, coords[1,])
 plot(dat$start_lon, dat$start_lat)
 lines(coords, col="red")
 
-library("sp")
 library("rgdal")
 sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(coords)), ID=1)))
 # set coordinate reference system with SpatialPolygons(..., proj4string=CRS(...))
@@ -270,7 +287,7 @@ sum_ind <- group_by(ind, Var2) %>%
   summarise(m = median(value),
     l = quantile(value, probs = 0.025),
     u = quantile(value, probs = 0.975)
-    )
+  )
 ggplot(ind, aes(as.factor(Var2), value/20)) + 
   geom_violin(col = "grey70", fill = "grey70") +
   geom_pointrange(data = sum_ind, aes(y = m/20, ymin = l/20, ymax = u/20)) +
