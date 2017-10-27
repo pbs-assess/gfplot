@@ -54,7 +54,7 @@ surv_col <- "grey33"
 axis_col <- "grey30"
 ###############
 
-torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(100)])
+torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(60)])
 
 for (i in seq_along(torun)) {
   
