@@ -54,7 +54,7 @@ surv_col <- "grey33"
 axis_col <- "grey30"
 ###############
 
-torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(60)])
+torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(50)])
 
 for (i in seq_along(torun)) {
   
@@ -114,6 +114,7 @@ for (i in seq_along(torun)) {
   abline(h = 1:ncol(qq)-.5, col = grid_col, lwd = grid_lwd)
   box(col = box_col, lwd = grid_lwd)
   
+  
   image(x = spb$year, y = 1:4, z = as.matrix(log(spb[, -1])), axes = FALSE,
     xlab = "", ylab = "", col = col)
   
@@ -123,6 +124,18 @@ for (i in seq_along(torun)) {
   abline(v = c(years, max(years)+1)-.5, col = grid_col, lwd = grid_lwd)
   abline(h = 1:5-.5, col = grid_col, lwd = grid_lwd)
   box(col = box_col, lwd = grid_lwd)
+  
+  max_val <- max(spb[,-1], na.rm = TRUE)
+  # round_clean <- function(x) 10^round(log10(x))
+  round_nice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
+    if(length(x) != 1) stop("'x' must be of length 1")
+    10^round(log10(x)) * nice[[which(x <= 10^round(log10(x)) * nice)[[1]]]]
+  }
+  max_ind <- which(spb[,-1] == max_val, arr.ind = TRUE)
+  max_ind <- max_ind[1,,drop = FALSE]
+  text(spb$year[max_ind[,"row"][[1]]], max_ind[,"col"][[1]], 
+    plyr::round_any(max_val, 100), col = "white", cex = 0.6)
+  
   dev.off()
   
 }
