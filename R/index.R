@@ -44,7 +44,7 @@ g
 devtools::load_all("../glmmfields/")
 options(mc.cores = parallel::detectCores())
 
-dat <- filter(sp, year %in% c(2003:2016),
+dat <- filter(sp, year %in% c(2010:2016),
   start_lon > -128, start_lon < -125,
   start_lat > 48, start_lat < 50.3)
 # ny <- data.frame(year = 2005:2016, joint_year = rep(seq(2005, 2016, 2), each = 2))
@@ -53,20 +53,46 @@ dat <- filter(sp, year %in% c(2003:2016),
 dat$start_lon10 <- dat$start_lon * 10
 dat$start_lat10 <- dat$start_lat * 10
 
-m <- glmmfields(log(catch_weight) ~ as.factor(year), 
+m <- glmmfields(log(catch_weight) ~ as.factor(year),
   lon = "start_lon", lat = "start_lat",
-  data = dat, iter = 400,
+  time = "year",
+  data = dat, iter = 300,
   prior_gp_theta = half_t(100, 0, 2),
   prior_gp_sigma = half_t(100, 0, 2),
   prior_intercept = half_t(100, 0, 5),
   prior_beta = half_t(100, 0, 2),
-  nknots = 15, cluster = "kmeans", chains = 1,
+  nknots = 10, cluster = "kmeans", chains = 1,
   estimate_ar = FALSE, estimate_df = FALSE, year_re = FALSE,
-  control = list(adapt_delta = 0.9))
+  control = list(adapt_delta = 0.95, max_treedepth = 20))
 m
 plot(m) + viridis::scale_color_viridis()
 plot(m, type = "residual-vs-fitted")
 plot(m, type = "spatial-residual")
+
+
+m2 <- rstanarm::stan_gamm4(log(catch_weight) ~ as.factor(year) +
+  s(start_lon, start_lat), data = dat, iter = 200, chains = 1)
+m2
+
+library(mgcv)
+
+dat$year_f <- as.factor(dat$year)
+dat <- filter(dat, fe_bottom_water_temperature > 4, fe_bottom_water_temperature < 10)
+m4 <- gam(catch_weight ~ 0 + year_f +
+    te(start_lon, start_lat, year) + s(fe_bottom_water_temperature), 
+  data = dat, family=tw(), method="REML")
+plot(m4,select = 11)
+dat$p <- predict(m4, newdata = dat)
+g <- ggplot(dat, aes(start_lon, start_lat)) +
+  coord_equal(
+    xlim = c(-128, -125),
+    ylim = c(48, 50.3)) +
+  stat_summary_hex(aes(z = p),
+    binwidth = 0.05, fun = function(x) mean((x))) +
+  viridis::scale_fill_viridis() +
+  facet_wrap(~year) +
+  geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
+g
 
 dat$p <- predict(m)$estimate
 g <- ggplot(dat, aes(start_lon, start_lat)) +
@@ -74,7 +100,7 @@ g <- ggplot(dat, aes(start_lon, start_lat)) +
     xlim = c(-128, -125),
     ylim = c(48, 50.3)) +
   stat_summary_hex(aes(z = p),
-    binwidth = 0.18, fun = function(x) mean((x))) +
+    binwidth = 0.1, fun = function(x) mean((x))) +
   viridis::scale_fill_viridis() +
   facet_wrap(~year) +
   geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
