@@ -3,6 +3,52 @@ load("gfast-om-species.rda")
 library(dplyr)
 library(ggplot2)
 library(mapdata)
+library(PBSmapping)
+library(PBSdata)
+data("isobath")
+
+## ########
+## library(PBSmapping)
+## library(PBSdata)
+## data(nepacLL)
+## ggplot(nepacLL, aes(X, Y, group = PID)) + geom_polygon() +
+##   coord_fixed(xlim = range(d_loc_cpue_pop$X), 
+##     ylim = range(d_loc_cpue_pop$Y))
+## 
+## xlim=range(d_loc_cpue_pop$X)
+## ylim=range(d_loc_cpue_pop$Y)
+## 
+## # xlim <- c(-133, -129)
+## # ylim <- c(52, 55)
+## #   
+## zlev <- c(100, 200, 500)
+## 
+## # data("bctopo")
+## # zx=bctopo$x>=xlim[1] & bctopo$x<=xlim[2] &!is.na(bctopo$x)
+## # zy=bctopo$y>=ylim[1] & bctopo$y<=ylim[2] &!is.na(bctopo$y)
+## # topo=bctopo[zx&zy,]
+## # bathy = makeTopography(topo) 
+## # bCL = contourLines(bathy,levels=zlev)
+## # bCP = convCP(bCL,projection="LL",zone=9)
+## # bPoly = bCP$PolySet
+## 
+## # ggplot(nepacLL, aes(X, Y, group = PID)) + geom_polygon() +
+## #   coord_fixed(xlim = range(d_loc_cpue_pop$X), 
+## #     ylim = range(d_loc_cpue_pop$Y)) +
+## #   geom_polygon(data = bPoly, aes(X, Y, group = SID, 
+## #     colour = as.factor(PID)), fill = NA)
+## 
+## data("isobath")
+## plot(1, 1, xlim = xlim, ylim = ylim, type = "n")
+## PBSmapping::addLines(filter(isobath, PID %in% zlev),
+##   col = "grey80", lwd = 0.5)
+## plyr::d_ply(nepacLL, "PID", function(i)
+##   polygon(i$X, i$Y, col = "grey65", border = NA, lwd = 0.5))
+## 
+## # PBSmapping::addLines(major,col = "blue", lwd = 0.5)
+## PBSmapping::addLines(wcvisa,col = "blue", lwd = 0.5)
+
+########
 
 # functions
 hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
@@ -78,33 +124,65 @@ pos <- tibble::tribble(
   -132.8, 48.6,   "phma_s"
   )
 
+pos$X <- pos$lon
+pos$Y <- pos$lat
+attr(pos, "projection") <- "LL"
+pos <- convUL(pos)
+pos$lon <- pos$X
+pos$lat <- pos$Y
+
 mpc <- ggplot2::map_data("worldHires", ".")
 # mpc <- ggplot2::map_data("world", ".") # low res
 dat <- filter(d_loc_cpue_pop, year %in% c(1400:2099))
 
+dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
+names(dsurv) <- tolower(names(dsurv))
+dsurv$species_common_name <- tolower(dsurv$species_common_name)
+dsurv$species_science_name <- tolower(dsurv$species_science_name)
+dsurv <- mutate(dsurv, year = lubridate::year(trip_start_date))
+
+dat <- filter(dsurv, species_common_name == "pacific cod") %>% 
+  mutate(X = start_lon, Y = start_lat) %>% 
+  filter(!is.na(X), !is.na(Y), !is.na(catch_weight), catch_weight > 0)
+
+# UTMs:
+attr(dat, "projection") <- "LL"
+xlim_ll <- range(dat$X) + c(-2, 2)
+ylim_ll <- range(dat$Y) + c(-2, 2)
+dat <- PBSmapping::convUL(dat)
+
 # hexagon bin size in lat/long degrees:
-bin_width <- 0.07
+bin_width <- 10
+
+# g <- ggplot(dat, aes(X, Y)) +
+#   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
+#   stat_summary_hex(aes(x = X, y = Y, z = log(catch_weight)),
+#       data = filter(dat),
+#     binwidth = bin_width, fun = function(x) mean((x), na.rm = TRUE)) +
+#   viridis::scale_fill_viridis()
+# g
 
 # use ggplot to compute hexagons:
 g <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
-  stat_summary_hex(aes(x = X, y = Y, z = log(cpue)), data = dat,
-    binwidth = bin_width, fun = mean) +
-  viridis::scale_fill_viridis() +
-  geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
+  # stat_summary_hex(aes(x = X, y = Y, z = log(cpue)), data = dat,
+  stat_summary_hex(aes(x = X, y = Y, z = log(catch_weight)), data = dat,
+    binwidth = bin_width, fun = function(x) mean(x, na.rm = TRUE)) +
+  viridis::scale_fill_viridis()
+
 
 g_count <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
-  stat_summary_hex(aes(x = X, y = Y, z = cpue), data = dat,
+  # stat_summary_hex(aes(x = X, y = Y, z = cpue), data = dat,
+  stat_summary_hex(aes(x = X, y = Y, z = catch_weight), data = dat,
     binwidth = bin_width, fun = length) +
-  viridis::scale_fill_viridis(trans = 'log') +
-  geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50")
+  scale_fill_distiller(palette = "Blues")
 
 gd <- ggplot_build(g) # extract data from ggplot
 gd1 <- gd$data[[1]] # hexagons
-gd2 <- gd$data[[2]] # map
+# gd2 <- gd$data[[2]] # map
 
-n_minimum_observations <- 3
+n_minimum_observations <- 1L
 gd_count <- ggplot_build(g_count) # to count observations per cell
 assertthat::are_equal(nrow(gd$data[[1]]), nrow(gd_count$data[[1]]))
 gd1 <- gd1[gd_count$data[[1]]$value > n_minimum_observations, ] # remove low observation hexagons
@@ -124,12 +202,23 @@ leg$i <- seq(0, 1, length.out = nrow(leg))
 # plot(gd1$x, gd1$y, col = gd1$fill, pch = 20)
 # plot(gd1$x, gd1$y, col = gd1$custom_col, pch = 20)
 
-pdf("pop-index-example.pdf", width = 4, height = 2.55)
+pdf("pop-index-example.pdf", width = 3.2, height = 3)
 par(mar = c(0, 0, 0, 0), oma = c(.5, .5, .5, .5), cex = 0.6)
-xlim <-  c(-133.4, -123.8)
-ylim <- c(48.26, 54.55)
-plot(gd1$x, gd1$y, asp = 1, type = "n", xlab = "", ylab = "", axes = FALSE,
-  xlim = xlim, ylim = ylim)
+# xlim <-  c(-133.4, -123.8)
+# ylim <- c(48.26, 54.55)
+
+xlim = range(dat$X) + c(-10, -5)
+ylim = range(dat$Y) + c(-10, 10)
+# plot(gd1$x, gd1$y, asp = 1, type = "n", xlab = "", ylab = "", axes = FALSE,
+  # xlim = xlim, ylim = ylim)
+
+data("nepacLLhigh")
+nepacUTM <- convUL(clipPolys(nepacLLhigh, xlim = xlim_ll, ylim = ylim_ll))
+
+plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
+  plt = c(0, 1, 0, 1), xlab = "", ylab = "")
+
+
 rect(xleft = -160, xright = -110, ybottom = 40, ytop = 60,
   col = "grey90")
 # box(col = "grey50")
@@ -137,14 +226,26 @@ rect(xleft = -160, xright = -110, ybottom = 40, ytop = 60,
 # axis(2)
 
 # hexagons:
+gd1$custom_fill <- paste0(substr(gd1$custom_fill, 1, 7), "FF")
 dx <- ggplot2::resolution(gd1$x, FALSE)
 dy <- resolution(gd1$y, FALSE) / 2 * 1.15
 plyr::a_ply(gd1, 1, function(i)
-  hexagon(i$x, i$y, dx, dy, col = i$custom_fill, border = i$custom_fill, lwd = 0.01))
+  hexagon(i$x, i$y, dx, dy, col = i$custom_fill, border = i$custom_fill, 
+    lwd = 0.02))
+
+zlev <- c(100, 200, 500)
+isobath_UTM <- convUL(clipPolys(filter(isobath, PID %in% zlev), 
+  xlim = xlim_ll, ylim = ylim_ll))
+PBSmapping::addLines(isobath_UTM, col = "#00000030", lwd = 0.6)
 
 # map:
-plyr::d_ply(gd2, "group", function(i)
-  polygon(i$x, i$y, col = "grey55", border = NA))
+# plyr::d_ply(gd2, "group", function(i)
+  # polygon(i$x, i$y, col = "grey55", border = NA))
+
+# data("nepacLL")
+plyr::d_ply(nepacUTM, "PID", function(i)
+  polygon(i$X, i$Y, col = "grey85", border = "grey75", lwd = 0.4))
+axis(1);axis(2)
 
 # spark lines:
 plyr::l_ply(pos$survey_id, function(xx) {
@@ -152,35 +253,35 @@ plyr::l_ply(pos$survey_id, function(xx) {
   dd <- left_join(dd, pos)
   dd <- arrange(dd, year) #%>% filter(biomass != 0)
   # dd <- left_join(expand.grid(year = min(dd$year):max(dd$year)), dd)
-  min_year_main <- 2000
+  min_year_main <- 2003
   # label_year <- ifelse(xx == "wcvi", TRUE, FALSE)
   label_year <- TRUE
   min_year <- ifelse(xx %in% c("phma_n", "phma_s"), 2006, min_year_main)
   survey_label <- ifelse(xx %in% c("phma_n", "phma_s"),
     toupper(gsub("_", " ", xx)), "")
   survey_spark(x = as.numeric(na.omit(unique(dd$lon))), y = as.numeric(na.omit(unique(dd$lat))),
-    ts_x = dd$year, ts_y = dd$biomass, scale_x = 0.17, scale_y = 0.4,
+    ts_x = dd$year, ts_y = dd$biomass, scale_x = 10, scale_y = 40,
     ts_y_upper = dd$lowerci, ts_y_lower = dd$upperci, label_year = label_year,
     min_year = min_year, survey_label = survey_label)
 })
 
 # colour legend:
 legend_image <- as.raster(matrix(leg$col, ncol = 1))
-leg_top <- ylim[[2]] - 0.55 # how far legend is from top
-leg_bottom <- leg_top - 2
-leg_left <- -125.0 # longitude of legend left point
+leg_top <- ylim[[2]] - 100 # how far legend is from top
+leg_bottom <- leg_top - diff(range(ylim)) * 0.2
+leg_left <- xlim[[2]] - 200 # longitude of legend left point
 
 for (lab in c(1, 10, 100, 1000)) {
-  rasterImage(legend_image, leg_left, leg_top, leg_left + 0.35, leg_bottom)
+  rasterImage(legend_image, leg_left, leg_top, leg_left + 25, leg_bottom)
   text_y <- leg_bottom + (leg_top-leg_bottom) * (leg[leg$raw_vals >= lab, "i"][1])
-  text(leg_left + 0.3, text_y, lab, cex = 0.8, col = "grey88", pos = 4)
+  text(leg_left + 15, text_y, lab, cex = 0.8, col = "grey20", pos = 4)
   # segments(-133.7, text_y, -133.8, text_y, lwd = 0.2, col = "white") # tick marks
 }
-text(leg_left - 0.2, leg_top + 0.2, "CPUE (kg/hr)", cex = 0.8, col = "grey88", pos = 4)
+text(leg_left + 15, leg_top + 10, "CPUE (kg/hr)", cex = 0.8, col = "grey20", pos = 4)
 # text(-128.2, leg_top + 0.2, "British Columbia", cex = 1, col = "grey85", pos = 4)
-rect(xleft = xlim[[1]] - 20, xright = xlim[[1]] + 2.6,
-  ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 2.5, col = NA, border = "grey60",
-  lwd = 0.7)
+# rect(xleft = xlim[[1]] - 20, xright = xlim[[1]] + 20.6,
+  # ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 20.5, col = NA, border = "grey60",
+  # lwd = 0.7)
 dev.off()
 
 # ##

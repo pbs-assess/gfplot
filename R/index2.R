@@ -1,4 +1,4 @@
-d <- readRDS("../../Dropbox/dfo/data/all-survey-dat.rds")
+d <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
 names(d) <- tolower(names(d))
 d$species_common_name <- tolower(d$species_common_name)
 d$species_science_name <- tolower(d$species_science_name)
@@ -20,6 +20,9 @@ nrow(dat)
 dat <- filter(dat, fe_bottom_water_temperature > 1, fe_bottom_water_temperature < 12,
   !is.na(fe_bottom_water_temp_depth), !is.na(fe_bottom_water_temperature))
 nrow(dat)
+
+# dat <- mutate(dat, density = catch_weight / 
+    # (fe_distance_travelled * mean(d$trlsp_doorspread, na.rm = TRUE)))
 
 ## depth map:
 library(sp)
