@@ -37,9 +37,10 @@ get_surv_data <- function(species, survey, years) {
   # dat <- filter(dat, present == 1)
   
   attr(dat, "projection") <- "LL"
+  attr(dat, "zone") <- 8
   dat$lat <- dat$Y
   dat$lon <- dat$X
-  dat <- suppressMessages(PBSmapping::convUL(dat))
+  dat <- (PBSmapping::convUL(dat))
   dat <- as.data.frame(na.omit(dat))
   dat
 }
@@ -55,7 +56,8 @@ join_noaa_bathy <- function(dat, plot = FALSE) {
     filter(depth < 0) %>% mutate(depth = -depth)
   
   attr(bath, "projection") <- "LL"
-  bath <- suppressMessages(PBSmapping::convUL(bath))
+  attr(bath, "zone") <- 8
+  bath <- PBSmapping::convUL(bath)
   
   # if (plot)
   #   ggplot(bath, aes(lon, lat)) + geom_tile(aes(fill = depth))
@@ -140,21 +142,24 @@ fit_glmmfields <- function(dat) {
   list(pos = m1, bin = m2)
 }
 
-fit_inla <- function(dat) {
+fit_inla <- function(dat, plot = TRUE, max.edge = c(1, 3), convex = 1.5) {
   library(INLA)
   
   pos_dat <- filter(dat, present == 1)
   coords <- cbind(dat$X10, dat$Y10)
   coords_pos <- cbind(pos_dat$X10, pos_dat$Y10)
   
-  bnd <- inla.nonconvex.hull(coords, convex = 1.5)
+  bnd <- inla.nonconvex.hull(coords, convex = convex)
   mesh6 = inla.mesh.2d(
     boundary = bnd,
-    max.edge = c(0.5, 3),
-    cutoff = 0.05,
+    max.edge = max.edge,
+    cutoff = 0.01,
     offset = 1.5)
-  plot(mesh6)
-  points(dat$X10, dat$Y10, col = "red")
+  
+  if (plot) {
+    plot(mesh6)
+    points(dat$X10, dat$Y10, col = "red")
+  }
   
   A.est6 <- inla.spde.make.A(mesh=mesh6, loc=coords)
   A.est6.pos <- inla.spde.make.A(mesh=mesh6, loc=coords_pos)
@@ -252,7 +257,7 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
   b2_bin <- plyr::laply(1:n, function(i) inla.mcmc.bin[[i]]$latent[b2_])
   
   projMatrix <- inla.spde.make.A(mesh, loc=as.matrix(pred_grid[,c("X10", "Y10")]))
-
+  
   pp <- plyr::laply(1:n, function(i) {
     as.numeric(projMatrix%*%inla.mcmc.pos[[i]]$latent[sf]) +
       b0[i] +
@@ -268,67 +273,90 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
   pc <- plogis(pb) * exp(pp)
   
   pred_grid$p <- apply(pc, 2, median)
-
+  
   invisible(pred_grid)
 } 
 
-# ------------------------------------------
+## # ------------------------------------------
+## dd1 <- get_surv_data("pacific ocean perch", 
+##   "West Coast Vancouver Island Synoptic Survey", years = c(2014, 2016))
+## b <- join_noaa_bathy(dd1)
+## dd2 <- b$data
+## dd3 <- scale_predictors(dd2)
+## m <- fit_glmmfields(dd3)
+## m
+## pg <- make_prediction_grid(dd3, b$bath)
+## pos <- predict(m$pos, newdata = data.frame(pg, time = 1), 
+##   type = "response", return_mcmc = TRUE, iter = 100)
+## bin <- predict(m$bin, newdata = data.frame(pg, time = 1), 
+##   type = "response", return_mcmc = TRUE, iter = 100)
+## 
+## com <- bin * pos
+## pg$combined <- apply(com, 1, median)
+## 
+## # mpc <- ggplot2::map_data("worldHires", "Canada") # high res
+## g <- ggplot(pg, aes(X10, Y10)) +
+##   coord_equal() +
+##   geom_raster(aes(fill = sqrt(combined))) +
+##   viridis::scale_fill_viridis() +
+##   facet_wrap(~year) +
+##   theme_light() +
+##   guides(fill = FALSE) +
+##   # geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50") +
+##   geom_point(data = dat, col = "white", pch = 3, alpha = 0.5)
+## g
+## 
+# ######## inla
+# 
+# unique(d$survey_series_desc)
+# [1] "Queen Charlotte Sound Shrimp Survey"          
+# [2] "Sablefish Research and Assessment Survey"     
+# [3] "Sablefish Inlet Standardized"                 
+# [4] "Sablefish Offshore Standardized"              
+# [5] "Queen Charlotte Sound Synoptic Survey"        
+# [6] "IPHC Longline Survey"                         
+# [7] "Sablefish Stratified Random"                  
+# [8] "West Coast Vancouver Island Synoptic Survey"  
+# [9] "Hecate Strait Synoptic Survey"                
+# [10] "West Coast Haida Gwaii Synoptic Survey"       
+# [11] "PHMA Rockfish Longline Survey - Outside North"
+# [12] "PHMA Rockfish Longline Survey - Outside South"
+
 dd1 <- get_surv_data("pacific ocean perch", 
-  "West Coast Vancouver Island Synoptic Survey", years = c(2014, 2016))
-b <- join_noaa_bathy(dd1)
-dd2 <- b$data
-dd3 <- scale_predictors(dd2)
-m <- fit_glmmfields(dd3)
-m
-pg <- make_prediction_grid(dd3, b$bath)
-pos <- predict(m$pos, newdata = data.frame(pg, time = 1), 
-  type = "response", return_mcmc = TRUE, iter = 100)
-bin <- predict(m$bin, newdata = data.frame(pg, time = 1), 
-  type = "response", return_mcmc = TRUE, iter = 100)
-
-com <- bin * pos
-pg$combined <- apply(com, 1, median)
-
-# mpc <- ggplot2::map_data("worldHires", "Canada") # high res
-g <- ggplot(pg, aes(X10, Y10)) +
-  coord_equal() +
-  geom_raster(aes(fill = sqrt(combined))) +
-  viridis::scale_fill_viridis() +
-  facet_wrap(~year) +
-  theme_light() +
-  guides(fill = FALSE) +
-  # geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50") +
-  geom_point(data = dat, col = "white", pch = 3, alpha = 0.5)
-g
-
-######## inla
-dd1 <- get_surv_data("yelloweye rockfish", 
-  "West Coast Haida Gwaii Synoptic Survey", years = c(2012, 2014, 2016))
+  c("Hecate Strait Synoptic Survey"), 
+  years = c(1996:2017))
 table(dd1$year)
+yrs <- unique(dd1$year)
+dd1 <- filter(dd1, year %in% yrs[(length(yrs)-1):length(yrs)])
+table(dd1$year, dd1$present)
+
 b <- join_noaa_bathy(dd1)
 dd2 <- b$data
 dd3 <- scale_predictors(dd2)
 m <- fit_inla(dd3)
-pg <- make_prediction_grid(dd3, b$bath)
-pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 400L, 
+pg <- make_prediction_grid(dd3, b$bath, n = 200)
+pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 800L, 
   mesh = m$mesh, pred_grid = pg)
-
 
 # plot:
 library(PBSmapping)
 data("nepacLLhigh")
+
+attr(nepacLLhigh, "zone") <- 8
 nepacUTM <- convUL(clipPolys(nepacLLhigh, xlim = range(dd3$lon) + c(-1, 1), 
   ylim = range(dd3$lat) + c(-1, 1)))
-ggplot(pred, aes(X10, Y10, fill = p)) + geom_tile() +
-  viridis::scale_fill_viridis() +
-  geom_point(data = dd3, fill = "#FFFFFF50", col = "white", 
+
+ggplot(pred, aes(X10, Y10, fill = sqrt(p))) + geom_tile() +
+  viridis::scale_fill_viridis(option = "D") +
+  # scale_fill_distiller(palette = "Spectral") +
+  geom_point(data = dd3, fill = "#FFFFFF60", col = "white", 
     aes(shape = as.factor(present), size = density)) +
   scale_shape_manual(values = c(4, 21)) +
+  scale_size_continuous(range = c(1, 6)) +
   theme_light() +
   coord_equal(
-        xlim = range(dd3$X10),
-        ylim = range(dd3$Y10)) +
+    xlim = range(dd3$X10),
+    ylim = range(dd3$Y10)) +
   theme(legend.position = "none") +
   geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
-    fill = "grey55")
-
+    fill = "grey35")
