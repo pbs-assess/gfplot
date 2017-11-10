@@ -91,7 +91,7 @@ scale_predictors <- function(dat) {
     depth_sd = sd(log(akima_depth)), 
     depth_scaled = (log(akima_depth) - depth_mean[1]) / depth_sd[1],
     depth_scaled2 = depth_scaled^2,
-    X10 = X/100, Y10 = Y/100)
+    X10 = X/10, Y10 = Y/10)
 }
 
 initf <- function(init_b0, n_time, n_knots, n_beta) {
@@ -106,7 +106,7 @@ initf <- function(init_b0, n_time, n_knots, n_beta) {
 
 fit_glmmfields <- function(dat) {
   load_all("../glmmfields/")
-  n_knots <- 25L
+  n_knots <- 15L
   n_beta <- 2L
   m1 <- glmmfields(density ~ 1 + depth_scaled + depth_scaled2,
     lon = "X10", lat = "Y10",
@@ -140,7 +140,48 @@ fit_glmmfields <- function(dat) {
   list(pos = m1, bin = m2)
 }
 
-make_prediction_grid <- function(dat, bath) {
+fit_inla <- function(dat) {
+  library(INLA)
+  
+  pos_dat <- filter(dat, present == 1)
+  coords <- cbind(dat$X10, dat$Y10)
+  coords_pos <- cbind(pos_dat$X10, pos_dat$Y10)
+  
+  bnd <- inla.nonconvex.hull(coords, convex = 1.5)
+  mesh6 = inla.mesh.2d(
+    boundary = bnd,
+    max.edge = c(0.5, 3),
+    cutoff = 0.05,
+    offset = 1.5)
+  plot(mesh6)
+  points(dat$X10, dat$Y10, col = "red")
+  
+  A.est6 <- inla.spde.make.A(mesh=mesh6, loc=coords)
+  A.est6.pos <- inla.spde.make.A(mesh=mesh6, loc=coords_pos)
+  spde <- inla.spde2.matern(mesh=mesh6, alpha=1.5)
+  formula <- y ~ -1 + intercept + depth_scaled + depth_scaled2 + f(spatial.field, model=spde)
+  s.index <- inla.spde.make.index(name="spatial.field", n.spde=spde$n.spde)
+  
+  stack.est.pos <- inla.stack(data=list(y=log(pos_dat$density)), A=list(A.est6.pos, 1, 1), 
+    effects = list(c(s.index, list(intercept=1)), 
+      list(depth_scaled = pos_dat$depth_scaled),
+      list(depth_scaled2 = pos_dat$depth_scaled2)), tag="est_pos")
+  output6.stack.pos <- inla(formula, data=inla.stack.data(stack.est.pos, spde=spde), 
+    family="gaussian", control.predictor=list(A=inla.stack.A(stack.est.pos), compute=TRUE), 
+    verbose=FALSE, control.compute=list(config = TRUE))
+  
+  stack.est.bin <- inla.stack(data=list(y=dat$present), A=list(A.est6, 1, 1), 
+    effects = list(c(s.index, list(intercept=1)), 
+      list(depth_scaled = dat$depth_scaled),
+      list(depth_scaled2 = dat$depth_scaled2)), tag="est_bin")
+  output6.stack.bin <- inla(formula, data=inla.stack.data(stack.est.bin, spde=spde), 
+    family="binomial", control.predictor=list(A=inla.stack.A(stack.est.bin), compute=TRUE), 
+    verbose=FALSE, control.compute=list(config = TRUE))
+  
+  list(pos = output6.stack.pos, bin = output6.stack.bin, mesh = mesh6)
+}
+
+make_prediction_grid <- function(dat, bath, n = 150) {
   
   x <- dat$X10
   y <- dat$Y10
@@ -156,14 +197,14 @@ make_prediction_grid <- function(dat, bath) {
   # e.g. CRS("+proj=longlat +datum=WGS84")
   sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
   
-  pred_grid <- expand.grid(X10 = seq(min(dat$X10), max(dat$X10), length.out = 60), 
-    Y10 = seq(min(dat$Y10), max(dat$Y10), length.out = 60), year = unique(dat$year))
+  pred_grid <- expand.grid(X10 = seq(min(dat$X10), max(dat$X10), length.out = n), 
+    Y10 = seq(min(dat$Y10), max(dat$Y10), length.out = n), year = unique(dat$year))
   coordinates(pred_grid) <- c("X10", "Y10")
   inside <- !is.na(over(pred_grid, as(sp_poly_df, "SpatialPolygons")))
   pred_grid <- pred_grid[inside, ]
   # plot(pred_grid)
   pred_grid <- as.data.frame(pred_grid)
-
+  
   ii <- interp(x = bath$X/10, 
     y = bath$Y/10,
     z = log(bath$depth),
@@ -191,6 +232,45 @@ make_prediction_grid <- function(dat, bath) {
   
   pred_grid
 }
+
+
+predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
+  
+  inla.mcmc.pos <- inla.posterior.sample(n = n, model_pos)
+  inla.mcmc.bin <- inla.posterior.sample(n = n, model_bin)
+  na <- rownames(inla.mcmc.pos[[1]]$latent)
+  sf <- grep("spatial.field", na)
+  b0_ <- grep("intercept", na)[1]
+  b1_ <- grep("depth_scaled", na)[1]
+  b2_ <- grep("depth_scaled", na)[2]
+  
+  b0 <- plyr::laply(1:n, function(i) inla.mcmc.pos[[i]]$latent[b0_])
+  b1 <- plyr::laply(1:n, function(i) inla.mcmc.pos[[i]]$latent[b1_])
+  b2 <- plyr::laply(1:n, function(i) inla.mcmc.pos[[i]]$latent[b2_])
+  b0_bin <- plyr::laply(1:n, function(i) inla.mcmc.bin[[i]]$latent[b0_])
+  b1_bin <- plyr::laply(1:n, function(i) inla.mcmc.bin[[i]]$latent[b1_])
+  b2_bin <- plyr::laply(1:n, function(i) inla.mcmc.bin[[i]]$latent[b2_])
+  
+  projMatrix <- inla.spde.make.A(mesh, loc=as.matrix(pred_grid[,c("X10", "Y10")]))
+
+  pp <- plyr::laply(1:n, function(i) {
+    as.numeric(projMatrix%*%inla.mcmc.pos[[i]]$latent[sf]) +
+      b0[i] +
+      b1[i] * pred_grid$depth_scaled + 
+      b2[i] * pred_grid$depth_scaled2
+  })
+  pb <- plyr::laply(1:n, function(i) {
+    as.numeric(projMatrix%*%inla.mcmc.bin[[i]]$latent[sf]) +
+      b0_bin[i] +
+      b1_bin[i] * pred_grid$depth_scaled + 
+      b2_bin[i] * pred_grid$depth_scaled2
+  })
+  pc <- plogis(pb) * exp(pp)
+  
+  pred_grid$p <- apply(pc, 2, median)
+
+  invisible(pred_grid)
+} 
 
 # ------------------------------------------
 dd1 <- get_surv_data("pacific ocean perch", 
@@ -220,3 +300,35 @@ g <- ggplot(pg, aes(X10, Y10)) +
   # geom_polygon(data = mpc, aes(x = long, y = lat, group = group), fill = "grey50") +
   geom_point(data = dat, col = "white", pch = 3, alpha = 0.5)
 g
+
+######## inla
+dd1 <- get_surv_data("yelloweye rockfish", 
+  "West Coast Haida Gwaii Synoptic Survey", years = c(2012, 2014, 2016))
+table(dd1$year)
+b <- join_noaa_bathy(dd1)
+dd2 <- b$data
+dd3 <- scale_predictors(dd2)
+m <- fit_inla(dd3)
+pg <- make_prediction_grid(dd3, b$bath)
+pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 400L, 
+  mesh = m$mesh, pred_grid = pg)
+
+
+# plot:
+library(PBSmapping)
+data("nepacLLhigh")
+nepacUTM <- convUL(clipPolys(nepacLLhigh, xlim = range(dd3$lon) + c(-1, 1), 
+  ylim = range(dd3$lat) + c(-1, 1)))
+ggplot(pred, aes(X10, Y10, fill = p)) + geom_tile() +
+  viridis::scale_fill_viridis() +
+  geom_point(data = dd3, fill = "#FFFFFF50", col = "white", 
+    aes(shape = as.factor(present), size = density)) +
+  scale_shape_manual(values = c(4, 21)) +
+  theme_light() +
+  coord_equal(
+        xlim = range(dd3$X10),
+        ylim = range(dd3$Y10)) +
+  theme(legend.position = "none") +
+  geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
+    fill = "grey55")
+
