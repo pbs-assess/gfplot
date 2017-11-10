@@ -7,6 +7,11 @@ get_surv_data <- function(species, survey, years) {
   d$species_science_name <- tolower(d$species_science_name)
   d$year <- lubridate::year(d$trip_start_date)
   
+  d$trawl_width <- ifelse(!is.na(d$trlsp_doorspread), d$trlsp_doorspread, NA)
+  d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_mouth_opening_width, d$trawl_width)
+  d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_wingspread, d$trawl_width)
+  d$trawl_width <- ifelse(is.na(d$trawl_width), mean(d$trawl_width, na.rm = TRUE), d$trawl_width)
+  
   all <- filter(d, survey_series_desc %in% survey) %>% 
     filter(year %in% years) %>% 
     select(year, start_lon, start_lat, 
@@ -323,11 +328,11 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
 # [12] "PHMA Rockfish Longline Survey - Outside South"
 
 dd1 <- get_surv_data("pacific ocean perch", 
-  c("Hecate Strait Synoptic Survey"), 
+  c("Queen Charlotte Sound Synoptic Survey"), 
   years = c(1996:2017))
 table(dd1$year)
 yrs <- unique(dd1$year)
-dd1 <- filter(dd1, year %in% yrs[(length(yrs)-1):length(yrs)])
+dd1 <- filter(dd1, year %in% yrs[(length(yrs)):length(yrs)])
 table(dd1$year, dd1$present)
 
 b <- join_noaa_bathy(dd1)
