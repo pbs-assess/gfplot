@@ -277,9 +277,23 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
   })
   pc <- plogis(pb) * exp(pp)
   
-  pred_grid$p <- apply(pc, 2, median)
+  # spatial field only:
+  spp <- plyr::laply(1:n, function(i) {
+    as.numeric(projMatrix%*%inla.mcmc.pos[[i]]$latent[sf])
+  })
+  spb <- plyr::laply(1:n, function(i) {
+    as.numeric(projMatrix%*%inla.mcmc.bin[[i]]$latent[sf])
+  })
   
-  invisible(pred_grid)
+  pred_grid$pred_delta <- apply(pc, 2, median)
+  pred_grid$pred_binary <- apply(plogis(pb), 2, median)
+  pred_grid$pred_positive <- apply(exp(pp), 2, median)
+  pred_grid$spatial_field <- apply(pc, 2, median)
+  pred_grid$spatial_field_binary <- apply(spb, 2, median)
+  pred_grid$spatial_field_positive <- apply(spp, 2, median)
+  
+  list(pred = pred_grid, prediction_posterior = pc, 
+    params = list(b0 = b0, b1 = b1, b2 = b2, b0_bin = b0_bin, b1_bin = b1_bin, b2_bin = b2_bin))
 } 
 
 ## # ------------------------------------------
@@ -327,19 +341,24 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
 # [11] "PHMA Rockfish Longline Survey - Outside North"
 # [12] "PHMA Rockfish Longline Survey - Outside South"
 
-dd1 <- get_surv_data("pacific ocean perch", 
-  c("Queen Charlotte Sound Synoptic Survey"), 
+dtemp <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
+names(dtemp) <- tolower(names(dtemp))
+dtemp$species_common_name <- tolower(dtemp$species_common_name)
+sort(table(dtemp$species_common_name))
+
+dd1 <- get_surv_data("pacific cod", 
+  c("Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey"), 
   years = c(1996:2017))
-table(dd1$year)
+table(dd1$year, dd1$present)
 yrs <- unique(dd1$year)
-dd1 <- filter(dd1, year %in% yrs[(length(yrs)):length(yrs)])
+dd1 <- filter(dd1, year %in% yrs[(length(yrs)-0):length(yrs)])
 table(dd1$year, dd1$present)
 
 b <- join_noaa_bathy(dd1)
 dd2 <- b$data
 dd3 <- scale_predictors(dd2)
 m <- fit_inla(dd3)
-pg <- make_prediction_grid(dd3, b$bath, n = 200)
+pg <- make_prediction_grid(dd3, b$bath, n = 200L)
 pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 800L, 
   mesh = m$mesh, pred_grid = pg)
 
@@ -351,17 +370,31 @@ attr(nepacLLhigh, "zone") <- 8
 nepacUTM <- convUL(clipPolys(nepacLLhigh, xlim = range(dd3$lon) + c(-1, 1), 
   ylim = range(dd3$lat) + c(-1, 1)))
 
-ggplot(pred, aes(X10, Y10, fill = sqrt(p))) + geom_tile() +
-  viridis::scale_fill_viridis(option = "D") +
-  # scale_fill_distiller(palette = "Spectral") +
-  geom_point(data = dd3, fill = "#FFFFFF60", col = "white", 
-    aes(shape = as.factor(present), size = density)) +
-  scale_shape_manual(values = c(4, 21)) +
-  scale_size_continuous(range = c(1, 6)) +
-  theme_light() +
-  coord_equal(
-    xlim = range(dd3$X10),
-    ylim = range(dd3$Y10)) +
-  theme(legend.position = "none") +
-  geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
-    fill = "grey35")
+plot_bc_map <- function(pred_dat, raw_dat, fill_column, 
+  pal = viridis::scale_fill_viridis(option = "D")) {
+  ggplot(pred_dat, aes_string("X10", "Y10", fill = fill_column)) + 
+    geom_tile() + pal +
+    geom_point(data = raw_dat, fill = "#FFFFFF60", col = "white", 
+      aes(shape = as.factor(present), size = density)) +
+    scale_shape_manual(values = c(4, 21)) +
+    scale_size_continuous(range = c(1, 6)) +
+    theme_light() +
+    coord_equal(
+      xlim = range(raw_dat$X10),
+      ylim = range(raw_dat$Y10)) +
+    theme(legend.position = "none") +
+    geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
+      fill = "grey35")
+}
+
+plot_bc_map(pred$pred, dd3, "I(pred_delta)")
+plot_bc_map(pred$pred, dd3, "pred_binary")
+plot_bc_map(pred$pred, dd3, "sqrt(pred_positive)")
+
+plot_bc_map(pred$pred, dd3, "spatial_field_binary", scale_fill_gradient2(low = scales::muted("blue"), high = scales::muted("red")))
+plot_bc_map(pred$pred, dd3, "spatial_field_positive",  scale_fill_gradient2(low = scales::muted("blue"), high = scales::muted("red")))
+
+reshape2::melt(dplyr::bind_rows(pred$params)) %>% ggplot(aes(value)) +
+  geom_histogram(bins = 30) + facet_wrap(~variable, scales = "free") +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  theme_light()
