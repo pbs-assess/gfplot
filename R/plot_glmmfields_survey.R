@@ -358,8 +358,8 @@ b <- join_noaa_bathy(dd1)
 dd2 <- b$data
 dd3 <- scale_predictors(dd2)
 m <- fit_inla(dd3)
-pg <- make_prediction_grid(dd3, b$bath, n = 200L)
-pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 800L, 
+pg <- make_prediction_grid(dd3, b$bath, n = 300L)
+pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 1000L, 
   mesh = m$mesh, pred_grid = pg)
 
 # plot:
@@ -382,19 +382,41 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
     coord_equal(
       xlim = range(raw_dat$X10),
       ylim = range(raw_dat$Y10)) +
-    theme(legend.position = "none") +
+    # theme(legend.position = "none") +
+    guides(shape = guide_legend(override.aes = list(colour = "grey30")),
+      size = guide_legend(override.aes = list(colour = "grey30"))) +
     geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
       fill = "grey35")
 }
+main_scale <- viridis::scale_fill_viridis(option = "C")
+binary_scale <- scale_fill_gradient2(low = scales::muted("blue"), mid = "grey90", high = scales::muted("red"), 
+  midpoint = 0.5, limits = c(0, 1))
+spatial_scale <- scale_fill_gradient2(low = scales::muted("blue"), mid = "grey90", high = scales::muted("red"))
 
-plot_bc_map(pred$pred, dd3, "I(pred_delta)")
-plot_bc_map(pred$pred, dd3, "pred_binary")
-plot_bc_map(pred$pred, dd3, "sqrt(pred_positive)")
-
-plot_bc_map(pred$pred, dd3, "spatial_field_binary", scale_fill_gradient2(low = scales::muted("blue"), high = scales::muted("red")))
-plot_bc_map(pred$pred, dd3, "spatial_field_positive",  scale_fill_gradient2(low = scales::muted("blue"), high = scales::muted("red")))
+plot_bc_map(pred$pred, dd3, "I(pred_delta)", main_scale)
+plot_bc_map(pred$pred, dd3, "pred_binary", binary_scale)
+plot_bc_map(pred$pred, dd3, "I(pred_positive)", main_scale)
+plot_bc_map(pred$pred, dd3, "spatial_field_binary", spatial_scale)
+plot_bc_map(pred$pred, dd3, "spatial_field_positive", spatial_scale)
 
 reshape2::melt(dplyr::bind_rows(pred$params)) %>% ggplot(aes(value)) +
   geom_histogram(bins = 30) + facet_wrap(~variable, scales = "free") +
   geom_vline(xintercept = 0, col = "red", lty = 2) +
   theme_light()
+
+x <- seq(min(dd3$depth_scaled), max(dd3$depth_scaled), length.out = 1000)
+x_real <- exp((x * dd3$depth_sd[1]) + dd3$depth_mean[1])
+
+post <- sapply(x, function(i) exp(pred$params$b0 + pred$params$b1 * i + pred$params$b2 * i^2))
+plot(x_real, apply(post, 2, quantile, probs = 0.5), type = "l", xlab = "Depth (m)", ylab = "log(density)")
+polygon(c(x_real, rev(x_real)), 
+  c(apply(post, 2, quantile, probs = 0.05), rev(apply(post, 2, quantile, probs = 0.95))),
+  col = "#00000030", border = NA)
+
+post <- sapply(x, function(i)  plogis(pred$params$b0_bin + pred$params$b1_bin * i + pred$params$b2_bin * i^2))
+plot(x_real, apply(post, 2, median), type = "l", xlab = "Depth (m)", ylab = "Probability of observing")
+polygon(c(x_real, rev(x_real)), 
+  c(apply(post, 2, quantile, probs = 0.05), rev(apply(post, 2, quantile, probs = 0.95))),
+  col = "#00000030", border = NA)
+
+# matplot(x_real, t(post), type = "l", col = "#00000010", lty = 1)
