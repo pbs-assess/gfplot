@@ -7,49 +7,6 @@ library(PBSmapping)
 library(PBSdata)
 data("isobath")
 
-## ########
-## library(PBSmapping)
-## library(PBSdata)
-## data(nepacLL)
-## ggplot(nepacLL, aes(X, Y, group = PID)) + geom_polygon() +
-##   coord_fixed(xlim = range(d_loc_cpue_pop$X), 
-##     ylim = range(d_loc_cpue_pop$Y))
-## 
-## xlim=range(d_loc_cpue_pop$X)
-## ylim=range(d_loc_cpue_pop$Y)
-## 
-## # xlim <- c(-133, -129)
-## # ylim <- c(52, 55)
-## #   
-## zlev <- c(100, 200, 500)
-## 
-## # data("bctopo")
-## # zx=bctopo$x>=xlim[1] & bctopo$x<=xlim[2] &!is.na(bctopo$x)
-## # zy=bctopo$y>=ylim[1] & bctopo$y<=ylim[2] &!is.na(bctopo$y)
-## # topo=bctopo[zx&zy,]
-## # bathy = makeTopography(topo) 
-## # bCL = contourLines(bathy,levels=zlev)
-## # bCP = convCP(bCL,projection="LL",zone=9)
-## # bPoly = bCP$PolySet
-## 
-## # ggplot(nepacLL, aes(X, Y, group = PID)) + geom_polygon() +
-## #   coord_fixed(xlim = range(d_loc_cpue_pop$X), 
-## #     ylim = range(d_loc_cpue_pop$Y)) +
-## #   geom_polygon(data = bPoly, aes(X, Y, group = SID, 
-## #     colour = as.factor(PID)), fill = NA)
-## 
-## data("isobath")
-## plot(1, 1, xlim = xlim, ylim = ylim, type = "n")
-## PBSmapping::addLines(filter(isobath, PID %in% zlev),
-##   col = "grey80", lwd = 0.5)
-## plyr::d_ply(nepacLL, "PID", function(i)
-##   polygon(i$X, i$Y, col = "grey65", border = NA, lwd = 0.5))
-## 
-## # PBSmapping::addLines(major,col = "blue", lwd = 0.5)
-## PBSmapping::addLines(wcvisa,col = "blue", lwd = 0.5)
-
-########
-
 # functions
 hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
   polygon(
@@ -127,32 +84,34 @@ pos <- tibble::tribble(
 pos$X <- pos$lon
 pos$Y <- pos$lat
 attr(pos, "projection") <- "LL"
+attr(pos, "zone") <- 9
 pos <- convUL(pos)
 pos$lon <- pos$X
 pos$lat <- pos$Y
 
 mpc <- ggplot2::map_data("worldHires", ".")
 # mpc <- ggplot2::map_data("world", ".") # low res
-dat <- filter(d_loc_cpue_pop, year %in% c(1400:2099))
+dat <- filter(d_loc_cpue_pop, year %in% c(2013:3000))
 
-dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
-names(dsurv) <- tolower(names(dsurv))
-dsurv$species_common_name <- tolower(dsurv$species_common_name)
-dsurv$species_science_name <- tolower(dsurv$species_science_name)
-dsurv <- mutate(dsurv, year = lubridate::year(trip_start_date))
-
-dat <- filter(dsurv, species_common_name == "pacific cod") %>% 
-  mutate(X = start_lon, Y = start_lat) %>% 
-  filter(!is.na(X), !is.na(Y), !is.na(catch_weight), catch_weight > 0)
+# dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
+# names(dsurv) <- tolower(names(dsurv))
+# dsurv$species_common_name <- tolower(dsurv$species_common_name)
+# dsurv$species_science_name <- tolower(dsurv$species_science_name)
+# dsurv <- mutate(dsurv, year = lubridate::year(trip_start_date))
+#
+# dat <- filter(dsurv, species_common_name == "pacific cod") %>%
+#   mutate(X = start_lon, Y = start_lat) %>%
+#   filter(!is.na(X), !is.na(Y), !is.na(catch_weight), catch_weight > 0)
 
 # UTMs:
 attr(dat, "projection") <- "LL"
+attr(dat, "zone") <- 9
 xlim_ll <- range(dat$X) + c(-2, 2)
 ylim_ll <- range(dat$Y) + c(-2, 2)
 dat <- PBSmapping::convUL(dat)
 
-# hexagon bin size in lat/long degrees:
-bin_width <- 10
+# hexagon bin size in UTM kms:
+bin_width <- 7
 
 # g <- ggplot(dat, aes(X, Y)) +
 #   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
@@ -165,16 +124,16 @@ bin_width <- 10
 # use ggplot to compute hexagons:
 g <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
-  # stat_summary_hex(aes(x = X, y = Y, z = log(cpue)), data = dat,
-  stat_summary_hex(aes(x = X, y = Y, z = log(catch_weight)), data = dat,
+  stat_summary_hex(aes(x = X, y = Y, z = log(cpue)), data = dat,
+  # stat_summary_hex(aes(x = X, y = Y, z = log(catch_weight)), data = dat,
     binwidth = bin_width, fun = function(x) mean(x, na.rm = TRUE)) +
   viridis::scale_fill_viridis()
 
 
 g_count <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
-  # stat_summary_hex(aes(x = X, y = Y, z = cpue), data = dat,
-  stat_summary_hex(aes(x = X, y = Y, z = catch_weight), data = dat,
+  stat_summary_hex(aes(x = X, y = Y, z = cpue), data = dat,
+  # stat_summary_hex(aes(x = X, y = Y, z = catch_weight), data = dat,
     binwidth = bin_width, fun = length) +
   scale_fill_distiller(palette = "Blues")
 
@@ -182,18 +141,20 @@ gd <- ggplot_build(g) # extract data from ggplot
 gd1 <- gd$data[[1]] # hexagons
 # gd2 <- gd$data[[2]] # map
 
-n_minimum_observations <- 1L
+n_minimum_observations <- 5L
 gd_count <- ggplot_build(g_count) # to count observations per cell
 assertthat::are_equal(nrow(gd$data[[1]]), nrow(gd_count$data[[1]]))
 gd1 <- gd1[gd_count$data[[1]]$value > n_minimum_observations, ] # remove low observation hexagons
 
-n_col_bins <- 200L
+n_col_bins <- 300L
 value_range <- range(gd1$value)
 vals <- seq((value_range[1]), (value_range[2]), length.out = n_col_bins)
-gd1$custom_fill <- viridisLite::viridis(n_col_bins)[findInterval((gd1$value), vals)]
+pal <- viridisLite::viridis(n_col_bins)
+# pal <- colorRampPalette(RColorBrewer::brewer.pal(9, "PuBu"))(n_col_bins)
+gd1$custom_fill <- pal[findInterval((gd1$value), vals)]
 
 # legend data for later:
-leg <- data.frame(vals = vals, col = viridisLite::viridis(n_col_bins),
+leg <- data.frame(vals = vals, col = pal,
   stringsAsFactors = FALSE)
 leg$raw_vals <- exp(leg$vals)
 leg$i <- seq(0, 1, length.out = nrow(leg))
@@ -202,7 +163,7 @@ leg$i <- seq(0, 1, length.out = nrow(leg))
 # plot(gd1$x, gd1$y, col = gd1$fill, pch = 20)
 # plot(gd1$x, gd1$y, col = gd1$custom_col, pch = 20)
 
-pdf("pop-index-example.pdf", width = 3.2, height = 3)
+pdf("pop-index-example.pdf", width = 3, height = 2.8)
 par(mar = c(0, 0, 0, 0), oma = c(.5, .5, .5, .5), cex = 0.6)
 # xlim <-  c(-133.4, -123.8)
 # ylim <- c(48.26, 54.55)
@@ -213,11 +174,12 @@ ylim = range(dat$Y) + c(-10, 10)
   # xlim = xlim, ylim = ylim)
 
 data("nepacLLhigh")
-nepacUTM <- convUL(clipPolys(nepacLLhigh, xlim = xlim_ll, ylim = ylim_ll))
+np <- clipPolys(nepacLLhigh, xlim = xlim_ll, ylim = ylim_ll)
+attr(np, "zone") <- 9
+nepacUTM <- convUL(np)
 
 plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
   plt = c(0, 1, 0, 1), xlab = "", ylab = "")
-
 
 rect(xleft = -160, xright = -110, ybottom = 40, ytop = 60,
   col = "grey90")
@@ -236,7 +198,8 @@ plyr::a_ply(gd1, 1, function(i)
 zlev <- c(100, 200, 500)
 isobath_UTM <- convUL(clipPolys(filter(isobath, PID %in% zlev), 
   xlim = xlim_ll, ylim = ylim_ll))
-PBSmapping::addLines(isobath_UTM, col = "#00000030", lwd = 0.6)
+PBSmapping::addLines(isobath_UTM, col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
+# PBSmapping::addLines(isobath_UTM, col = c("red", "green", "blue"), lwd = 0.7)
 
 # map:
 # plyr::d_ply(gd2, "group", function(i)
@@ -244,8 +207,8 @@ PBSmapping::addLines(isobath_UTM, col = "#00000030", lwd = 0.6)
 
 # data("nepacLL")
 plyr::d_ply(nepacUTM, "PID", function(i)
-  polygon(i$X, i$Y, col = "grey85", border = "grey75", lwd = 0.4))
-axis(1);axis(2)
+  polygon(i$X, i$Y, col = "grey85", border = "grey70", lwd = 0.4))
+# axis(1);axis(2)
 
 # spark lines:
 plyr::l_ply(pos$survey_id, function(xx) {
