@@ -12,6 +12,11 @@ get_surv_data <- function(species, survey, years) {
   d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_wingspread, d$trawl_width)
   d$trawl_width <- ifelse(is.na(d$trawl_width), mean(d$trawl_width, na.rm = TRUE), d$trawl_width)
   
+  # d <- mutate(d, tow_length_m = fe_distance_travelled * 1000,
+  #   tow_length_m = ifelse(is.na(tow_length_m), 0, tow_length_m),
+  #   doorspread_m = ifelse(is.na(trlsp_doorspread), 0, trlsp_doorspread),
+  #   speed_mpm = ifelse(is.na(trlsp_speed), 0, trlsp_speed * 16.66667))
+  
   all <- filter(d, survey_series_desc %in% survey) %>% 
     filter(year %in% years) %>% 
     select(year, start_lon, start_lat, 
