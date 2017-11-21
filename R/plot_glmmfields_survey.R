@@ -59,7 +59,7 @@ join_noaa_bathy <- function(dat, plot = FALSE) {
   library(sp)
   library(marmap)
   mm <- getNOAA.bathy(lon1 = min(dat$lon) - 0.5, lon2 = max(dat$lon) + 0.5,
-    lat1=min(dat$lat) - 0.5,lat2=max(dat$lat) + 0.5, resolution=1) 
+    lat1=min(dat$lat) - 0.5,lat2=max(dat$lat) + 0.5, resolution = 1, keep = TRUE)
   # plot(mm, image=TRUE)
   # plot(as.raster(mm))
   bath <- as.xyz(mm) %>% rename(X = V1, Y = V2, depth = V3) %>% 
@@ -116,11 +116,12 @@ initf <- function(init_b0, n_time, n_knots, n_beta) {
       matrix(runif(n_time * n_knots, -0.05, 0.05), nrow = n_time, ncol = n_knots))
 }
 
-fit_glmmfields <- function(dat) {
+fit_glmmfields <- function(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
+  formula_binary = present ~ depth_scaled + depth_scaled2, n_knots = 15L) {
   load_all("../glmmfields/")
-  n_knots <- 15L
+
   n_beta <- 2L
-  m1 <- glmmfields(density ~ 1 + depth_scaled + depth_scaled2,
+  m1 <- glmmfields(formula,
     lon = "X10", lat = "Y10",
     data = filter(dat, present == 1), iter = 500,
     prior_gp_theta = half_t(100, 0, 5),
@@ -135,7 +136,7 @@ fit_glmmfields <- function(dat) {
     # length(unique(dat$year)), n_knots, n_beta)},
     control = list(adapt_delta = 0.98, max_treedepth = 20))
   
-  m2 <- glmmfields(present ~ 1 + depth_scaled + depth_scaled2,
+  m2 <- glmmfields(formula_binary,
     lon = "X10", lat = "Y10",
     data = dat, iter = 500,
     prior_gp_theta = half_t(100, 0, 5),
@@ -301,19 +302,20 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
     params = list(b0 = b0, b1 = b1, b2 = b2, b0_bin = b0_bin, b1_bin = b1_bin, b2_bin = b2_bin))
 } 
 
-## # ------------------------------------------
-## dd1 <- get_surv_data("pacific ocean perch", 
-##   "West Coast Vancouver Island Synoptic Survey", years = c(2014, 2016))
-## b <- join_noaa_bathy(dd1)
-## dd2 <- b$data
-## dd3 <- scale_predictors(dd2)
-## m <- fit_glmmfields(dd3)
-## m
-## pg <- make_prediction_grid(dd3, b$bath)
-## pos <- predict(m$pos, newdata = data.frame(pg, time = 1), 
-##   type = "response", return_mcmc = TRUE, iter = 100)
-## bin <- predict(m$bin, newdata = data.frame(pg, time = 1), 
-##   type = "response", return_mcmc = TRUE, iter = 100)
+# # ------------------------------------------
+# dd1 <- get_surv_data("redbanded rockfish",
+#   c("Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey"),
+#   years = c(1996:2017))
+# b <- join_noaa_bathy(dd1)
+# dd2 <- b$data
+# dd3 <- scale_predictors(dd2)
+# m <- fit_glmmfields(dd3)
+# m
+# pg <- make_prediction_grid(dd3, b$bath, n = 200L)
+# pos <- predict(m$pos, newdata = data.frame(pg, time = 1),
+#   type = "response", return_mcmc = TRUE, iter = 100)
+# bin <- predict(m$bin, newdata = data.frame(pg, time = 1),
+#   type = "response", return_mcmc = TRUE, iter = 100)
 ## 
 ## com <- bin * pos
 ## pg$combined <- apply(com, 1, median)
@@ -349,9 +351,10 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
 dtemp <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
 names(dtemp) <- tolower(names(dtemp))
 dtemp$species_common_name <- tolower(dtemp$species_common_name)
+dtemp <- dplyr::filter(dtemp, survey_series_desc %in% c("Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey"))
 sort(table(dtemp$species_common_name))
 
-dd1 <- get_surv_data("pacific cod", 
+dd1 <- get_surv_data("shortraker rockfish",
   c("Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey"), 
   years = c(1996:2017))
 table(dd1$year, dd1$present)
@@ -363,8 +366,8 @@ b <- join_noaa_bathy(dd1)
 dd2 <- b$data
 dd3 <- scale_predictors(dd2)
 m <- fit_inla(dd3)
-pg <- make_prediction_grid(dd3, b$bath, n = 300L)
-pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 1000L, 
+pg <- make_prediction_grid(dd3, b$bath, n = 200L)
+pred <- predict_inla(model_bin = m$bin, model_pos = m$pos, n = 700L,
   mesh = m$mesh, pred_grid = pg)
 
 # plot:
@@ -398,9 +401,9 @@ binary_scale <- scale_fill_gradient2(low = scales::muted("blue"), mid = "grey90"
   midpoint = 0.5, limits = c(0, 1))
 spatial_scale <- scale_fill_gradient2(low = scales::muted("blue"), mid = "grey90", high = scales::muted("red"))
 
-plot_bc_map(pred$pred, dd3, "I(pred_delta)", main_scale)
+plot_bc_map(pred$pred, dd3, "sqrt(pred_delta)", main_scale)
 plot_bc_map(pred$pred, dd3, "pred_binary", binary_scale)
-plot_bc_map(pred$pred, dd3, "I(pred_positive)", main_scale)
+plot_bc_map(pred$pred, dd3, "sqrt(pred_positive)", main_scale)
 plot_bc_map(pred$pred, dd3, "spatial_field_binary", spatial_scale)
 plot_bc_map(pred$pred, dd3, "spatial_field_positive", spatial_scale)
 
@@ -412,16 +415,20 @@ reshape2::melt(dplyr::bind_rows(pred$params)) %>% ggplot(aes(value)) +
 x <- seq(min(dd3$depth_scaled), max(dd3$depth_scaled), length.out = 1000)
 x_real <- exp((x * dd3$depth_sd[1]) + dd3$depth_mean[1])
 
-post <- sapply(x, function(i) exp(pred$params$b0 + pred$params$b1 * i + pred$params$b2 * i^2))
-plot(x_real, apply(post, 2, quantile, probs = 0.5), type = "l", xlab = "Depth (m)", ylab = "log(density)")
-polygon(c(x_real, rev(x_real)), 
-  c(apply(post, 2, quantile, probs = 0.05), rev(apply(post, 2, quantile, probs = 0.95))),
+post <- sapply(x, function(i) pred$params$b0 + pred$params$b1 * i + pred$params$b2 * i^2)
+l <- apply(post, 2, quantile, probs = 0.1)
+u <- apply(post, 2, quantile, probs = 0.9)
+plot(x_real, apply(post, 2, quantile, probs = 0.5), type = "l", xlab = "Depth (m)", ylab = "log(density)",
+  ylim = range(c(l, u)))
+polygon(c(x_real, rev(x_real)), c(l, rev(u)),
   col = "#00000030", border = NA)
 
 post <- sapply(x, function(i)  plogis(pred$params$b0_bin + pred$params$b1_bin * i + pred$params$b2_bin * i^2))
+l <- apply(post, 2, quantile, probs = 0.1)
+u <- apply(post, 2, quantile, probs = 0.9)
 plot(x_real, apply(post, 2, median), type = "l", xlab = "Depth (m)", ylab = "Probability of observing")
-polygon(c(x_real, rev(x_real)), 
-  c(apply(post, 2, quantile, probs = 0.05), rev(apply(post, 2, quantile, probs = 0.95))),
+polygon(c(x_real, rev(x_real)), c(l, rev(u)),
   col = "#00000030", border = NA)
+
 
 # matplot(x_real, t(post), type = "l", col = "#00000010", lty = 1)
