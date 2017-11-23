@@ -91,7 +91,11 @@ pos$lat <- pos$Y
 
 mpc <- ggplot2::map_data("worldHires", ".")
 # mpc <- ggplot2::map_data("world", ".") # low res
-dat <- filter(d_loc_cpue_pop, year %in% c(2013:3000))
+dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")
+names(dcpue) <- tolower(names(dcpue))
+dat <- filter(dcpue, year %in% c(2013:4000), species_common_name %in% "PACIFIC OCEAN PERCH") %>% 
+  rename(X = lon, Y = lat)
+# dat <- filter(d_loc_cpue_pop, year %in% c(2013:3000))
 
 # dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
 # names(dsurv) <- tolower(names(dsurv))
@@ -125,28 +129,22 @@ bin_width <- 7
 g <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
   stat_summary_hex(aes(x = X, y = Y, z = log(cpue)), data = dat,
-  # stat_summary_hex(aes(x = X, y = Y, z = log(catch_weight)), data = dat,
-    binwidth = bin_width, fun = function(x) mean(x, na.rm = TRUE)) +
-  viridis::scale_fill_viridis()
-
+    binwidth = bin_width, fun = function(x) mean(x, na.rm = TRUE))
 
 g_count <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
-  stat_summary_hex(aes(x = X, y = Y, z = cpue), data = dat,
-  # stat_summary_hex(aes(x = X, y = Y, z = catch_weight), data = dat,
-    binwidth = bin_width, fun = length) +
-  scale_fill_distiller(palette = "Blues")
+  stat_summary_hex(aes(x = X, y = Y, z = vessel_registration_number), data = dat,
+    binwidth = bin_width, fun = length)
 
 gd <- ggplot_build(g) # extract data from ggplot
 gd1 <- gd$data[[1]] # hexagons
-# gd2 <- gd$data[[2]] # map
 
-n_minimum_observations <- 5L
+n_minimum_vessels <- 3L
 gd_count <- ggplot_build(g_count) # to count observations per cell
 assertthat::are_equal(nrow(gd$data[[1]]), nrow(gd_count$data[[1]]))
-gd1 <- gd1[gd_count$data[[1]]$value > n_minimum_observations, ] # remove low observation hexagons
+gd1 <- gd1[gd_count$data[[1]]$value > n_minimum_vessels, ] # remove low observation hexagons
 
-n_col_bins <- 300L
+n_col_bins <- 200L
 value_range <- range(gd1$value)
 vals <- seq((value_range[1]), (value_range[2]), length.out = n_col_bins)
 pal <- viridisLite::viridis(n_col_bins)
