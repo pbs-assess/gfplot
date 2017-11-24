@@ -1,5 +1,12 @@
+hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
+  polygon(
+    hexbin::hexcoords(unitcell_x)$x + x,
+    hexbin::hexcoords(unitcell_y)$y + y, ...)
+}
+
 plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3L,
   pal_function = viridisLite::viridis) {
+  
   # hexagon bin size in UTM kms
   
   library(tidyverse)
@@ -121,6 +128,8 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   # ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 20.5, col = NA, border = "grey60",
   # lwd = 0.7)
   # dev.off()
+  
+  box(col = "grey60")
 }
 
 # dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")

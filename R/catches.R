@@ -56,25 +56,27 @@ add_label <- function(xfrac, yfrac, label, pos = 4, ...) {
 plot_catch <- function(a, b, lab) {
   plot(1, 1, type = "n", xlim = c(1960, 2017) + c(-0.5, 0.5), ylim = c(0, max(a + b)*1.03), 
     axes = FALSE, ann = FALSE, xaxs = "i", yaxs = "i")
+  abline(v = seq(1900, 2020, 10), col = "grey90")
   # polygon(c(x$year, rev(x$year)), c(rep(0, nrow(x)), rev(x$landed_kg + x$discarded_kg)), col = "red")
   # polygon(c(x$year, rev(x$year)), c(rep(0, nrow(x)), rev(x$discarded_kg)), col = "blue")
   rect(xleft = x$year - 0.5, xright = x$year + 0.5, ybottom = rep(0, nrow(x)), ytop = a + b,
     col = pal[[3]], border = "#00000090", lwd = 0.5)
   rect(xleft = x$year - 0.5, xright = x$year + 0.5, ybottom = rep(0, nrow(x)), ytop = b,
     col = pal[[2]], border = "#00000090", lwd = 0.5)
-  box(col = "grey75")
+  box(col = "grey50")
   axis(2, col = "grey60", col.ticks = "grey70", col.axis = "grey30", las = 1)
   
-  add_label(-0.005, 0.07, lab, col = "grey30", cex = 1)
+  add_label(-0.008, 0.09, lab, col = "grey30", cex = 1)
+
 }
 
 for(i in unique(cm$species_common_name)) {
-  pdf(paste0("catch/", gsub("/", "-", gsub(" ", "-", i)), ".pdf"), width = 3, height = 3)
+  pdf(paste0("catch/", gsub("/", "-", gsub(" ", "-", i)), ".pdf"), width = 3, height = 2.8)
   x <- filter(catches, species_common_name == i)
   par(mfrow = c(2, 1), oma = c(2, 1, .5, .5), cex = 0.7, mar = c(0, 2.5, 0, 0), mgp = c(2, 0.4, 0),
     tcl = -0.3)
-  plot_catch(x$landed_kg/100000, x$discarded_kg/100000, "Trawl")
-  plot_catch(x$landed_pcs/1000, x$discarded_pcs/1000, "Longline")
+  plot_catch(x$landed_kg/100000, x$discarded_kg/100000, "Trawl (10000 kg)")
+  plot_catch(x$landed_pcs/1000, x$discarded_pcs/1000, "Longline (1000 fish)")
   axis(1, col = "grey60", col.ticks = "grey70", col.axis = "grey30")
   dev.off()
 }

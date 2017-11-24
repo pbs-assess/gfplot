@@ -309,10 +309,21 @@ predict_inla <- function(model_bin, model_pos, pred_grid, mesh, n = 1000L) {
 } 
 
 plot_bc_map <- function(pred_dat, raw_dat, fill_column, 
-  pal = viridis::scale_fill_viridis(option = "D"), pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
+  pal_fill = ggplot2::scale_fill_distiller(palette = "Spectral", direction = -1),
+  pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
+  pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
   pt_size_range = c(2, 7)) {
-  ggplot(pred_dat, aes_string("X10", "Y10", fill = fill_column)) + 
-    geom_tile() + pal +
+  
+  library(PBSmapping)
+  data("nepacLLhigh")
+  attr(nepacLLhigh, "zone") <- 8
+  nepacUTM <- suppressMessages(convUL(clipPolys(nepacLLhigh, 
+    xlim = range(raw_dat$lon) + c(-2, 2), 
+    ylim = range(raw_dat$lat) + c(-2, 2))))
+  
+  ggplot(pred_dat, aes_string("X10", "Y10")) + 
+    geom_tile(aes_string(fill = fill_column)) + 
+    pal_fill + #pal_col +
     geom_point(data = raw_dat, fill = pt_fill, col = pt_col, 
       aes(shape = as.factor(present), size = density)) +
     scale_shape_manual(values = c(4, 21)) +
@@ -326,6 +337,75 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
       size = guide_legend(override.aes = list(colour = "grey30"))) +
     geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
       fill = "grey35")
+}
+
+plot_bc_map_base <- function(pred_dat, raw_dat, fill_column, 
+  pal_fill = ggplot2::scale_fill_distiller(palette = "Spectral", direction = -1),
+  pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
+  pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
+  pt_size_range = c(2, 7)) {
+  
+  library(PBSmapping)
+  data("nepacLLhigh")
+  attr(nepacLLhigh, "zone") <- 8
+  nepacUTM <- suppressMessages(convUL(clipPolys(nepacLLhigh, 
+    xlim = range(raw_dat$lon) + c(-2, 2), 
+    ylim = range(raw_dat$lat) + c(-2, 2))))
+  
+  g <- ggplot(pred_dat, aes_string("X10", "Y10")) + 
+    geom_tile(aes_string(fill = fill_column, colour = fill_column)) + 
+    pal_fill + pal_col +
+    geom_point(data = raw_dat, fill = pt_fill, col = pt_col, 
+      aes(shape = as.factor(present), size = density)) +
+    scale_shape_manual(values = c(4, 21)) +
+    scale_size_continuous(range = pt_size_range) +
+    theme_light() +
+    coord_equal(
+      xlim = range(raw_dat$X10),
+      ylim = range(raw_dat$Y10)) +
+    guides(shape = guide_legend(override.aes = list(colour = "grey30")),
+      size = guide_legend(override.aes = list(colour = "grey30"))) +
+    geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
+      fill = "grey35")
+  
+  gd <- ggplot_build(g) # extract data from ggplot
+  
+  pts <- gd$data[[2]]
+  srv <- gd$data[[1]]
+  map <- gd$data[[3]]
+  
+  xlim = range(pred_dat$X10) + c(-1.5, 1.5)
+  ylim = range(pred_dat$Y10) + c(-1.5, 1.5)
+  
+  cell_width <- max(diff(sort(srv$x)))
+  cell_height <- max(diff(sort(srv$y)))
+  
+  plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
+    plt = c(0, 1, 0, 1), xlab = "", ylab = "")
+  
+  rect(xleft = srv$x - cell_width/2, xright = srv$x + cell_width/2, 
+    ybottom = srv$y - cell_height/2, ytop = srv$y + cell_height/2,
+    border = srv$fill, col = srv$fill)
+  points(pts$x, pts$y, pch = ifelse(pts$shape == 4, 4, NA), cex = 1.4)
+  
+  pts_pos <- dplyr::filter(pts, shape != 4)
+  symbols(pts_pos$x, pts_pos$y, circles = pts_pos$size/15, fg = "black",
+    bg = "#00000050", inches = FALSE, add = TRUE) # TODO CHECK!! radius ggplot?
+  # sqrt(area / 3.14159265)
+  
+  # library(PBSdata)
+  # data("isobath")
+  # zlev <- c(100, 200, 500)
+  # isobath_UTM <- suppressMessages(convUL(clipPolys(filter(isobath, PID %in% zlev), 
+  #   xlim = range(raw_dat$lon), ylim = range(raw_dat$lat))))
+  # isobath_UTM$X <-  isobath_UTM$X/10
+  # isobath_UTM$Y <-  isobath_UTM$Y/10
+  # PBSmapping::addLines(isobath_UTM, 
+  #   col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
+  
+  plyr::d_ply(nepacUTM, "PID", function(i)
+    polygon(i$X/10, i$Y/10, col = "grey90", border = "grey70", lwd = 0.4))
+  box(col = "grey50")
 }
 
 fit_spatial_survey_model <- function(species, survey, years) {

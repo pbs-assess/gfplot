@@ -109,7 +109,7 @@ plot_index_sparks <- function(species) {
       lines(x$year, x$biomass_scaled, col = "grey30", lwd = 2.5)
       points(x$year, x$biomass_scaled, pch = 21, col = "grey40", bg = "grey60", cex = 1.25, lwd = 2)
     }
-    box(col = "grey75")
+    box(col = "grey50")
     add_label(-0.005, 0.15, unique(x$survey_series_desc), col = "grey30", cex = 0.9)
     # par(xpd = FALSE)
   })
