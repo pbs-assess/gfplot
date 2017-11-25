@@ -1,0 +1,309 @@
+---
+title: "Extract data for DLMtool PBS case studies"
+author: "Sean Anderson"
+date: "`r Sys.Date()`"
+---
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(assertthat))
+theme_set(ggsidekick::theme_sleek())
+```
+
+To start with I've run a long sequence of SQL queries which are in another R file. Need to be on the PBS local network for this:
+
+```{r, eval=FALSE}
+source("get-dat.R")
+```
+
+Let's extract data for the following species. Also, we'll extract survey indices for the following surveys.
+
+```{r}
+species <- tolower(c("Squalus suckleyi", "sebastes borealis",
+  "Sebastes babcocki", "Microstomus pacificus",
+  "Glyptocephalus zachirus", "Hydrolagus colliei",
+  "Sebastes alutus"))
+
+surveys <- c("Hecate Strait Multispecies Assemblage Survey",                                  
+  "Hecate Strait Synoptic Survey",                                                 
+  "IPHC Longline Survey",                                                          
+  "PHMA Rockfish Longline Survey - Outside North",                                 
+  "PHMA Rockfish Longline Survey - Outside South",                                 
+  "Queen Charlotte Sound Shrimp Survey",                                           
+  "Queen Charlotte Sound Synoptic Survey",                                         
+  # "Sablefish Inlet Standardized",                                                  
+  # "Sablefish Offshore Standardized",                                               
+  # "Sablefish Stratified Random",                                                   
+  # "Strait of Georgia Dogfish Longline Survey",                                     
+  # "Strait of Georgia Synoptic Survey",                                             
+  "West Coast Haida Gwaii Synoptic Survey",                                        
+  "West Coast Vancouver Island Shrimp Survey",                                     
+  "West Coast Vancouver Island Synoptic Survey")
+```
+
+# Biomass indices:
+
+These are the standard survey index trends with confidence intervals calculated through a stratum-based bootstrap procedure.
+
+```{r, fig.width=13, fig.height=9, message=FALSE}
+d <- readRDS("data/all-boot-biomass-indices.rds")
+names(d) <- tolower(names(d))
+d$species_common_name <- tolower(d$species_common_name)
+d$species_science_name <- tolower(d$species_science_name)
+d <- filter(d, species_science_name %in% species)
+
+bindex_filtered <- filter(d, species_science_name %in% species,
+  survey_series_desc %in% surveys) %>% 
+  arrange(species_common_name, survey_series_desc, year) %>% 
+  select(-num_sets, -num_pos_sets, -survey_series_id)
+
+assert_that(all(species %in% unique(bindex_filtered$species_science_name)))
+
+ggplot(bindex_filtered, aes(year, biomass)) + geom_line() +
+  facet_grid(species_common_name~survey_series_desc, scales = "free_y") +
+  geom_ribbon(aes(ymin = lowerci, ymax = upperci), fill = "#00000060", col = NA)
+```
+
+## Biological samples
+
+Let's bring in the commercial and survey biological samples separately. Then we'll join them up at the end.
+
+TODO: I still need to check to make sure I'm not bringing in duplicate trips.
+
+### Commercial biological samples:
+
+```{r, fig.width=12, fig.height=9, warning=FALSE}
+dbio_c <- readRDS("../../Dropbox/dfo/data/all-commercial-bio.rds")
+names(dbio_c) <- tolower(names(dbio_c))
+dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
+dbio_c$species_science_name <- tolower(dbio_c$species_science_name)
+dbio_c <- mutate(dbio_c, year = lubridate::year(trip_start_date))
+dbio_c <- select(dbio_c, -trip_start_date, -species_code, -trip_sub_type_code)
+dbio_c <- filter(dbio_c, species_science_name %in% species)
+dbio_c$sorted <- NA
+dbio_c$sorted[dbio_c$species_category_code == 1] <- FALSE
+dbio_c$sorted[dbio_c$species_category_code == 3] <- TRUE
+dbio_c$species_category_code <- NULL
+
+reshape2::melt(dbio_c, id.vars = c("species_common_name"), 
+  measure.vars = c("sex", "age", "length", "weight", "maturity_code")) %>%
+  ggplot(aes(value)) + geom_histogram() +
+  facet_wrap(variable~species_common_name, scales = "free", ncol = length(species))
+```
+
+Female: sex == 2
+Male: sex == 1
+
+### Survey biological samples:
+
+```{r, fig.width=12, fig.height=9, warning=FALSE}
+dbio_s <- readRDS("../../Dropbox/dfo/data/all-survey-bio.rds")
+names(dbio_s) <- tolower(names(dbio_s))
+dbio_s$species_common_name <- tolower(dbio_s$species_common_name)
+dbio_s$species_science_name <- tolower(dbio_s$species_science_name)
+dbio_s <- mutate(dbio_s, year = lubridate::year(trip_start_date))
+
+ss <- readRDS("data/survey_series.rds")
+names(ss) <- tolower(names(ss))
+dbio_s <- left_join(dbio_s, ss)
+
+dbio_s_filtered <- filter(dbio_s, survey_series_type_code > 0)
+# sort(table(dbio_s_filtered$survey_series_desc))
+
+dbio_s_filtered <- select(dbio_s_filtered, -trip_start_date, -species_code, 
+  -trip_sub_type_code, -survey_series_id, -species_category_code, -survey_series_type_code)
+dbio_s_filtered <- filter(dbio_s_filtered, species_science_name %in% species)
+
+reshape2::melt(dbio_s_filtered, id.vars = c("species_common_name"), 
+  measure.vars = c("sex", "age", "length", "weight", "maturity_code")) %>%
+  ggplot(aes(value)) + geom_histogram() +
+  facet_wrap(variable~species_common_name, scales = "free", ncol = length(species))
+```
+
+Join the commercial and biological samples. `survey_series_desc` will equal `"Commercial"` for the commercial samples and be the name of the survey otherwise.
+
+```{r}
+dbio_c$survey_series_desc <- "Commercial"
+dbio_s_filtered$sorted <- NA
+dbio <- suppressWarnings(bind_rows(dbio_s_filtered, dbio_c))
+```
+
+Assign maturity where possible:
+
+```{r}
+sort(table(dbio$maturity_convention_desc))
+dbio$mature <- NA
+
+dbio$mature[dbio$maturity_code >= 3  & dbio$maturity_code <= 7 & 
+    dbio$maturity_convention_desc == "ROCKFISH (1977+)"] <- TRUE
+dbio$mature[dbio$maturity_code < 3  & dbio$maturity_code <= 7 & 
+    dbio$maturity_convention_desc == "ROCKFISH (1977+)"] <- FALSE
+
+dbio$mature[dbio$maturity_code >= 77 & dbio$maturity_code <= 99 & 
+    dbio$maturity_convention_desc == "DOGFISH"] <- TRUE
+dbio$mature[dbio$maturity_code < 77 & dbio$maturity_code <= 99 & 
+    dbio$maturity_convention_desc == "DOGFISH"] <- FALSE
+
+dbio$mature[dbio$maturity_code >= 3  & dbio$maturity_code <= 7 & 
+    dbio$maturity_convention_desc == "FLATFISH (1978+)"] <- TRUE
+dbio$mature[dbio$maturity_code < 3  & dbio$maturity_code <= 7 & 
+    dbio$maturity_convention_desc == "FLATFISH (1978+)"] <- FALSE
+
+dbio$maturity_convention_desc <- tolower(dbio$maturity_convention_desc)
+```
+
+Let's look at the missing maturity values:
+
+```{r}
+missing_maturity <- filter(dbio, is.na(mature), species_common_name != "north pacific spiny dogfish", 
+  species_common_name != "spotted ratfish", !is.na(maturity_code), 
+  maturity_convention_desc != "maturities not looked at")
+
+table(missing_maturity$maturity_convention_desc)
+```
+
+So the vast majority are from "port samples".
+
+```{r}
+port <- filter(missing_maturity, maturity_convention_desc == "port samples")
+table(port$maturity_code)
+table(port$species_common_name)
+```
+
+And these are all rockfish or flatfish both of which have maturity scales that max out at 7. 3+ is mature.
+
+```{r}
+dbio$mature[dbio$maturity_code >= 3 & dbio$maturity_code <= 7 & 
+    dbio$maturity_convention_desc == "port samples"] <- TRUE
+dbio$mature[dbio$maturity_code < 3 & dbio$maturity_code <= 7 & 
+    dbio$maturity_convention_desc == "port samples"] <- FALSE
+```
+
+## Catches:
+
+This is not necessarily all catches but it should be all the catches recorded in our various databases. If at all possible it would be better to look at a previous stock assessment for the stock where catch has been carefully reconstructed.
+
+```{r}
+d <- readRDS("data/all-catches.rds")
+names(d) <- tolower(names(d))
+d$species_common_name <- tolower(d$species_common_name)
+d$species_scientific_name <- tolower(d$species_scientific_name)
+d$year <- lubridate::year(d$best_date)
+
+d_filtered <- filter(d, species_scientific_name %in% species)
+d_spiny <- filter(d, species_common_name %in% "spiny dogfish")
+d <- bind_rows(d_filtered, d_spiny)
+
+catches <- d %>% filter(!is.na(year)) %>% 
+  group_by(year, species_common_name, species_scientific_name) %>% 
+  summarise(landed_kg = sum(landed_kg, na.rm = TRUE), discarded_kg = sum(discarded_kg, na.rm = TRUE),
+    landed_pcs = sum(landed_pcs, na.rm = TRUE), discarded_pcs = sum(discarded_pcs, na.rm = TRUE)) %>%
+  ungroup() %>%
+  arrange(species_common_name, year)
+
+reshape2::melt(catches, id.vars = c("year", "species_common_name"), 
+  measure.vars = c("landed_kg", "discarded_kg")) %>%
+  ggplot(aes(year, value, fill = variable)) + 
+  geom_col() +
+  facet_wrap(~species_common_name, scales = "free")
+
+reshape2::melt(catches, id.vars = c("year", "species_common_name"), 
+  measure.vars = c("landed_pcs", "discarded_pcs")) %>%
+  ggplot(aes(year, value, fill = variable)) + 
+  geom_col() +
+  facet_wrap(~species_common_name, scales = "free")
+```
+
+## Effort:
+
+Effort data are not consistently available going back pre early 2000s. I would need to extract it separately if we want it for all trips on more recent years. Below I'll plot the proportion of trips with some catch that have associated trip start and end times to calculate effort:
+
+```{r}
+avail_eff <- group_by(d, species_common_name, year) %>% 
+  summarize(prop_effort_avail = sum(!is.na(fe_start_date))/n())
+
+ggplot(avail_eff, aes(year, prop_effort_avail)) +
+  geom_point() +
+  facet_wrap(~species_common_name)
+
+# d <- mutate(d, fe_start_date = parsedate::parse_iso_8601(fe_start_date),
+#   fe_end_date = parsedate::parse_iso_8601(fe_end_date))
+# d <- mutate(d, fe_diff = as.numeric(difftime(fe_end_date , fe_start_date, units = "mins")))
+# 
+# d <- mutate(d, tot = sum(landed_kg, discarded_kg, landed_pcs, discarded_pcs, na.rm = TRUE))
+# sum(d$tot == 0, na.rm = TRUE)
+# 
+# ggplot(filter(d, !is.na(fe_diff), landed_kg > 0 | discarded_kg > 0), 
+#   aes(x = as.factor(year), y = fe_diff / 60)) + geom_boxplot() +
+#   facet_wrap(~species_common_name) +
+#   scale_y_log10() +
+#   geom_hline(yintercept = c(12, 24), col = "red")
+# 
+# effort <- d %>% filter(!is.na(year)) %>% 
+#   group_by(year, species_common_name) %>% 
+#   summarise(sum_effort_minutes = sum(fe_diff, na.rm = TRUE)) %>% 
+#   ungroup() %>%
+#   arrange(species_common_name, year) %>% 
+#   right_join(avail_eff)
+# 
+# ggplot(effort, aes(year, sum_effort_minutes / 60 / 1000, colour = prop_effort_avail)) +
+#   geom_point() +
+#   facet_wrap(~species_common_name, scales = "free_y") +
+#   viridis::scale_color_viridis(direction = -1) +
+#   ylab("Total (available) effort in 1000s of hours") +
+#   labs(colour = "Proportion of trips with effort data")
+```
+
+## Save:
+
+Let's save the 3 main data sets. Catches, biological samples, and survey indices.
+
+```{r}
+saveRDS(as.data.frame(catches), file = "generated-data/catches.rds")
+saveRDS(as.data.frame(dbio), file = "generated-data/bio-samples.rds")
+saveRDS(as.data.frame(bindex_filtered), file = "generated-data/bio-indices.rds")
+```
+
+## Let's describe the data:
+
+```{r}
+head(catches)
+```
+
+The `kg` columns describe available landed and discarded catches and the `pcs` describe landed and discarded individual fish/pieces. Adding the pieces into the weight would require assumptions about the average weight of an individual.
+
+```{r}
+head(dbio)
+```
+
+Sex: 1 = male, 2 = female
+
+Age in years.
+
+Length in cm.
+
+A maturity code with different scales in various cases. 
+
+A description of that maturity code scale.
+
+The maximum value on that maturity scale.
+
+Weight in grams.
+
+Species common and Latin names.
+
+Year.
+
+Name of trawl survey if from a survey. `survey_series_desc` takes on the value "Commercial" for the samples from the commercial fisheries.
+
+Sorted: NA if a survey. TRUE if a commercial sample after discards (potentially based on size). FALSE if commercial sample before sorting. 
+
+Mature: TRUE if mature according to maturity scale. FALSE if not mature according to the maturity scale. NA if no maturity code is available or if I have not been able to track down the maturity scale.
+
+```{r}
+head(bindex_filtered)
+```
+
+Trawl survey index values.
+
+`re` refers to the survey CV that year from the bootstrapping if I'm reading the code correctly.
