@@ -13,3 +13,8 @@ marmap_coord_-134.287133;52.56505;-132.120716;54.976666_res_1.csv
 marmap_coord_-133.35505;52.20215;-129.349766;55.1566_res_1.csv
 *.html
 *.rds
+*.aux
+*.log
+*html*
+*chunk*
+*cache*
