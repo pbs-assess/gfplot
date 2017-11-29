@@ -110,7 +110,7 @@ dev.off()
 dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")
 dir.create("cpue", showWarnings = FALSE)
 
-for(i in tolower(names(rev(sort(table(dcpue$SPECIES_COMMON_NAME)))[1:30]))) {
+for(i in tolower(names(rev(sort(table(dcpue$SPECIES_COMMON_NAME)))[1:50]))) {
   print(i)
   pdf(paste0("cpue/", gsub("/", "-", gsub(" ", "-", i)), ".pdf"), width = 3, height = 3)
   plot_spatial_cpue(dcpue, i, bin_width = 7, 
@@ -126,6 +126,7 @@ bio$species_common_name <- tolower(bio$species_common_name)
 bio$species_science_name <- tolower(bio$species_science_name)
 bio$year <- lubridate::year(bio$trip_start_date)
 
+source("R/bio-sparks.R")
 
 spp <- group_by(bio, species_common_name) %>% filter(
   year > 2000,
@@ -135,11 +136,11 @@ spp <- group_by(bio, species_common_name) %>% filter(
   !grepl("urchin", species_common_name),
   !grepl("jelly", species_common_name)
 ) %>% summarise(total_catch = sum(catch_weight, na.rm = TRUE)) %>%
-  arrange(-total_catch) %>% `[`(1:20, 1:2)
+  arrange(-total_catch) %>% `[`(1:70, 1:2)
 
 
 for(i in unique(spp$species_common_name)) {
-  pdf(paste0("sparks/", gsub("/", "-", gsub(" ", "-", i)), ".pdf"), width = 2.5, height = 4.75)
+  pdf(paste0("sparks/", gsub("/", "-", gsub(" ", "-", i)), ".pdf"), width = 4, height = 4.75)
   plot_index_sparks(i)
   dev.off()
 }
@@ -148,5 +149,7 @@ for(i in unique(spp$species_common_name)) {
 source("R/bio.R")
 
 source("R/catches.R")
+
+source("R/joy.R")
 
 source("R/joy.R")

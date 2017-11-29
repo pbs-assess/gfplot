@@ -17,7 +17,7 @@ catches <- d %>% filter(!is.na(species_common_name), !is.na(year)) %>%
 
 catches <- mutate(catches, species_common_name = forcats::fct_reorder(species_common_name, -total_catch))
 
-cm <- reshape2::melt(filter(catches, total_catch > 1e6, !species_common_name %in% "unknown fish"), 
+cm <- reshape2::melt(filter(catches, total_catch > 2e5, !species_common_name %in% "unknown fish"), 
   id.vars = c("year", "species_common_name"))
 unique(cm$species_common_name) %>% length()
 
@@ -39,7 +39,7 @@ filter(cm, variable %in% c("landed_pcs", "discarded_pcs")) %>%
   scale_fill_manual(values = c("grey50", "grey10"))
 dev.off()
 
-pal <- RColorBrewer::brewer.pal(5, "Blues")
+pal <- RColorBrewer::brewer.pal(5, "Greys")
 
 #' @param xfrac The fraction over from the left side.
 #' @param yfrac The fraction down from the top.
@@ -60,9 +60,9 @@ plot_catch <- function(a, b, lab) {
   # polygon(c(x$year, rev(x$year)), c(rep(0, nrow(x)), rev(x$landed_kg + x$discarded_kg)), col = "red")
   # polygon(c(x$year, rev(x$year)), c(rep(0, nrow(x)), rev(x$discarded_kg)), col = "blue")
   rect(xleft = x$year - 0.5, xright = x$year + 0.5, ybottom = rep(0, nrow(x)), ytop = a + b,
-    col = pal[[3]], border = "#00000090", lwd = 0.5)
-  rect(xleft = x$year - 0.5, xright = x$year + 0.5, ybottom = rep(0, nrow(x)), ytop = b,
     col = pal[[2]], border = "#00000090", lwd = 0.5)
+  rect(xleft = x$year - 0.5, xright = x$year + 0.5, ybottom = rep(0, nrow(x)), ytop = b,
+    col = pal[[3]], border = "#00000090", lwd = 0.5)
   box(col = "grey50")
   axis(2, col = "grey60", col.ticks = "grey70", col.axis = "grey30", las = 1)
   

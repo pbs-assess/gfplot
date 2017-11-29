@@ -1,3 +1,26 @@
+bbox <- vector(length = 4, mode = "list")
+names(bbox) <- c("WCHG", "WCVI", "QCS", "HS")
+# bbox[[1]] <- c(range(surv_wchg$data$lon, na.rm = TRUE), range(surv_wchg$data$lat, na.rm = TRUE))
+# bbox[[2]] <- c(range(surv_wcvi$data$lon, na.rm = TRUE), range(surv_wcvi$data$lat, na.rm = TRUE))
+# bbox[[3]] <- c(range(surv_qcs$data$lon, na.rm = TRUE), range(surv_qcs$data$lat, na.rm = TRUE))
+# bbox[[4]] <- c(range(surv_hs$data$lon, na.rm = TRUE), range(surv_hs$data$lat, na.rm = TRUE))
+
+
+# 
+# bbox[[1]] <- c(boxes[["WCHG"]]$xlim, boxes
+# bbox[[2]] <- c(-128.54825, -124.915633, 48.24815, 50.5058)
+# bbox[[3]] <- c(-131.208066, -127.949483, 51.005316, 52.683)
+# bbox[[4]] <- c(-132.85505, -129.849766, 52.70215, 54.6566)
+# 
+# 
+# cols <- c(
+#   RColorBrewer::brewer.pal(9, "Blues")[5],
+#   RColorBrewer::brewer.pal(9, "Purples")[5],
+#   RColorBrewer::brewer.pal(9, "Reds")[5],
+#   RColorBrewer::brewer.pal(9, "Greens")[5]
+# )
+# bbox$cols <- cols
+
 hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
   polygon(
     hexbin::hexcoords(unitcell_x)$x + x,
@@ -22,7 +45,7 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   
   # UTMs:
   attr(dat, "projection") <- "LL"
-  attr(dat, "zone") <- 9
+  attr(dat, "zone") <- 8
   xlim_ll <- range(dat$X) + c(-2, 2)
   ylim_ll <- range(dat$Y) + c(-2, 2)
   dat <- suppressMessages(PBSmapping::convUL(dat))
@@ -66,7 +89,7 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   
   data("nepacLLhigh")
   np <- clipPolys(nepacLLhigh, xlim = xlim_ll, ylim = ylim_ll)
-  attr(np, "zone") <- 9
+  attr(np, "zone") <- 8
   nepacUTM <- suppressMessages(convUL(np))
   
   plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
@@ -130,6 +153,23 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   # dev.off()
   
   box(col = "grey60")
+  
+  boxes <- readRDS("data/boxes.rds")
+  
+  cols <- c(
+    RColorBrewer::brewer.pal(9, "Blues")[5],
+    RColorBrewer::brewer.pal(9, "Greens")[5],
+    RColorBrewer::brewer.pal(9, "Reds")[5],
+    RColorBrewer::brewer.pal(9, "Purples")[5]
+  )
+
+  for (i in seq_len(4)) {
+    # rect(xleft = bb$X[1], xright = bb$X[2], ytop = bb$Y[1], ybottom = bb$Y[2],
+    #   border = bbox$cols[i], col = NA)
+    rect(xleft = boxes[[i]]$xlim[1]*10, xright = boxes[[i]]$xlim[2]*10, 
+      ytop = boxes[[i]]$ylim[1]*10, ybottom = boxes[[i]]$ylim[2]*10,
+      border = cols[i], col = NA, lwd = 1.25)
+  }
 }
 
 # dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")

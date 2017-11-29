@@ -1,12 +1,12 @@
 library(tidyverse)
 
-if (!exists("dsurv")) {
+# if (!exists("dsurv")) {
   dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
   names(dsurv) <- tolower(names(dsurv))
   dsurv$species_common_name <- tolower(dsurv$species_common_name)
   dsurv$species_science_name <- tolower(dsurv$species_science_name)
   dsurv <- mutate(dsurv, year = lubridate::year(trip_start_date))
-}
+# }
 
 surv <- group_by(dsurv, species_common_name, species_science_name, 
   survey_series_desc, year) %>% 
@@ -36,20 +36,27 @@ surveys <- data.frame(survey_series_desc = c("Hecate Strait Synoptic Survey",
 all_surv_n <- group_by(surv, survey_series_desc, year) %>% 
   summarise(n = sum(c(n_fe_weight, n_fe_count)))
 
-if (!exists("dbio")) {
+# if (!exists("dbio")) {
   dbio <- readRDS("../../Dropbox/dfo/data/all-survey-bio.rds")
   names(dbio) <- tolower(names(dbio))
   dbio$species_common_name <- tolower(dbio$species_common_name)
   dbio$species_science_name <- tolower(dbio$species_science_name)
   dbio <- mutate(dbio, year = lubridate::year(trip_start_date))
   
-  ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds") %>%
-    select(-SURVEY_SERIES_TYPE_CODE)
+  ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds")
   names(ss) <- tolower(names(ss))
+  dbio <- inner_join(dbio, ss)
+  dbio <- filter(dbio, survey_series_type_code > 0)
+  
   surv2 <- left_join(surv, ss)
-  dbio <- filter(dbio, survey_series_id %in% unique(surv2$survey_series_id)) %>% 
+  
+  dbio <- filter(dbio) %>% 
     select(species_common_name, species_science_name, year, age, length, weight, maturity_code)
-}
+  
+  
+# }
+
+
 
 # commercial bio samples:
 dbio_c <- readRDS("../../Dropbox/dfo/data/all-commercial-bio.rds")
@@ -91,8 +98,8 @@ bio <- group_by(dbio_combined, type, species_common_name, species_science_name, 
 years <- seq(1996, 2016)
 labs <- intersect(seq(1800, 3000, 2), years)
 # col <- viridis::viridis(200, option = "D")
-col_com <- colorRampPalette(RColorBrewer::brewer.pal(9, "Blues"))(200)
-col_surv <- colorRampPalette(RColorBrewer::brewer.pal(9, "Reds"))(200)
+col_com <- colorRampPalette(RColorBrewer::brewer.pal(9, "Greys")[-9])(200)
+col_surv <- colorRampPalette(RColorBrewer::brewer.pal(9, "Greys")[-9])(200)
 # col <- colorRampPalette(RColorBrewer::brewer.pal(9, "Spectral"))(200)
 grid_col <- "grey75"
 box_col <- "grey55"
@@ -117,7 +124,7 @@ names(qq_all) <- gsub("PHMAN", "PHMA N", names(qq_all))
 
 ######
 
-torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(40)])
+torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(70)])
 
 for (i in seq_along(torun)) {
   
@@ -182,7 +189,7 @@ for (i in seq_along(torun)) {
     width = 6, height = 2.75)
   # layout(c(rep(1, 16), rep(2, 10)))
   layout(c(rep(1, 16), rep(2, 16)))
-  par(mar = c(2, 4.75, .5, .5), cex = 0.8, oma = c(0, .5, 1.5, .5))
+  par(mar = c(2, 4.75, 1.5, .5), cex = 0.8, oma = c(0, .5, 0.25, .5))
   
   # graphics::image(x = qq$year, y = seq(1, ncol(qq) - 1), z = qq_combined[, -1], axes = FALSE,
   #   xlab = "", ylab = "", col = c(grid_col, "grey25"), breaks = c(0, 1, 2))
@@ -227,12 +234,20 @@ for (i in seq_along(torun)) {
     substr(x, 1, 1) <- toupper(substr(x, 1, 1))
     x
   }
-  mtext(text = firstup(gsub("/", "-", gsub(" ", " ", common_name))), 
-    side = 3, adj = 1, line = 0.4,
-    col = axis_col)
+  # mtext(text = firstup(gsub("/", "-", gsub(" ", " ", common_name))), 
+  #   side = 3, adj = 1, line = 0.4,
+  #   col = axis_col)
+  # 
+  mtext(text = "Commercial samples", 
+    side = 3, adj = 0, line = 0.4,
+    col = axis_col, cex = 0.8)
   
   com <- filter(spb, type == "survey")
   plot_grid(as.matrix((com[, -c(1:2)])), col_surv)
+  
+  mtext(text = "Survey samples", 
+    side = 3, adj = 0, line = 0.4,
+    col = axis_col, cex = 0.8)
   
   
   # for (i in seq(1, ncol(qq) - 1))

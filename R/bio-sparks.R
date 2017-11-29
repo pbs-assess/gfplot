@@ -22,16 +22,19 @@ plot_index_sparks <- function(species) {
   
   d <- filter(d, species_common_name %in% species)
   
-  surveys <- c("Queen Charlotte Sound Synoptic Survey",
-    # "Hecate Strait Multispecies Assemblage Survey",
-    "Hecate Strait Synoptic Survey",
-    "West Coast Vancouver Island Synoptic Survey",
+  surveys <- c(
     "West Coast Haida Gwaii Synoptic Survey",
-    # "Sablefish Offshore Standardized",
-    # "Sablefish Stratified Random",
+    "Hecate Strait Synoptic Survey",
+    "Queen Charlotte Sound Synoptic Survey",
+    "West Coast Vancouver Island Synoptic Survey",
     "PHMA Rockfish Longline Survey - Outside North",
-    "PHMA Rockfish Longline Survey - Outside South"
-    # "Sablefish Inlet Standardized"
+    "PHMA Rockfish Longline Survey - Outside South",
+    "Sablefish Offshore Standardized",
+    "Sablefish Inlet Standardized",
+    "Sablefish Stratified Random",
+    "Queen Charlotte Sound Shrimp Survey",
+    "West Coast Vancouver Island Shrimp Survey",
+    "IPHC Longline Survey"
   )
   
   d <- filter(d, survey_series_desc %in% surveys)
@@ -72,47 +75,71 @@ plot_index_sparks <- function(species) {
   #   # coord_cartesian(ylim = c(0, 2))
   #   
   
-  d$survey_series_desc <- gsub("Outside North", "Out. N.", d$survey_series_desc)
-  d$survey_series_desc <- gsub("Outside South", "Out. S.", d$survey_series_desc)
-  d$survey_series_desc <- gsub(" Survey", "", d$survey_series_desc)
+  # d$survey_series_desc <- gsub("Outside North", "Out. N.", d$survey_series_desc)
+  # d$survey_series_desc <- gsub("Outside South", "Out. S.", d$survey_series_desc)
+  # d$survey_series_desc <- gsub(" Survey", "", d$survey_series_desc)
   
-  all_surv <- data.frame(survey_series_desc = c("West Coast Haida Gwaii Synoptic", 
-    "Hecate Strait Synoptic", 
-    "Queen Charlotte Sound Synoptic", 
-    "West Coast Vancouver Island Synoptic", 
-    "PHMA Rockfish Longline - Out. N.", 
-    "PHMA Rockfish Longline - Out. S."), stringsAsFactors = FALSE)
+  all_surv <- data.frame(survey_series_desc = surveys, stringsAsFactors = FALSE)
   d <- left_join(all_surv, d, by = "survey_series_desc")
   
-  d$survey_series_desc <- factor(d$survey_series_desc, levels = c(
-    "West Coast Haida Gwaii Synoptic", 
-    "Hecate Strait Synoptic", 
-    "Queen Charlotte Sound Synoptic", 
-    "West Coast Vancouver Island Synoptic", 
-    "PHMA Rockfish Longline - Out. N.", 
-    "PHMA Rockfish Longline - Out. S."
-  ))
+  d$survey_series_desc <- factor(d$survey_series_desc, levels = surveys)
   
+  cols <- c(
+    RColorBrewer::brewer.pal(9, "Greens")[2],
+    RColorBrewer::brewer.pal(9, "Blues")[2],
+    RColorBrewer::brewer.pal(9, "Reds")[2],
+    RColorBrewer::brewer.pal(9, "Purples")[2]
+  )
+  cols <- paste0(cols, "")
   
-  par(mfrow = c(6, 1), oma = c(2, .5, .5, .5), cex = 0.7, mar = c(0, 0, 0, 0), mgp = c(2, 0.4, 0),
+  par(mfrow = c(6, 2), oma = c(2, .5, .5, .5), cex = 0.7, mar = c(0, 0, 0, 0), mgp = c(2, 0.4, 0),
     tcl = -0.3)
   # par(xpd = NA)
-  plyr::d_ply(d, "survey_series_desc", function(x) {
-    plot(1, 1, type = "n", xlim = c(2003, 2017) + c(-0.3, 0.3), ylim = c(0, 1.03), axes = FALSE, ann = FALSE,
+  
+  panel <<- 0
+  
+    plyr::d_ply(d, "survey_series_desc", function(x) {
+    
+    panel <<- panel + 1
+    plot(1, 1, type = "n", xlim = c(2002, 2017) + c(-0.3, 0.3), ylim = c(0, 1.03), axes = FALSE, ann = FALSE,
       xaxs = "i", yaxs = "i")
     abline(v = seq(1960, 2020, 2), col = "grey90")
-    if (!is.na(x$year) & length(unique(x$year)) > 1) {
+    if (!is.na(x$year[[1]]) & length(unique(x$year)) > 1) {
+      
+      main_scale1 <- ggplot2::scale_fill_distiller(palette = "Blues", direction = 1)
+      main_scale2 <- ggplot2::scale_fill_distiller(palette = "Reds", direction = 1)
+      main_scale3 <- ggplot2::scale_fill_distiller(palette = "Greens", direction = 1)
+      main_scale4 <- ggplot2::scale_fill_distiller(palette = "Purples", direction = 1)
+      
+      shade <- "grey90"
+      if (unique(x$survey_series_desc) == "West Coast Haida Gwaii Synoptic Survey")
+        shade <- cols[[2]]
+      if (unique(x$survey_series_desc) == "Hecate Strait Synoptic Survey")
+        shade <- cols[[1]]
+      if (unique(x$survey_series_desc) == "West Coast Vancouver Island Synoptic Survey")
+        shade <- cols[[4]]
+      if (unique(x$survey_series_desc) == "Queen Charlotte Sound Synoptic Survey")
+        shade <- cols[[3]]
+      
       polygon(c(x$year, rev(x$year)), c(x$lowerci_scaled, rev(x$upperci_scaled)),
-        col = "grey90", border = NA)
+        col = shade, border = NA)
       # segments(x0 = x$year, x1 = x$year, y0 = x$lowerci_scaled, y1 = x$upperci_scaled, col = "grey60",
       #   lwd = 1.5)
       lines(x$year, x$biomass_scaled, col = "grey30", lwd = 2.5)
-      points(x$year, x$biomass_scaled, pch = 21, col = "grey40", bg = "grey60", cex = 1.25, lwd = 2)
+      # par(xpd = NA)
+      points(x$year, x$biomass_scaled, pch = 21, col = "grey40", bg = "grey60", cex = 1.25, 
+        lwd = 2)
+      # par(xpd = FALSE)
     }
     box(col = "grey50")
-    add_label(-0.005, 0.15, unique(x$survey_series_desc), col = "grey30", cex = 0.9)
+    add_label(-0.005, 0.15, unique(x$survey_series_desc), col = "grey30", cex = 0.8)
     # par(xpd = FALSE)
+    
+    if (panel %in% c(11:12))
+      axis(1, col = "grey60", col.ticks = "grey70", col.axis = "grey30",
+        at = seq(2000, 2040, 4))
+    
   })
-  axis(1, col = "grey60", col.ticks = "grey70", col.axis = "grey30")
+
   
 }

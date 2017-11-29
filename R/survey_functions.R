@@ -124,7 +124,8 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 fit_glmmfields <- function(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
   formula_binary = present ~ depth_scaled + depth_scaled2, n_knots = 20, iter = 500, 
   chains = 1, adapt_delta = 0.99, ...) {
-  load_all("../glmmfields/")
+  # load_all("../glmmfields/")
+  library(glmmfields)
   
   options(mc.cores = parallel::detectCores())
   n_beta <- 2L
@@ -204,29 +205,47 @@ fit_inla <- function(dat, plot = TRUE, max.edge = c(1, 3), convex = 1.5) {
   list(pos = output6.stack.pos, bin = output6.stack.bin, mesh = mesh6)
 }
 
-make_prediction_grid <- function(dat, bath, n = 150) {
-  
-  x <- dat$X10
-  y <- dat$Y10
-  z <- chull(x,y)
-  coords <- cbind(x[z], y[z])
-  coords <- rbind(coords, coords[1,])
-  # plot(dat$start_lon, dat$start_lat)
-  # lines(coords, col="red")
+make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
   
   library("rgdal")
-  sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(coords)), ID=1)))
-  # set coordinate reference system with SpatialPolygons(..., proj4string=CRS(...))
-  # e.g. CRS("+proj=longlat +datum=WGS84")
-  sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
   
-  pred_grid <- expand.grid(X10 = seq(min(dat$X10), max(dat$X10), length.out = n), 
-    Y10 = seq(min(dat$Y10), max(dat$Y10), length.out = n), year = unique(dat$year))
-  coordinates(pred_grid) <- c("X10", "Y10")
+  if (is.null(region)) {
+    x <- dat$X10 * 10
+    y <- dat$Y10 * 10
+    z <- chull(x,y)
+    coords <- cbind(x[z], y[z])
+    coords <- rbind(coords, coords[1,])
+    # # plot(dat$start_lon, dat$start_lat)
+    # # lines(coords, col="red")
+    sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(coords)), ID=1)))
+    # set coordinate reference system with SpatialPolygons(..., proj4string=CRS(...))
+    # e.g. CRS("+proj=longlat +datum=WGS84")
+    sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
+    pred_grid <- expand.grid(X = seq(min(dat$X), max(dat$X), length.out = n), 
+      Y = seq(min(dat$Y), max(dat$Y), length.out = n), year = unique(dat$year))
+  } else {
+    setwd("data/SynopticTrawlSurveyBoundaries/")
+    shape <- readOGR(dsn = ".", layer = paste0(region, "_BLOB"))
+    setwd("../../")
+    shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
+    names(shape) <- c("X", "Y")
+    attr(shape, "projection") <- "LL"
+    attr(shape, "zone") <- 8
+    shapeUTM <- PBSmapping::convUL(shape)
+    sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(shapeUTM)), ID=1)))
+    sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
+    pred_grid <- expand.grid(X = seq(min(shapeUTM$X), max(shapeUTM$X), length.out = n), 
+      Y = seq(min(shapeUTM$Y), max(shapeUTM$Y), length.out = n), year = unique(dat$year))
+  }
+  coordinates(pred_grid) <- c("X", "Y")
+  
   inside <- !is.na(over(pred_grid, as(sp_poly_df, "SpatialPolygons")))
   pred_grid <- pred_grid[inside, ]
   # plot(pred_grid)
   pred_grid <- as.data.frame(pred_grid)
+  
+  pred_grid <- mutate(pred_grid, X10 = X/10, Y10 = Y/10) %>% 
+    select(-X, -Y)
   
   ii <- interp(x = bath$X/10, 
     y = bath$Y/10,
@@ -246,6 +265,10 @@ make_prediction_grid <- function(dat, bath, n = 150) {
     select(-Var1, -Var2)
   
   pred_grid <- left_join(as.data.frame(pred_grid), z, by = c("X10", "Y10"))
+  
+  if (is.null(region))
+    pred_grid <- filter(pred_grid, akima_depth >= min(dat$akima_depth),
+      akima_depth <= max(dat$akima_depth))
   
   pred_grid$depth_scaled <- (log(pred_grid$akima_depth) - dat$depth_mean[1]) / dat$depth_sd[1]
   # pred_grid$temp_scaled <- predict(m_temp_scaled, newdata = pred_grid)
@@ -312,7 +335,7 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
   pal_fill = ggplot2::scale_fill_distiller(palette = "Spectral", direction = -1),
   pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
-  pt_size_range = c(2, 7)) {
+  pt_size_range = c(2, 7), show_legend = TRUE) {
   
   library(PBSmapping)
   data("nepacLLhigh")
@@ -321,7 +344,7 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
     xlim = range(raw_dat$lon) + c(-2, 2), 
     ylim = range(raw_dat$lat) + c(-2, 2))))
   
-  ggplot(pred_dat, aes_string("X10", "Y10")) + 
+  gg <- ggplot(pred_dat, aes_string("X10", "Y10")) + 
     geom_tile(aes_string(fill = fill_column)) + 
     pal_fill + #pal_col +
     geom_point(data = raw_dat, fill = pt_fill, col = pt_col, 
@@ -332,18 +355,38 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
     coord_equal(
       xlim = range(raw_dat$X10),
       ylim = range(raw_dat$Y10)) +
-    # theme(legend.position = "none") +
     guides(shape = guide_legend(override.aes = list(colour = "grey30")),
       size = guide_legend(override.aes = list(colour = "grey30"))) +
     geom_polygon(data = nepacUTM, aes(x = X/10, y = Y/10, group = PID), 
-      fill = "grey35")
+      fill = "grey50")
+  
+  if (!show_legend) 
+    gg <- gg + theme(legend.position = "none")
+  
+  gg
 }
 
 plot_bc_map_base <- function(pred_dat, raw_dat, fill_column, 
   pal_fill = ggplot2::scale_fill_distiller(palette = "Spectral", direction = -1),
   pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
-  pt_size_range = c(2, 7)) {
+  pt_size_range = c(2, 7), aspect_ratio = 0.8054, region = "",
+  show_model_predictions = TRUE) {
+  
+  xlim <- range(pred_dat$X10)
+  ylim <- range(pred_dat$Y10)
+  xrange <- diff(xlim)
+  yrange <- diff(ylim)
+  if (yrange / xrange > aspect_ratio) { # too tall
+    needed_xrange <- yrange / aspect_ratio
+    mid_pt <- xlim[1] + xrange/2
+    xlim <- c(mid_pt - needed_xrange/2, mid_pt + needed_xrange/2)
+  }
+  if (yrange / xrange < aspect_ratio) { # too wide
+    needed_yrange <- xrange * aspect_ratio
+    mid_pt <- ylim[1] + yrange/2
+    ylim <- c(mid_pt - needed_yrange/2, mid_pt + needed_yrange/2)
+  }
   
   library(PBSmapping)
   data("nepacLLhigh")
@@ -374,8 +417,8 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   srv <- gd$data[[1]]
   map <- gd$data[[3]]
   
-  xlim = range(pred_dat$X10) + c(-1.5, 1.5)
-  ylim = range(pred_dat$Y10) + c(-1.5, 1.5)
+  # xlim = range(pred_dat$X10) + c(-1.5, 1.5)
+  # ylim = range(pred_dat$Y10) + c(-1.5, 1.5)
   
   cell_width <- max(diff(sort(srv$x)))
   cell_height <- max(diff(sort(srv$y)))
@@ -383,10 +426,24 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
     plt = c(0, 1, 0, 1), xlab = "", ylab = "")
   
-  rect(xleft = srv$x - cell_width/2, xright = srv$x + cell_width/2, 
-    ybottom = srv$y - cell_height/2, ytop = srv$y + cell_height/2,
-    border = srv$fill, col = srv$fill)
+  if (show_model_predictions) {
+    rect(xleft = srv$x - cell_width/2, xright = srv$x + cell_width/2, 
+      ybottom = srv$y - cell_height/2, ytop = srv$y + cell_height/2,
+      border = srv$fill, col = srv$fill)
+  }
   points(pts$x, pts$y, pch = ifelse(pts$shape == 4, 4, NA), cex = 1.4)
+  
+  if (!show_model_predictions) {
+    setwd("data/SynopticTrawlSurveyBoundaries/")
+    shape <- readOGR(dsn = ".", layer = paste0(region, "_BLOB"))
+    setwd("../../")
+    shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
+    names(shape) <- c("X", "Y")
+    attr(shape, "projection") <- "LL"
+    attr(shape, "zone") <- 8
+    shapeUTM <- PBSmapping::convUL(shape)
+    polygon(shapeUTM$X/10, shapeUTM$Y/10, border = "grey70", col = NA)
+  }
   
   pts_pos <- dplyr::filter(pts, shape != 4)
   symbols(pts_pos$x, pts_pos$y, circles = pts_pos$size/15, fg = "black",
@@ -405,10 +462,22 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   
   plyr::d_ply(nepacUTM, "PID", function(i)
     polygon(i$X/10, i$Y/10, col = "grey90", border = "grey70", lwd = 0.4))
+  
+  mtext(paste0(region[[1]], " ", unique(raw_dat$year)[[1]]), side = 3, adj = 0.95, 
+    line = -2, col = "grey30")
+  
   box(col = "grey50")
+  
+  invisible(list(xlim = xlim, ylim = ylim))
 }
 
 fit_spatial_survey_model <- function(species, survey, years) {
+  
+  region <- NA
+  if (survey == "West Coast Haida Gwaii Synoptic Survey") region <- "WCHG"
+  if (survey == "West Coast Vancouver Island Synoptic Survey") region <- "WCVI"
+  if (survey == "Queen Charlotte Sound Synoptic Survey") region <- "QCS"
+  if (survey == "Hecate Strait Synoptic Survey") region <- "HS"
   
   dd1 <- get_surv_data(species, survey, years = years)
   dd1 <- unique(dd1) # FIXME!!
@@ -424,12 +493,14 @@ fit_spatial_survey_model <- function(species, survey, years) {
   dd3 <- scale_predictors(dd2)
   dd3$X10 <- dd3$X10 * 10
   dd3$Y10 <- dd3$Y10 * 10
-  m <- fit_glmmfields(dd3, chains = 4L, iter = 1000L, n_knots = min(sum(dd1$present)-2, 15L), 
-    adapt_delta = 0.98, thin = 2)
+  m <- fit_glmmfields(dd3, chains = 4L, iter = 1000L, 
+    n_knots = min(sum(dd1$present)-2, 15L), 
+    adapt_delta = 0.9, thin = 2)
   m
   dd3$X10 <- dd3$X10 / 10
   dd3$Y10 <- dd3$Y10 / 10
-  pg <- make_prediction_grid(dd3, b$bath, n = 120L)
+  pg <- make_prediction_grid(dd3, b$bath, n = 100L, 
+    region = ifelse(is.na(region), NULL, region))
   pg$X10 <- pg$X10 * 10
   pg$Y10 <- pg$Y10 * 10
   pos <- predict(m$pos, newdata = data.frame(pg, time = 1),
