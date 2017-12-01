@@ -14,7 +14,6 @@ catches <- d %>% filter(!is.na(species_common_name), !is.na(year),
   arrange(-landed_kg) %>% 
   `[`(1:50, 1:2)
 
-spp <- gsub("/", "-", gsub(" ", "-", catches$species_common_name))
 spp <- spp[-which(spp == "spiny-dogfish")]
 spp <- spp[-which(spp == "unknown-fish")] 
 spp <- spp[-which(spp == "scorpionfishes")]
@@ -30,6 +29,9 @@ spp <- spp[-which(spp == "chub-mackerel")]
 spp <- spp[-which(spp == "jack-mackerel")]
 
 spp <- sort(spp)
-spp <- c("pacific-ocean-perch", "dover-sole", "spotted-ratfish", "north-pacific-spiny-dogfish", "redbanded-rockfish", 
-  "shortraker-rockfish", "sablefish", "walleye-pollock", spp)
+spp <- c("pacific ocean perch", "dover sole", "spotted ratfish", "north pacific spiny dogfish", "redbanded rockfish", 
+  "shortraker rockfish", "sablefish", "walleye pollock", spp)
 spp <- spp[!duplicated(spp)]
+
+common <- spp
+spp <- gsub("/", "-", gsub(" ", "-", catches$species_common_name))
