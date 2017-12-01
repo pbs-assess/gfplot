@@ -17,6 +17,7 @@ source("R/survey_functions.R")
 
 source("R/make-spp-list.R")
 print(common)
+fits_not_good <- "spotted ratfish"
 
 surveys_to_fit <- data.frame(survey = c(
   "West Coast Haida Gwaii Synoptic Survey",
@@ -31,17 +32,19 @@ main_scale3 <- ggplot2::scale_fill_distiller(palette = "Greens", direction = 1)
 main_scale4 <- ggplot2::scale_fill_distiller(palette = "Purples", direction = 1)
 pal_scales <- list(main_scale1, main_scale2, main_scale3, main_scale4)
 
-for (i in 1:3) {  
+for (i in 1:10) {  
   spp_file_name <- gsub("/", "-", gsub(" ", "-", common[i]))
   save_file <- paste0("spatial-survey/", spp_file_name, "-spatial-fits.rda")
 
   if (!file.exists(save_file)) {
+    message(paste("Fitting", common[i], "models"))
     model_fits <- list()
-    message(paste("Fitting models for", common[i]))
     for (j in seq_len(4)) {
+      message(paste0("Fitting models for ", common[i], 
+        " with survey ", surveys_to_fit$survey[j]), " in ", surveys_to_fit$years[j], ".")
       model_fits[[j]] <- fit_spatial_survey_model(common[i],
         survey = surveys_to_fit$survey[j],
-        years = surveys_to_fit$years[j], chains = 4L, iter = 1000L, max_knots = 15L,
+        years = surveys_to_fit$years[j], chains = 3L, iter = 800L, max_knots = 15L,
         adapt_delta = 0.9, thin = 1L, prediction_grid_n = 150L,
         mcmc_posterior_samples = 100L, required_obs_percent = 0.1)
     }
@@ -49,10 +52,10 @@ for (i in 1:3) {
       file = paste0("spatial-survey/", spp_file_name, "-spatial-fits.rda"))
   } else {
     load(save_file)
-    message(paste("Reloading", print(common[i]), "models"))
+    message(paste("Reloading", common[i], "models"))
   }
   
-  message(paste("Plotting maps for", print(common[i])))
+  message(paste0("Plotting maps for ", print(common[i])))
   pdf(paste0("spatial-survey/", spp_file_name, ".pdf"), 
     width = 8, height = 6.46)
   par(mfrow = c(2, 2))
@@ -61,8 +64,10 @@ for (i in 1:3) {
     plot_bc_map_base(model_fits[[j]]$predictions, model_fits[[j]]$data, "sqrt(combined)",
       pt_col = "#00000080", pt_fill = "#00000040", pal_fill = pal_scales[[j]],
       region = model_fits[[j]]$region, 
-      show_model_predictions = ifelse("combined" %in% 
-          names(model_fits[[j]]$predictions), TRUE, FALSE))
+      show_model_predictions = ifelse(
+        "combined" %in% names(model_fits[[j]]$predictions) & 
+          !common[i] %in% fits_not_good, 
+        TRUE, FALSE))
   }
   dev.off()
 }

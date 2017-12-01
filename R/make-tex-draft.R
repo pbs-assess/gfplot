@@ -19,9 +19,9 @@ temp <- lapply(spp, function(x) {
   out[[9]] <- paste0("\\includegraphics[height=1.5in]{synop/dat-syn-", x, ".pdf}")
   
   if (file.exists(paste0("spatial-survey/", x, "-spatial-survey.pdf"))) {
-    out[[10]] <- paste0("\\includegraphics[height=3.3in]{spatial-survey/", x, "-spatial-survey.pdf}")
+    out[[10]] <- paste0("\\includegraphics[height=3.3in]{spatial-survey/", x, ".pdf}")
   } else {
-    out[[10]] <- paste0("% \\includegraphics[height=3.3in]{spatial-survey/", x, "-spatial-survey.pdf}")
+    out[[10]] <- paste0("% survey map not rendered")
   }
 
   out[[11]] <- paste0("\\caption{", lab, "}")

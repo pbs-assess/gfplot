@@ -262,22 +262,15 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   
   if (show_model_predictions)
     g <- g + geom_tile(aes_string(fill = fill_column, colour = fill_column))
-  
   gd <- ggplot_build(g) # extract data from ggplot
-  
-  if (show_model_predictions) {
-    pts <- gd$data[[2]]
-    srv <- gd$data[[1]]
-    map <- gd$data[[3]]
-  } else {
-    pts <- gd$data[[1]]
-    map <- gd$data[[2]]
-  }
+  pts <- gd$data[[1]]
+  map <- gd$data[[2]]
   
   plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
     plt = c(0, 1, 0, 1), xlab = "", ylab = "")
   
   if (show_model_predictions) {
+    srv <- gd$data[[3]]
     cell_width <- max(diff(sort(srv$x)))
     cell_height <- max(diff(sort(srv$y)))
     
@@ -296,14 +289,23 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
     attr(shape, "projection") <- "LL"
     attr(shape, "zone") <- 8
     shapeUTM <- PBSmapping::convUL(shape)
-    polygon(shapeUTM$X, shapeUTM$Y, border = "grey70", col = "#00000010")
+    
+    # get colour with bad hack:
+    g1 <- ggplot(data.frame(x = 1:9, y = rep(1, 9)), aes(x, y, fill = x)) + 
+      pal_fill + geom_point(pch = 21)
+    cols <- ggplot_build(g1)$data[[1]]$fill
+    
+    polygon(shapeUTM$X, shapeUTM$Y, border = cols[6], col = paste0(cols[3], "40"))
   }
   
-  pts_pos <- dplyr::filter(pts, shape != 4)
-  if (nrow(pts_pos) > 0) {
-    symbols(pts_pos$x, pts_pos$y, circles = pts_pos$size/1.5, fg = "black",
-      bg = "#00000050", inches = FALSE, add = TRUE) # TODO CHECK!! radius ggplot?
-    # sqrt(area / 3.14159265)
+  if ("shape" %in% names(pts)) {
+    pts_pos <- dplyr::filter(pts, shape != 4)
+    if (nrow(pts_pos) > 0) {
+      symbols(pts_pos$x, pts_pos$y, circles = pts_pos$size/1.5, fg = "black",
+        bg = "#00000050", inches = FALSE, add = TRUE) 
+      # TODO: CHECK!! radius or area from ggplot?
+      # sqrt(area / 3.14159265)
+    }
   }
   
   lims <- data.frame(X = sort(xlim), Y = sort(ylim))
