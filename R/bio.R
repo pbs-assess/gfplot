@@ -42,11 +42,12 @@ all_surv_n <- group_by(surv, survey_series_desc, year) %>%
   dbio$species_common_name <- tolower(dbio$species_common_name)
   dbio$species_science_name <- tolower(dbio$species_science_name)
   dbio <- mutate(dbio, year = lubridate::year(trip_start_date))
+
   
   ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds")
   names(ss) <- tolower(names(ss))
   dbio <- inner_join(dbio, ss)
-  dbio <- filter(dbio, survey_series_type_code > 0)
+  dbio <- dbio[!duplicated(dbio$specimen_id), ]
   
   surv2 <- left_join(surv, ss)
   
@@ -56,6 +57,30 @@ all_surv_n <- group_by(surv, survey_series_desc, year) %>%
   
 # }
 
+# q <- filter(dbio, species_common_name == "shortraker rockfish") %>%
+#   filter(!is.na(length), !is.na(weight))
+# nrow(q)
+# # ggplot(q, aes(length, weight, colour = as.factor(year))) + geom_smooth(se = FALSE)
+# # library(rstanarm)
+# # m <- stan_glm(log(weight) ~ log(length), family = gaussian(), data = q,
+# #   iter = 500, chains = 3, cores = 3)
+# m.lm <- lm(log(weight) ~ log(length), data = q)
+# summary(m)
+# summary(m.lm)
+# newdata <- data.frame(length = seq(min(q$length), max(q$length), length.out = 300))
+# newdata$est <- predict(m.lm, newdata = newdata)
+# newdata$se <- predict(m.lm, se.fit = TRUE, newdata = newdata,
+#   interval = "prediction")$se.fit
+# newdata$lwr <- newdata$est + qnorm(0.025) * newdata$se
+# newdata$upr <- newdata$est + qnorm(0.975) * newdata$se
+# ggplot(q, aes(length)) + geom_hex(aes(y = weight/1000), alpha = 0.8) +
+#   scale_fill_distiller(palette = "YlOrRd", direction = 1, trans = "log") +
+#   geom_line(data = newdata, aes(length, exp(est))) +
+#   # geom_ribbon(data = newdata, aes(length, ymin = exp(lwr), ymax = exp(upr)),
+#     # fill = "red", col = NA)
+#   theme_light() +
+#   guides(fill = FALSE)
+# 
 
 
 # commercial bio samples:
@@ -185,7 +210,7 @@ for (i in seq_along(torun)) {
   spb <- left_join(all, spb)
   #########
   
-  pdf(paste0("synop/dat-syn-", gsub("/", "-", gsub(" ", "-", common_name)), ".pdf"), 
+  pdf(paste0("synop/dat-syn-", gsub("/", "-", gsub(" ", "-", common_name)), ".pdf"),
     width = 6, height = 2.75)
   # layout(c(rep(1, 16), rep(2, 10)))
   layout(c(rep(1, 16), rep(2, 16)))
@@ -203,7 +228,10 @@ for (i in seq_along(torun)) {
   
   
   plot_grid <- function(mat_dat, col) {
-    graphics::image(x = unique(spb$year), y = 1:4, z = log(mat_dat), axes = FALSE,
+    
+    if (sum(mat_dat) == 0) col <- "white"
+    
+    graphics::image(x = unique(spb$year), y = 1:4, z = log(mat_dat+1), axes = FALSE,
       xlab = "", ylab = "", col = col)
     axis(1, at = labs, labels = labs, tick = 0, line = -0.65, col.axis = axis_col)
     axis(2, at = 1:4, labels = names(spb)[-c(1, 2)], las = 1, tick = 0, line = -0.4,
@@ -214,7 +242,7 @@ for (i in seq_along(torun)) {
     # 
     max_val <- ifelse(all(is.na(mat_dat)), NA, max(mat_dat, na.rm = TRUE))
     
-    if (!is.na(max_val)) {
+    if (!is.na(max_val) & max_val != 0) {
       round_nice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
         if(length(x) != 1) stop("'x' must be of length 1")
         10^round(log10(x)) * nice[[which(x <= 10^round(log10(x)) * nice)[[1]]]]
@@ -225,6 +253,12 @@ for (i in seq_along(torun)) {
         plyr::round_any(max_val, 100), col = "white", cex = 0.6)
     }
     
+  }
+  
+  for (i in 3:6) {
+    temp <- spb[,i]
+    temp[is.na(temp)] <- 0
+    spb[,i] <- temp
   }
   
   com <- filter(spb, type == "commercial")

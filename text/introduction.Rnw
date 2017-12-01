@@ -1,0 +1,8 @@
+% !TEX root = gf-synopsis.Rnw
+
+\section{INTRODUCTION}
+
+\subsection{PURPOSE OF DOCUMENT} \label{sec:purpose}
+
+\subsection{MOTIVATION}
+

@@ -7,6 +7,7 @@ names(dbio) <- tolower(names(dbio))
 dbio$species_common_name <- tolower(dbio$species_common_name)
 dbio$species_science_name <- tolower(dbio$species_science_name)
 dbio <- mutate(dbio, year = lubridate::year(trip_start_date))
+dbio <- dbio[!duplicated(dbio$specimen_id), ]
 
 ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds") %>%
   select(-SURVEY_SERIES_TYPE_CODE)
@@ -53,12 +54,13 @@ dbio <- dbio %>%
 # bad data:
 
 dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "north pacific spiny dogfish"), ]
+dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "big skate"), ]
 
-spp <- names(rev(sort(table(dbio$species_common_name)))[1:60])
+spp <- names(rev(sort(table(dbio$species_common_name)))[1:50])
 
 for (ii in seq_along(spp)) {
-  print(ii)
-  print(spp[ii])
+
+  message(spp[ii])
   dd <- filter(dbio, species_common_name == spp[[ii]])
   dd2 <- filter(dd, survey_series_desc %in% c(
     "West Coast Haida Gwaii Synoptic Survey",
@@ -77,7 +79,7 @@ for (ii in seq_along(spp)) {
   
   dd2 <- suppressWarnings(inner_join(surv, dd2, by = "survey_series_desc"))
   
-  scaling <- 2.5
+  scaling <- 1.8
   
   cols <- c(
     RColorBrewer::brewer.pal(9, "Blues")[2],
@@ -104,8 +106,8 @@ for (ii in seq_along(spp)) {
   for (j in seq_along(survs)) {
     dd3 <- filter(dd2, survey_series_desc == survs[j],
       !is.na(length))
-    plot(1, 1, xlim = range(dd2$length, na.rm = TRUE), ylim = c(2003, 2017) + c(0.1, 1.5), 
-      ylab = "Year", xlab = "Length (cm)", axes = FALSE)
+    plot(1, 1, xlim = range(dd2$length, na.rm = TRUE), ylim = c(2003, 2018) + c(-0.025, 0.65), 
+      ylab = "Year", xlab = "Length (cm)", axes = FALSE, yaxs = "i")
     mtext(unique(surv$surv_short)[j], side = 3, line = 0.2, cex = 0.7)
     abline(h = seq(min(dd2$year), max(dd2$year), 1), col = "#00000030")
     
@@ -116,36 +118,70 @@ for (ii in seq_along(spp)) {
     
     max_y <- list()
     den <- list()
-    for (k in 1:2) {
-      den[[k]] <- list()
-      for (i in seq_along(rev(unique(dd3$year)))) {
-        x <- dplyr::filter(dd3, year == rev(unique(dd3$year))[i], sex == k)
-        
-        if (nrow(x) > 10) 
-          den[[k]][[i]] <- density(x$length)
-        else
-          den[[k]][[i]] <- NA
-      }
-      max_y[[k]] <- max(unlist(lapply(den[[k]], function(qq) ifelse(is.na(qq), NA, max(qq$y)))))
-    }
-    max_y <- max(unlist(max_y))
-    this_scaling <- scaling / max_y
+    # for (k in 1:2) {
+    #   den[[k]] <- list()
+    #   for (i in seq_along(rev(unique(dd3$year)))) {
+    #     x <- dplyr::filter(dd3, year == rev(unique(dd3$year))[i], sex == k)
+    #     
+    #     if (nrow(x) > 10) 
+    #       den[[k]][[i]] <- density(x$length)
+    #     else
+    #       den[[k]][[i]] <- NA
+    #   }
+    #   max_y[[k]] <- max(unlist(lapply(den[[k]], function(qq) ifelse(is.na(qq), NA, max(qq$y, na.rm = TRUE)))), na.rm = TRUE)
+    # }
+    # 
+    library(ggplot2)
     
-    for (i in seq_along(rev(unique(dd3$year)))) {
+    dd3 <- group_by(dd3, survey_series_desc, year, sex) %>% mutate(samples = n()) %>% 
+      filter(samples >= 20) %>% 
+      ungroup()
+    
+    if (nrow(dd3) > 0) {
+      g <- ggplot(dd3, aes(length, colour = as.factor(sex))) + 
+        geom_density() + facet_wrap(~year)
+
+      gd <- ggplot_build(g) # extract data from ggplot
+      gd1 <- gd$data[[1]]
+      gd1$year <- unique(dd3$year)[gd1$PANEL]
+      gd1$sex <- unique(dd3$sex)[as.numeric(as.factor(gd1$colour))]
+      # par(mfrow = c(8, 1))
+      # for (i in 1:8) 
+      #   plyr::d_ply(gd1, "PANEL", function(x) 
+      #     plot(x$x, x$density, colour = x$sex, type = "l"))
       
-      for (k in 1:2) {
-        x <- dplyr::filter(dd3, year == rev(unique(dd3$year))[i])
-        if (!is.na(den[[k]][[i]])) {
-          polygon(c(den[[k]][[i]]$x, rev(den[[k]][[i]]$x)),
-            c(den[[k]][[i]]$y * this_scaling + x$year[1], rep(x$year[1], length(den[[k]][[i]]$y))),
+      # max_y <- max(unlist(max_y))
+      # this_scaling <- scaling / max_y
+      # this_scaling <- 20
+      
+      
+
+      # gd1 <- inner_join(gd1, ns, by = "year")
+      # gd1$density[gd1$samples < 25] <- 0
+      
+      max_y <- max(gd1$density)
+      this_scaling <- scaling / max_y
+      
+      for (i in seq_along(rev(unique(dd3$year)))) {
+        
+        for (k in 1:2) {
+          x <- dplyr::filter(gd1, year == rev(unique(dd3$year))[i], sex == k)
+          # if (!is.na(den[[k]][[i]])) {
+          #   polygon(c(den[[k]][[i]]$x, rev(den[[k]][[i]]$x)),
+          #     c(den[[k]][[i]]$y * this_scaling + x$year[1], rep(x$year[1], length(den[[k]][[i]]$y))),
+          #     border = c("grey30", cols_dark[j])[k], col = c("grey70", cols[j])[k], lwd = 1.1)
+          # }
+          polygon(c(x$x, rev(x$x)),
+            c(x$density * this_scaling + x$year[1], rep(x$year[1], length(x$y))),
             border = c("grey30", cols_dark[j])[k], col = c("grey70", cols[j])[k], lwd = 1.1)
         }
       }
+      
+     
+      
+      
     }
-    
     box(col = "grey60")
-    
-    
   }
   mtext("Length (cm)", side = 1, outer = TRUE, col = "grey30", line = 1.5, cex = 0.7)
   dev.off()

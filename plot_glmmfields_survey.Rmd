@@ -30,11 +30,10 @@ dd1 <- get_surv_data("pacific ocean perch",
 I then go through a bit of data manipulation (not shown) which includes centering the predictors by their mean and dividing them by their standard deviation to put them on a reasonable scale for the priors in this model. I will also convert coordinates into eastings and northings so distance is constant throughout the data. Later `X10` and `Y10` refer to eastings and northings divided by 10 (to put some of the spatial parameters on an appropriate scale for the priors).
 
 ```{r, message=FALSE, warning=FALSE, results='hide'}
-dd1 <- unique(dd1) # FIXME!!
-unique(dd1$year)
-# nrow(dd1)
-# table(dd1$present)
+nrow(dd1)
+table(dd1$present)
 b <- join_noaa_bathy(dd1)
+b$data$akima_depth <- b$data$depth # FIXME
 dd2 <- b$data
 dat <- scale_predictors(dd2)
 dat$X10 <- dat$X10 * 10
@@ -95,7 +94,7 @@ dat$X10 <- dat$X10 / 10
 dat$Y10 <- dat$Y10 / 10
 ```
 
-We then that make a fine scale grid over the range of the survey boundaries on which to project our model projections onto.
+We then make a fine-scale grid over the range of the survey boundaries on which to project our model predictions.
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
 pg <- make_prediction_grid(dat, b$bath, n = 150L, region = "QCS")
@@ -106,7 +105,7 @@ pg$X10 <- pg$X10 * 10
 pg$Y10 <- pg$Y10 * 10
 ```
 
-Next we predict from the positive and binary models onto our prediction grid.
+Next we predict from the positive and binary models onto our grid.
 
 ```{r, echo=TRUE}
 pos <- predict(m$pos, newdata = data.frame(pg, time = 1),

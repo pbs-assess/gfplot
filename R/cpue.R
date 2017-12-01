@@ -81,7 +81,6 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   leg$raw_vals <- exp(leg$vals)
   leg$i <- seq(0, 1, length.out = nrow(leg))
   
-  # pdf("pop-index-example.pdf", width = 3, height = 2.8)
   par(mar = c(0, 0, 0, 0), oma = c(.5, .5, .5, .5), cex = 0.6)
   
   xlim = range(dat$X) + c(-10, -5)
@@ -107,8 +106,9 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
       lwd = 0.02))
   
   zlev <- c(100, 200, 500)
-  isobath_UTM <- suppressMessages(convUL(clipPolys(filter(isobath, PID %in% zlev), 
-    xlim = xlim_ll, ylim = ylim_ll)))
+  isobath <- clipPolys(filter(isobath, PID %in% zlev), xlim = xlim_ll, ylim = ylim_ll)
+  attr(isobath, "zone") <- 8
+  isobath_UTM <- suppressMessages(convUL(isobath))
   PBSmapping::addLines(isobath_UTM, col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
   
   plyr::d_ply(nepacUTM, "PID", function(i)
@@ -150,8 +150,7 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   # rect(xleft = xlim[[1]] - 20, xright = xlim[[1]] + 20.6,
   # ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 20.5, col = NA, border = "grey60",
   # lwd = 0.7)
-  # dev.off()
-  
+
   box(col = "grey60")
   
   boxes <- readRDS("data/boxes.rds")

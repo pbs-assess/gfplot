@@ -1,0 +1,92 @@
+\documentclass[11pt]{book}
+
+%% Use the style file in the csas-style repository:
+%% https://github.com/cgrandin/csas-style
+\usepackage{../../csas-style/res-doc} % may need to adjust this path
+\usepackage{textcomp}
+
+\input{title-pages}
+
+\clearpage
+
+<<echo=FALSE,  message=FALSE, results='hide', warning=FALSE>>=
+library("knitr")
+opts_chunk$set(dev = 'png',
+               fig.dpi = 96,
+               fig.width = 7.5,
+               fig.height = 4,
+               dpi = 100,
+               echo = FALSE,
+               results = FALSE,
+               message = FALSE,
+               warning = FALSE,
+               results = 'hide',
+               cache = TRUE,
+               autodep = TRUE)
+@
+
+\TableOfContents
+
+\Main
+
+\abstract{}
+
+\frenchabstract{
+Blank for now.
+}
+
+\clearpage
+
+% The next two lines are required to start off numbering
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+<<intro, child='introduction.Rnw'>>=
+@
+
+<<methods, child='methods.Rnw'>>=
+@
+
+% \begin{table}[htpb]
+% \caption{Groundfish stocks the framework potentially applies to.}
+% \end{table}
+
+% \begin{table}[htpb]
+% \caption{DFO-specific R functions for examining simulation output.}
+% \end{table}
+
+\clearpage
+
+\bibliographystyle{res-doc}
+\bibliography{refs}
+
+% \clearpage
+
+% \section{TABLES}
+
+% \clearpage
+
+% \section{FIGURES}
+
+% \begin{figure}[H]
+% \begin{center}
+% \includegraphics[width=6in]{filename}
+% \end{center}
+% \caption{}
+% \label{fig:labelhere}
+% \end{figure}
+
+\clearpage
+
+\Appendices
+
+%% Need \refstepcounter{chapter} before every new appendix
+%%  to increment the appendix letter.
+
+% \clearpage
+% \refstepcounter{chapter}
+% <<om-model-description, child='om-description.Rnw'>>=
+% @
+
+
+\end{document}

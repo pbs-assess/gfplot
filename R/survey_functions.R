@@ -1,48 +1,49 @@
 library(tidyverse)
 
 get_surv_data <- function(species, survey, years) {
-  d <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
+  d <- readRDS("../../Dropbox/dfo/data/select-survey-spatial-tows.rds")
   names(d) <- tolower(names(d))
-  d$species_common_name <- tolower(d$species_common_name)
-  d$species_science_name <- tolower(d$species_science_name)
-  d$year <- lubridate::year(d$trip_start_date)
+  # d$species_common_name <- tolower(d$species_common_name)
+  # d$species_science_name <- tolower(d$species_science_name)
+  # d$year <- lubridate::year(d$trip_start_date)
   
-  d$trawl_width <- ifelse(!is.na(d$trlsp_doorspread), d$trlsp_doorspread, NA)
-  d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_mouth_opening_width, d$trawl_width)
-  d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_wingspread, d$trawl_width)
-  d$trawl_width <- ifelse(is.na(d$trawl_width), mean(d$trawl_width, na.rm = TRUE), d$trawl_width)
+  # d$trawl_width <- ifelse(!is.na(d$trlsp_doorspread), d$trlsp_doorspread, NA)
+  # d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_mouth_opening_width, d$trawl_width)
+  # d$trawl_width <- ifelse(is.na(d$trawl_width), d$trlsp_wingspread, d$trawl_width)
+  # d$trawl_width <- ifelse(is.na(d$trawl_width), mean(d$trawl_width, na.rm = TRUE), d$trawl_width)
+  # 
+  # # d <- mutate(d, tow_length_m = fe_distance_travelled * 1000,
+  # #   tow_length_m = ifelse(is.na(tow_length_m), 0, tow_length_m),
+  # #   doorspread_m = ifelse(is.na(trlsp_doorspread), 0, trlsp_doorspread),
+  # #   speed_mpm = ifelse(is.na(trlsp_speed), 0, trlsp_speed * 16.66667))
+  # 
+  # d$trawl_width <- mean(d$trlsp_doorspread, na.rm = TRUE)
   
-  # d <- mutate(d, tow_length_m = fe_distance_travelled * 1000,
-  #   tow_length_m = ifelse(is.na(tow_length_m), 0, tow_length_m),
-  #   doorspread_m = ifelse(is.na(trlsp_doorspread), 0, trlsp_doorspread),
-  #   speed_mpm = ifelse(is.na(trlsp_speed), 0, trlsp_speed * 16.66667))
+  d <- rename(d, start_lon = longitude, start_lat = latitude)
   
-  d$trawl_width <- mean(d$trlsp_doorspread, na.rm = TRUE)
+  # all <- filter(d, survey_series_desc %in% survey) %>% 
+    # filter(year %in% years) %>% 
+    # select(year, start_lon, start_lat, depth_m)
   
-  all <- filter(d, survey_series_desc %in% survey) %>% 
-    filter(year %in% years) %>% 
-    select(year, start_lon, start_lat, 
-      fe_bottom_water_temp_depth, trip_id, 
-      fishing_event_id, set_num) %>% 
-    unique()
+  dat <- dplyr::filter(d, species_common_name %in% species) %>% 
+    dplyr::filter(survey_series_desc %in% survey) %>% 
+    dplyr::filter(year %in% years) %>% 
+    dplyr::rename(density = density_kgpm2)
   
-  dat <- filter(d, species_common_name %in% species) %>% 
-    filter(!is.na(catch_weight)) %>% 
-    filter(survey_series_desc %in% survey) %>% 
-    filter(year %in% years)
+  # dat <- mutate(dat, density = catch_weight / 
+  #     (fe_distance_travelled * mean(d$trlsp_doorspread, na.rm = TRUE)))
   
-  dat <- mutate(dat, density = catch_weight / 
-      (fe_distance_travelled * mean(d$trlsp_doorspread, na.rm = TRUE)))
+  # dat <- mutate(d, density = density_kgpm2)
   
-  dat <- left_join(all, dat, 
-    by = c("year", "start_lon", "start_lat", 
-      "fe_bottom_water_temp_depth", "trip_id", 
-      "fishing_event_id", "set_num"))
-  dat$density[is.na(dat$density)] <- 0
+  # dat <- left_join(all, dat, 
+  #   by = c("year", "start_lon", "start_lat", 
+  #     "fe_bottom_water_temp_depth", "trip_id", 
+  #     "fishing_event_id", "set_num"))
+  # dat$density[is.na(dat$density)] <- 0
   
-  dat <- select(dat, year, start_lon, start_lat, fe_bottom_water_temp_depth, density) %>%
+  dat <- select(dat, year, start_lon, start_lat, depth_m, density) %>%
     rename(X = start_lon, Y = start_lat) %>% 
-    rename(depth = fe_bottom_water_temp_depth)
+    rename(depth = depth_m)
   
   ## binomial?
   dat <- mutate(dat, present = ifelse(density > 0, 1, 0))
@@ -52,8 +53,10 @@ get_surv_data <- function(species, survey, years) {
   attr(dat, "zone") <- 8
   dat$lat <- dat$Y
   dat$lon <- dat$X
-  dat <- (PBSmapping::convUL(dat))
-  dat <- as.data.frame(na.omit(dat))
+  
+  if (nrow(dat) > 1)
+    dat <- suppressMessages(PBSmapping::convUL(dat))
+  dat <- as.data.frame(dat)
   dat
 }
 
@@ -442,7 +445,7 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
     attr(shape, "projection") <- "LL"
     attr(shape, "zone") <- 8
     shapeUTM <- PBSmapping::convUL(shape)
-    polygon(shapeUTM$X/10, shapeUTM$Y/10, border = "grey70", col = NA)
+    polygon(shapeUTM$X/10, shapeUTM$Y/10, border = "grey70", col = "#00000010")
   }
   
   pts_pos <- dplyr::filter(pts, shape != 4)
@@ -459,9 +462,26 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   # isobath_UTM$Y <-  isobath_UTM$Y/10
   # PBSmapping::addLines(isobath_UTM, 
   #   col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
+
+  lims <- data.frame(X = sort(xlim)*10, Y = sort(ylim)*10)
+  attr(lims, "projection") <- "UTM"
+  attr(lims, "zone") <- 8
+  lims_ll <- suppressMessages(convUL(lims))
   
+  # browser()
+  library(PBSdata)
+  data("isobath")
+  zlev <- c(100, 200, 500)
+  isobath <- clipPolys(filter(isobath, PID %in% zlev), 
+    xlim = lims_ll$X + c(-10, 10), ylim = lims_ll$Y + c(-10, 10))
+  attr(isobath, "zone") <- 8
+  isobath_UTM <- suppressMessages(convUL(isobath))
+  isobath_UTM$X <- isobath_UTM$X/10
+  isobath_UTM$Y <- isobath_UTM$Y/10
+  PBSmapping::addLines(isobath_UTM, 
+    col = rev(c("#00000070", "#00000055", "#00000040")), lwd = 0.8)
   plyr::d_ply(nepacUTM, "PID", function(i)
-    polygon(i$X/10, i$Y/10, col = "grey90", border = "grey70", lwd = 0.4))
+    polygon(i$X/10, i$Y/10, col = "grey90", border = "grey70", lwd = 0.7))
   
   mtext(paste0(region[[1]], " ", unique(raw_dat$year)[[1]]), side = 3, adj = 0.95, 
     line = -2, col = "grey30")
@@ -480,26 +500,33 @@ fit_spatial_survey_model <- function(species, survey, years) {
   if (survey == "Hecate Strait Synoptic Survey") region <- "HS"
   
   dd1 <- get_surv_data(species, survey, years = years)
-  dd1 <- unique(dd1) # FIXME!!
+  
+  if (nrow(dd1) < 10) return(list(data = dd1))
+  if (sum(dd1$present) < 10) return(list(data = dd1))
+  
+  # dd1 <- unique(dd1) # FIXME!!
   assertthat::assert_that(length(unique(dd1$year)) == 1L)
   message(unique(dd1$year))
   message(nrow(dd1))
   print(table(dd1$present))
   
-  stopifnot(sum(dd1$present) > 10)
+
   
   b <- join_noaa_bathy(dd1)
   dd2 <- b$data
   dd3 <- scale_predictors(dd2)
   dd3$X10 <- dd3$X10 * 10
   dd3$Y10 <- dd3$Y10 * 10
-  m <- fit_glmmfields(dd3, chains = 4L, iter = 1000L, 
+  
+
+  
+  m <- fit_glmmfields(dd3, chains = 3L, iter = 1200L, 
     n_knots = min(sum(dd1$present)-2, 15L), 
-    adapt_delta = 0.9, thin = 2)
+    adapt_delta = 0.95, thin = 2)
   m
   dd3$X10 <- dd3$X10 / 10
   dd3$Y10 <- dd3$Y10 / 10
-  pg <- make_prediction_grid(dd3, b$bath, n = 100L, 
+  pg <- make_prediction_grid(dd3, b$bath, n = 150L, 
     region = ifelse(is.na(region), NULL, region))
   pg$X10 <- pg$X10 * 10
   pg$Y10 <- pg$Y10 * 10
@@ -515,7 +542,7 @@ fit_spatial_survey_model <- function(species, survey, years) {
   pg$bin <- apply(bin, 1, median)
   pg$pos <- apply(pos, 1, median)
   
-  pg <- filter(pg, akima_depth >= min(dd3$akima_depth), akima_depth <= max(dd3$akima_depth))
+  # pg <- filter(pg, akima_depth >= min(dd3$akima_depth), akima_depth <= max(dd3$akima_depth))
   
   list(predictions = pg, data = dd3, models = m)
 }
