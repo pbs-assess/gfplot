@@ -1,15 +1,19 @@
 library(tidyverse)
 
 get_surv_data <- function(species, survey, years) {
-  
+  library(dplyr)
   d <- readRDS("../../Dropbox/dfo/data/select-survey-spatial-tows.rds")
   names(d) <- tolower(names(d))
+  
+  d <- filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
+  d <- filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
+  
   d <- rename(d, start_lon = longitude, start_lat = latitude)
   dat <- dplyr::filter(d, species_common_name %in% species) %>% 
     filter(survey_series_desc %in% survey) %>% 
     filter(year %in% years) %>% 
     rename(density = density_kgpm2)
-  dat <- select(dat, year, start_lon, start_lat, depth_m, density) %>%
+  dat <- dplyr::select(dat, year, start_lon, start_lat, depth_m, density) %>%
     rename(X = start_lon, Y = start_lat) %>% 
     rename(depth = depth_m)
   
@@ -31,20 +35,16 @@ join_noaa_bathy <- function(dat, plot = FALSE) {
   library(marmap)
   mm <- getNOAA.bathy(lon1 = min(dat$lon) - 0.5, lon2 = max(dat$lon) + 0.5,
     lat1=min(dat$lat) - 0.5,lat2=max(dat$lat) + 0.5, resolution = 1, keep = TRUE)
-  # plot(mm, image=TRUE)
-  # plot(as.raster(mm))
   bath <- as.xyz(mm) %>% rename(X = V1, Y = V2, depth = V3) %>% 
     filter(depth < 0) %>% mutate(depth = -depth)
-  
   attr(bath, "projection") <- "LL"
   attr(bath, "zone") <- 8
-  bath <- PBSmapping::convUL(bath)
+  bath <- suppressMessages(PBSmapping::convUL(bath))
   
   message("Interpolating depth...")
-  library(akima)
-  ii <- interp(x = bath$X, 
+  ii <- akima::interp(x = bath$X, 
     y = bath$Y,
-    z = log(bath$depth),
+    z = bath$depth,
     xo = sort(unique(dat$X)),
     yo = sort(unique(dat$Y)))
   
@@ -52,7 +52,6 @@ join_noaa_bathy <- function(dat, plot = FALSE) {
   z$x <- ii$x[z$Var1]
   z$y <- ii$y[z$Var2]
   z <- filter(z, paste(x, y) %in% paste(dat$X, dat$Y))
-  z$value <- exp(z$value)
   z <- rename(z, X = x, Y = y, akima_depth = value) %>% 
     select(-Var1, -Var2)
   dat <- left_join(dat, z, by = c("X", "Y"))
@@ -60,10 +59,11 @@ join_noaa_bathy <- function(dat, plot = FALSE) {
 }
 
 scale_predictors <- function(dat) {
+  dat$depth[is.na(dat$depth)] <- dat$akima_depth
   mutate(dat, 
-    depth_mean = mean(log(akima_depth)), 
-    depth_sd = sd(log(akima_depth)), 
-    depth_scaled = (log(akima_depth) - depth_mean[1]) / depth_sd[1],
+    depth_mean = mean(log(depth), na.rm = TRUE), 
+    depth_sd = sd(log(depth), na.rm = TRUE), 
+    depth_scaled = (log(depth) - depth_mean[1]) / depth_sd[1],
     depth_scaled2 = depth_scaled^2,
     X10 = X/10, Y10 = Y/10)
 }
@@ -86,10 +86,11 @@ fit_glmmfields <- function(dat,
   chains = 1, adapt_delta = 0.98, ...) {
   
   library(glmmfields)
-  
   options(mc.cores = parallel::detectCores())
   n_beta <- 2L
-  m1 <- glmmfields(formula_positive,
+  
+  message("Fitting positive component model...")
+  m1 <- glmmfields::glmmfields(formula_positive,
     lon = "X", lat = "Y",
     data = dplyr::filter(dat, present == 1), iter = iter,
     prior_gp_theta = half_t(100, 0, 10),
@@ -104,7 +105,8 @@ fit_glmmfields <- function(dat,
       length(unique(dat$year)), n_knots, n_beta)},
     control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...)
   
-  m2 <- glmmfields(formula_binary,
+  message("Fitting binary component model...")
+  m2 <- glmmfields::glmmfields(formula_binary,
     lon = "X", lat = "Y",
     data = dat, iter = iter,
     prior_gp_theta = half_t(100, 0, 10),
@@ -129,15 +131,14 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
     z <- chull(x,y)
     coords <- cbind(x[z], y[z])
     coords <- rbind(coords, coords[1,])
-    # # plot(dat$start_lon, dat$start_lat)
-    # # lines(coords, col="red")
     sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(coords)), ID=1)))
     sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
     pred_grid <- expand.grid(X = seq(min(dat$X), max(dat$X), length.out = n), 
       Y = seq(min(dat$Y), max(dat$Y), length.out = n), year = unique(dat$year))
   } else {
     setwd("data/SynopticTrawlSurveyBoundaries/")
-    shape <- readOGR(dsn = ".", layer = paste0(region, "_BLOB"))
+    library(rgdal)
+    shape <- rgdal::readOGR(dsn = ".", layer = paste0(region, "_BLOB"), verbose = FALSE)
     setwd("../../")
     shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
     names(shape) <- c("X", "Y")
@@ -155,9 +156,9 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
   pred_grid <- pred_grid[inside, ]
   pred_grid <- as.data.frame(pred_grid)
   
-  ii <- interp(x = bath$X, 
+  ii <- akima::interp(x = bath$X, 
     y = bath$Y,
-    z = log(bath$depth),
+    z = bath$depth,
     xo = sort(unique(pred_grid$X)),
     yo = sort(unique(pred_grid$Y)))
   
@@ -165,7 +166,6 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
   z$x <- ii$x[z$Var1]
   z$y <- ii$y[z$Var2]
   z <- filter(z, paste(x, y) %in% paste(pred_grid$X, pred_grid$Y))
-  z$value <- exp(z$value)
   z <- rename(z, X = x, Y = y, akima_depth = value) %>% 
     select(-Var1, -Var2)
   
@@ -185,7 +185,12 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
   pal_fill = ggplot2::scale_fill_distiller(palette = "Spectral", direction = -1),
   pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
-  pt_size_range = c(2, 7), show_legend = TRUE) {
+  pt_size_range = c(2, 7), show_legend = TRUE,
+  do_not_extrapolate_depth = FALSE) {
+  
+  if (do_not_extrapolate_depth)
+    pred_dat <- filter(pred_dat, akima_depth >= min(raw_dat$depth),
+      akima_depth <= max(raw_dat$depth))
   
   library(PBSmapping)
   data("nepacLLhigh")
@@ -221,10 +226,22 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
   pt_size_range = c(2, 7), aspect_ratio = 0.8054, region = "",
-  show_model_predictions = TRUE) {
+  show_model_predictions = TRUE,
+  do_not_extrapolate_depth = TRUE) {
   
-  xlim <- range(raw_dat$X)
-  ylim <- range(raw_dat$Y)
+  if (do_not_extrapolate_depth)
+    pred_dat <- filter(pred_dat, akima_depth >= min(raw_dat$depth, na.rm = TRUE),
+      akima_depth <= max(raw_dat$depth, na.rm = TRUE))
+
+  if (region == "") {
+    xlim <- range(raw_dat$X) + c(-10, 10)
+    ylim <- range(raw_dat$Y) + c(-10, 10)
+  } else {
+    b <- readRDS("data/boxes.rds")
+    xlim <- b[[region]]$xlim * 10
+    ylim <- b[[region]]$ylim * 10
+  }
+  
   xrange <- diff(xlim)
   yrange <- diff(ylim)
   if (yrange / xrange > aspect_ratio) { # too tall
@@ -266,8 +283,8 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   pts <- gd$data[[1]]
   map <- gd$data[[2]]
   
-  plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
-    plt = c(0, 1, 0, 1), xlab = "", ylab = "")
+  plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, 
+    plt = c(0, 1, 0, 1), xlab = "", ylab = "", type = "n")
   
   if (show_model_predictions) {
     srv <- gd$data[[3]]
@@ -278,17 +295,19 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
       ybottom = srv$y - cell_height/2, ytop = srv$y + cell_height/2,
       border = srv$fill, col = srv$fill)
   }
+  
   points(pts$x, pts$y, pch = ifelse(pts$shape == 4, 4, NA), cex = 1.4)
   
   if (!show_model_predictions) {
     setwd("data/SynopticTrawlSurveyBoundaries/")
-    shape <- readOGR(dsn = ".", layer = paste0(region, "_BLOB"))
+    library(rgdal)
+    shape <- rgdal::readOGR(dsn = ".", layer = paste0(region, "_BLOB"), verbose = FALSE)
     setwd("../../")
     shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
     names(shape) <- c("X", "Y")
     attr(shape, "projection") <- "LL"
     attr(shape, "zone") <- 8
-    shapeUTM <- PBSmapping::convUL(shape)
+    shapeUTM <- suppressMessages(PBSmapping::convUL(shape))
     
     # get colour with bad hack:
     g1 <- ggplot(data.frame(x = 1:9, y = rep(1, 9)), aes(x, y, fill = x)) + 
@@ -308,30 +327,24 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
     }
   }
   
-  lims <- data.frame(X = sort(xlim), Y = sort(ylim))
-  attr(lims, "projection") <- "UTM"
-  attr(lims, "zone") <- 8
-  lims_ll <- suppressMessages(convUL(lims))
-  
   library(PBSdata)
   data("isobath")
   zlev <- c(100, 200, 500)
-  isobath <- clipPolys(filter(isobath, PID %in% zlev), 
-    xlim = lims_ll$X + c(-10, 10), ylim = lims_ll$Y + c(-10, 10))
+  xlim_ll <- c(-134.1, -123.0)
+  ylim_ll <- c(48.4, 54.25)
+  isobath <- PBSmapping::clipPolys(dplyr::filter(isobath, PID %in% zlev),
+    xlim = xlim_ll + c(-5, 5), ylim = ylim_ll + c(-5, 5))
   attr(isobath, "zone") <- 8
   isobath_UTM <- suppressMessages(convUL(isobath))
-  isobath_UTM$X <- isobath_UTM$X
-  isobath_UTM$Y <- isobath_UTM$Y
   PBSmapping::addLines(isobath_UTM, 
     col = rev(c("#00000070", "#00000055", "#00000040")), lwd = 0.8)
   plyr::d_ply(nepacUTM, "PID", function(i)
-    polygon(i$X, i$Y, col = "grey90", border = "grey70", lwd = 0.7))
+    polygon(i$X, i$Y, col = "grey90", border = "grey65", lwd = 0.7))
   
   mtext(paste0(region[[1]], " ", unique(raw_dat$year)[[1]]), side = 3, adj = 0.95, 
     line = -2, col = "grey30")
   
-  box(col = "grey50")
-  
+  box(col = "grey50", lwd = 1.2)
   invisible(list(xlim = xlim, ylim = ylim))
 }
 

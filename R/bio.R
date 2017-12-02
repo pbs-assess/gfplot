@@ -1,60 +1,58 @@
 library(tidyverse)
+# 
+# # if (!exists("dsurv")) {
+#   dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
+#   names(dsurv) <- tolower(names(dsurv))
+#   dsurv$species_common_name <- tolower(dsurv$species_common_name)
+#   dsurv$species_science_name <- tolower(dsurv$species_science_name)
+#   dsurv <- mutate(dsurv, year = lubridate::year(trip_start_date))
+# # }
+# 
+# surv <- group_by(dsurv, species_common_name, species_science_name, 
+#   survey_series_desc, year) %>% 
+#   summarise(
+#     n_fe_weight = sum(!is.na(catch_weight)),
+#     n_fe_count = sum(!is.na(catch_count))
+#   ) %>% ungroup %>% 
+#   filter(!survey_series_desc %in% "Queen Charlotte Sound Shrimp Survey")
+# 
+# pp <- filter(surv, year >= 1996)
+# sort(table(pp$survey_series_desc))
+# 
+# ppp <- group_by(pp, survey_series_desc, year) %>% summarise(n = n())
+# ggplot(ppp, aes(year, n)) + facet_wrap(~survey_series_desc)+ geom_point()
+# 
+# surveys <- data.frame(survey_series_desc = c("Hecate Strait Synoptic Survey", 
+#   "IPHC Longline Survey", 
+#   "PHMA Rockfish Longline Survey - Outside North", 
+#   "PHMA Rockfish Longline Survey - Outside South",
+#   "Queen Charlotte Sound Synoptic Survey", 
+#   "West Coast Haida Gwaii Synoptic Survey",
+#   "West Coast Vancouver Island Synoptic Survey",
+#   "Sablefish Stratified Random"),
+#   surv_short = c("HS", "IPHC", "PHMAN", "PHMAS", "QCS", "WCHG", "WCVI", "SabStRS"), 
+#   stringsAsFactors = FALSE)
+# # 
+# all_surv_n <- group_by(surv, survey_series_desc, year) %>% 
+#   summarise(n = sum(c(n_fe_weight, n_fe_count)))
+# 
+# # if (!exists("dbio")) {
+dbio <- readRDS("../../Dropbox/dfo/data/all-survey-bio.rds")
+names(dbio) <- tolower(names(dbio))
+dbio$species_common_name <- tolower(dbio$species_common_name)
+dbio$species_science_name <- tolower(dbio$species_science_name)
+dbio <- mutate(dbio, year = lubridate::year(trip_start_date))
 
-# if (!exists("dsurv")) {
-  dsurv <- readRDS("../../Dropbox/dfo/data/all-survey-catches.rds")
-  names(dsurv) <- tolower(names(dsurv))
-  dsurv$species_common_name <- tolower(dsurv$species_common_name)
-  dsurv$species_science_name <- tolower(dsurv$species_science_name)
-  dsurv <- mutate(dsurv, year = lubridate::year(trip_start_date))
-# }
+# ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds")
+# names(ss) <- tolower(names(ss))
+# dbio <- inner_join(dbio, ss)
+dbio <- dbio[!duplicated(dbio$specimen_id), ]
 
-surv <- group_by(dsurv, species_common_name, species_science_name, 
-  survey_series_desc, year) %>% 
-  summarise(
-    n_fe_weight = sum(!is.na(catch_weight)),
-    n_fe_count = sum(!is.na(catch_count))
-  ) %>% ungroup %>% 
-  filter(!survey_series_desc %in% "Queen Charlotte Sound Shrimp Survey")
+# surv2 <- left_join(surv, ss)
 
-pp <- filter(surv, year >= 1996)
-sort(table(pp$survey_series_desc))
+dbio <- filter(dbio) %>% 
+  select(species_common_name, species_science_name, year, age, length, weight, maturity_code)
 
-ppp <- group_by(pp, survey_series_desc, year) %>% summarise(n = n())
-ggplot(ppp, aes(year, n)) + facet_wrap(~survey_series_desc)+ geom_point()
-
-surveys <- data.frame(survey_series_desc = c("Hecate Strait Synoptic Survey", 
-  "IPHC Longline Survey", 
-  "PHMA Rockfish Longline Survey - Outside North", 
-  "PHMA Rockfish Longline Survey - Outside South",
-  "Queen Charlotte Sound Synoptic Survey", 
-  "West Coast Haida Gwaii Synoptic Survey",
-  "West Coast Vancouver Island Synoptic Survey",
-  "Sablefish Stratified Random"),
-  surv_short = c("HS", "IPHC", "PHMAN", "PHMAS", "QCS", "WCHG", "WCVI", "SabStRS"), 
-  stringsAsFactors = FALSE)
-
-all_surv_n <- group_by(surv, survey_series_desc, year) %>% 
-  summarise(n = sum(c(n_fe_weight, n_fe_count)))
-
-# if (!exists("dbio")) {
-  dbio <- readRDS("../../Dropbox/dfo/data/all-survey-bio.rds")
-  names(dbio) <- tolower(names(dbio))
-  dbio$species_common_name <- tolower(dbio$species_common_name)
-  dbio$species_science_name <- tolower(dbio$species_science_name)
-  dbio <- mutate(dbio, year = lubridate::year(trip_start_date))
-
-  
-  ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds")
-  names(ss) <- tolower(names(ss))
-  dbio <- inner_join(dbio, ss)
-  dbio <- dbio[!duplicated(dbio$specimen_id), ]
-  
-  surv2 <- left_join(surv, ss)
-  
-  dbio <- filter(dbio) %>% 
-    select(species_common_name, species_science_name, year, age, length, weight, maturity_code)
-  
-  
 # }
 
 # q <- filter(dbio, species_common_name == "shortraker rockfish") %>%
@@ -81,7 +79,6 @@ all_surv_n <- group_by(surv, survey_series_desc, year) %>%
 #   theme_light() +
 #   guides(fill = FALSE)
 # 
-
 
 # commercial bio samples:
 dbio_c <- readRDS("../../Dropbox/dfo/data/all-commercial-bio.rds")
@@ -132,38 +129,40 @@ grid_lwd <- 1.3
 surv_col <- "grey33"
 axis_col <- "grey30"
 ###############
-
-# when were surveys done?
-qq_all <- all_surv_n %>% 
-  right_join(expand.grid(year = years, 
-    survey_series_desc = unique(surv$survey_series_desc), stringsAsFactors = FALSE)) %>% 
-  mutate(present = ifelse(!is.na(n), TRUE, FALSE)) %>% 
-  select(-n) %>% ungroup() %>% 
-  inner_join(surveys) %>% 
-  select(-survey_series_desc) %>% 
-  reshape2::dcast(year ~ surv_short, value.var = "present") %>% 
-  select(year, SabStRS, IPHC, PHMAS, PHMAN, WCVI, QCS, HS, WCHG) # reorder
-names(qq_all) <- gsub("PHMAS", "PHMA S", names(qq_all))
-names(qq_all) <- gsub("PHMAN", "PHMA N", names(qq_all))
+# 
+# # when were surveys done?
+# qq_all <- all_surv_n %>% 
+#   right_join(expand.grid(year = years, 
+#     survey_series_desc = unique(surv$survey_series_desc), stringsAsFactors = FALSE)) %>% 
+#   mutate(present = ifelse(!is.na(n), TRUE, FALSE)) %>% 
+#   select(-n) %>% ungroup() %>% 
+#   inner_join(surveys) %>% 
+#   select(-survey_series_desc) %>% 
+#   reshape2::dcast(year ~ surv_short, value.var = "present") %>% 
+#   select(year, SabStRS, IPHC, PHMAS, PHMAN, WCVI, QCS, HS, WCHG) # reorder
+# names(qq_all) <- gsub("PHMAS", "PHMA S", names(qq_all))
+# names(qq_all) <- gsub("PHMAN", "PHMA N", names(qq_all))
 
 
 ######
 
-torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(70)])
+# torun <- names(rev(sort(table(dbio$species_common_name)))[seq_len(70)])
+source("R/make-spp-list.R")
+torun <- get_spp_names()$species_common_name
 
 for (i in seq_along(torun)) {
   
   common_name <- torun[i]
-  print(common_name)
+  message(common_name)
   
-  sps <- filter(surv, species_common_name %in% common_name) %>% 
-    select(-species_common_name, -species_science_name) %>% 
-    inner_join(surveys)
-  
-  qq <- sps %>% mutate(combined = n_fe_weight + n_fe_count) %>% 
-    filter(combined > 3) %>% 
-    reshape2::dcast(year ~ surv_short, value.var = "combined") %>%
-    right_join(data.frame(year = years))
+  # sps <- filter(surv, species_common_name %in% common_name) %>% 
+  #   select(-species_common_name, -species_science_name) %>% 
+  #   inner_join(surveys)
+  # 
+  # qq <- sps %>% mutate(combined = n_fe_weight + n_fe_count) %>% 
+  #   filter(combined > 3) %>% 
+  #   reshape2::dcast(year ~ surv_short, value.var = "combined") %>%
+  #   right_join(data.frame(year = years))
   
   # # fix this!!! how ugly
   # # filling in zeros for missing surveys
@@ -198,6 +197,8 @@ for (i in seq_along(torun)) {
     select(-species_common_name, -species_science_name)
   # spb <- left_join(data.frame(year = years), spb)
   
+  
+  
   spb <- rename(spb, 
     `# Maturity` = n_maturity,
     `# Weight` = n_weight,
@@ -207,7 +208,7 @@ for (i in seq_along(torun)) {
   
   # fill missing:
   all <- expand.grid(year = 1996:2017, type = c("commercial", "survey"), stringsAsFactors = FALSE)
-  spb <- left_join(all, spb)
+  spb <- left_join(all, spb, by = c("year", "type"))
   #########
   
   pdf(paste0("synop/dat-syn-", gsub("/", "-", gsub(" ", "-", common_name)), ".pdf"),
@@ -243,14 +244,22 @@ for (i in seq_along(torun)) {
     max_val <- ifelse(all(is.na(mat_dat)), NA, max(mat_dat, na.rm = TRUE))
     
     if (!is.na(max_val) & max_val != 0) {
-      round_nice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
-        if(length(x) != 1) stop("'x' must be of length 1")
-        10^round(log10(x)) * nice[[which(x <= 10^round(log10(x)) * nice)[[1]]]]
+      # round_nice <- function(x, nice=c(1,2,3,4,5,6,7,8,9,10)) {
+      #   if(length(x) != 1) stop("'x' must be of length 1")
+      #   out <- 10^round(log10(x)) * nice[[which(x <= 10^round(log10(x)) * nice)[[1]]]]
+      #   if (out == 0) out <- x
+      #   out
+      # }
+      
+      round_nice <- function(x) {
+        out <- plyr::round_any(max_val, 100)
+        if (out == 0) out <- x
+        out
       }
       max_ind <- which(mat_dat == max_val, arr.ind = TRUE)
       max_ind <- max_ind[1,,drop = FALSE]
       text(spb$year[max_ind[,"row"][[1]]], max_ind[,"col"][[1]],
-        plyr::round_any(max_val, 100), col = "white", cex = 0.6)
+        round_nice(max_val), col = "white", cex = 0.6)
     }
     
   }

@@ -19,6 +19,15 @@ plot_index_sparks <- function(species) {
   d$species_common_name <- tolower(d$species_common_name)
   d$species_science_name <- tolower(d$species_science_name)
   
+  d <- filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
+  d <- filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
+  
+  dup <- group_by(d, species_common_name) %>% 
+    summarise(n_spp = length(unique(species_science_name))) %>% 
+    arrange(-n_spp) %>% 
+    filter(n_spp > 1)
+  stopifnot(nrow(dup) == 0)
+  
   xlim <- c(1975, 2017)
   d <- filter(d, species_common_name %in% species,
     year >= xlim[1])
@@ -39,28 +48,31 @@ plot_index_sparks <- function(species) {
     ungroup() %>% 
     filter(n_years >= 4)
   
-  no_plot <- FALSE
-  if (nrow(d) == 0) no_plot <- TRUE
+  make_plot <- TRUE
+  if (nrow(d) == 0) make_plot <- FALSE
+   
   
-  if (!no_plot) {
-    surveys <- c(
-      "West Coast Haida Gwaii Synoptic Survey",
-      "Hecate Strait Synoptic Survey",
-      "Queen Charlotte Sound Synoptic Survey",
-      "West Coast Vancouver Island Synoptic Survey",
-      "PHMA Rockfish Longline Survey - Outside North",
-      "PHMA Rockfish Longline Survey - Outside South",
-      # "Sablefish Offshore Standardized",
-      # "Sablefish Inlet Standardized",
-      # "Sablefish Stratified Random",
-      "IRF Longline Survey (North)",
-      "IRF Longline Survey (South)",
-      "Hecate Strait Multispecies Assemblage Survey",
-      "Restratification of Goose Island Gully for the 2009 POP Assessment.",
-      "Queen Charlotte Sound Shrimp Survey",
-      "West Coast Vancouver Island Shrimp Survey",
-      "IPHC Longline Survey"
-    )
+  surveys <- c(
+    "West Coast Haida Gwaii Synoptic Survey",
+    "Hecate Strait Synoptic Survey",
+    "Queen Charlotte Sound Synoptic Survey",
+    "West Coast Vancouver Island Synoptic Survey",
+    "PHMA Rockfish Longline Survey - Outside North",
+    "PHMA Rockfish Longline Survey - Outside South",
+    # "Sablefish Offshore Standardized",
+    # "Sablefish Inlet Standardized",
+    # "Sablefish Stratified Random",
+    "IRF Longline Survey (North)",
+    "IRF Longline Survey (South)",
+    "Hecate Strait Multispecies Assemblage Survey",
+    # "Restratification of Goose Island Gully for the 2009 POP Assessment.",
+    "Queen Charlotte Sound Shrimp Survey",
+    "West Coast Vancouver Island Shrimp Survey",
+    "IPHC Longline Survey"
+  )
+  
+  if (make_plot) {
+   
     
     d <- filter(d, survey_series_desc %in% surveys)
     
@@ -88,7 +100,7 @@ plot_index_sparks <- function(species) {
       `IRF Longline Survey (North)` = "IRF Longline Survey North",
       `IRF Longline Survey (South)` = "IRF Longline Survey South",
       `Hecate Strait Multispecies Assemblage Survey` = "Hecate Strait Multispecies Assemblage",
-      `Restratification of Goose Island Gully for the 2009 POP Assessment.` = "Goose Island Gully",
+      # `Restratification of Goose Island Gully for the 2009 POP Assessment.` = "Goose Island Gully",
       `Queen Charlotte Sound Shrimp Survey` = "Queen Charlotte Sound Shrimp",
       `West Coast Vancouver Island Shrimp Survey` = "West Coast Vancouver Island Shrimp",
       `IPHC Longline Survey` = "IPHC Longline"))
@@ -109,7 +121,8 @@ plot_index_sparks <- function(species) {
       RColorBrewer::brewer.pal(9, "Purples")[7]
     )
     
-    par(mfrow = c(7, 2), oma = c(2, .5, .5, .5), cex = 0.7, mar = c(0, 0, 0, 0), mgp = c(2, 0.4, 0),
+    par(mfrow = c(6, 2), oma = c(2, .5, .5, .5), cex = 0.7, mar = c(0, 0, 0, 0), 
+      mgp = c(2, 0.4, 0),
       tcl = -0.3)
     # par(xpd = NA)
     
@@ -124,7 +137,7 @@ plot_index_sparks <- function(species) {
       abline(v = seq(1960, 2020, 2), col = "grey95", lwd = 0.7)
       box(col = "grey50")
       
-      if (panel %in% c(12:13))
+      if (panel %in% c(11:12))
         axis(1, col = "grey60", col.ticks = "grey70", col.axis = "grey30",
           at = seq(1980, 2040, 5))
       
@@ -172,8 +185,20 @@ plot_index_sparks <- function(species) {
       
     })
   } else {
-    plot(1, 1, type = "n", ann = FALSE, axes = FALSE)
+    par(mfrow = c(6, 2), oma = c(2, .5, .5, .5), cex = 0.7, mar = c(0, 0, 0, 0), 
+      mgp = c(2, 0.4, 0),
+      tcl = -0.3)
+    for (i in 1:12) {
+      plot(1, 1, type = "n", xlim = xlim + c(-0.4, 0.4), ylim = c(-0.03, 1.03), 
+        axes = FALSE, ann = FALSE,
+        xaxs = "i", yaxs = "i")
+      # abline(v = seq(1960, 2020, 10), col = "grey87", lwd = 1.1)
+      # abline(v = seq(1960, 2020, 2), col = "grey95", lwd = 0.7)
+      box(col = "grey50")
+      if (i %in% c(11:12))
+        axis(1, col = "grey60", col.ticks = "grey70", col.axis = "grey30",
+          at = seq(1980, 2040, 5))
+    }
   }
-  
-  
+
 }
