@@ -33,33 +33,48 @@ get_surv_data <- function(species, survey, years) {
 join_noaa_bathy <- function(dat, plot = FALSE) {
   library(sp)
   library(marmap)
-  mm <- getNOAA.bathy(lon1 = min(dat$lon) - 0.5, lon2 = max(dat$lon) + 0.5,
-    lat1=min(dat$lat) - 0.5,lat2=max(dat$lat) + 0.5, resolution = 1, keep = TRUE)
-  bath <- as.xyz(mm) %>% rename(X = V1, Y = V2, depth = V3) %>% 
-    filter(depth < 0) %>% mutate(depth = -depth)
+
+  # mm <- getNOAA.bathy(lon1 = min(dat$lon) - 0.5, lon2 = max(dat$lon) + 0.5,
+  #   lat1=min(dat$lat) - 0.5,lat2=max(dat$lat) + 0.5, resolution = 1, keep = TRUE)
+  # bath <- as.xyz(mm) %>% rename(X = V1, Y = V2, depth = V3) %>% 
+  #   filter(depth < 0) %>% mutate(depth = -depth)
+  
+  library("PBSdata")
+  data("bctopo")
+  
+  bath <- rename(bctopo, X = x, Y = y, depth = z)
   attr(bath, "projection") <- "LL"
   attr(bath, "zone") <- 8
   bath <- suppressMessages(PBSmapping::convUL(bath))
   
-  message("Interpolating depth...")
-  ii <- akima::interp(x = bath$X, 
+  # reduce size first:
+  bath <- filter(bath, X < max(dat$X + 20), X > min(dat$X - 20), Y < max(dat$Y + 20),
+    Y > min(dat$Y - 20), depth > 0)
+
+  xo <- sort(unique(dat$X))
+  yo <- sort(unique(dat$Y))
+
+  message("Interpolating depth to fill in missing data if needed...")
+  ii <- suppressWarnings(akima::interp(x = bath$X, 
     y = bath$Y,
-    z = bath$depth,
-    xo = sort(unique(dat$X)),
-    yo = sort(unique(dat$Y)))
-  
+    z = log(bath$depth),
+    xo = xo,
+    yo = yo, extrap = TRUE, linear = TRUE))
+
   z <- reshape2::melt(ii$z)
   z$x <- ii$x[z$Var1]
   z$y <- ii$y[z$Var2]
   z <- filter(z, paste(x, y) %in% paste(dat$X, dat$Y))
   z <- rename(z, X = x, Y = y, akima_depth = value) %>% 
     select(-Var1, -Var2)
+  z <- mutate(z, akima_depth = exp(akima_depth))
   dat <- left_join(dat, z, by = c("X", "Y"))
   list(data = dat, bath = bath)
 }
 
 scale_predictors <- function(dat) {
-  dat$depth[is.na(dat$depth)] <- dat$akima_depth
+  if (sum(is.na(dat$depth)) > 0)
+    dat$depth[is.na(dat$depth)] <- dat$akima_depth[is.na(dat$depth)]
   mutate(dat, 
     depth_mean = mean(log(depth), na.rm = TRUE), 
     depth_sd = sd(log(depth), na.rm = TRUE), 
@@ -144,7 +159,7 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
     names(shape) <- c("X", "Y")
     attr(shape, "projection") <- "LL"
     attr(shape, "zone") <- 8
-    shapeUTM <- PBSmapping::convUL(shape)
+    shapeUTM <- suppressMessages(PBSmapping::convUL(shape))
     sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(shapeUTM)), ID=1)))
     sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
     pred_grid <- expand.grid(X = seq(min(shapeUTM$X), max(shapeUTM$X), length.out = n), 
@@ -155,14 +170,25 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
   inside <- !is.na(over(pred_grid, as(sp_poly_df, "SpatialPolygons")))
   pred_grid <- pred_grid[inside, ]
   pred_grid <- as.data.frame(pred_grid)
-  
+
+  xo <- sort(unique(pred_grid$X))
+  yo <- sort(unique(pred_grid$Y))
+
+  file_name <- paste0("generated-data/", region, "pred-grid-interp-n-", n, ".rds")
+  if (!file.exists(file_name) & !is.null(region)) {
+  message("Interpolating depth for prediction grid...")
   ii <- akima::interp(x = bath$X, 
     y = bath$Y,
-    z = bath$depth,
-    xo = sort(unique(pred_grid$X)),
-    yo = sort(unique(pred_grid$Y)))
+    z = log(bath$depth),
+    xo = xo,
+    yo = yo, extrap = TRUE, linear = FALSE)
+  saveRDS(ii, file_name)
+  } else {
+    message("Preloading interpolated depth for prediction grid...")
+    ii <- readRDS(file_name)
+  }
   
-  z = reshape2::melt(ii$z)
+  z <- reshape2::melt(ii$z)
   z$x <- ii$x[z$Var1]
   z$y <- ii$y[z$Var2]
   z <- filter(z, paste(x, y) %in% paste(pred_grid$X, pred_grid$Y))
@@ -170,6 +196,11 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
     select(-Var1, -Var2)
   
   pred_grid <- left_join(pred_grid, z, by = c("X", "Y"))
+  pred_grid <- mutate(pred_grid, akima_depth = exp(akima_depth))
+  assertthat::assert_that(sum(is.na(pred_grid$akima_depth)) == 0)
+  
+  # all under water!
+  # pred_grid <- filter(pred_grid, akima_depth > 0)
   
   if (is.null(region))
     pred_grid <- filter(pred_grid, akima_depth >= min(dat$akima_depth),
@@ -224,15 +255,15 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
 plot_bc_map_base <- function(pred_dat, raw_dat, fill_column, 
   pal_fill = ggplot2::scale_fill_distiller(palette = "Spectral", direction = -1),
   pal_col = ggplot2::scale_colour_distiller(palette = "Spectral", direction = -1),
-  pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
-  pt_size_range = c(2, 7), aspect_ratio = 0.8054, region = "",
+  pt_col = "#FFFFFF85", pt_fill = "#FFFFFF40",
+  pt_size_range = c(1.5, 10), aspect_ratio = 0.8054, region = "",
   show_model_predictions = TRUE,
   do_not_extrapolate_depth = TRUE) {
   
   if (do_not_extrapolate_depth)
-    pred_dat <- filter(pred_dat, akima_depth >= min(raw_dat$depth, na.rm = TRUE),
-      akima_depth <= max(raw_dat$depth, na.rm = TRUE))
-
+    pred_dat <- filter(pred_dat, akima_depth >= min(raw_dat$depth, na.rm = TRUE) - 5,
+      akima_depth <= max(raw_dat$depth, na.rm = TRUE) + 5, akima_depth > 0)
+  
   if (region == "") {
     xlim <- range(raw_dat$X) + c(-10, 10)
     ylim <- range(raw_dat$Y) + c(-10, 10)
@@ -298,32 +329,38 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   
   points(pts$x, pts$y, pch = ifelse(pts$shape == 4, 4, NA), cex = 1.4)
   
+  setwd("data/SynopticTrawlSurveyBoundaries/")
+  library(rgdal)
+  shape <- rgdal::readOGR(dsn = ".", layer = paste0(region, "_BLOB"), verbose = FALSE)
+  setwd("../../")
+  shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
+  names(shape) <- c("X", "Y")
+  attr(shape, "projection") <- "LL"
+  attr(shape, "zone") <- 8
+  shapeUTM <- suppressMessages(PBSmapping::convUL(shape))
+  
+  # get colour with bad hack:
+  g1 <- ggplot(data.frame(x = 1:9, y = rep(1, 9)), aes(x, y, fill = x)) + 
+    pal_fill + geom_point(pch = 21)
+  cols <- ggplot_build(g1)$data[[1]]$fill
+  
   if (!show_model_predictions) {
-    setwd("data/SynopticTrawlSurveyBoundaries/")
-    library(rgdal)
-    shape <- rgdal::readOGR(dsn = ".", layer = paste0(region, "_BLOB"), verbose = FALSE)
-    setwd("../../")
-    shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
-    names(shape) <- c("X", "Y")
-    attr(shape, "projection") <- "LL"
-    attr(shape, "zone") <- 8
-    shapeUTM <- suppressMessages(PBSmapping::convUL(shape))
-    
-    # get colour with bad hack:
-    g1 <- ggplot(data.frame(x = 1:9, y = rep(1, 9)), aes(x, y, fill = x)) + 
-      pal_fill + geom_point(pch = 21)
-    cols <- ggplot_build(g1)$data[[1]]$fill
-    
-    polygon(shapeUTM$X, shapeUTM$Y, border = cols[6], col = paste0(cols[3], "40"))
+    polygon(shapeUTM$X, shapeUTM$Y, border = NA, col = paste0(cols[3], "40")) # light shading
   }
+  
+  polygon(shapeUTM$X, shapeUTM$Y, border = cols[6], col = NA)
   
   if ("shape" %in% names(pts)) {
     pts_pos <- dplyr::filter(pts, shape != 4)
     if (nrow(pts_pos) > 0) {
       symbols(pts_pos$x, pts_pos$y, circles = pts_pos$size/1.5, fg = "black",
         bg = "#00000050", inches = FALSE, add = TRUE) 
-      # TODO: CHECK!! radius or area from ggplot?
-      # sqrt(area / 3.14159265)
+      # prove that ggplot size = area:
+      # q <- filter(d, species_common_name == "pacific ocean perch", 
+      #  survey_series_desc == "Queen Charlotte Sound Synoptic Survey", 
+      #  year == 2015, density_kgpm2 > 0)
+      # symbols(q$start_lon, q$start_lat, circles = sqrt(q$density_kgpm2 / 3.14159265), inches = FALSE)
+      # plot(sqrt(q$density_kgpm2/3.14159265), pts_pos$size)
     }
   }
   
@@ -385,6 +422,7 @@ fit_spatial_survey_model <- function(species, survey, years,
     adapt_delta = adapt_delta, thin = thin)
   m
   
+  message("Predicting density onto grid...")
   pos <- predict(m$pos, newdata = data.frame(pg, time = 1),
     type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples)
   bin <- predict(m$bin, newdata = data.frame(pg, time = 1),
