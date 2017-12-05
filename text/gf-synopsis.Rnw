@@ -4,6 +4,7 @@
 %% https://github.com/cgrandin/csas-style
 \usepackage{../../csas-style/res-doc} % may need to adjust this path
 \usepackage{textcomp}
+\usepackage{verbatim}
 
 \input{title-pages}
 
@@ -83,10 +84,10 @@ Blank for now.
 %% Need \refstepcounter{chapter} before every new appendix
 %%  to increment the appendix letter.
 
-% \clearpage
-% \refstepcounter{chapter}
-% <<om-model-description, child='om-description.Rnw'>>=
-% @
+\clearpage
+\refstepcounter{chapter}
+<<spatial-appendix, child='spatial-appendix.Rnw'>>=
+@
 
 
 \end{document}

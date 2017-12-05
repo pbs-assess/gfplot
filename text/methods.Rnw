@@ -4,13 +4,44 @@
 
 \subsection{COMMERCIAL FISHERY CATCHES}
 
+I extracted commercial fishery landings and discards from the GFFOS
+\texttt{GF\_MERGED\_CATCH} table.
+
+\verbatiminput{../R/get-landings.sql}
+
+The plot shows the sum of landings (weight of landings plus weight of discards)
+aggregated each year within bottom trawl, midwater trawl, hook and line, and
+trap categories. I aggregate other minor categories, including \texttt{unknown}
+and generic \texttt{trawl} into their own category. I combined discarded weight
+across all the categories. I did not include fish pieces in the current plot,
+which for the most part means that hook and line discards are ignored.
+
 \subsection{COMMERCIAL CATCH PER UNIT EFFORT}
 
-\subsection{AVAILABLE BIOLOGICAL SAMPLES}
+\verbatiminput{../R/get-cpue.sql}
+
+\subsection{AVAILABLE BIOLOGICAL SAMPLES} \label{sec:bio-samples}
+
+\verbatiminput{../R/get-survey-biology.sql}
+
+\verbatiminput{../R/get-commercial-biology.sql}
 
 \subsection{LENGTH DISTRIBUTIONS}
 
+Uses the same SQL query as for Section \ref{sec:bio-samples}.
+
+Coloured represents females. Grey represents males.
+
+Only showing probability density plots for year-sex-survey combinations with at
+least 20 fish samples.
+
 \subsection{SPATIAL MODELLING OF SYNOPTIC TRAWL SURVEY DATA}
 
+\texttt{GFBioSQL}
+
+\texttt{EXEC proc\_catmat\_2011 SURVEY\_ID SPECIES\_CODE}
+
 \subsection{BIOMASS SURVEY INDEX TRENDS}
+
+\verbatiminput{../R/get-survey-boot.sql}
 

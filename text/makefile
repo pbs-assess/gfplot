@@ -1,22 +1,69 @@
-TEXT = gf-synopsis
-REFS = refs
+all:pdf  
+MAINFILE  := gf-synopsis
+RNWFILES  := methods.Rnw, introduction.Rnw
+RFILES    := 
+TEXFILES  := 
+CACHEDIR  := cache
+FIGUREDIR := fig
+LATEXMK_FLAGS := 
+BIBFILES  := refs.bib
 
-all: $(TEXT).pdf
+# -------------
+RNWTEX = $(RNWFILES:.Rnw=.tex)
+ROUTFILES = $(RFILES:.R=.Rout)
+RDATAFILES= $(RFILES:.R=.Rdata)
+MAINTEX = $(MAINFILE:=.tex)
+MAINPDF = $(MAINFILE:=.pdf)
+ALLTEX = $(MAINTEX) $(RNWTEX) $(TEXFILES)
+KNITCMD="library('knitr'); \
+knitr::opts_chunk[['set']](prefix.string='$(FIGUREDIR)/$*-');\
+knitr::opts_chunk[['set']](prefix.cache='$(CACHEDIR)/$*-');\
+knit('$<','$@')"
 
-%.tex: %.Rnw $(REFS).bib
-	Rscript -e "knitr::knit('$<')"
+# Dependencies
+$(RNWTEX): $(RDATAFILES)
+$(MAINTEX): $(RNWTEX) $(TEXFILES)
+$(MAINPDF): $(MAINTEX) $(ALLTEX) 
 
-$(TEXT).pdf: $(TEXT).tex $(REFS).bib title-pages.tex methods.tex introduction.tex
-	latexmk -pdf $(TEXT)
+.PHONY:pdf tex clean clearcache cleanall
+pdf: $(MAINPDF)
+tex: $(RDATAFILES) $(ALLTEX) 
+
+$(CACHEDIR):
+	mkdir $(CACHEDIR)
+	
+$(FIGUREDIR):
+	mkdir $(FIGUREDIR)
+
+%.tex:%.Rnw | $(CACHEDIR) $(FIGUREDIR)
+	Rscript -e $(KNITCMD)
+
+%.R:%.Rnw
+	Rscript -e "Sweave('$^', driver=Rtangle())"
+
+%.Rout:%.R
+	R CMD BATCH "$^" "$@"
+
+%.pdf: %.tex 
+	latexmk -pdf $<
+	
+clean:
+	-latexmk -c -quiet $(MAINFILE).tex
+	-rm -f Rplots.pdf $(MAINTEX) $(RNWTEX)
+	-rm -rf $(FIGUREDIR)
+	-rm *tikzDictionary
+	-rm $(MAINPDF)
+	-rm -f $(MAINFILE).bbl
+	-rm -f $(MAINFILE).upa
+	-rm -f $(MAINFILE).pdf
+	
+clearcache:
+	-rm -rf cache *.map
+  
+cleanall: clean clearcache
 
 rtf: $(TEXT).pdf
 	latex2rtf -f0 -M3 -E0 $(TEXT).tex
-
-clean:
-	latexmk -c
-	rm -f $(TEXT).bbl
-	rm -f $(TEXT).upa
-	rm -f $(TEXT).pdf
 
 continuous:
 	while true; do make --silent; sleep 1; done
