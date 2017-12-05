@@ -42,8 +42,8 @@ main_scale3 <- ggplot2::scale_fill_distiller(palette = "Greens", direction = 1)
 main_scale4 <- ggplot2::scale_fill_distiller(palette = "Purples", direction = 1)
 pal_scales <- list(main_scale1, main_scale2, main_scale3, main_scale4)
 
-# for (i in 1:length(common)) {
-  for (i in 25) {
+for (i in 1:length(common)) {
+  # for (i in 25) {
   spp_file_name <- gsub("/", "-", gsub(" ", "-", common[i]))
   save_file <- paste0("spatial-survey/", spp_file_name, "-spatial-fits.rda")
   
