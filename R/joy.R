@@ -36,9 +36,14 @@ source("R/make-spp-list.R")
 spp <- get_spp_names()$species_common_name
 
 spp %in% dbio$species_common_name
+ 
+# spp <- "lingcod"
 
+dbio <- mutate(dbio, sex = ifelse(sex == 1, "a_male", "b_female"))
+dbio$sex <- as.factor(dbio$sex)
 for (ii in seq_along(spp)) {
   
+
   message(spp[ii])
   dd <- filter(dbio, species_common_name == spp[[ii]])
   dd2 <- filter(dd, survey_series_desc %in% c(
@@ -101,7 +106,7 @@ for (ii in seq_along(spp)) {
         las = 1, cex.axis = 0.8, col = "grey40", col.axis = "grey30")
     
     if (nrow(dd2) > 0)
-      axis(1, las = 1, cex.axis = 0.8, col = "grey40", col.axis = "grey30", padj = -0.3)
+     axis(1, las = 1, cex.axis = 0.8, col = "grey40", col.axis = "grey30", padj = -0.3)
     
     max_y <- list()
     den <- list()
@@ -111,13 +116,15 @@ for (ii in seq_along(spp)) {
       ungroup()
     
     if (nrow(dd3) > 0) {
-      g <- ggplot(dd3, aes(length, colour = as.factor(sex))) + 
-        geom_density() + facet_wrap(~year)
+      g <- ggplot(dd3, aes(length, colour = sex)) + 
+        geom_density() + facet_wrap(~year) +
+        scale_color_manual(values = c("a_male" = "white", "b_female" = "black"))
       
       gd <- ggplot_build(g) # extract data from ggplot
       gd1 <- gd$data[[1]]
       gd1$year <- unique(dd3$year)[gd1$PANEL]
-      gd1$sex <- unique(dd3$sex)[as.numeric(as.factor(gd1$colour))]
+      assertthat::assert_that(all(gd1$colour %in% c("white", "black")))
+      gd1$sex <- ifelse(gd1$colour == "white", 1, 2)
       
       max_y <- max(gd1$density)
       this_scaling <- scaling / max_y
@@ -126,11 +133,6 @@ for (ii in seq_along(spp)) {
         
         for (k in 1:2) {
           x <- dplyr::filter(gd1, year == rev(unique(dd3$year))[i], sex == k)
-          # if (!is.na(den[[k]][[i]])) {
-          #   polygon(c(den[[k]][[i]]$x, rev(den[[k]][[i]]$x)),
-          #     c(den[[k]][[i]]$y * this_scaling + x$year[1], rep(x$year[1], length(den[[k]][[i]]$y))),
-          #     border = c("grey30", cols_dark[j])[k], col = c("grey70", cols[j])[k], lwd = 1.1)
-          # }
           polygon(c(x$x, rev(x$x)),
             c(x$density * this_scaling + x$year[1], rep(x$year[1], length(x$y))),
             border = c("grey30", cols_dark[j])[k], col = c("grey70", cols[j])[k], lwd = 1.1)
