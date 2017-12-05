@@ -258,11 +258,13 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   pt_col = "#FFFFFF85", pt_fill = "#FFFFFF40",
   pt_size_range = c(1.5, 10), aspect_ratio = 0.8054, region = "",
   show_model_predictions = TRUE,
-  do_not_extrapolate_depth = TRUE) {
+  do_not_extrapolate_depth = TRUE, extrapolation_buffer = 5) {
   
   if (do_not_extrapolate_depth)
-    pred_dat <- filter(pred_dat, akima_depth >= min(raw_dat$depth, na.rm = TRUE) - 5,
-      akima_depth <= max(raw_dat$depth, na.rm = TRUE) + 5, akima_depth > 0)
+    pred_dat <- filter(pred_dat, 
+      akima_depth >= min(raw_dat$depth, na.rm = TRUE) - extrapolation_buffer,
+      akima_depth <= max(raw_dat$depth, na.rm = TRUE) + extrapolation_buffer, 
+      akima_depth > 0)
   
   if (region == "") {
     xlim <- range(raw_dat$X) + c(-10, 10)
