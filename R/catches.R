@@ -76,8 +76,10 @@ catches$species_common_name[catches$species_common_name == "spiny dogfish"] <- "
 # ## ----------------
 
 plot_catch <- function(dat, xlim = c(1955, 2017)) {
+  
   pal <-  c(RColorBrewer::brewer.pal(n = length(unique(all_landings$gear))-2, 
     "Paired"),"grey60", "grey30")[c(2, 1, 4, 3, 5, 6)]
+  names(pal) <- levels(all_landings$gear)
   
   # if (unique(dat$species_common_name) == "copper rockfish") browser()
   
