@@ -231,7 +231,7 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
     ylim = range(raw_dat$lat) + c(-2, 2))))
   
   gg <- ggplot(pred_dat, aes_string("X", "Y")) + 
-    geom_tile(aes_string(fill = fill_column)) + 
+    geom_tile(aes_string(fill = fill_column), colour = NA) + 
     pal_fill + #pal_col +
     geom_point(data = raw_dat, fill = pt_fill, col = pt_col, 
       aes(shape = as.factor(present), size = density)) +
