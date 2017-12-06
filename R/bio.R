@@ -86,6 +86,7 @@ names(dbio_c) <- tolower(names(dbio_c))
 dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
 dbio_c$species_science_name <- tolower(dbio_c$species_science_name)
 dbio_c <- mutate(dbio_c, year = lubridate::year(trip_start_date))
+assertthat::assert_that(sum(duplicated(dbio_c$specimen_id)) == 0)
 dbio_c <- select(dbio_c, species_common_name, species_science_name, year, age, length, weight, maturity_code)
 
 # ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds") %>%
