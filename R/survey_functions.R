@@ -347,7 +347,9 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   cols <- ggplot_build(g1)$data[[1]]$fill
   
   if (!show_model_predictions) {
-    polygon(shapeUTM$X, shapeUTM$Y, border = NA, col = paste0(cols[3], "40")) # light shading
+    # polygon(shapeUTM$X, shapeUTM$Y, border = NA, col = paste0(cols[3], "40")) # light shading
+    # polygon(shapeUTM$X, shapeUTM$Y, border = NA, col = NA) # light shading
+    polygon(shapeUTM$X, shapeUTM$Y, border = cols[6], col = NA, lwd = 1.5) # thicker
   }
   
   polygon(shapeUTM$X, shapeUTM$Y, border = cols[6], col = NA)
