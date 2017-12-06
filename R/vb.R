@@ -32,7 +32,7 @@ names(ss) <- tolower(names(ss))
 dbio <- left_join(dbio, ss)
 dbio <- dbio %>% 
   select(species_common_name, species_science_name, year, age, length, weight, 
-    maturity_code, sex, survey_series_desc)
+    maturity_code, sex, survey_series_desc, maturity_convention_desc, maturity_convention_maxvalue)
 
 # bad data:
 dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "north pacific spiny dogfish"), ]
@@ -111,7 +111,7 @@ for (i in seq_along(spp)) {
       iter = 800, chains = 1, cores = 3, thin = 2)
     p_female <-lapply(extract(m_vb_female), median)
     # }
-    ages <- seq(quantile(d$age, probs = 0.001), quantile(d$age, probs = 0.999), length.out = 200)
+    ages <- seq(quantile(d$age, probs = 0.000), quantile(d$age, probs = 1), length.out = 200)
     lengths_female <- p_female[["linf"]] * (1 - exp(-p_female[["k"]] * (ages - p_female[["t0"]])))
   }
   
@@ -126,8 +126,8 @@ for (i in seq_along(spp)) {
   if (nrow(d_weight_female) > 50) fit_weight_female <- TRUE
   
   if (fit_weight_male | fit_weight_female) 
-    nd <- data.frame(length = seq(quantile(d_weight$length, probs = 0.005), 
-      quantile(d_weight$length, probs = 0.995), length.out = 200))
+    nd <- data.frame(length = seq(quantile(d_weight$length, probs = 0.00), 
+      quantile(d_weight$length, probs = 1), length.out = 200))
   if (fit_weight_female) {
     m_weight_female <- MASS::rlm(log(weight) ~ log(length), data = d_weight_female)
     nd$weight_female <- predict(m_weight_female, newdata = nd)
@@ -248,3 +248,17 @@ for (i in seq_along(spp)) {
   
   dev.off()
 }
+
+#-------------
+# maturity
+
+mat_df <- tibble::tribble(
+  ~maturity_convention_desc, ~mature_at,
+  "ROCKFISH (1977+)",        3,
+  "DOGFISH",                 77,
+  "FLATFISH (1978+)",        3
+)
+
+dbio <- left_join(dbio, mat_df)
+
+# dbio <- mutate(dbio, )
