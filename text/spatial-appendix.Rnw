@@ -1,31 +1,29 @@
-\section{SPATIAL SURVEY MODELLING METHODS}
+\section{SPATIAL SURVEY MODELLING METHODS} \label{sec:spatial-app}
 
-In this document I'm going to walk through an example of spatial modelling of BC
+In this appendix I'm going to walk through an example of spatial modelling of BC
 groundfish trawl survey data using the glmmfields R package
-(\url{https://github.com/seananderson/glmmfields}). This implements Bayesian
-generalized linear mixed effects models with Gaussian random fields describing
-the spatial ``random effects'' using Stan as a backend. Essentially this Gaussian
-random field describes a wiggly surface of unexplained spatial pattern in the
-response variable (here biomass of fish or probability of observing a given fish
-species in a survey tow) beyond that which can be described by the included
-("fixed effect") predictors (here a quadratic effect of bottom depth). Gaussian
-random fields describe random effects drawn from a multivariate normal
-distribution with some estimated covariance structure. The glmmfields package
-uses a predictive process approach where a limited number of ``knots'' are modelled
-and these are projected to the data locations as part of the fitting process.
-
-At this point I'm only using bottom depth as a predictor but there's no reason
-why we couldn't include other predictors such as bottom temperature and
-substrate type.
+(\url{https://github.com/seananderson/glmmfields}).
 
 This document includes all the code to fit the models and make the plots, but
-I'm not going to show some of the code in the output document just for brevity
-and to make this easy to follow.
+I'm not going to show some of the code in the output document for brevity
+and to make this easier to follow.
 
-<<echo = FALSE, message = FALSE, eval=TRUE>>=
+<<echo = FALSE, message = FALSE, eval=TRUE, cache=FALSE>>=
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", echo = FALSE,
-  cache = TRUE, autodep = TRUE)
+  cache = TRUE, autodep = FALSE, cache.comments = FALSE)
 knitr::opts_chunk$set(eval=TRUE)
+
+knitr::opts_chunk$set(
+ # dev = 'png',
+ # fig.dpi = 96,
+  fig.width = 7.5,
+  fig.height = 4,
+ # dpi = 100,
+ echo = FALSE,
+ results = FALSE,
+ message = FALSE,
+ warning = FALSE,
+ results = 'hide')
 set.seed(42)
 @
 
@@ -33,10 +31,10 @@ In this example I will model the expected biomass per unit area of Pacific ocean
 perch in the Queen Charlotte Sound Synoptic Survey for the last available year
 of data, here 2015.
 
-<<message=FALSE, warning=FALSE, echo=TRUE>>=
+<<pop_dat, message=FALSE, warning=FALSE, echo=TRUE>>=
 setwd("../")
 source("R/survey_functions.R")
-dd1 <- get_surv_data("pacific ocean perch",
+pop <- get_surv_data("pacific ocean perch",
   c("Queen Charlotte Sound Synoptic Survey"),
   years = 2015)
 @
@@ -45,10 +43,12 @@ I then go through a bit of data manipulation which includes
 centering the predictors by their mean and dividing them by their standard
 deviation to put them on a reasonable scale for the priors in this model.
 
-<<echo=TRUE, message=FALSE, warning=FALSE, results='hide'>>=
-b <- join_noaa_bathy(dd1)
-b$data[is.na(b$data)] <- b$akima_depth[is.na(b$data)] # fill in missing values
-dat <- scale_predictors(b$data)
+<<dat, echo=TRUE, message=FALSE, warning=FALSE, results='hide', dependson='pop'>>=
+d <- join_noaa_bathy(pop)
+# fill in missing values:
+d$data <- dplyr::mutate(d$data, 
+  depth = ifelse(is.na(depth), akima_depth, depth))
+dat <- scale_predictors(d$data)
 @
 
 Now we can fit the models. We will fit one model predicting the presence vs.
@@ -64,7 +64,7 @@ TODO: the following is very incomplete:
 The models can be described as: 
 
 \begin{align} 
-g(\mu_{s}) &= \beta_0 + \beta_1 T + \beta_2 T^2 + \gamma_{s,t}, \\
+  g(\mu_{s}) &= \beta_0 + \beta_1 T_s + \beta_2 T^2_s + \gamma_{s}, \\
   \gamma_{s} &\sim \mathrm{MVN}\left(0, \mathbf{\Sigma}_{s}\right),
 \end{align}
 
@@ -88,8 +88,9 @@ variance parameter $\sigma_{\mathrm{GP}}^2$ scaling the amplitude of the spatial
 deviations and the $*$ denoting a symbol referring to the knot locations as
 opposed to the sample locations.
 
-<<warning=FALSE, echo=TRUE, message=FALSE>>=
-m <- fit_glmmfields(dat, chains = 4L, iter = 1000, n_knots = 20L, adapt_delta = 0.8)
+<<m, warning=FALSE, echo=TRUE, message=FALSE, dependson='dat'>>=
+m <- fit_glmmfields(dat, chains = 4, iter = 1000, n_knots = 20, 
+  adapt_delta = 0.8)
 m
 @
 
@@ -107,39 +108,39 @@ centering and scaling log depth by 1 SD). All are shown on the GLMM link scale
 
 Positive component model:
 
-<<echo=TRUE>>=
+<<pars, echo=TRUE, dependson='m'>>=
 pars <- c("gp_sigma", "gp_theta", "B[1]", "B[2]", "B[3]")
 bayesplot::mcmc_trace(as.array(m$pos$model), pars = c(pars, "sigma[1]"))
 @
  
 Binary component model:
 
-<<echo=TRUE>>=
+<<echo=TRUE, dependson=c('m', 'pars')>>=
 bayesplot::mcmc_trace(as.array(m$bin$model), pars = pars)
 @
 
 We then make a fine-scale grid over the range of the survey boundaries on which
 to project our model predictions.
 
-<<echo=TRUE, message=FALSE, warning=FALSE, results='hide'>>=
+<<pg, echo=TRUE, message=FALSE, warning=FALSE, results='hide', dependson='dat'>>=
 setwd("..")
-pg <- make_prediction_grid(dat, b$bath, n = 150L, region = "QCS")
+pg <- make_prediction_grid(dat, d$bath, n = 125L, region = "QCS")
 @
 
 Next we predict from the positive and binary models onto our grid.
 
-<<echo=TRUE>>=
+<<posbin, echo=TRUE, dependson=c('pg', 'm')>>=
 pos <- predict(m$pos, newdata = data.frame(pg, time = 1),
-  type = "response", return_mcmc = TRUE, iter = 200)
+  type = "response", return_mcmc = TRUE, iter = 400)
 bin <- predict(m$bin, newdata = data.frame(pg, time = 1),
-  type = "response", return_mcmc = TRUE, iter = 200)
+  type = "response", return_mcmc = TRUE, iter = 400)
 @
 
 And then combine the binary and positive models into a combined prediction. Will
 calculate median values for the combined, positive, and binary predictions. We
 will also calculate 80\% credible intervals on the combined prediction.
 
-<<echo=TRUE>>=
+<<com, echo=TRUE, dependson=c('pg', 'posbin')>>=
 com <- bin * pos
 pg$combined <- apply(com, 1, median)
 pg$combined_lwr <- apply(com, 1, quantile, probs = 0.1)
@@ -148,9 +149,9 @@ pg$bin <- apply(bin, 1, median)
 pg$pos <- apply(pos, 1, median)
 @
 
-Let's set up some colour scales to plot with:
+% Let's set up some colour scales to plot with:
 
-<<echo=TRUE>>=
+<<scales, dependson=c('pg'), echo=FALSE>>=
 main_scale <- viridis::scale_fill_viridis(option = "C", 
   limits = sqrt(range(c(pg$combined, pg$combined_lwr, pg$combined_upr))))
 binary_scale <- scale_fill_gradient2(low = scales::muted("blue"), 
@@ -162,13 +163,14 @@ First, let's plot the combined density estimate (binary times positive component
 I have square root transformed the values just to make the colour scale easier to
 read. 
 
-<<echo=TRUE, message=FALSE>>=
-plot_bc_map(pg, dat, "sqrt(combined)", viridis::scale_fill_viridis(option = "D"))
+<<plot_combined, echo=TRUE, message=FALSE, dependson=c('pg', 'dat')>>=
+plot_bc_map(pg, dat, "sqrt(combined)", 
+  viridis::scale_fill_viridis(option = "D"))
 @
 
 Next let's plot the lower 10\% quantile, median, and 90\% quantiles:
 
-<<echo=TRUE, fig.width=12, fig.height=6>>=
+<<plot_cis, echo=TRUE, fig.width=12, fig.height=6, dependson=c('pg', 'dat', 'scales')>>=
 g1 <- plot_bc_map(pg, dat, "sqrt(combined)", main_scale, show_legend = FALSE)
 g2 <- plot_bc_map(pg, dat, "sqrt(combined_lwr)", main_scale, show_legend = FALSE)
 g3 <- plot_bc_map(pg, dat, "sqrt(combined_upr)", main_scale, show_legend = FALSE)
@@ -177,7 +179,7 @@ gridExtra::grid.arrange(g2, g1, g3, nrow = 1)
 
 Here is the predicted probability projected across the entire survey area:
 
-<<echo=TRUE>>=
+<<plot_bin, echo=TRUE, dependson=c('pg', 'dat', 'scales')>>=
 plot_bc_map(pg, dat, "bin", binary_scale)
 @
 
@@ -185,36 +187,45 @@ And here is the positive component only projected on the entire survey area.
 Note that in this case this looks almost identical to the combined version
 because there is a strong agreement between the binary and positive components.
 
-<<echo=TRUE>>=
+<<plot_pos, echo=TRUE, dependson=c('pg', 'dat', 'scales')>>=
 plot_bc_map(pg, dat, "sqrt(pos)", main_scale)
 @
 
 We can inspect the fixed effect (depth) marginal effect on the responses. The
 credible intervals are 80\% intervals and the lines medians of the posterior.
 
-<<echo=TRUE, fig.height=4, fig.width=6, out.width='5in'>>=
-x <- seq(min(dat$depth_scaled), max(dat$depth_scaled), length.out = 500L)
-x_real <- exp((x * dat$depth_sd[1]) + dat$depth_mean[1])
-ep <- rstan::extract(m$pos$model)
-eb <- rstan::extract(m$bin$model)
-par(cex = 0.8)
+<<<plot_marginal, echo=FALSE>>=
+plot_marginal <- function(dat, model, pts_x = NULL, pts_y = NULL, lab = "", 
+  quants = c(0.1, 0.9), ylim = NULL, invlink = I) {
+  x <- seq(min(dat$depth_scaled), max(dat$depth_scaled), length.out = 500L)
+  x_real <- exp((x * dat$depth_sd[1]) + dat$depth_mean[1])
+  ep <- rstan::extract(model$model)
+  eb <- rstan::extract(model$model)
+  par(cex = 0.8)
 
-post <- exp(sapply(x, function(i) ep$B[,1] + ep$B[,2] * i + ep$B[,3] * i^2))
-l <- apply(post, 2, quantile, probs = 0.1)
-u <- apply(post, 2, quantile, probs = 0.9)
-plot(x_real, apply(post, 2, quantile, probs = 0.5), type = "l", 
-  xlab = "Depth (m)", ylab = "Biomass density",
-  ylim = range(c(l, u)))
-polygon(c(x_real, rev(x_real)), c(l, rev(u)),
-  col = "#00000030", border = NA)
+  post <- invlink(sapply(x, function(i) ep$B[,1] + ep$B[,2] * i + ep$B[,3] * i^2))
+  l <- apply(post, 2, quantile, probs = quants[[1]])
+  u <- apply(post, 2, quantile, probs = quants[[2]])
 
-post <- plogis(sapply(x, function(i) eb$B[,1] + eb$B[,2] * i + eb$B[,3] * i^2))
-l <- apply(post, 2, quantile, probs = 0.1)
-u <- apply(post, 2, quantile, probs = 0.9)
-plot(x_real, apply(post, 2, quantile, probs = 0.5), type = "l", 
-  xlab = "Depth (m)", ylab = "Probability of observation",
-  yaxs = "i", ylim = c(-0.1, 1.1))
-polygon(c(x_real, rev(x_real)), c(l, rev(u)),
-  col = "#00000030", border = NA)
-points(dat$akima_depth, jitter(dat$present, amount = 0.05))
+  if (is.null(ylim)) ylim <- range(c(l, u))
+  plot(x_real, apply(post, 2, quantile, probs = 0.5), type = "l", 
+    xlab = "Depth (m)", ylab = lab,
+    ylim = ylim)
+  polygon(c(x_real, rev(x_real)), c(l, rev(u)),
+    col = "#00000030", border = NA)
+
+  if (!is.null(pts_x) & !is.null(pts_y)) {
+    points(pts_x, pts_y)
+  }
+}
+@
+
+<<make_marginal_plots, echo=TRUE, fig.height=4, fig.width=6, out.width='5in', dependson=c('m', 'pg', 'dat', 'scales', "plot_marginal")>>=
+plot_marginal(dat = dat, model = m$pos, lab = "Biomass density",
+  invlink = exp)
+
+plot_marginal(dat = dat, model = m$bin, 
+  lab = "Probability of observation",
+  pts_x = dat$depth, pts_y = jitter(dat$present, amount = 0.05),
+  ylim = c(-0.1, 1.1), invlink = plogis) 
 @

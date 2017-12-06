@@ -10,7 +10,7 @@
 
 \clearpage
 
-<<echo=FALSE,  message=FALSE, results='hide', warning=FALSE>>=
+<<eval=FALSE, echo=FALSE,  message=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
 library("knitr")
 opts_chunk$set(dev = 'png',
                fig.dpi = 96,
@@ -23,7 +23,7 @@ opts_chunk$set(dev = 'png',
                warning = FALSE,
                results = 'hide',
                cache = TRUE,
-               autodep = TRUE)
+               autodep = FALSE)
 @
 
 \TableOfContents
@@ -42,8 +42,9 @@ Blank for now.
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-<<intro, child='introduction.Rnw'>>=
-@
+% <<intro, child='introduction.Rnw'>>=
+% @
+\include{introduction}
 
 <<methods, child='methods.Rnw'>>=
 @
@@ -86,8 +87,9 @@ Blank for now.
 
 \clearpage
 \refstepcounter{chapter}
-<<spatial-appendix, child='spatial-appendix.Rnw'>>=
-@
+% <<spatial-appendix, child='spatial-appendix.Rnw'>>=
+% @
+\include{spatial-appendix}
 
 
 \end{document}
