@@ -165,13 +165,13 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
     leg_bottom <- leg_top - diff(range(ylim)) * 0.2
     leg_left <- xlim[[2]] - 200 # longitude of legend left point
     
-    for (lab in c(1, 10, 100, 1000)) {
+    for (lab in c(1, 10, 100, 1000, 10000)) {
       rasterImage(legend_image, leg_left, leg_bottom, leg_left + 25, leg_top)
       text_y <- leg_bottom + (leg_top-leg_bottom) * (leg[leg$raw_vals >= lab, "i"][1])
       text(leg_left + 15, text_y, lab, cex = 0.8, col = "grey20", pos = 4)
       # segments(-133.7, text_y, -133.8, text_y, lwd = 0.2, col = "white") # tick marks
     }
-    text(leg_left + 15, leg_top + 10, "CPUE (kg/hr)", cex = 0.8, col = "grey20", pos = 4)
+    text(leg_left + 15, leg_top + 12, "CPUE (kg/hr)", cex = 0.8, col = "grey20", pos = 4)
     # text(-128.2, leg_top + 0.2, "British Columbia", cex = 1, col = "grey85", pos = 4)
     # rect(xleft = xlim[[1]] - 20, xright = xlim[[1]] + 20.6,
     # ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 20.5, col = NA, border = "grey60",
