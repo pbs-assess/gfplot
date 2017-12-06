@@ -1,6 +1,6 @@
 all:pdf  
 MAINFILE  := gf-synopsis
-RNWFILES  := methods.Rnw, introduction.Rnw
+RNWFILES  := methods.Rnw, introduction.Rnw spatial-appendix.Rnw
 RFILES    := 
 TEXFILES  := 
 CACHEDIR  := cache
