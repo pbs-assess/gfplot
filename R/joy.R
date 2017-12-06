@@ -5,6 +5,19 @@ names(dbio) <- tolower(names(dbio))
 dbio$species_common_name <- tolower(dbio$species_common_name)
 dbio$species_science_name <- tolower(dbio$species_science_name)
 dbio <- mutate(dbio, year = lubridate::year(trip_start_date))
+
+ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds") %>%
+  select(-SURVEY_SERIES_TYPE_CODE)
+names(ss) <- tolower(names(ss))
+dbio <- inner_join(dbio, ss)
+
+dbio <- filter(dbio, survey_series_desc %in% c(
+  "West Coast Haida Gwaii Synoptic Survey",
+  "Queen Charlotte Sound Synoptic Survey",
+  "Hecate Strait Synoptic Survey",
+  "West Coast Vancouver Island Synoptic Survey"
+))
+
 dbio <- dbio[!duplicated(dbio$specimen_id), ]
 
 dup <- group_by(dbio, species_common_name) %>% 
@@ -13,11 +26,6 @@ dup <- group_by(dbio, species_common_name) %>%
   filter(n_spp > 1)
 stopifnot(nrow(dup) == 0)
 
-
-ss <- readRDS("../../Dropbox/dfo/data/survey_series.rds") %>%
-  select(-SURVEY_SERIES_TYPE_CODE)
-names(ss) <- tolower(names(ss))
-dbio <- left_join(dbio, ss)
 dbio <- dbio %>% 
   select(species_common_name, species_science_name, year, age, length, weight, 
     maturity_code, sex, survey_series_desc)
@@ -30,6 +38,7 @@ dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "big skate")
 dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "longnose skate"), ]
 
 dbio <- dbio[-which(dbio$length > 60 & dbio$species_common_name == "pacific tomcod"), ]
+dbio <- dbio[-which(dbio$length > 50 & dbio$species_common_name == "quillback-rockfish"), ]
 
 # spp <- names(rev(sort(table(dbio$species_common_name)))[1:50])
 source("R/make-spp-list.R")
