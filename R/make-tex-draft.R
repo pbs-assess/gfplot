@@ -13,23 +13,28 @@ firstup <- function(x) {
 temp <- lapply(spp, function(x) {
   lab <- gsub("-", " ", firstup(x))
   out <- list()
-  out[[1]] <- paste0("\\section*{", lab, "}")
-  out[[2]] <- ""
-  out[[3]] <- "\\begin{figure}[htbp]"
-  out[[4]] <- "\\centering"
-  out[[5]] <- paste0("\\includegraphics[height=1.25in]{catches/", x, ".pdf}")
-  out[[6]] <- paste0("\\includegraphics[height=2.75in]{sparks/", x, ".pdf}")
-  out[[7]] <- paste0("\\includegraphics[height=2.8in]{joy/", x, "-joy.pdf}")
-  out[[8]] <- paste0("\\includegraphics[height=2.8in]{cpue/", x, ".pdf}")
+  out[[1]] <- paste0("\\subsection*{", lab, "}")
+  out[[length(out) + 1]] <- ""
+  out[[length(out) + 1]] <- "\\begin{figure}[htbp]"
+  out[[length(out) + 1]] <- "\\centering"
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=2.5in]{bubbles/", x, ".pdf}")
+  
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=2.45in]{sparks/", x, ".pdf}")
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=2.6in]{joy/", x, "-joy.pdf}")
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=2.65in]{cpue/", x, ".pdf}")
   if (file.exists(paste0("spatial-survey/", x, ".pdf"))) {
-    out[[9]] <- paste0("\\includegraphics[height=2.78in]{spatial-survey/", x, ".pdf}")
+    out[[length(out) + 1]] <- paste0("\\includegraphics[height=2.62in]{spatial-survey/", x, ".pdf}")
   } else {
-    out[[9]] <- paste0("% survey map not rendered")
+    out[[length(out) + 1]] <- paste0("% survey map not rendered")
   }
-  out[[10]] <- paste0("\\includegraphics[height=1.5in]{synop/dat-syn-", x, ".pdf}")
-  out[[11]] <- paste0("\\caption{", lab, "}")
-  out[[12]] <- "\\end{figure}"
-  out[[13]] <- "\\clearpage"
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=1.25in]{catches/", x, ".pdf}")
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=1.5in]{synop/dat-syn-", x, ".pdf}")
+  out[[length(out) + 1]] <- paste0("\\includegraphics[height=2.2in]{vb/", x, ".pdf}")
+  out[[length(out) + 1]] <- paste0("\\caption{", lab, "}")
+  out[[length(out) + 1]] <- "\\end{figure}"
+  out[[length(out) + 1]] <- "\\clearpage"
+  if (x == "english-sole") # last of "commercially valuable"
+    out[[length(out) + 1]] <- "\\section*{Candidate species for triage assessments}"
   out
 })
 
