@@ -120,6 +120,10 @@ plot_catch <- function(dat, xlim = c(1955, 2017)) {
   axis(2, las = 1, cex.axis = 0.8, col = "grey40", col.axis = "grey40")
   mtext(ylab, side = 2, line = 2, col = "grey40", cex = 0.75)
 
+  # more reliable 1996+
+  rect(xleft = 1950, xright = 1996 - 0.5, ybottom = 0, ytop = max(gd1$y) * 1.1, 
+    border = NA, col = "#00000020")
+  
   par(xpd = NA)
   legend(1955, max(gd1$y) * 1.38, legend = levels(all_landings$gear)[1:3],
     col =  pal[1:3], pch = 21, pt.bg = pal[1:3], bty = "n", cex = 0.75,
