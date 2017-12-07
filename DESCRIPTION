@@ -20,6 +20,8 @@ Imports:
     rgdal,
     RColorBrewer,
     viridis,
+    lubridate,
+    DBI,
     glmmfields,
     PBSmapping,
     PBSdata
