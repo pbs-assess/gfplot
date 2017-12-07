@@ -3,7 +3,7 @@ library(tidyverse)
 # source("R/get-dat.R") # must be on DFO-networked PC
 source("R/survey-functions.R")
 source("R/cpue.R")
-source("R/bio-sparks.R")
+source("R/bio-indices.R")
 source("R/make-spp-list.R")
 torun <- get_spp_names()$species_common_name
 
@@ -29,9 +29,9 @@ for(i in torun) {
   dev.off()
 }
 
-source("R/bio.R")
+source("R/bio-availability.R")
 source("R/catches.R")
-source("R/joy.R")
+source("R/length.R")
 source("R/fit-spatial-survey-models.R")
-source("R/bubbles.R")
-source("R/vb.R")
+source("R/age-bubbles.R")
+source("R/growth.R")
