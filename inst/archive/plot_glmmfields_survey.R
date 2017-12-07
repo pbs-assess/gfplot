@@ -1,4 +1,4 @@
-source("R/survey_functions.R")
+source("R/survey-functions.R")
 
 dd1 <- get_surv_data("pacific ocean perch",
   c("Queen Charlotte Sound Synoptic Survey"),

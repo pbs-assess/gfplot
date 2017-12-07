@@ -1,17 +1,6 @@
 library(dplyr)
 
-
-#' @param xfrac The fraction over from the left side.
-#' @param yfrac The fraction down from the top.
-#' @param label The text to label with.
-#' @param pos Position to pass to text()
-#' @param ... Anything extra to pass to text(), e.g. cex, col.
-add_label <- function(xfrac, yfrac, label, pos = 4, col = "grey30", ...) {
-  u <- par("usr")
-  x <- u[1] + xfrac * (u[2] - u[1])
-  y <- u[4] - yfrac * (u[4] - u[3])
-  text(x, y, label, pos = pos, col = col, ...)
-}
+source("add-label.R")
 
 dbio <- readRDS("../../Dropbox/dfo/data/all-survey-bio.rds")
 names(dbio) <- tolower(names(dbio))
@@ -34,12 +23,11 @@ dbio <- dbio %>%
   select(species_common_name, species_science_name, year, age, length, weight, 
     maturity_code, sex, survey_series_desc, maturity_convention_desc, maturity_convention_maxvalue)
 
+# TODO move to outside:
 # bad data:
 dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "north pacific spiny dogfish"), ]
 dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "big skate"), ]
-
 dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "longnose skate"), ]
-
 dbio <- dbio[-which(dbio$length > 60 & dbio$species_common_name == "pacific tomcod"), ]
 dbio <- dbio[-which(dbio$length > 50 & dbio$species_common_name == "quillback rockfish"), ]
 dbio <- dbio[-which(dbio$length < 10 & dbio$weight/1000 > 1.0 & 
@@ -51,15 +39,8 @@ smo <- stan_model("R/vb.stan")
 
 source("R/make-spp-list.R")
 spp <- get_spp_names()$species_common_name
-# spp %in% dbio$species_common_name
 
 dir.create("vb", showWarnings = FALSE)
-
-# spp <- "lingcod"
-# spp <- spp[7]
-# spp <- "sablefish"
-
-# spp <- "silvergray rockfish"
 
 female_col <- RColorBrewer::brewer.pal(5, "Reds")[[4]]
 
@@ -249,7 +230,7 @@ for (i in seq_along(spp)) {
   dev.off()
 }
 
-#-------------
+# -------------
 # maturity
 
 mat_df <- tibble::tribble(
@@ -261,4 +242,3 @@ mat_df <- tibble::tribble(
 
 dbio <- left_join(dbio, mat_df)
 
-# dbio <- mutate(dbio, )

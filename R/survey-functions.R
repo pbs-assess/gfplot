@@ -5,6 +5,7 @@ get_surv_data <- function(species, survey, years) {
   d <- readRDS("../../Dropbox/dfo/data/select-survey-spatial-tows.rds")
   names(d) <- tolower(names(d))
   
+# TODO filter these outside:
   d <- filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
   d <- filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
   
@@ -32,13 +33,6 @@ get_surv_data <- function(species, survey, years) {
 
 join_noaa_bathy <- function(dat, plot = FALSE) {
   library(sp)
-  library(marmap)
-
-  # mm <- getNOAA.bathy(lon1 = min(dat$lon) - 0.5, lon2 = max(dat$lon) + 0.5,
-  #   lat1=min(dat$lat) - 0.5,lat2=max(dat$lat) + 0.5, resolution = 1, keep = TRUE)
-  # bath <- as.xyz(mm) %>% rename(X = V1, Y = V2, depth = V3) %>% 
-  #   filter(depth < 0) %>% mutate(depth = -depth)
-  
   library("PBSdata")
   data("bctopo")
   
@@ -359,12 +353,6 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
     if (nrow(pts_pos) > 0) {
       symbols(pts_pos$x, pts_pos$y, circles = pts_pos$size/1.5, fg = "black",
         bg = "#00000050", inches = FALSE, add = TRUE) 
-      # prove that ggplot size = area:
-      # q <- filter(d, species_common_name == "pacific ocean perch", 
-      #  survey_series_desc == "Queen Charlotte Sound Synoptic Survey", 
-      #  year == 2015, density_kgpm2 > 0)
-      # symbols(q$start_lon, q$start_lat, circles = sqrt(q$density_kgpm2 / 3.14159265), inches = FALSE)
-      # plot(sqrt(q$density_kgpm2/3.14159265), pts_pos$size)
     }
   }
   
@@ -406,9 +394,7 @@ fit_spatial_survey_model <- function(species, survey, years,
     stop("No survey data for species-survey-year combination.")
   
   assertthat::assert_that(length(unique(dd1$year)) == 1L)
-  # message(unique(dd1$year))
-  # message(nrow(dd1))
-  # print(table(dd1$present))
+  assertthat::assert_that(nrow(dd1) > 0)
   
   b <- join_noaa_bathy(dd1)
   dd2 <- b$data
@@ -424,7 +410,6 @@ fit_spatial_survey_model <- function(species, survey, years,
   m <- fit_glmmfields(dd3, chains = chains, iter = iter, 
     n_knots = min(sum(dd1$present)-2, max_knots), 
     adapt_delta = adapt_delta, thin = thin)
-  m
   
   message("Predicting density onto grid...")
   pos <- predict(m$pos, newdata = data.frame(pg, time = 1),

@@ -1,26 +1,3 @@
-bbox <- vector(length = 4, mode = "list")
-names(bbox) <- c("WCHG", "WCVI", "QCS", "HS")
-# bbox[[1]] <- c(range(surv_wchg$data$lon, na.rm = TRUE), range(surv_wchg$data$lat, na.rm = TRUE))
-# bbox[[2]] <- c(range(surv_wcvi$data$lon, na.rm = TRUE), range(surv_wcvi$data$lat, na.rm = TRUE))
-# bbox[[3]] <- c(range(surv_qcs$data$lon, na.rm = TRUE), range(surv_qcs$data$lat, na.rm = TRUE))
-# bbox[[4]] <- c(range(surv_hs$data$lon, na.rm = TRUE), range(surv_hs$data$lat, na.rm = TRUE))
-
-
-# 
-# bbox[[1]] <- c(boxes[["WCHG"]]$xlim, boxes
-# bbox[[2]] <- c(-128.54825, -124.915633, 48.24815, 50.5058)
-# bbox[[3]] <- c(-131.208066, -127.949483, 51.005316, 52.683)
-# bbox[[4]] <- c(-132.85505, -129.849766, 52.70215, 54.6566)
-# 
-# 
-# cols <- c(
-#   RColorBrewer::brewer.pal(9, "Blues")[5],
-#   RColorBrewer::brewer.pal(9, "Purples")[5],
-#   RColorBrewer::brewer.pal(9, "Reds")[5],
-#   RColorBrewer::brewer.pal(9, "Greens")[5]
-# )
-# bbox$cols <- cols
-
 hexagon <- function (x, y, unitcell_x = 1, unitcell_y = 1, ...) {
   polygon(
     hexbin::hexcoords(unitcell_x)$x + x,
@@ -32,8 +9,8 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   ylim_ll = c(48.4, 54.25)) {
   
   # hexagon bin size in UTM kms
-  
-  library(tidyverse)
+  library(ggplot2)
+  library(dplyr)
   library(PBSmapping)
   library(PBSdata)
   data("isobath")
@@ -50,12 +27,8 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   
   if (plot_hexagons) {
     
-    # UTMs:
     attr(dat, "projection") <- "LL"
     attr(dat, "zone") <- 8
-    # xlim_ll <- range(dat$X) + c(-2, 2)
-    # ylim_ll <- range(dat$Y) + c(-2, 2)
-    
     dat <- suppressMessages(PBSmapping::convUL(dat))
     
     # use ggplot to compute hexagons:
@@ -84,7 +57,6 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
       value_range <- range(gd1$value)
       vals <- seq((value_range[1]), (value_range[2]), length.out = n_col_bins)
       pal <- pal_function(n_col_bins)
-      # pal <- colorRampPalette(RColorBrewer::brewer.pal(9, "PuBu"))(n_col_bins)
       gd1$custom_fill <- pal[findInterval((gd1$value), vals)]
       
       # legend data for later:
@@ -93,18 +65,14 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
       leg$raw_vals <- exp(leg$vals)
       leg$i <- seq(0, 1, length.out = nrow(leg))
     }
-    
-    # xlim = range(dat$X) + c(-10, -5)
-    # ylim = range(dat$Y) + c(-10, 10)
   }
   
   lims <- data.frame(X = sort(xlim_ll), Y = sort(ylim_ll))
   attr(lims, "projection") <- "LL"
   attr(lims, "zone") <- 8
   lims <- suppressMessages(convUL(lims))
-  
-  xlim <- lims$X #+ c(-150, 150) # bring in extra for projection / contour lines
-  ylim <- lims$Y #+ c(-150, 150)
+  xlim <- lims$X
+  ylim <- lims$Y
   
   par(mar = c(0, 0, 0, 0), oma = c(.5, .5, .5, .5), cex = 0.6)
   
@@ -139,26 +107,7 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   plyr::d_ply(nepacUTM, "PID", function(i)
     polygon(i$X, i$Y, col = "grey90", border = "grey70", lwd = 0.4))
   
-  # # spark lines:
-  # plyr::l_ply(pos$survey_id, function(xx) {
-  #   dd <- filter(dat_indices, species == "sebastes alutus", survey_id == xx)
-  #   dd <- left_join(dd, pos)
-  #   dd <- arrange(dd, year) #%>% filter(biomass != 0)
-  #   # dd <- left_join(expand.grid(year = min(dd$year):max(dd$year)), dd)
-  #   min_year_main <- 2003
-  #   # label_year <- ifelse(xx == "wcvi", TRUE, FALSE)
-  #   label_year <- TRUE
-  #   min_year <- ifelse(xx %in% c("phma_n", "phma_s"), 2006, min_year_main)
-  #   survey_label <- ifelse(xx %in% c("phma_n", "phma_s"),
-  #     toupper(gsub("_", " ", xx)), "")
-  #   survey_spark(x = as.numeric(na.omit(unique(dd$lon))), y = as.numeric(na.omit(unique(dd$lat))),
-  #     ts_x = dd$year, ts_y = dd$biomass, scale_x = 10, scale_y = 40,
-  #     ts_y_upper = dd$lowerci, ts_y_lower = dd$upperci, label_year = label_year,
-  #     min_year = min_year, survey_label = survey_label)
-  # })
-  
   # colour legend:
-  
   if (plot_hexagons) {
     legend_image <- raster::as.raster(matrix(rev(leg$col), ncol = 1)) # fixme
     leg_top <- ylim[[2]] - 100 # how far legend is from top
@@ -172,10 +121,6 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
       # segments(-133.7, text_y, -133.8, text_y, lwd = 0.2, col = "white") # tick marks
     }
     text(leg_left + 15, leg_top + 12, "CPUE (kg/hr)", cex = 0.8, col = "grey20", pos = 4)
-    # text(-128.2, leg_top + 0.2, "British Columbia", cex = 1, col = "grey85", pos = 4)
-    # rect(xleft = xlim[[1]] - 20, xright = xlim[[1]] + 20.6,
-    # ybottom = ylim[[1]] - 20, ytop = ylim[[1]] + 20.5, col = NA, border = "grey60",
-    # lwd = 0.7)
   }
   
   box(col = "grey60")
@@ -190,16 +135,9 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   )
   
   for (i in seq_len(4)) {
-    # rect(xleft = bb$X[1], xright = bb$X[2], ytop = bb$Y[1], ybottom = bb$Y[2],
-    #   border = bbox$cols[i], col = NA)
     rect(xleft = boxes[[i]]$xlim[1]*10, xright = boxes[[i]]$xlim[2]*10, 
       ytop = boxes[[i]]$ylim[1]*10, ybottom = boxes[[i]]$ylim[2]*10,
       border = cols[i], col = NA, lwd = 1.25)
   }
 }
-
-# dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")
-# plot_spatial_cpue(dcpue, "PACIFIC OCEAN PERCH", bin_width = 7)
-# plot_spatial_cpue(dcpue, "PACIFIC COD", bin_width = 7)
-# plot_spatial_cpue(dcpue, "LINGCOD", bin_width = 7)
 

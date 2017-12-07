@@ -1,15 +1,13 @@
 library(tidyverse)
-source("R/survey_functions.R")
+source("R/survey-functions.R")
 
 source("R/make-spp-list.R")
 spp <- get_spp_names()
 common <- spp$species_common_name
 d <- readRDS("../../Dropbox/dfo/data/select-survey-spatial-tows.rds")
 stopifnot(all(common %in% unique(d$species_common_name)))
-# common <- common[common %in% unique(d$species_common_name)] # temp
 
 # TODO FIX ON PC:
-
 d <- filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
 d <- filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
 
@@ -43,7 +41,6 @@ main_scale4 <- ggplot2::scale_fill_distiller(palette = "Purples", direction = 1)
 pal_scales <- list(main_scale1, main_scale2, main_scale3, main_scale4)
 
 for (i in 1:length(common)) {
-  # for (i in 25) {
   spp_file_name <- gsub("/", "-", gsub(" ", "-", common[i]))
   save_file <- paste0("spatial-survey/", spp_file_name, "-spatial-fits.rda")
   

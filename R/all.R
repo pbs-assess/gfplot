@@ -1,14 +1,15 @@
 library(tidyverse)
 
 # source("R/get-dat.R") # must be on DFO-networked PC
-source("R/survey_functions.R")
+source("R/survey-functions.R")
 source("R/cpue.R")
 source("R/bio-sparks.R")
 source("R/make-spp-list.R")
 torun <- get_spp_names()$species_common_name
 
 dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")
-dcpue$SPECIES_COMMON_NAME[dcpue$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <- toupper("north pacific spiny dogfish")
+dcpue$SPECIES_COMMON_NAME[dcpue$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <- 
+  toupper("north pacific spiny dogfish")
 dir.create("cpue", showWarnings = FALSE)
 
 for(i in torun) {
@@ -32,3 +33,5 @@ source("R/bio.R")
 source("R/catches.R")
 source("R/joy.R")
 source("R/fit-spatial-survey-models.R")
+source("R/bubbles.R")
+source("R/vb.R")
