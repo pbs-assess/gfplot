@@ -38,6 +38,14 @@ I've included the SQL code at this stage for full transparency and so others can
 check the data query, but ultimately I imagine this would be summarized in the
 research document.
 
+I'm assuming we won't include captions for every single plot on every single
+page (there would be a fully explained template at the beginning and a research
+document accompanying the first year of publication to fill in more details).
+However, it might be useful to have labels on each plot/panel to help people
+remember the basics of what each plot indicates.
+
+If we include much more (and even now) we might need two pages per stock.
+
 \textit{Other possible plots:}
 
 Do we want to show effort through time at least for recent years?
@@ -79,7 +87,7 @@ trawl and hook and line / traps separately?
 \centering
 \includegraphics[height=3.8in]{../cpue/pacific-ocean-perch.pdf}
 \caption{Pacific Ocean Perch CPUE for the groundfish bottom trawl sector. Shown
-  is the geometric mean within each hexagon sell since 2013.}
+  is the geometric mean within each hexagon cell since 2013.}
 \end{figure}
 
 The data are extracted from GFFOS with the following code:
@@ -100,7 +108,7 @@ show.
 The map shows depth contours at 100m, 200m, and 500m (in increasingly slightly
 darker shades of grey).
 
-The coloured rectangles indicate the subplot regions in the special survey plots.
+The coloured rectangles indicate the subplot regions in the spatial survey plots.
 
 We may want to show the trawl footprint boundaries.
 
@@ -126,7 +134,7 @@ I extracted data for the survey samples from GFBioSQL with:
 
 \verbatiminput{../R/get-survey-biology.sql}
 
-I then remove duplicate specimen IDs in R since these can be duplicated across
+I then removed duplicate specimen IDs in R since these can be duplicated across
 multiple survey groupings (and my R skills greatly exceed my SQL skills!).
                                                    
 I extracted data for the commercial samples from GFBioSQL with:
@@ -134,7 +142,7 @@ I extracted data for the commercial samples from GFBioSQL with:
 \verbatiminput{../R/get-commercial-biology.sql}
 
 The shading of the grid cells indicates the number of samples for a given year
-and datatype available across all surveys or commercial sources. The cell in
+and data type available across all surveys or commercial sources. The cell in
 each panel with the largest value has its value indicated in text (rounded to an
 appropriate clean number). The color scales are independent between the
 commercial and survey panels.
@@ -196,7 +204,7 @@ Here I am fitting Bayesian generalized linear mixed effects models with Gaussian
 random fields to estimate expected biomass density on the surface covering the
 entirety of the survey boundaries. I fit the models with the glmmfields
 R package I've been working on
-(\url{https://github.com/seananderson/glmmfields}). Essentially the Gaussian
+(\url{https://github.com/seananderson/glmmfields}). The Gaussian
 random field describes a wiggly surface of unexplained spatial pattern (the
 ``random effects'') in the response variable (here biomass of fish or
 probability of observing a given fish species in a survey tow) beyond that which
@@ -212,9 +220,15 @@ See Appendix \ref{sec:spatial-app} for details on the methods.
 
 At this point I'm only using bottom depth as a predictor but there's no reason
 why we couldn't include other predictors such as bottom temperature and
-substrate type. I still need to tweak the interpolation algorithm to go from the
+substrate type. 
+
+I still need to tweak the interpolation algorithm to go from the
 bathymetry grid layer to the locations of the grid cells in the final
-projection.
+projection (I think it's introducing a bit of `roughness' right now). I'm using
+actual tow depth for the observed data and the depth data from `PBSdata::bctopo`
+for the projections. Originally I was using a NOAA dataset, but it didn't match
+the trawl depths as closely. It sounds like another division of DFO might be
+developing an even better version we could use.
 
 There are separate models for the presence or absence of a given species in
 a tow and for the density if they are observed. These are then combined after by
@@ -245,6 +259,10 @@ scale the colours and point sizes so that they are consistent across the
 different survey panels. Right now there is no way to get a feeling for the
 relative abundance of species between the survey areas. The only larger scale
 spatial indicator is the trawl CPUE.
+
+We would want to emphasize that these spatial predictions are for visualization
+purposes only at this point. We'd want to do a lot more investigation on
+a stock-by-stock basis before believing them too strongly.
 
 \subsection{BIOMASS SURVEY INDEX TRENDS}
 
