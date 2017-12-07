@@ -9,13 +9,13 @@ surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
   "SELECT * FROM SURVEY_SERIES")
 saveRDS(surveys, file = "survey_series.rds")
 
-species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-  "SELECT * FROM SPECIES")
-saveRDS(species, file = "species.rds")
-
-trip_survey <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-  "SELECT * FROM TRIP_SURVEY")
-saveRDS(fishing_event, file = "fishing_event.rds")
+# species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+#   "SELECT * FROM SPECIES")
+# saveRDS(species, file = "species.rds")
+# 
+# trip_survey <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+#   "SELECT * FROM TRIP_SURVEY")
+# saveRDS(fishing_event, file = "fishing_event.rds")
 
 survey_ids <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
   "SELECT S.SURVEY_ID, SS.SURVEY_SERIES_ID, SS.SURVEY_SERIES_DESC
@@ -51,11 +51,9 @@ d_survs_df <- d_survs_df %>% mutate(species_science_name = tolower(species_scien
 
 saveRDS(d_survs_df, file = "select-survey-spatial-tows.rds")
 
-# -----------------
 survey_bio_sql <- paste(readLines("get-survey-biology.sql"), collapse = "\n")
 d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), survey_bio_sql)
 saveRDS(d, file = "all-survey-bio.rds")
-# -----------------
 
 survey_com_sql <- paste(readLines("get-commercial-biology.sql"), collapse = "\n")
 d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), survey_com_sql)
@@ -70,9 +68,6 @@ saveRDS(d, file = "all-catches.rds")
 # trawlfootprint feeze = April 2012
 landings_sql <- paste(readLines("get-cpue.sql"), collapse = "\n")
 d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), landings_sql)
-
-head(d)
-nrow(d)
 saveRDS(d, file = "all-spatial-cpue.rds")
 
 # biomass indices:
