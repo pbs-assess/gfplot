@@ -56,4 +56,4 @@ temp <- lapply(temp, function(x) paste(x, collapse = "\n"))
 temp <- paste(temp, collapse = "\n")
 writeLines(temp, con = "inst/tex/synopsis-draft-body.tex")
 system("latexmk inst/tex/synopsis-plots")
-# system("pdflatex synopsis-plots")
+

@@ -4,7 +4,7 @@ source("R/survey-functions.R")
 source("R/make-spp-list.R")
 spp <- get_spp_names()
 common <- spp$species_common_name
-d <- readRDS("../../Dropbox/dfo/data/select-survey-spatial-tows.rds")
+d <- readRDS("data-cache/all-survey-spatial-tows.rds")
 stopifnot(all(common %in% unique(d$species_common_name)))
 
 # TODO FIX ON PC:
@@ -25,13 +25,13 @@ surveys_to_fit <- data.frame(survey = c(
   years = c(2016, 2017, 2015, 2016), stringsAsFactors = FALSE)
 
 fits_not_good <- tribble(
-  ~common,            ~survey,
-  "spotted ratfish",  "West Coast Haida Gwaii Synoptic Survey",
-  "spotted ratfish",  "West Coast Vancouver Island Synoptic Survey",
-  "spotted ratfish",  "Queen Charlotte Sound Synoptic Survey",
-  "spotted ratfish",  "Hecate Strait Synoptic Survey",
-  "longnose skate",   "Queen Charlotte Sound Synoptic Survey",
-  "giant grenadier",  "West Coast Haida Gwaii Synoptic Survey"
+  ~common,            ~survey
+  # "spotted ratfish",  "West Coast Haida Gwaii Synoptic Survey",
+  # "spotted ratfish",  "West Coast Vancouver Island Synoptic Survey",
+  # "spotted ratfish",  "Queen Charlotte Sound Synoptic Survey",
+  # "spotted ratfish",  "Hecate Strait Synoptic Survey",
+  # "longnose skate",   "Queen Charlotte Sound Synoptic Survey",
+  # "giant grenadier",  "West Coast Haida Gwaii Synoptic Survey"
 )
 
 main_scale1 <- ggplot2::scale_fill_distiller(palette = "Blues", direction = 1)

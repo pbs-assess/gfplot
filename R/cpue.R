@@ -21,7 +21,6 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
     species_common_name %in% toupper(species)) %>% 
     rename(X = lon, Y = lat)
   
-  
   plot_hexagons <- TRUE
   if (nrow(dat) == 0) plot_hexagons <- FALSE
   
@@ -79,14 +78,13 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   data("nepacLLhigh")
   np <- clipPolys(nepacLLhigh, xlim = xlim_ll + c(-2, 2), ylim = ylim_ll + c(-2, 2))
   attr(np, "zone") <- 8
-  nepacUTM <- suppressMessages(convUL(np))
+  nepacUTM <- suppressMessages(PBSmapping::convUL(np))
   
   plotMap(nepacUTM, xlim = xlim, ylim = ylim, axes = FALSE, type = "n",
     plt = c(0, 1, 0, 1), xlab = "", ylab = "")
   
   if (plot_hexagons) {
-    # hexagons:
-    gd1$custom_fill <- paste0(substr(gd1$custom_fill, 1, 7), "FF") # add transparency?
+    gd1$custom_fill <- paste0(substr(gd1$custom_fill, 1, 7), "FF") # add transparency (FF)?
     dx <- ggplot2::resolution(gd1$x, FALSE)
     dy <- resolution(gd1$y, FALSE) / 2 * 1.15
     plyr::a_ply(gd1, 1, function(i)
@@ -102,7 +100,8 @@ plot_spatial_cpue <- function(dat, species, bin_width = 6, n_minimum_vessels = 3
   
   attr(isobath, "zone") <- 8
   isobath_UTM <- suppressMessages(convUL(isobath))
-  PBSmapping::addLines(isobath_UTM, col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
+  PBSmapping::addLines(isobath_UTM, 
+    col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
   
   plyr::d_ply(nepacUTM, "PID", function(i)
     polygon(i$X, i$Y, col = "grey90", border = "grey70", lwd = 0.4))
