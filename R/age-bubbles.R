@@ -21,11 +21,11 @@ dbio <- dbio %>%
     length, weight, maturity_code, sex, survey_series_desc)
 
 # bad data:
-dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "north pacific spiny dogfish"), ]
-dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "big skate"), ]
-dbio <- dbio[-which(dbio$length > 600 & dbio$species_common_name == "longnose skate"), ]
-dbio <- dbio[-which(dbio$length > 60 & dbio$species_common_name == "pacific tomcod"), ]
-dbio <- dbio[-which(dbio$length > 50 & dbio$species_common_name == "quillback-rockfish"), ]
+dbio <- dbio[!(dbio$length > 600 & dbio$species_common_name == "north pacific spiny dogfish"), ]
+dbio <- dbio[!(dbio$length > 600 & dbio$species_common_name == "big skate"), ]
+dbio <- dbio[!(dbio$length > 600 & dbio$species_common_name == "longnose skate"), ]
+dbio <- dbio[!(dbio$length > 60 & dbio$species_common_name == "pacific tomcod"), ]
+dbio <- dbio[!(dbio$length > 50 & dbio$species_common_name == "quillback-rockfish"), ]
 
 source("R/add-label.R")
 
