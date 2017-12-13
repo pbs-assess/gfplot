@@ -5,8 +5,8 @@ plot_index_sparks <- function(species) {
   library(tidyverse)
 
   d <- readRDS("data-cache/all-boot-biomass-indices.rds")
-  d <- filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
-  d <- filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
+  d <- dplyr::filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
+  d <- dplyr::filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
 
   dup <- group_by(d, species_common_name) %>%
     summarise(n_spp = length(unique(species_science_name))) %>%
@@ -152,9 +152,81 @@ plot_index_sparks <- function(species) {
         lines(x$year, x$biomass_scaled, col = "#00000050", lwd = 2)
         points(x$year, x$biomass_scaled, pch = 21, col = pt_col, bg = "grey60", cex = 1.0,
           lwd = 1.6)
+        
+        # diagnostics:
+        
+        all_tows <- unique(select(d, survey_series_desc, year))
+        all_tows <- filter(all_tows, survey_series_desc %in% x$survey_series_desc)
+        xx <- left_join(all_tows, x, by = c("survey_series_desc", "year"))
+        
+        gap <- 0.15
+        start_gap <- 0.30
+        lab_col <- "grey40"
+        
+        add_label(-0.005, start_gap + 0 * gap,
+          paste("Avg. pos. sets / sets  =",
+            round(mean(x$num_pos_sets), 0), "/", round(mean(x$num_sets), 0)
+          ), cex = 0.7,
+          col = lab_col)
+        
+        avg_cv <- mean(x$re)
+        add_label(-0.005, start_gap + 1 * gap,
+          paste("Avg. annual CV =",
+            sprintf("%.2f", round(avg_cv, 2))
+          ), cex = 0.7,
+          col = lab_col)
+        
+        cv_time <- sd(x$biomass) / mean(x$biomass)
+        add_label(-0.005, start_gap + 2 * gap,
+          paste("Temporal CV =",
+            sprintf("%.2f", round(cv_time, 2))
+          ), cex = 0.7,
+          col = lab_col)
+        
+        frac_pos <- mean(x$num_pos_sets / x$num_sets)
+        
+        if (cv_time > 1.25 | avg_cv > 0.8 | frac_pos < 0.05)
+          rect(xleft = 1970, xright = 2020, ybottom = -10, ytop = 10,
+            col = "#00000010", border = NA)
+        
+        # add_label(-0.005, 0.25,
+        #   paste("Median # pos. sets / median # sets  =", 
+        #     round(median(x$num_pos_sets), 1), "/", round(median(x$num_sets), 1)
+        #   ), cex = 0.7,
+        #   col = "grey30")
+        # 
+        # add_label(-0.005, 0.35, 
+        #   paste("Median frac. pos. sets =", round(median(x$num_pos_sets/x$num_sets), 2)), cex = 0.7,
+        #   col = "grey30")
+        # 
+        # add_label(-0.005, 0.45, 
+        #   paste("Median CV =", round(median(x$re), 2)), cex = 0.7,
+        #   col = "grey30")
+        # 
+        # # add_label(-0.005, 0.55,
+        # #   paste("Years with no positive tows =", 
+        # #     sum(is.na(xx$num_pos_sets) | xx$biomass == 0)
+        # #   ), cex = 0.7,
+        # #   col = "grey30")
+        # 
+        # cv_cv <- sd(x$re) / mean(x$re)
+        # add_label(-0.005, 0.55,
+        #   paste("CV of CV =", 
+        #     round(cv_cv, 2)
+        #   ), cex = 0.7,
+        #   col = "grey30")
+        # 
+        # cv_time <- sd(x$biomass) / mean(x$biomass)
+        # add_label(-0.005, 0.65,
+        #   paste("CV of biomass through time =", 
+        #     round(cv_time, 2)
+        #   ), cex = 0.7,
+        #   col = "grey30")
+        
       }
 
       add_label(-0.005, 0.15, unique(x$survey_series_desc), col = "grey30", cex = 0.8)
+      
     })
   } else { # blank:
     par(mfrow = c(6, 2), oma = c(2, .5, .5, .5), cex = 0.7, mar = c(0, 0, 0, 0),
