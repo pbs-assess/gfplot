@@ -1,9 +1,13 @@
 library(tidyverse)
 
+sanitize_common_name <- function(x) {
+  gsub("/", "-", gsub(" ", "-", x))
+}
+
 # source("R/get-dat.R") # must be on DFO-networked PC
 source("R/survey-functions.R")
+
 source("R/cpue.R")
-source("R/bio-indices.R")
 source("R/make-spp-list.R")
 torun <- get_spp_names()$species_common_name
 
@@ -19,22 +23,38 @@ for(i in torun) {
   dev.off()
 }
 
+source("R/bio-indices.R")
 dir.create("sparks", showWarnings = FALSE)
 for(i in torun) {
   message(i)
-  pdf(paste0("sparks/", gsub("/", "-", gsub(" ", "-", i)), ".pdf"),
+  pdf(paste0("sparks/", sanitize_common_name(i), ".pdf"),
     width = 4.5, height = 4.55)
   plot_index_sparks(i)
   dev.off()
 }
 
+dir.create("synop", showWarnings = FALSE)
 source("R/bio-availability.R")
+dbio <- readRDS("data-cache/all-survey-bio.rds")
+dbio_c <- readRDS("data-cache/all-commercial-bio.rds")
+bio <- summarize_bio_avail(dbio, dbio_c)
+source("R/make-spp-list.R")
+torun <- get_spp_names()$species_common_name
+for (i in seq_along(torun)) {
+  pdf(paste0("synop/dat-syn-", sanitize_common_name(torun[i]), ".pdf"),
+    width = 6, height = 2.75)
+  message(torun[i])
+  plot_bio_avail(common_name = torun[i], bio)
+  dev.off()
+}
+
 source("R/catches.R")
 source("R/length.R")
 source("R/fit-spatial-survey-models.R")
 source("R/age-bubbles.R")
 source("R/growth.R")
 
+###########################################################################
 # ----------
 library(tidyverse)
 source("R/make-spp-list.R")
