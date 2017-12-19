@@ -1,0 +1,82 @@
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+ggplot2::theme_set(theme_light())
+sa <- readr::read_csv("~/Dropbox/dfo/selected-data/SPECIMEN_AGE.txt", col_names = FALSE,
+  progress = FALSE)
+sa <- sa[,c(1, 2, 4, 5, 8, 9, 10, 11)]
+names(sa) <- c("sample_id", "specimen_id", "age_reading_type_code", "aging_method_code",
+  "employee_id", "specimen_age", "minimum_age", "maximum_age")
+d <- readRDS("../data-cache/all-survey-bio.rds")
+dd2 <- filter(d, species_common_name == "shortraker rockfish")
+dd2$survey_series_desc <- NULL
+dd2$trip_sub_type_code <- NULL
+dd2$survey_series_id <- NULL
+nrow(dd2)
+dd2 <- dd2[!duplicated(dd2), ]
+nrow(dd2)
+dd <- inner_join(dd2, sa, by = "specimen_id") %>%
+  filter(!is.na(specimen_age))
+# dd <- filter(dd, age_reading_type_code != 2) # primary
+dd <- filter(dd, age_reading_type_code != 4) # secondary
+# nrow(dd)
+# head(dd)
+# filter(dd, age_reading_type_code == 3)
+```
+
+```{r}
+arrange(dd, specimen_age) %>%
+  ggplot(aes(seq_along(specimen_age), y = specimen_age,
+  ymin = minimum_age, ymax = maximum_age,
+  colour = as.factor(age_reading_type_code))) +
+  geom_pointrange()
+```
+
+```{r}
+checked <- group_by(dd, specimen_id) %>% 
+  mutate(checked = any(c(3) %in% age_reading_type_code)) %>% 
+  filter(checked) %>% 
+  ungroup()
+
+checked <- checked %>% mutate(age_reading_type_code = 
+    gsub(2, 1, age_reading_type_code))
+
+table(checked$age_reading_type_code)
+
+arrange(checked, specimen_age) %>%
+  ggplot(aes(seq_along(specimen_age), y = specimen_age,
+  ymin = minimum_age, ymax = maximum_age,
+  colour = as.factor(age_reading_type_code))) +
+  geom_pointrange()
+
+library(reshape2)
+m <- filter(checked) %>% 
+  dcast(specimen_id ~ age_reading_type_code, 
+    value.var = "specimen_age",
+    fun.aggregate = function(x) {mean(x, na.rm = TRUE)}) %>%
+  rename(final = `1`, precision = `3`)
+
+l <- filter(checked) %>% 
+  dcast(specimen_id ~ age_reading_type_code, 
+    value.var = "maximum_age",
+    fun.aggregate = function(x) {mean(x, na.rm = TRUE)}) %>%
+  rename(final_max = `1`, precision_max = `3`)
+
+u <- filter(checked) %>% 
+  dcast(specimen_id ~ age_reading_type_code, 
+    value.var = "minimum_age",
+    fun.aggregate = function(x) {mean(x, na.rm = TRUE)}) %>%
+  rename(final_min = `1`, precision_min = `3`)
+
+all <- inner_join(m, l, by = "specimen_id") %>% 
+  inner_join(u, by = "specimen_id")
+
+ggplot(all, aes(final, precision)) +
+  geom_abline(intercept = 0, slope = 1, col = "grey30", lty = 2) +
+  geom_point(pch = 21, colour = "grey10", fill = "#00000060") +
+  coord_equal() +
+  geom_segment(aes(x = final_min, xend = final_max, y = precision, 
+    yend = precision), alpha = 0.6) +
+  geom_segment(aes(x = final, xend = final, y = precision_min, 
+    yend = precision_max), alpha = 0.6)
+```
+
