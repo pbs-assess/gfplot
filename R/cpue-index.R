@@ -181,7 +181,10 @@ m_stan2 <- stan("logistic.stan",
   data = list(X = mm, y = qq$pos_catch, N = nrow(qq), J = ncol(mm)),
   iter = 100, chains = 1, thin = 1, init = initf1)
 
-mm2 <- model.matrix(pos_catch ~ year_factor, data = qq)
+qq$best_depth <- arm::rescale(qq$best_depth)
+qq$latitude <- arm::rescale(qq$latitude)
+f <- pos_catch ~ year_factor + poly(best_depth, 2) + vessel_name
+mm2 <- model.matrix(f, data = qq)
 system.time({
   opt <- optimizing(sm,
     data = list(X = mm2, y = qq$pos_catch, N = nrow(qq), J = ncol(mm2)))
@@ -189,9 +192,45 @@ system.time({
 initf1 <- function() {
   list(beta = as.numeric(as.matrix(opt$par)[,1]))
 }
+system.time({
 m_stan22 <- stan("logistic.stan",
   data = list(X = mm2, y = qq$pos_catch, N = nrow(qq), J = ncol(mm2)),
-  iter = 100, chains = 1, thin = 1, init = initf1)
+  iter = 100, thin = 1, init = initf1, chains = 2,
+  cores = 2)
+})
+system.time({
+  m_stan222 <- rstanarm::stan_glmer(pos_catch ~
+      year_factor + poly(best_depth, 2) +
+      (1 | vessel_name) + (1 | dfo_locality) + (1 | month_factor),
+    iter = 500, chains = 4, thin = 1, cores = 4,
+    data = qq[, ], family = binomial(link = "logit"))
+})
+
+library(mgcv)
+m_pos <- gam(log(spp_catch) ~ year_factor + s(best_depth) +
+    s(month) + s(hours_fished) + s(latitude),
+  data = filter(d_retained, pos_catch == 1))
+
+system.time({
+  m_bin <- gam(pos_catch ~ year_factor + s(best_depth) +
+      s(month) + s(hours_fished) + s(latitude), data = d_retained,
+    family = binomial(link = "logit"))
+})
+
+install_github("glmmTMB/glmmTMB")
+library(glmmTMB)
+
+qq <- d_retained[, ]
+system.time({
+mm <- glmmTMB(pos_catch ~ year_factor + poly(best_depth, 3) +
+    poly(hours_fished, 3) +
+    (1 | vessel_name) + (1 | dfo_locality) + (1 | month_factor),
+  data = qq,
+  family = binomial(link = "logit"),
+  verbose = TRUE
+)
+})
+
 
 # m_stan3 <- vb(sm,
 #   data = list(X = mm, y = qq$pos_catch, N = nrow(qq), J = ncol(mm)),
