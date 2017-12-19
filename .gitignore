@@ -40,3 +40,5 @@ text/spatial-appendix.tex
 *.out
 *.lof
 *.docx
+*.o
+*.so
