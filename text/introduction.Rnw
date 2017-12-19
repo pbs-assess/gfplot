@@ -43,6 +43,9 @@ Purposes: (in language that has not yet been carefully crafted)
     such as the survey index trends on a regular basis even if we aren't
     publishing full assessments every year.
 
-  \item Your ideas here \ldots
+  \item To generate a standard view of all DFOs data holdings for any given
+    groundfish species to facilitate a rapid, qualitative, assessment of what is
+    possible with respect to stock assessment as well provide a tool for an
+    equally qualitative assessment of possible risk.  
 
 \end{itemize}
