@@ -33,12 +33,15 @@ obj <- MakeADFun(
     X1_pred_ij = mm_pred1, X2_pred_ij = mm_pred2),
   # parameters = list(b1_j = rep(0, ncol(mm1)), b2_j = rep(0, ncol(mm2)),
   parameters = list(
-    b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.0001),
-    b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.0001),
+    b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.00001),
+    b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.00001),
     log_sigma = log(summary(m_pos)$sigma)),
   DLL = "deltalognormal")
 # obj$fn(obj$par)
 # obj$gr(obj$par)
+
+st - Sys.time()
+
 system.time({
   opt <- nlminb(
     start = obj$par,
@@ -52,3 +55,7 @@ max(obj$gr(opt$par))
 message("Getting sdreport...")
 # obj$report()
 r <- sdreport(obj)
+
+ft <- Sys.time()
+
+that_took <- abs(round(as.numeric(st - ft, units = "secs"), 0))

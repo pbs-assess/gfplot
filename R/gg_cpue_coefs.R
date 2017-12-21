@@ -18,11 +18,13 @@ gg_cpue_coefs <- function(sm, mm1, mm2, re = TRUE) {
       paste("z2_k", seq_along(grep("z2_k", pars))),
       paste("z1_g", seq_along(grep("z1_g", pars))),
       paste("z2_g", seq_along(grep("z2_g", pars))),
-      paste("prediction", 1996:2015), paste("log-prediction", 1996:2015))
+      # paste("prediction", 1996:2015),
+      paste("log-prediction", 1996:2015))
   } else {
     sm$par_name <- c(paste("bin", colnames(mm1)), paste("pos", colnames(mm2)),
       "log_sigma",
-      paste("prediction", 1996:2015), paste("log-prediction", 1996:2015))
+      # paste("prediction", 1996:2015),
+      paste("log-prediction", 1996:2015))
   }
   sm <- mutate(sm, par_name = gsub("as\\.factor\\(", "", par_name))
   sm <- mutate(sm, par_name = gsub("as\\.character\\(", "", par_name))

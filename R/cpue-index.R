@@ -57,10 +57,16 @@ caught_something <- d_fe %>%
   mutate(n_years = length(unique(year))) %>%
   filter(n_years >= 4) %>%
   ungroup() %>% group_by(vessel_name) %>%
-  mutate(max_trips_per_year = max(n_trips_per_year),
-    n_trips_total = length(unique(trip_id))) %>%
+  mutate(n_trips_total = length(unique(trip_id))) %>%
   ungroup() %>%
-  filter(max_trips_per_year >= 4, n_trips_total >= 100)
+  group_by(year, vessel_name) %>%
+  summarise(n_trips_per_year = unique(n_trips_per_year)) %>%
+  ungroup() %>% group_by(vessel_name) %>%
+  mutate(trips_over_treshold_this_year = n_trips_per_year >= 4) %>%
+  group_by(vessel_name) %>%
+  summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
+  filter(trips_over_thresh >= 4)
+length(unique(caught_something$vessel_name))
 
 d_retained <- filter(d_fe, vessel_name %in% unique(caught_something$vessel_name))
 d_retained <- mutate(d_retained, pos_catch = ifelse(spp_catch > 0, 1, 0))

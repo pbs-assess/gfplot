@@ -1,5 +1,17 @@
 # Evaluating approaches to standardizing groundfish commercial CPUE
 
+The purpose of this document is to:
+
+- make sure I can reproduce the CPUE index standardization results from recent assessments so I can create them for many stocks and regions for the data synopsis report
+- test a delta-lognormal model written in TMB to see if it's considerably faster and obtains the same results
+- try a version of the delta-lognormal model that includes random intercepts to see if this is technically feasible in terms of computation time and to see whether it generates a similar standardized index 
+
+In terms of vessel selection criteria right now I am using the same criteria used in the recent walleye pollock assessment:
+
+- vessels must catch pollock in at least 4 years
+- each of those years must include at least 4 trips with pollock
+- each included vessel must make at least 100 trips that include some pollock
+
 ```{r, eval=TRUE, echo=FALSE}
 knitr::opts_knit$set(root.dir = '..')
 ggplot2::theme_set(ggplot2::theme_light())
@@ -40,13 +52,13 @@ Now let's load our TMB version and compare the results.
 This is the model:
 
 ```{r, comment=NA,echo=FALSE}
-writeLines(readLines("deltalognormal.cpp"))
+writeLines(readLines("inst/tmb/deltalognormal.cpp"))
 ```
 
 ```{r, message=FALSE, warning=FALSE, results="hide"}
 library(TMB)
-compile("deltalognormal.cpp")
-dyn.load(dynlib("deltalognormal"))
+compile("inst/tmb/deltalognormal.cpp")
+dyn.load(dynlib("inst/tmb/deltalognormal"))
 
 mm1 <- as.matrix(model.matrix(non_zero ~ x, data = d))
 mm2 <- as.matrix(model.matrix(y ~ x, data = pos_dat))
@@ -61,12 +73,17 @@ obj <- MakeADFun(
   DLL = "deltalognormal")
 obj$fn(obj$par)
 obj$gr(obj$par)
+st <- Sys.time()
 opt <- nlminb(
   start = obj$par,
   objective = obj$fn,
   gradient = obj$gr)
 r <- sdreport(obj)
+ft <- Sys.time()
+tmb_time1 <- as.numeric(ft - st, units = "secs")
 ```
+
+That took `r round(tmb_time1, 3)` seconds.
 
 ```{r}
 summary(r)
@@ -81,7 +98,7 @@ We get exactly the same point estimate as with the R functions.
 
 We can compare the confidence intervals derived from the delta method standard errors from TMB (on the log scale) to a bootstrap approach:
 
-```{r, cache=TRUE}
+```{r}
 hurdle_fn <- function(data, i) {
   dat_boot <- data[i, ]
   m1 <- glm(non_zero ~ x, data = dat_boot,
@@ -94,10 +111,15 @@ hurdle_fn <- function(data, i) {
 }
 
 library(boot)
+st <- Sys.time()
 b <- boot(d, hurdle_fn, R = 1000)
 b.ci <- boot.ci(b, type = "bca")
+ft <- Sys.time()
 print(b.ci)
 ```
+
+That took `r round(as.numeric(ft - st, units = "secs"), 3)` seconds 
+(`r round(as.numeric(ft - st, units = "secs")/tmb_time1, 0)` times longer than the TMB approach.)
 
 The confidence intervals are almost exactly the same. However, the bootstrap approach takes a very long time to fit to a full data set of real groundfish CPUE data. It's doable for one stock if you are very patient but likely prohibitive to run for all or many stocks. The TMB approach is much faster.
 
@@ -120,15 +142,15 @@ mean(d_retained$pos_catch)
 Let's fit our models in TMB. First we will start with a simple model that just has year effects. 
 
 ```{r, message=FALSE, warning=FALSE, results="hide"}
-compile("deltalognormal.cpp")
-dyn.load(dynlib("deltalognormal"))
+compile("inst/tmb/deltalognormal.cpp")
+dyn.load(dynlib("inst/tmb/deltalognormal"))
 
 f1 <- pos_catch ~ year_factor
 f2 <- log(spp_catch/hours_fished) ~ year_factor
 
 if (!file.exists("cpue-glm-eg-year.rda")) {
   source("R/delta-cpue-tmb-glm.R")
-  save(r, mm1, mm2, obj, file = "cpue-glm-eg-year.rda") 
+  save(r, mm1, mm2, obj, that_took, file = "cpue-glm-eg-year.rda") 
 } else {
   load("cpue-glm-eg-year.rda")
 }
@@ -166,11 +188,13 @@ f2 <- log(spp_catch/hours_fished) ~ year_factor + f(month_factor) +
 
 if (!file.exists("cpue-glm-eg.rda")) {
   source("R/delta-cpue-tmb-glm.R")
-  save(r, mm1, mm2, obj, file = "cpue-glm-eg.rda") 
+  save(r, mm1, mm2, that_took, obj, file = "cpue-glm-eg.rda") 
 } else {
   load("cpue-glm-eg.rda")
 }
 ```
+
+That took `r that_took` seconds.
 
 ```{r}
 opt$convergence
@@ -328,12 +352,12 @@ Now let's fit a similar model with random intercepts for vessel and DFO locality
 This is the model:
 
 ```{r, comment=NA,echo=FALSE}
-writeLines(readLines("deltalognormal_2re.cpp"))
+writeLines(readLines("inst/tmb/deltalognormal_2re.cpp"))
 ```
 
 ```{r, message=FALSE, warning=FALSE, results="hide"}
-compile("deltalognormal_2re.cpp")
-dyn.load(dynlib("deltalognormal_2re"))
+compile("inst/tmb/deltalognormal_2re.cpp")
+dyn.load(dynlib("inst/tmb/deltalognormal_2re"))
 
 f1 <- pos_catch ~ year_factor + f(month_factor) + f(depth_band) + f(latitude_band)
 f2 <- log(spp_catch/hours_fished) ~ year_factor + f(month_factor) +
@@ -341,11 +365,13 @@ f2 <- log(spp_catch/hours_fished) ~ year_factor + f(month_factor) +
 
 if (!file.exists("cpue-glmm-eg.rda")) {
   source("R/delta-cpue-tmb-glmm.R")
-  save(r_re, mm1, mm2, obj, file = "cpue-glmm-eg.rda") 
+  save(r_re, mm1, mm2, obj, that_took, file = "cpue-glmm-eg.rda") 
 } else {
   load("cpue-glmm-eg.rda")
 }
 ```
+
+That took `r that_took` seconds.
 
 That takes considerably longer to run (several minutes). Let's make a plot combining the various trends we have calculated:
 
@@ -365,7 +391,7 @@ ggplot(df2, aes(year, exp(Estimate),
 
 In the above plot, blue is the unstandardized series, black is the GLM/LM standardized series, and red is the GLMM/LMM standardized series (i.e. the red line and shading is for the model including random intercepts for vessels and DFO locality).
 
-So the random effects model produces almost exactly the same point estimate of the index trend but introduces a bit of (likely realistic) uncertainty around the trend estimate. Importantly, the random effect model estimates its trend for an average locality and average vessel whereas the GLM version has to make its estimate at a particular locality and vessel. However, once they are all scaled to have the same geometric mean the results are quite similar. 
+So the random effects model produces almost exactly the same point estimate of the index trend but introduces a bit of (likely realistic) uncertainty around the trend estimate. Importantly, the random effect model estimates its trend for an average locality and average vessel whereas the GLM version has to make its estimate at a particular locality and vessel. However, once they are all scaled to have the same geometric mean the results are quite similar. Given the extra time needed for the random effects model with a similar result, it may not be worth using.
 
 Again, let's plot out the coefficients:
 
@@ -390,7 +416,7 @@ lines(scale(plogis(b) * exp(p)), type = "l", lty = 1)
 
 In the above plot, the red line is the version combined according to the formula and the black line is the version combined by multiplying the probability by the positive mean expectation. The results are similar (after scaling) but not exactly the same. 
 
-We can also just plot out of the lower half of the formula that scales and inverts the probability component to see what's going on.
+We can also just plot out the lower half of the formula that scales and inverts the probability component to see what's going on.
 
 ```{r}
 plot(1/(cyy_lower(plogis(p[1]), plogis(b))), type = "l", lty = 2, col = "red",
@@ -398,5 +424,5 @@ plot(1/(cyy_lower(plogis(p[1]), plogis(b))), type = "l", lty = 2, col = "red",
 lines(plogis(b))
 ```
 
-In the above plot, the red line is the version from the formula and the black line is 1 minus the raw probability. I still can't wrap my head around why we'd want to use the formula or method used in a number of recent assessments versus just multiplying the probability by the positive estimate.
+In the above plot, the red line is the version from the formula and the black line is the raw probability. I still can't wrap my head around why we'd want to use the formula used in a number of recent assessments versus just multiplying the probability by the positive estimate.
 

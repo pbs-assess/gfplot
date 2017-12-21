@@ -66,6 +66,8 @@ obj <- MakeADFun(
 
 obj$fn(obj$par)
 obj$gr(obj$par)
+
+st - Sys.time()
 system.time({
   opt <- nlminb(
     start = obj$par,
@@ -77,3 +79,6 @@ system.time({
 
 obj$report()
 r_re <- sdreport(obj)
+ft <- Sys.time()
+
+that_took <- abs(round(as.numeric(st - ft, units = "secs"), 0))
