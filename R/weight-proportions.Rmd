@@ -1,0 +1,111 @@
+# Age frequency or proportion weighting
+
+In this document I'm going to try and reproduce the calculations from p161 of:
+Stock Assessment and Harvest Advice for Rock Sole (Lepidopsetta spp.) in British Columbia
+Kendra R. Holt, Paul J. Starr, Rowan Haigh, and Brian Krishka using dplyr and pipes.
+PDF: <http://waves-vagues.dfo-mpo.gc.ca/Library/363948.pdf>
+
+All equation numbers below refer to that page.
+
+I will simulate a data set to work with.
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(assertthat)
+library(ggplot2)
+set.seed(42)
+d <- expand.grid(year = 1:15, trip = 1:8, age = 1:9, quarter = 1:4) %>%
+  mutate(
+    freq = round(rlnorm(n(), 2, 1)),
+    catch = round(rlnorm(n(), 2, 1))) %>%
+  as_tibble()
+d
+```
+
+Now I'll work through the equations in batches and check them along the way with assertions to make sure that the total count of observations stays the same throughout:
+
+```{r}
+wp1 <- d %>% group_by(year, quarter) %>% # pre D.4
+  mutate(catch_quarter_prop = catch/sum(catch)) %>% # D.4
+  group_by(year, quarter, age) %>% # pre D.5
+  summarise(weighted_age_freq1 = sum(freq * catch_quarter_prop), # D.5
+    sum_catch = sum(catch), sum_freq = sum(freq)) %>% # needed for D.6 and D.7
+  mutate(weighted_age_freq1_scaled =
+      weighted_age_freq1 * sum(sum_freq)/sum(weighted_age_freq1)) # D.6
+
+# check:
+a1 <- group_by(wp1, year, quarter) %>%
+  summarise(f = sum(weighted_age_freq1_scaled)) %>% round(9)
+a2 <- group_by(d, year, quarter) %>%
+  summarise(f = sum(freq)) %>% round(9)
+assert_that(identical(a1$f, a2$f))
+```
+
+So within each year and quarter we still have the same counts.
+
+```{r}
+wp2 <- wp1 %>%
+  group_by(year) %>% # pre D.7
+  mutate(catch_annual_prop = sum_catch/sum(sum_catch)) %>% # D.7
+  group_by(year, age) %>% # pre D.8
+  summarise(
+    weighted_age_freq2 = sum(weighted_age_freq1_scaled * catch_annual_prop), # D.8
+    sum_weighted_age_freq1 = sum(weighted_age_freq1_scaled)) %>% # needed for D.9
+  group_by(year) %>% # pre D.9
+  mutate(weighted_age_freq2_scaled = weighted_age_freq2 *
+      (sum(sum_weighted_age_freq1) / sum(weighted_age_freq2)))  # D.9
+
+# check:
+a1 <- group_by(wp2, year) %>%
+  summarise(f = sum(weighted_age_freq2_scaled)) %>% round(9)
+a2 <- group_by(d, year) %>%
+  summarise(f = sum(freq)) %>% round(9)
+assert_that(identical(a1$f, a2$f))
+```
+
+And now within each year we have the same counts.
+
+```{r}
+wp3 <- wp2 %>% group_by(year) %>%
+  mutate(weighted_age_prop = 
+      weighted_age_freq2_scaled / sum(weighted_age_freq2_scaled)) %>% # D.10
+  select(-contains("freq"))
+
+# check:
+a1 <- group_by(wp3, year) %>%
+  summarise(total = sum(weighted_age_prop)) %>% round(9)
+assert_that(all(a1$total == 1))
+head(as.data.frame(wp3), n = 12)
+```
+
+And all the proportions add up to 1 each year. 
+
+```{r}
+ggplot(wp3, aes(year, age, size = weighted_age_prop)) +
+  geom_point()
+```
+
+The above code can be condensed without assertions to:
+
+```{r}
+d %>% group_by(year, quarter) %>% # pre D.4
+  mutate(catch_quarter_prop = catch/sum(catch)) %>% # D.4
+  group_by(year, quarter, age) %>% # pre D.5
+  summarise(weighted_age_freq1 = sum(freq * catch_quarter_prop), # D.5
+    sum_catch = sum(catch), sum_freq = sum(freq)) %>% # needed for D.6 and D.7
+  mutate(weighted_age_freq1_scaled =
+      weighted_age_freq1 * sum(sum_freq)/sum(weighted_age_freq1)) %>%  # D.6
+  group_by(year) %>% # pre D.7
+  mutate(catch_annual_prop = sum_catch/sum(sum_catch)) %>% # D.7
+  group_by(year, age) %>% # pre D.8
+  summarise(
+    weighted_age_freq2 = sum(weighted_age_freq1_scaled * catch_annual_prop), # D.8
+    sum_weighted_age_freq1 = sum(weighted_age_freq1_scaled)) %>% # needed for D.9
+  group_by(year) %>% # pre D.9
+  mutate(weighted_age_freq2_scaled = weighted_age_freq2 *
+      (sum(sum_weighted_age_freq1) / sum(weighted_age_freq2))) %>% # D.9
+  group_by(year) %>%
+  mutate(weighted_age_prop =
+      weighted_age_freq2_scaled / sum(weighted_age_freq2_scaled)) %>% # D.10
+  select(-contains("freq"))
+```
