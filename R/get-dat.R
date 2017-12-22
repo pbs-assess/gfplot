@@ -1,3 +1,5 @@
+library(dplyr)
+
 db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
   DBI::dbConnect(odbc::odbc(), driver = "SQL Server",
     server = server, database = database)
