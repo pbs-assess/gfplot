@@ -2,15 +2,22 @@
 
 The purpose of this document is to:
 
-- make sure I can reproduce the CPUE index standardization results from recent assessments so I can create them for many stocks and regions for the data synopsis report
-- test a delta-lognormal model written in TMB to see if it's considerably faster and obtains the same results
-- try a version of the delta-lognormal model that includes random intercepts to see if this is technically feasible in terms of computation time and to see whether it generates a similar standardized index 
+1. make sure I can reproduce the CPUE index standardization results from recent assessments so I can create them for many stocks and regions for the data synopsis report
+2. test a delta-lognormal model written in TMB to see if it's considerably faster and obtains the same results
+3. try a version of the delta-lognormal model that includes random intercepts to see if this is technically feasible in terms of computation time and to see whether it generates a similar standardized index
 
-In terms of vessel selection criteria right now I am using the same criteria used in the recent walleye pollock assessment:
+To jump to the punchline:
+
+1. yes
+2. yes
+3. similar result, 10 times slower
+
+In the section below using real data I focus on walleye pollock bottom trawl CPUE in areas 5CDE. In terms of vessel selection criteria right now I am using the same criteria used in the recent walleye pollock assessment:
 
 - vessels must catch pollock in at least 4 years
 - each of those years must include at least 4 trips with pollock
 - each included vessel must make at least 100 trips that include some pollock
+- include all trips for retained vessels
 
 ```{r, eval=TRUE, echo=FALSE}
 knitr::opts_knit$set(root.dir = '..')
@@ -33,7 +40,7 @@ ggplot(d, aes(x, y_to_plot, colour = as.factor(non_zero))) +
   geom_point(alpha = 0.6)
 ```
 
-Now we can fit models to the simulated data and combine them by multiplying the probability of observing something by the expectation given that something is observed. Note that I am not dealing with bias correction when exponentiating the predicitons from the linear model fit to log data. This should be considered.
+Now we can fit models to the simulated data and combine them by multiplying the probability of observing something by the expectation given that something is observed. Note that I am not dealing with bias correction when exponentiating the predicitons from the linear model fit to log data. This should be considered later.
 
 ```{r}
 m1 <- glm(non_zero ~ x, data = d, family = binomial(link = logit))
@@ -120,7 +127,7 @@ print(b.ci)
 That took `r round(as.numeric(ft - st, units = "secs"), 3)` seconds 
 (`r round(as.numeric(ft - st, units = "secs")/tmb_time1, 0)` times longer than the TMB approach.)
 
-The confidence intervals are almost exactly the same. However, the bootstrap approach takes a very long time to fit to a full data set of real groundfish CPUE data. It's doable for one stock if you are very patient but likely prohibitive to run for all or many stocks. The TMB approach is much faster.
+The confidence intervals are very similar. However, the bootstrap approach takes a very long time to fit to a full data set of real groundfish CPUE data. It's doable for one stock if you are very patient but likely prohibitive to run for all or many stocks. The TMB approach is much faster.
 
 ## A delta-lognormal TMB GLM fit to real CPUE data
 
@@ -139,7 +146,6 @@ mean(d_retained$pos_catch)
 ```
 
 Let's fit our models in TMB. First we will start with a simple model that just has year effects. 
-
 ```{r, message=FALSE, warning=FALSE, results="hide"}
 compile("inst/tmb/deltalognormal.cpp")
 dyn.load(dynlib("inst/tmb/deltalognormal"))
@@ -215,7 +221,7 @@ ggplot(df2, aes(year, exp(Estimate),
   geom_ribbon(data = df1, fill = "blue", alpha = 0.3)
 ```
 
-I also wrote a helper function to plot the coefficients from the models. The panels that start with "bin" are the binary models and the panel to start with "pos" are the positive component models. I'd have to do a bit more work to make sure the various binned factor predictors are always in order in the plot.
+I also wrote a quick helper function to plot the coefficients from the models. The panels that start with "bin" are the binary models and the panel to start with "pos" are the positive component models. I'd have to do a bit more work to make sure the various binned factor predictors are always in order in the plot.
 
 <!-- TODO -->
 
@@ -346,7 +352,7 @@ Lines that deviate the furthest from the overall thick black line have the bigge
 
 ## A random effects model
 
-Now let's fit a similar model with random intercepts for vessel and DFO locality instead of treating them as factor level predictors.
+Now let's fit a similar model with random intercepts for vessel and DFO locality instead of treating them factor-level predictors.
 
 This is the model:
 
@@ -372,7 +378,7 @@ if (!file.exists("cpue-glmm-eg.rda")) {
 
 That took `r that_took` seconds.
 
-That takes considerably longer to run (several minutes). Let's make a plot combining the various trends we have calculated:
+That takes considerably longer to run. Let's make a plot combining the various trends we have calculated:
 
 ```{r}
 df_re <- gg_tmb_cpue_ribbon(r_re)
@@ -400,7 +406,15 @@ gg_cpue_coefs(sm_re, mm1, mm2, re = TRUE)
 
 # Comparing methods of combining positive and binary component models
 
-I've been trying to work out the formula used to combine the positive and binary models in a number of recent groundfish stock assessments. The following is a tiny simulation example:
+I've been trying to work out the formula used to combine the positive and binary models in a number of recent groundfish stock assessments. 
+
+The equation is:
+
+lyy / (1 - p0 * (1 - 1/(byy)))
+
+where lyy is the lognormal/positive component index (on the natural scale), p0 is the probability of observing the species in year 1, and byy is the binary component index (on the probability scale).
+
+The following is a tiny simulation example:
 
 ```{r}
 cyy <- function(p0, byy, lyy) {lyy / (1 - p0 * (1 - 1/(byy)))}
@@ -424,4 +438,3 @@ lines(plogis(b))
 ```
 
 In the above plot, the red line is the version from the formula and the black line is the raw probability. I still can't wrap my head around why we'd want to use the formula used in a number of recent assessments versus just multiplying the probability by the positive estimate.
-
