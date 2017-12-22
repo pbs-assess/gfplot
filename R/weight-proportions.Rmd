@@ -75,12 +75,12 @@ wp3 <- wp2 %>% group_by(year) %>%
 a1 <- group_by(wp3, year) %>%
   summarise(total = sum(weighted_age_prop)) %>% round(9)
 assert_that(all(a1$total == 1))
-head(as.data.frame(wp3), n = 12)
 ```
 
 And all the proportions add up to 1 each year. 
 
 ```{r}
+head(as.data.frame(wp3), n = 12)
 ggplot(wp3, aes(year, age, size = weighted_age_prop)) +
   geom_point()
 ```

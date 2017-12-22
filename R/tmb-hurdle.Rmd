@@ -20,8 +20,7 @@ ggplot2::theme_set(ggplot2::theme_light())
 Let's start by simulating some simple data to fit a delta-lognormal model to and verify that we get comparable confidence intervals to the bootstrap approach.
 
 ```{r, message=FALSE, warning=FALSE}
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 set.seed(1)
 x <- runif(500, -2, 2)
 lp <- -0.9 + x * 0.5
@@ -34,7 +33,7 @@ ggplot(d, aes(x, y_to_plot, colour = as.factor(non_zero))) +
   geom_point(alpha = 0.6)
 ```
 
-Now we can fit models to the simulated data and combine them by multiplying the probability of observing something by the expectation given that something is observed. Note that I am not dealing with bias correction when exponentiating the projections from the linear model fit to log data. This should be considered.
+Now we can fit models to the simulated data and combine them by multiplying the probability of observing something by the expectation given that something is observed. Note that I am not dealing with bias correction when exponentiating the predicitons from the linear model fit to log data. This should be considered.
 
 ```{r}
 m1 <- glm(non_zero ~ x, data = d, family = binomial(link = logit))
