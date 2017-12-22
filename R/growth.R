@@ -232,16 +232,3 @@ for (i in seq_along(spp)) {
 
   dev.off()
 }
-
-# -------------
-# maturity
-
-mat_df <- tibble::tribble(
-  ~maturity_convention_desc, ~mature_at,
-  "ROCKFISH (1977+)",        3,
-  "DOGFISH",                 77,
-  "FLATFISH (1978+)",        3
-)
-
-dbio <- left_join(dbio, mat_df)
-
