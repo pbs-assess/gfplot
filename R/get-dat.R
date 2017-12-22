@@ -63,7 +63,7 @@ collapse_spp_names <- function(x) {
 get_survey_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-survey-biology.sql")
-  i <- grep("WHERE", q)
+  i <- grep("ORDER BY", q) - 1
   q <- c(q[1:i],
     paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
     q[(i+1):length(q)])
