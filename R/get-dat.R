@@ -185,8 +185,7 @@ get_all_data <- function(spp, path = "data-cache") {
   saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
 }
 
-load("spp-to-get.rda") # contains `spp`
-species <- spp
-rm(spp)
+source("R/make-spp-list.R")
+species <- get_spp_names()$species_common_name
 
 get_all_data(species)
