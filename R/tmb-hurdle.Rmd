@@ -29,15 +29,15 @@ Let's start by simulating some simple data to fit a delta-lognormal model to and
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 set.seed(1)
-x <- runif(1000, -2, 2)
+x <- runif(10000, -2, 2)
 lp <- -0.9 + x * 0.5
 y_bin <- rbinom(length(x), size = 1, prob = plogis(lp))
 y <- y_bin * exp(rnorm(length(x), lp, 0.2))
 non_zero <- ifelse(y > 0, 1, 0)
 d <- data.frame(x, y, non_zero)
-d <- mutate(d, y_to_plot = ifelse(non_zero == 0, y + jitter(y, amount = 0.02), y)) 
+d <- mutate(d, y_to_plot = ifelse(non_zero == 0, y + jitter(y, amount = 0.03), y)) 
 ggplot(d, aes(x, y_to_plot, colour = as.factor(non_zero))) + 
-  geom_point(alpha = 0.6)
+  geom_point(alpha = 0.4)
 ```
 
 Now we can fit models to the simulated data and combine them by multiplying the probability of observing something by the expectation given that something is observed. Note that I am not dealing with bias correction when exponentiating the predicitons from the linear model fit to log data. This should be considered later.
@@ -119,7 +119,8 @@ hurdle_fn <- function(data, i) {
 library(boot)
 st <- Sys.time()
 b <- boot(d, hurdle_fn, R = 1000)
-b.ci <- boot.ci(b, type = "bca")
+# bca sometimes gives errors on big datasets but gives similar results on small datasets
+b.ci <- boot.ci(b, type = "norm") 
 ft <- Sys.time()
 print(b.ci)
 ```
