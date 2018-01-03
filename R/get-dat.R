@@ -91,30 +91,24 @@ source("R/SurveyIndices.r")
 get_stratum_densities <- function(spp, survey_codes = c(1, 3, 4, 16)) {
 
   species_code <- common2codes(spp)
+  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SPECIES_CODE, SPECIES_COMMON_NAME FROM SPECIES")
+  names(species) <- tolower(names(species))
+  species$species_common_name <- tolower(species$species_common_name)
 
   k <- 1
   out <- list()
   for (i in seq_along(species_code)) {
-    message(spp[i])
     for (j in seq_along(survey_codes)) {
       out[[k]] <- get_species_stratum_densities(species_code[i], survey_codes[j])
       k <- k + 1
     }
   }
 
-
-  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT SPECIES_CODE, SPECIES_COMMON_NAME FROM SPECIES")
-  names(species) <- tolower(names(species))
-  species$species_common_name <- tolower(species$species_common_name)
-
-
   dbio <- dplyr::bind_rows(out)
-
   names(dbio) <- tolower(names(dbio))
   dbio <- dplyr::inner_join(dbio, species, by = "species_code")
   dbio$species_common_name <- tolower(dbio$species_common_name)
-
   dbio
 }
 
