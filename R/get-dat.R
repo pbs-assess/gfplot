@@ -12,6 +12,13 @@ common2codes <- function(common) {
   dd$SPECIES_CODE
 }
 
+get_sample_trip_id_lookup <- function() {
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
+  names(x) <- tolower(names(x))
+  x
+}
+
 get_spatial_survey <- function(spp, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(spp)
   library(dplyr)
@@ -84,31 +91,6 @@ get_survey_specimens <- function(spp) {
   warning("Duplicate specimen IDs still present! Filter them yourself.")
   # dbio <- dbio[!duplicated(dbio$specimen_id), ]
 
-  dbio
-}
-
-source("R/SurveyIndices.r")
-get_stratum_densities <- function(spp, survey_codes = c(1, 3, 4, 16)) {
-
-  species_code <- common2codes(spp)
-  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT SPECIES_CODE, SPECIES_COMMON_NAME FROM SPECIES")
-  names(species) <- tolower(names(species))
-  species$species_common_name <- tolower(species$species_common_name)
-
-  k <- 1
-  out <- list()
-  for (i in seq_along(species_code)) {
-    for (j in seq_along(survey_codes)) {
-      out[[k]] <- get_species_stratum_densities(species_code[i], survey_codes[j])
-      k <- k + 1
-    }
-  }
-
-  dbio <- dplyr::bind_rows(out)
-  names(dbio) <- tolower(names(dbio))
-  dbio <- dplyr::inner_join(dbio, species, by = "species_code")
-  dbio$species_common_name <- tolower(dbio$species_common_name)
   dbio
 }
 
@@ -199,9 +181,6 @@ get_all_data <- function(species, path = "data-cache") {
   d <- get_survey_specimens(species)
   saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
 
-  d <- get_stratum_densities(species)
-  saveRDS(d, file = file.path(path, "all-survey-strat-dens.rds"))
-
   d <- get_commercial_specimens(species)
   saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
 
@@ -213,6 +192,9 @@ get_all_data <- function(species, path = "data-cache") {
 
   d <- get_bio_indices(species)
   saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
+  
+  d <- get_sample_trip_id_lookup()
+  saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
 }
 
 source("R/make-spp-list.R")
