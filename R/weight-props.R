@@ -6,20 +6,35 @@ weight_proportions <- function(dat, strat_dat) {
   # 2. generate the catch per year / area per stratum data.frame
   # 3. join these data.frames with the main data.frame at the 2 weighting stages
 
-  browser()
-  library(magrittr)
+  # browser()
+  library(dplyr)
 
-  dd <- left_join(dat, strat_dat, by = c("year", "grouping_code")) %>%
-    select(year, sample_id, age, weight, grouping_code,
-      total_density, area) %>%
+  raw_comp <- dat %>%
+    select(year, sample_id, age, weight, grouping_code) %>%
     filter(!is.na(age)) %>%
-    group_by(year, grouping_code, age, area, total_density) %>%
-    summarise(n = n())
+    group_by(year, sample_id, grouping_code, age) %>%
+    summarise(n = n()) %>% ungroup()
 
-  strat_areas <- group_by(strat_dat, year) %>%
-    summarise(total_area = sum(area)) %>% ungroup()
-  strat_dens <- group_by(strat_dat, year) %>%
-    summarise(total_density = sum(density)) %>% ungroup()
+  strat_areas <- select(strat_dat, year, grouping_code, area_km2) %>%
+    unique() %>%
+    group_by(year) %>%
+    mutate(total_area_km2 = sum(area_km2)) %>% ungroup()
+
+  strat_dens <- select(strat_dat, year, fishing_event_id, grouping_code, density_kgpm2) %>%
+    unique() %>%
+    group_by(year, grouping_code) %>%
+    summarise(total_density = sum(density_kgpm2*1000000)) %>% ungroup()
+
+  sample_dens <- select(dat, -area_km2) %>%
+    inner_join(strat_dat,
+      by = c("fishing_event_id", "year", "survey_id", "sample_id", "grouping_code")) %>%
+    group_by(year, grouping_code, sample_id) %>%
+    summarise(density = mean(density_kgpm2*1000000)) %>% ungroup()
+
+  dd <- inner_join(raw_comp, sample_dens,
+    by = c("year", "sample_id", "grouping_code")) %>%
+    inner_join(strat_dens, by = c("year", "grouping_code")) %>%
+    inner_join(strat_areas, by = c("year", "grouping_code"))
 
   dplyr::group_by(dat, year, quarter) %>% # pre D.4
 
@@ -62,19 +77,21 @@ d <- readRDS("data-cache/all-survey-bio.rds") %>% as_tibble() %>%
   filter(species_common_name %in% "canary rockfish") %>%
   filter(survey_series_id %in% 1)
 
-strat <- readRDS("data-cache/all-survey-strat-dens.rds") %>% as_tibble() %>%
-  filter(species_common_name %in% "canary rockfish") %>%
-  filter(survey_series_id %in% 1)
+# strat <- readRDS("data-cache/all-survey-strat-dens.rds") %>% as_tibble() %>%
+#   filter(species_common_name %in% "canary rockfish") %>%
+#   filter(survey_series_id %in% 1)
 
-s <- group_by(strat, year, grouping_code) %>%
-  summarise(density = sum(mean_per_strat), area = unique(area))
+# s <- group_by(strat, year, grouping_code) %>%
+#   summarise(density = sum(mean_per_strat), area = unique(area))
 
 spa <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
   filter(species_common_name %in% "canary rockfish") %>%
   filter(survey_series_id %in% 1)
-lu <- readRDS("data-cache/sample_trip_id_lookup.rds")
-spa <- left_join(spa, lu, by = "fishing_event_id") %>%
-  select(year, fishing_event_id, sample_id, grouping_code, density_kgpm2)
+lu <- readRDS("data-cache/sample-trip-id-lookup.rds")
+s <- left_join(spa, lu, by = "fishing_event_id") %>%
+  select(year, survey_id, fishing_event_id, sample_id, grouping_code, density_kgpm2)
+area <- readRDS("data-cache/stratum-areas.rds")
+s <- left_join(s, area, by = c("survey_id", "grouping_code"))
 
 weight_proportions(d, s)
 
@@ -94,6 +111,6 @@ dplyr::mutate(year = lubridate::year(trip_start_date)) %>%
   dplyr::summarise(freq = n(), weight = weight[1]) %>%
 
 
-dplyr::rename(d, quarter = grouping_code, catch = weight) %>%
+  dplyr::rename(d, quarter = grouping_code, catch = weight) %>%
 
   weight_proportions()
