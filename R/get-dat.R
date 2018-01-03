@@ -19,6 +19,18 @@ get_sample_trip_id_lookup <- function() {
   x
 }
 
+get_stratum_areas <- function() {
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SG.SURVEY_ID,
+    SG.GROUPING_CODE,
+    G.AREA_KM2
+    FROM SURVEY_GROUPING SG
+    INNER JOIN GROUPING G ON
+    SG.GROUPING_CODE = G.GROUPING_CODE")
+  names(x) <- tolower(names(x))
+  x
+}
+
 get_spatial_survey <- function(spp, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(spp)
   library(dplyr)
@@ -195,6 +207,9 @@ get_all_data <- function(species, path = "data-cache") {
   
   d <- get_sample_trip_id_lookup()
   saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
+  
+  d <- get_stratum_areas()
+  saveRDS(d, file = file.path(path, "stratum-areas.rds"))
 }
 
 source("R/make-spp-list.R")
