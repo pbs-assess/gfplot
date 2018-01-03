@@ -1,12 +1,26 @@
 
-weight_proportions <- function(dat) {
+weight_proportions <- function(dat, strat_dat) {
 
   # Plan:
   # 1. generate the catch per year-quarter / density per year-stratum data.frame
   # 2. generate the catch per year / area per stratum data.frame
   # 3. join these data.frames with the main data.frame at the 2 weighting stages
 
+  browser()
   library(magrittr)
+
+  dd <- left_join(dat, strat_dat, by = c("year", "grouping_code")) %>%
+    select(year, sample_id, age, weight, grouping_code,
+      total_density, area) %>%
+    filter(!is.na(age)) %>%
+    group_by(year, grouping_code, age, area, total_density) %>%
+    summarise(n = n())
+
+  strat_areas <- group_by(strat_dat, year) %>%
+    summarise(total_area = sum(area)) %>% ungroup()
+  strat_dens <- group_by(strat_dat, year) %>%
+    summarise(total_density = sum(density)) %>% ungroup()
+
   dplyr::group_by(dat, year, quarter) %>% # pre D.4
 
     # first level (within quarters by catch or within strata by survey catch):
@@ -44,10 +58,25 @@ weight_proportions <- function(dat) {
 }
 
 library(dplyr)
-d <- readRDS("~/Dropbox/PBS synopsis/example_survey_data_with_strata_area.RDS") %>% as_tibble() %>%
+d <- readRDS("data-cache/all-survey-bio.rds") %>% as_tibble() %>%
   filter(species_common_name %in% "canary rockfish") %>%
-  filter(survey_series_desc %in% "Queen Charlotte Sound Synoptic Survey")
+  filter(survey_series_id %in% 1)
 
+strat <- readRDS("data-cache/all-survey-strat-dens.rds") %>% as_tibble() %>%
+  filter(species_common_name %in% "canary rockfish") %>%
+  filter(survey_series_id %in% 1)
+
+s <- group_by(strat, year, grouping_code) %>%
+  summarise(density = sum(mean_per_strat), area = unique(area))
+
+spa <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
+  filter(species_common_name %in% "canary rockfish") %>%
+  filter(survey_series_id %in% 1)
+lu <- readRDS("data-cache/sample_trip_id_lookup.rds")
+spa <- left_join(spa, lu, by = "fishing_event_id") %>%
+  select(year, fishing_event_id, sample_id, grouping_code, density_kgpm2)
+
+weight_proportions(d, s)
 
 # d <- mutate(d, month = lubridate::month(trip_start_date),
 #   quarter = case_when(
