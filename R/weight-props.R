@@ -70,53 +70,6 @@ weight_proportions <- function(dat) {
 }
 
 
-library(dplyr)
-
-d <- readRDS("data-cache/all-survey-bio.rds") %>% as_tibble() %>%
-  filter(species_common_name %in% "pacific ocean perch") %>%
-  filter(survey_series_id %in% 1)
-
-spa <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
-  filter(species_common_name %in% "pacific ocean perch") %>%
-  filter(survey_series_id %in% 1)
-lu <- readRDS("data-cache/sample-trip-id-lookup.rds")
-s <- left_join(spa, lu, by = "fishing_event_id") %>%
-  select(year, survey_id, fishing_event_id, sample_id, grouping_code, density_kgpm2)
-area <- readRDS("data-cache/stratum-areas.rds")
-s <- left_join(s, area, by = c("survey_id", "grouping_code"))
-
-comp <- join_comps_strata(d, s) %>% weight_proportions()
-
-a1 <- group_by(comp, year) %>%
-  summarise(total = sum(weighted_age_prop)) %>% round(9)
-assertthat::assert_that(all(a1$total == 1))
-head(comp)
-
-raw <- d %>%
-  select(year, age, weight) %>%
-  filter(!is.na(age)) %>%
-  group_by(year, age) %>%
-  summarise(freq = n()) %>%
-  group_by(year) %>%
-  mutate(age_prop = freq / sum(freq)) %>%
-  select(-freq) %>%
-  left_join(comp, by = c("year", "age")) %>%
-  filter(!is.na(weighted_age_prop))
-
-tidyr::gather(raw, proportion_type, age_prop, -age, -year) %>%
-  ggplot(aes(year, age, size = age_prop)) +
-  # geom_vline(xintercept = seq(min(raw$year), max(raw$year)), alpha = 0.2) +
-  geom_point(alpha = 0.8, pch = 21) + scale_size(range = c(0.2, 8)) +
-  facet_wrap(~proportion_type) + ggsidekick::theme_sleek() +
-  scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
-
-ggplot(raw, aes(year, age, colour = weighted_age_prop / age_prop,
-  size = abs(log(weighted_age_prop / age_prop)))) +
-  # geom_vline(xintercept = seq(min(raw$year), max(raw$year)), alpha = 0.2) +
-  geom_point(pch = 21) +
-  scale_size(range = c(0.2, 8)) +
-  scale_color_gradient2(midpoint = 1.0) + ggsidekick::theme_sleek() +
-  scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
 
 
 # #####################################################################
