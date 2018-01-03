@@ -87,6 +87,37 @@ get_survey_specimens <- function(spp) {
   dbio
 }
 
+source("R/SurveyIndices.r")
+get_stratum_densities <- function(spp, survey_codes = c(1, 3, 4, 16)) {
+
+  species_code <- common2codes(spp)
+
+  k <- 1
+  out <- list()
+  for (i in seq_along(species_code)) {
+    message(spp[i])
+    for (j in seq_along(survey_codes)) {
+      out[[k]] <- get_species_stratum_densities(species_code[i], survey_codes[j])
+      k <- k + 1
+    }
+  }
+
+
+  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SPECIES_CODE, SPECIES_COMMON_NAME FROM SPECIES")
+  names(species) <- tolower(names(species))
+  species$species_common_name <- tolower(species$species_common_name)
+
+
+  dbio <- dplyr::bind_rows(out)
+
+  names(dbio) <- tolower(names(dbio))
+  dbio <- dplyr::inner_join(dbio, species, by = "species_code")
+  dbio$species_common_name <- tolower(dbio$species_common_name)
+
+  dbio
+}
+
 get_commercial_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
@@ -165,7 +196,7 @@ get_bio_indices <- function(spp) {
   d
 }
 
-get_all_data <- function(spp, path = "data-cache") {
+get_all_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
   d_survs_df <- get_spatial_survey(species)
@@ -173,6 +204,9 @@ get_all_data <- function(spp, path = "data-cache") {
 
   d <- get_survey_specimens(species)
   saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
+
+  d <- get_stratum_densities(species)
+  saveRDS(d, file = file.path(path, "all-survey-strat-dens.rds"))
 
   d <- get_commercial_specimens(species)
   saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
