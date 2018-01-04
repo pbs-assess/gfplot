@@ -1,3 +1,18 @@
+# Investigating aging reliability 
+
+```{r, eval=TRUE, echo=FALSE}
+knitr::opts_knit$set(root.dir = '..')
+ggplot2::theme_set(ggplot2::theme_light())
+```
+
+A number of our groundfish stocks that have not been assessed recently have aging data that may be too imprecise to use. Shortraker rockfish is a prime example. GFBio contains data on the range of possible ages one assessor counts and also data on selected fish that had a precision test where another assessor aged the same fish.
+
+For the purposes of using these ages to form a growth model we can integrate intra- and inter- individual measuring imprecision into the model if we can quantify it. 
+
+Also, I wanted to look at ways we could visually present these precision tests as a possible panel for the synopsis report.
+
+What follows is some experimentation with this:
+
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 ggplot2::theme_set(theme_light())
@@ -6,30 +21,27 @@ sa <- readr::read_csv("~/Dropbox/dfo/selected-data/SPECIMEN_AGE.txt", col_names 
 sa <- sa[,c(1, 2, 4, 5, 8, 9, 10, 11)]
 names(sa) <- c("sample_id", "specimen_id", "age_reading_type_code", "aging_method_code",
   "employee_id", "specimen_age", "minimum_age", "maximum_age")
-d <- readRDS("../data-cache/all-survey-bio.rds")
+d <- readRDS("data-cache/all-survey-bio.rds")
 dd2 <- filter(d, species_common_name == "shortraker rockfish")
 dd2$survey_series_desc <- NULL
 dd2$trip_sub_type_code <- NULL
 dd2$survey_series_id <- NULL
-nrow(dd2)
 dd2 <- dd2[!duplicated(dd2), ]
-nrow(dd2)
 dd <- inner_join(dd2, sa, by = "specimen_id") %>%
   filter(!is.na(specimen_age))
-# dd <- filter(dd, age_reading_type_code != 2) # primary
 dd <- filter(dd, age_reading_type_code != 4) # secondary
-# nrow(dd)
-# head(dd)
-# filter(dd, age_reading_type_code == 3)
 ```
 
+The following plot shows all shortraker fish that have been aged arranged from youngest to oldest. The confidence intervals from the database are shown as line segments. The various age type reading codes are shown in various colors. 2 are primary measurements, 3 are precision checks, 1 are final measurements if I'm remembering correctly/ TODO I need to follow up on this. 
 ```{r}
 arrange(dd, specimen_age) %>%
   ggplot(aes(seq_along(specimen_age), y = specimen_age,
-  ymin = minimum_age, ymax = maximum_age,
-  colour = as.factor(age_reading_type_code))) +
+    ymin = minimum_age, ymax = maximum_age,
+    colour = as.factor(age_reading_type_code))) +
   geom_pointrange()
 ```
+
+Let's just work with the fish that have a precision check now:
 
 ```{r}
 checked <- group_by(dd, specimen_id) %>% 
@@ -39,15 +51,11 @@ checked <- group_by(dd, specimen_id) %>%
 
 checked <- checked %>% mutate(age_reading_type_code = 
     gsub(2, 1, age_reading_type_code))
+```
 
-table(checked$age_reading_type_code)
+Let's make a plot with this data set:
 
-arrange(checked, specimen_age) %>%
-  ggplot(aes(seq_along(specimen_age), y = specimen_age,
-  ymin = minimum_age, ymax = maximum_age,
-  colour = as.factor(age_reading_type_code))) +
-  geom_pointrange()
-
+```{r}
 library(reshape2)
 m <- filter(checked) %>% 
   dcast(specimen_id ~ age_reading_type_code, 
@@ -80,3 +88,141 @@ ggplot(all, aes(final, precision)) +
     yend = precision_max), alpha = 0.6)
 ```
 
+The above plot shows the "final" age reading on the x axis and the "precision" age reading on the y axis. The line segments correspond to the 2 age ranges recorded by the final and precision reading. The dashed line corresponds to the 1-to-1 line which would represent perfect agreement between the final and precision aging.
+
+From this we can estimate an average aging measurement error CV and integrate it into a growth model.
+
+We need to translate the range of ages into a standard error. If we assume that the ranges correspond roughly to a 95% confidence interval then we can approximately divide the ranges by 4 as input into the model as the standard errors. We can then fit a model in Stan that assumes a 1-to-1 relationship but allows for the intra-individual measurement range and estimates the between-individual measurement error. Because we fit the model to log transformed ages, the sigma (residual standard deviation) term represents the standard deviation of a lognormal distribution and therefore approximately the measurement CV.
+
+Our model is:
+
+```{r, comment=NA,echo=FALSE}
+writeLines(readLines("inst/stan/aging-error.stan"))
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE, message=FALSE, results='hide', cache.comments=FALSE}
+all <- na.omit(all)
+library(rstan)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+m <- stan("inst/stan/aging-error.stan", 
+  data = list(
+    age1 = log(all$final),
+    se1 = (log(all$final_max) - log(all$final_min))/4,
+    age2 = log(all$precision),
+    se2 = (log(all$precision_max) - log(all$precision_min))/4,
+    N = length(all$final)
+  ), iter = 1000)
+m
+```
+
+```{r}
+sigma <- rstan::extract(m)$sigma
+bayesplot::mcmc_combo(rstan::extract(m, 
+  inc_warmup = FALSE, permuted = FALSE), pars = "sigma")
+```
+
+```{r, echo=FALSE}
+# x <- exp(rnorm(10000, 0, 0.16))
+# sd(x) / mean(x)
+```
+
+So we estimate that the average measurement CV is approximately `r round(mean(sigma), 2)`
+
+We can now fit a growth curve allowing for this measurement error. We will just work with female fish right now.
+
+Our model (with error) is:
+
+```{r, comment=NA,echo=FALSE}
+writeLines(readLines("inst/stan/vb_aging_error_gamma.stan"))
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE, message=FALSE, results='hide', cache.comments=FALSE}
+stan_dat <- filter(dd2, !is.na(age), !is.na(length), sex %in% c(1, 2))
+age_pred <- seq(0, max(stan_dat$age), length.out = 200)
+nrow(stan_dat)
+vb <- stan("inst/stan/vb_aging_error_gamma.stan",
+  data = list(
+    N = nrow(stan_dat),
+    length = stan_dat$length,
+    age = stan_dat$age,
+    cv_age = mean(sigma),
+    age_pred = age_pred,
+    N_pred = length(age_pred)
+  ), control = list(adapt_delta = 0.99, max_treedepth = 20),
+  iter = 2000)
+
+vb_noerror <- stan("inst/stan/vb_gamma.stan",
+  data = list(
+    N = nrow(stan_dat),
+    length = stan_dat$length,
+    age = stan_dat$age,
+    age_pred = age_pred,
+    N_pred = length(age_pred)
+  ), control = list(adapt_delta = 0.99, max_treedepth = 20),
+  iter = 2000)
+```
+
+Let's look at trace plots for the key parameters:
+
+```{r}
+pars <- c("k", "linf", "t0", "cv_length")
+bayesplot::mcmc_trace(rstan::extract(vb, 
+  inc_warmup = FALSE, permuted = FALSE), pars = pars)
+
+bayesplot::mcmc_trace(rstan::extract(vb_noerror, 
+  inc_warmup = FALSE, permuted = FALSE), pars = pars)
+```
+
+And plot the fits:
+
+```{r}
+e <- rstan::extract(vb)$length_pred
+plot(stan_dat$age, stan_dat$length, col = "#00000040", cex = 0.6)
+for (i in 1:50)
+  lines(age_pred, e[i,], col = "#FF000030")
+e2 <- rstan::extract(vb_noerror)$length_pred
+for (i in 1:50)
+  lines(age_pred, e2[i,], col = "#0000FF30")
+legend(x = "bottomright", col = c("red", "blue"), legend = c("VB with error", "VB"), lty = 1)
+```
+
+Let's compare the parameter estimates between the two models:
+
+```{r, warning=FALSE, message=FALSE}
+out <- stanhelpers::extract_df(vb, output = "long_df")
+out$model <- "VB with error"
+out2 <- stanhelpers::extract_df(vb_noerror, output = "long_df")
+out2$model <- "VB"
+out <- bind_rows(out, out2)
+out %>% filter(variable %in% pars) %>% 
+  group_by(model, variable) %>% 
+  summarise(
+    m = median(value),
+    l = quantile(value, probs = 0.05),
+    u = quantile(value, probs = 0.95)
+  ) %>% 
+  ggplot(aes(x = 0, y = m, ymin = l, ymax = u, colour = model))+
+  facet_wrap(~variable, scales = "free_x") + 
+  geom_pointrange(position = position_dodge(width = 0.01)) +
+  coord_flip() +
+  scale_colour_manual(values = c("VB with error" = "#FF0000", "VB" = "#0000FF")) +
+  ylab("Parameter value") +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+```
+
+
+So aging error does have a moderate effect on $t_0$ (the theoretical average age at length 0) for males or both sexes combined (not shown). We can also see that in the predicted model fits above towards the left of the plot.
+
+There isn't a huge effect of integrating a measurement CV of `r round(mean(sigma), 2)` on ages for females only.
+
+Measurement error probably decreases for the younger fish (and indeed we can see that in the cross-plot higher up) and presumably these younger fish have more of an effect on $t_0$. Another option would be to ignore the between individual aging error and input the ranges of aging error on each observation directly in the final growth model. Or maybe there's some other better way?
+
+These values are approximately in line with those from Alaska published in this paper:
+<https://www.afsc.noaa.gov/Quarterly/amj2005/amj05feature.pdf>
+
+They give values for a set of samples from 2000 of: t0 = -2.9, K = 0.04, Linf = 69.
+
+Our $t_0$ is a bit off (for females only (not shown)), but we don't have a lot of data on the younger fish and the measurement error is smaller there anyways. $L_\mathrm{inf}$ (theoretical average length at age infinity) and $K$ (growth rate) are similar. For females only, $K$ matches almost exactly. For all fish (as shown), $t_0$ is also very similar.
