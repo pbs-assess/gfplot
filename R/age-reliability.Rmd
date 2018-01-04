@@ -214,15 +214,15 @@ out %>% filter(variable %in% pars) %>%
 ```
 
 
-So aging error does have a moderate effect on $t_0$ (the theoretical average age at length 0) for males or both sexes combined (not shown). We can also see that in the predicted model fits above towards the left of the plot.
+So aging error does have a moderate effect on $t_0$ (the theoretical average age at length 0) for males or both sexes combined (as shown). We can also see that in the predicted model fits above towards the left of the plot.
 
-There isn't a huge effect of integrating a measurement CV of `r round(mean(sigma), 2)` on ages for females only.
+There isn't a huge effect of integrating a measurement CV of `r round(mean(sigma), 2)` on ages for females only (not shown).
 
-Measurement error probably decreases for the younger fish (and indeed we can see that in the cross-plot higher up) and presumably these younger fish have more of an effect on $t_0$. Another option would be to ignore the between individual aging error and input the ranges of aging error on each observation directly in the final growth model. Or maybe there's some other better way?
+Another option would be to ignore the between individual aging error and input the ranges of aging error on each observation directly in the final growth model. Or maybe there's some other better way?
 
-These values are approximately in line with those from Alaska published in this paper:
+These values are approximately in line with those from in Alaska published in:
 <https://www.afsc.noaa.gov/Quarterly/amj2005/amj05feature.pdf>
 
 They give values for a set of samples from 2000 of: t0 = -2.9, K = 0.04, Linf = 69.
 
-Our $t_0$ is a bit off (for females only (not shown)), but we don't have a lot of data on the younger fish and the measurement error is smaller there anyways. $L_\mathrm{inf}$ (theoretical average length at age infinity) and $K$ (growth rate) are similar. For females only, $K$ matches almost exactly. For all fish (as shown), $t_0$ is also very similar.
+Our $t_0$ is a bit off (for females only --- not shown), but we don't have a lot of data on the younger fish and the measurement error is smaller there anyways. $L_\mathrm{inf}$ (theoretical average length at age infinity) and $K$ (growth rate) are similar. For females only, $K$ matches almost exactly. For all fish (as shown), $t_0$ is also very similar.

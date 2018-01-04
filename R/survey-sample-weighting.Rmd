@@ -1,0 +1,87 @@
+---
+title: "Survey sample weighting"
+output: html_document
+---
+
+```{r, eval=TRUE, echo=FALSE}
+knitr::opts_knit$set(root.dir = '..')
+ggplot2::theme_set(ggsidekick::theme_sleek())
+```
+
+Let's use pacific ocean perch and the Queen Charlotte Sound Synoptic Survey as an example:
+
+Read in the various data frames we need:
+
+```{r, message=FALSE, warning=FALSE}
+source("R/weight-props.R")
+library(dplyr)
+library(ggplot2)
+
+d <- readRDS("data-cache/all-survey-bio.rds") %>%
+  filter(species_common_name %in% "pacific ocean perch") %>%
+  filter(survey_series_id %in% 1)
+
+spa <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
+  filter(species_common_name %in% "pacific ocean perch") %>%
+  filter(survey_series_id %in% 1)
+
+lu <- readRDS("data-cache/sample-trip-id-lookup.rds")
+
+area <- readRDS("data-cache/stratum-areas.rds")
+```
+
+Combine the strata data frames: 
+
+```{r}
+s <- left_join(spa, lu, by = "fishing_event_id") %>%
+  select(year, survey_id, fishing_event_id, sample_id, grouping_code, density_kgpm2)
+s <- left_join(s, area, by = c("survey_id", "grouping_code"))
+head(s)
+```
+
+The magic happens here:
+
+```{r}
+comp <- join_comps_strata(d, s) %>% weight_proportions()
+```
+
+Make sure the proportions add up to 1 each year: 
+
+```{r}
+a1 <- group_by(comp, year) %>%
+  summarise(total = sum(weighted_age_prop)) %>% round(9)
+assertthat::assert_that(all(a1$total == 1))
+head(comp)
+```
+
+A plot of the output comparing the raw proportions to the weighted proportions:
+
+```{r}
+raw <- d %>%
+  select(year, age, weight) %>%
+  filter(!is.na(age)) %>%
+  group_by(year, age) %>%
+  summarise(freq = n()) %>%
+  group_by(year) %>%
+  mutate(age_prop = freq / sum(freq)) %>%
+  select(-freq) %>%
+  left_join(comp, by = c("year", "age")) %>%
+  filter(!is.na(weighted_age_prop))
+
+tidyr::gather(raw, proportion_type, age_prop, -age, -year) %>%
+  ggplot(aes(year, age, size = age_prop)) +
+  geom_point(alpha = 0.8, pch = 21) + scale_size(range = c(0.2, 8)) +
+  facet_wrap(~proportion_type) +
+  scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
+```
+
+Plot the difference between the 2:
+
+```{r}
+ggplot(raw, aes(year, age, colour = weighted_age_prop / age_prop,
+  size = abs(log(weighted_age_prop / age_prop)))) +
+  geom_point(pch = 21) +
+  scale_size(range = c(0.2, 8)) +
+  scale_color_gradient2(midpoint = 1.0) +
+  scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
+```

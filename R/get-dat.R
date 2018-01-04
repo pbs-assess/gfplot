@@ -12,6 +12,25 @@ common2codes <- function(common) {
   dd$SPECIES_CODE
 }
 
+get_sample_trip_id_lookup <- function() {
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
+  names(x) <- tolower(names(x))
+  x
+}
+
+get_stratum_areas <- function() {
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SG.SURVEY_ID,
+    SG.GROUPING_CODE,
+    G.AREA_KM2
+    FROM SURVEY_GROUPING SG
+    INNER JOIN GROUPING G ON
+    SG.GROUPING_CODE = G.GROUPING_CODE")
+  names(x) <- tolower(names(x))
+  x
+}
+
 get_spatial_survey <- function(spp, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(spp)
   library(dplyr)
@@ -165,7 +184,7 @@ get_bio_indices <- function(spp) {
   d
 }
 
-get_all_data <- function(spp, path = "data-cache") {
+get_all_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
   d_survs_df <- get_spatial_survey(species)
@@ -185,6 +204,12 @@ get_all_data <- function(spp, path = "data-cache") {
 
   d <- get_bio_indices(species)
   saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
+  
+  d <- get_sample_trip_id_lookup()
+  saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
+  
+  d <- get_stratum_areas()
+  saveRDS(d, file = file.path(path, "stratum-areas.rds"))
 }
 
 source("R/make-spp-list.R")
