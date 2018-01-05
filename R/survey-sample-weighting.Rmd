@@ -166,3 +166,14 @@ tidyr::gather(comp_length_raw, proportion_type, length_prop, -bin, -year) %>%
   facet_wrap(~year) + xlab("Length bin")
 ```
 
+
+```{r}
+d <- readRDS("data-cache/all-commercial-bio.rds") %>% filter(species_common_name %in% "pacific ocean perch") %>% filter(!is.na(age))
+ca <- readRDS("data-cache/all-catches.rds") %>% filter(species_common_name %in% "pacific ocean perch")
+
+
+cmps <- join_comps_commercial(d, ca)
+head(as.data.frame(cmps), n = 20)
+tail(as.data.frame(cmps), n = 10)
+```
+

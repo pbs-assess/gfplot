@@ -1,3 +1,50 @@
+join_comps_commercial <- function(dat, catch_dat) {
+  library(dplyr)
+
+  dat <- mutate(dat, month = lubridate::month(trip_start_date),
+    quarter = case_when(
+      month %in% seq(1, 3) ~ 1,
+      month %in% seq(4, 6) ~ 2,
+      month %in% seq(7, 9) ~ 3,
+      month %in% seq(10, 12) ~ 4
+    )) %>% select(-month)
+
+  catch_dat <- filter(all_catch, !is.na(fe_end_date)) %>%
+    mutate(month = lubridate::month(fe_end_date),
+      quarter = case_when(
+        month %in% seq(1, 3) ~ 1,
+        month %in% seq(4, 6) ~ 2,
+        month %in% seq(7, 9) ~ 3,
+        month %in% seq(10, 12) ~ 4
+      )) %>% select(-month)
+
+  sampled_trip_id_catch <-
+    unique(select(dat, year, quarter, trip_id, catch_weight)) %>%
+    group_by(year, quarter, trip_id) %>%
+    summarise(samp_trip_catch_weight = sum(catch_weight))
+
+  quarter_sampled_catch <- sampled_trip_id_catch %>%
+    group_by(year, quarter) %>%
+    summarise(samp_catch_weight_quarter = sum(samp_trip_catch_weight))
+
+  freq_and_catch_by_trip <- dat %>% group_by(year, trip_id, quarter, age) %>%
+    summarise(freq = n()) %>%
+    inner_join(sampled_trip_id_catch, by = c("year", "trip_id", "quarter"))
+
+  species_catch_by_quarter <- group_by(catch_dat, year, quarter) %>%
+    summarise(landed_kg_quarter = sum(landed_kg)) %>%
+    group_by(year) %>%
+    mutate(landed_kg_year = sum(landed_kg_quarter))
+
+  inner_join(freq_and_catch_by_trip,
+    species_catch_by_quarter, by = c("year", "quarter")) %>%
+    inner_join(quarter_sampled_catch, by = c("year", "quarter")) %>%
+    select(year, trip_id, quarter, age, freq,
+      samp_trip_catch_weight, samp_catch_weight_quarter,
+      landed_kg_quarter, landed_kg_year) %>% # re-order
+    arrange(year, trip_id, age)
+}
+
 
 join_comps_strata <- function(dat, strat_dat) {
   library(dplyr)
