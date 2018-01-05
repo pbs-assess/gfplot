@@ -20,28 +20,13 @@ library(ggplot2)
 survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
   filter(species_common_name %in% "pacific ocean perch") %>%
   filter(survey_series_id %in% 1)
-survey_specimens_age <- survey_specimens %>% filter(!is.na(age))
-survey_specimens_length <- survey_specimens %>% filter(!is.na(length))
 
 survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
   filter(species_common_name %in% "pacific ocean perch") %>%
   filter(survey_series_id %in% 1)
-
-sample_trip_ids <- readRDS("data-cache/sample-trip-id-lookup.rds")
-
-areas <- readRDS("data-cache/stratum-areas.rds")
 ```
 
-Combine the strata data frames: 
-
-```{r}
-strata_dat <- left_join(survey_tows, sample_trip_ids, by = "fishing_event_id") %>%
-  select(year, survey_id, fishing_event_id, sample_id, grouping_code, density_kgpm2)
-strata_dat <- left_join(strata_dat, areas, by = c("survey_id", "grouping_code"))
-head(strata_dat)
-```
-
-The magic happens here with these functions. The first combines the composition data with information on average species density per stratum and the area of the strata. The second does the re-weighting.
+The magic happens here with these functions. The first two combine the composition data with information on average species density per stratum and the area of the strata OR .... The second does the re-weighting.
 
 For surveys, the proportions are first weighted by the density of the tow associated with the sample compared to the species density in the strata and secondly by the strata area compared to the total area for the survey.
 
@@ -51,7 +36,8 @@ For surveys, the proportions are first weighted by the density of the tow associ
 Which we execute on our data with:
 
 ```{r}
-comp <- join_comps_strata(survey_specimens_age, strata_dat) %>% 
+comp <- survey_specimens %>% filter(!is.na(age)) %>% 
+  join_comps_strata(survey_tows) %>% 
   weight_comps()
 head(comp)
 ```
@@ -123,6 +109,7 @@ ggplot(raw, aes(year, age, colour = weighted_age_prop - raw_age_prop)) +
 Now the lengths (the functions will be cleaned up to make this easier):
 
 ```{r}
+survey_specimens_length <- survey_specimens %>% filter(!is.na(length))
 bin_size <- 2
 length_bins <- seq(min(survey_specimens_length$length), 
   max(survey_specimens_length$length), bin_size)
@@ -172,8 +159,6 @@ d <- readRDS("data-cache/all-commercial-bio.rds") %>% filter(species_common_name
 ca <- readRDS("data-cache/all-catches.rds") %>% filter(species_common_name %in% "pacific ocean perch")
 
 
-cmps <- join_comps_commercial(d, ca)
-head(as.data.frame(cmps), n = 20)
-tail(as.data.frame(cmps), n = 10)
+comps_age_comm <- join_comps_commercial(d, ca) %>% weight_comps()
 ```
 

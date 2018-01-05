@@ -1,7 +1,7 @@
-join_comps_commercial <- function(dat, catch_dat) {
+join_comps_commercial <- function(specimen_dat, catch_dat) {
   library(dplyr)
 
-  dat <- mutate(dat, month = lubridate::month(trip_start_date),
+  dat <- mutate(specimen_dat, month = lubridate::month(trip_start_date),
     quarter = case_when(
       month %in% seq(1, 3) ~ 1,
       month %in% seq(4, 6) ~ 2,
@@ -47,10 +47,18 @@ join_comps_commercial <- function(dat, catch_dat) {
 }
 
 
-join_comps_strata <- function(dat, strat_dat) {
+join_comps_strata <- function(specimen_dat, survey_tows) {
   library(dplyr)
 
-  raw_comp <- dat %>%
+  sample_trip_ids <- readRDS("data-cache/sample-trip-id-lookup.rds")
+  areas <- readRDS("data-cache/stratum-areas.rds")
+
+  strat_dat <- survey_tows %>%
+    left_join(sample_trip_ids, by = "fishing_event_id") %>%
+    select(year, survey_id, fishing_event_id, sample_id, grouping_code, density_kgpm2)
+  strat_dat <- left_join(strat_dat, areas, by = c("survey_id", "grouping_code"))
+
+  raw_comp <- specimen_dat %>%
     select(year, sample_id, age, weight, grouping_code) %>%
     group_by(year, sample_id, grouping_code, age) %>%
     summarise(freq = n())
@@ -66,7 +74,7 @@ join_comps_strata <- function(dat, strat_dat) {
     group_by(year, grouping_code) %>%
     summarise(total_density = sum(density_kgpm2*1e6))
 
-  sample_dens <- select(dat, -area_km2) %>%
+  sample_dens <- select(specimen_dat, -area_km2) %>%
     inner_join(strat_dat,
       by = c("year", "survey_id", "sample_id", "grouping_code")) %>%
     group_by(year, grouping_code, sample_id) %>%
@@ -119,3 +127,57 @@ weight_comps <- function(dat) {
     select(-contains("freq"))
 }
 
+weight_comps_base <- function(dat) {
+  library(dplyr)
+
+  # value (age or length)
+
+  # grouping1 (quarter or grouping_code)
+
+  # weighting1 (samp_trip_catch_weight or density)
+  # weighting1_total (samp_catch_weight_quarter or total_density)
+
+  # weighting2 (landed_kg_quarter or area_km2)
+  # weighting2_total (landed_kg_year or total_area_km2)
+
+  group_by(dat, year, grouping1) %>% # pre D.4 / # quarter
+
+    # first level (within quarters by catch or within strata by survey catch):
+    mutate(prop = weighting1/weighting1_total) %>% # D.4
+    # re-weight:
+    group_by(year, grouping1, weighting2, weighting2_total, value) %>% # pre D.5
+    summarise(weighted_freq1 = sum(freq * prop), # D.5
+      sum_freq = sum(freq)) %>% # needed for D.6
+
+    # re-standardize:
+    mutate(weighted_freq1_scaled =
+        weighted_freq1 * sum(sum_freq)/sum(weighted_freq1)) %>%  # D.6
+    group_by(year) %>% # pre D.7
+
+    # second level (within years by catch or within survey-years by area):
+    mutate(annual_prop = weighting2/sum(weighting2_total)) %>% # D.7
+    group_by(year, value) %>% # pre D.8
+
+    # re-weight:
+    summarise(
+      weighted_freq2 = sum(weighted_freq1_scaled * annual_prop), # D.8
+      sum_weighted_freq1 = sum(weighted_freq1_scaled)) %>% # needed for D.9
+    group_by(year) %>% # pre D.9
+
+    # re-standardize:
+    mutate(weighted_freq2_scaled = weighted_freq2 *
+        (sum(sum_weighted_freq1) / sum(weighted_freq2))) %>% # D.9
+    group_by(year) %>%
+
+    # calculate proportions:
+    mutate(weighted_prop =
+        weighted_freq2_scaled / sum(weighted_freq2_scaled)) %>% # D.10
+    select(-contains("freq"))
+}
+
+weight_comps <- function(dat) {
+  names(dat) <- c("year", "id", "grouping1", "value", "freq",
+    "weighting1", "weighting1_total",
+    "weighting2", "weighting2_total")
+  weight_comps_base(dat)
+}
