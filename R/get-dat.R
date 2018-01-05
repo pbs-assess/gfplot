@@ -107,7 +107,7 @@ get_survey_specimens <- function(spp) {
 }
 
 get_commercial_specimens <- function(spp) {
-  # spp <- common2codes(spp)
+  spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
   i <- grep("ORDER BY TRIP_ID", q) - 1
   q <- c(q[seq(1, i)],
