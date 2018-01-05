@@ -83,9 +83,9 @@ get_survey_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-survey-biology.sql")
   i <- grep("ORDER BY", q) - 1
-  q <- c(q[1:i],
+  q <- c(q[seq(1, i)],
     paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[(i+1):length(q)])
+    q[seq(i+1, length(q))])
   survey_bio_sql <- paste(q, collapse = "\n")
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), survey_bio_sql)
 
@@ -107,13 +107,15 @@ get_survey_specimens <- function(spp) {
 }
 
 get_commercial_specimens <- function(spp) {
-  spp <- common2codes(spp)
+  # spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
   i <- grep("ORDER BY TRIP_ID", q) - 1
-  q <- c(q[1:i],
+  q <- c(q[seq(1, i)],
     paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[(i+1):length(q)])
+    q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
+
+  browser()
   dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
 
   names(dbio_c) <- tolower(names(dbio_c))
@@ -121,8 +123,6 @@ get_commercial_specimens <- function(spp) {
   dbio_c$species_science_name <- tolower(dbio_c$species_science_name)
   dbio_c <- mutate(dbio_c, year = lubridate::year(trip_start_date))
   assertthat::assert_that(sum(duplicated(dbio_c$specimen_id)) == 0)
-  # dbio_c <- select(dbio_c, species_common_name, species_science_name,
-    # year, age, length, weight, maturity_code)
   dbio_c
 }
 
@@ -130,9 +130,9 @@ get_landings <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-landings.sql")
   i <- grep("ORDER BY BEST", q) - 1
-  q <- c(q[1:i],
+  q <- c(q[seq(1, i)],
     paste("WHERE SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[(i+1):length(q)])
+    q[seq(i+1, length(q))])
   landings_sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), landings_sql)
   names(d) <- tolower(names(d))
@@ -155,9 +155,9 @@ get_cpue <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-cpue.sql")
   i <- grep("ORDER BY YEAR", q) - 1
-  q <- c(q[1:i],
+  q <- c(q[seq(1, i)],
     paste("AND SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[(i+1):length(q)])
+    q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
   dcpue <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
   dcpue$SPECIES_COMMON_NAME[dcpue$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
@@ -173,9 +173,9 @@ get_bio_indices <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-survey-boot.sql")
   i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
-  q <- c(q[1:i],
+  q <- c(q[seq(1, i)],
     paste("WHERE SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[(i+1):length(q)])
+    q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
   names(d) <- tolower(names(d))
