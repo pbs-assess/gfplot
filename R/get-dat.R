@@ -115,14 +115,14 @@ get_commercial_specimens <- function(spp) {
     q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
 
-  browser()
+
   dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
 
   names(dbio_c) <- tolower(names(dbio_c))
   dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
   dbio_c$species_science_name <- tolower(dbio_c$species_science_name)
   dbio_c <- mutate(dbio_c, year = lubridate::year(trip_start_date))
-  assertthat::assert_that(sum(duplicated(dbio_c$specimen_id)) == 0)
+  #assertthat::assert_that(sum(duplicated(dbio_c$specimen_id)) == 0)
   dbio_c
 }
 
