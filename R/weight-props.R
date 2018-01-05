@@ -42,7 +42,8 @@ join_comps_commercial <- function(dat, catch_dat) {
     select(year, trip_id, quarter, age, freq,
       samp_trip_catch_weight, samp_catch_weight_quarter,
       landed_kg_quarter, landed_kg_year) %>% # re-order
-    arrange(year, trip_id, age)
+    arrange(year, trip_id, age) %>%
+    ungroup()
 }
 
 
@@ -75,7 +76,8 @@ join_comps_strata <- function(dat, strat_dat) {
     by = c("year", "sample_id", "grouping_code")) %>%
     inner_join(strat_dens, by = c("year", "grouping_code")) %>%
     inner_join(strat_areas, by = c("year", "grouping_code")) %>%
-    ungroup()
+    ungroup() %>%
+    arrange(year, sample_id, age)
 }
 
 weight_comps <- function(dat) {
