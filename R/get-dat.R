@@ -109,7 +109,7 @@ get_survey_specimens <- function(spp) {
 get_commercial_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
-  i <- grep("WHERE TRIP", q)
+  i <- grep("ORDER BY TRIP_ID", q) - 1
   q <- c(q[1:i],
     paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
     q[(i+1):length(q)])
@@ -204,10 +204,10 @@ get_all_data <- function(species, path = "data-cache") {
 
   d <- get_bio_indices(species)
   saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
-  
+
   d <- get_sample_trip_id_lookup()
   saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
-  
+
   d <- get_stratum_areas()
   saveRDS(d, file = file.path(path, "stratum-areas.rds"))
 }
