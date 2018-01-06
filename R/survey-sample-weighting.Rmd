@@ -37,7 +37,7 @@ Which we execute on our data with:
 
 ```{r}
 comp <- survey_specimens %>% filter(!is.na(age)) %>% 
-  join_comps_strata(survey_tows) %>% 
+  join_comps_survey(survey_tows) %>% 
   weight_comps()
 head(comp)
 ```
@@ -119,7 +119,7 @@ comp_length_raw <- survey_specimens_length %>%
 
 comp_length <- comp_length_raw %>%
   select(-age) %>% rename(age = bin) %>% 
-  join_comps_strata(strata_dat) %>% 
+  join_comps_survey(strata_dat) %>% 
   weight_comps() %>% 
   rename(weighted_length_prop = weighted_age_prop, bin = age)
 ```

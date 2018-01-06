@@ -47,7 +47,7 @@ join_comps_commercial <- function(specimen_dat, catch_dat) {
 }
 
 
-join_comps_strata <- function(specimen_dat, survey_tows) {
+join_comps_survey <- function(specimen_dat, survey_tows) {
   library(dplyr)
 
   sample_trip_ids <- readRDS("data-cache/sample-trip-id-lookup.rds")
