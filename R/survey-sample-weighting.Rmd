@@ -159,6 +159,6 @@ d <- readRDS("data-cache/all-commercial-bio.rds") %>% filter(species_common_name
 ca <- readRDS("data-cache/all-catches.rds") %>% filter(species_common_name %in% "pacific ocean perch")
 
 
-comps_age_comm <- join_comps_commercial(d, ca) %>% weight_comps()
+comps_age_comm <- join_comps_commercial(d, ca, age) %>% weight_comps()
 ```
 

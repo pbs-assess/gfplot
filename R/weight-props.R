@@ -1,5 +1,7 @@
-join_comps_commercial <- function(specimen_dat, catch_dat) {
+join_comps_commercial <- function(specimen_dat, catch_dat, value = age) {
   library(dplyr)
+
+  value <- enquo(value)
 
   dat <- mutate(specimen_dat, month = lubridate::month(trip_start_date),
     quarter = case_when(
@@ -27,7 +29,7 @@ join_comps_commercial <- function(specimen_dat, catch_dat) {
     group_by(year, quarter) %>%
     summarise(samp_catch_weight_quarter = sum(samp_trip_catch_weight))
 
-  freq_and_catch_by_trip <- dat %>% group_by(year, trip_id, quarter, age) %>%
+  freq_and_catch_by_trip <- dat %>% group_by(year, trip_id, quarter, !!value) %>%
     summarise(freq = n()) %>%
     inner_join(sampled_trip_id_catch, by = c("year", "trip_id", "quarter"))
 
@@ -39,16 +41,18 @@ join_comps_commercial <- function(specimen_dat, catch_dat) {
   inner_join(freq_and_catch_by_trip,
     species_catch_by_quarter, by = c("year", "quarter")) %>%
     inner_join(quarter_sampled_catch, by = c("year", "quarter")) %>%
-    select(year, trip_id, quarter, age, freq,
+    select(year, trip_id, quarter, !!value, freq,
       samp_trip_catch_weight, samp_catch_weight_quarter,
       landed_kg_quarter, landed_kg_year) %>% # re-order
-    arrange(year, trip_id, age) %>%
+    arrange(year, trip_id, !!value) %>%
     ungroup()
 }
 
 
-join_comps_survey <- function(specimen_dat, survey_tows) {
+join_comps_survey <- function(specimen_dat, survey_tows, value = age) {
   library(dplyr)
+
+  value <- enquo(value)
 
   sample_trip_ids <- readRDS("data-cache/sample-trip-id-lookup.rds")
   areas <- readRDS("data-cache/stratum-areas.rds")
@@ -59,8 +63,8 @@ join_comps_survey <- function(specimen_dat, survey_tows) {
   strat_dat <- left_join(strat_dat, areas, by = c("survey_id", "grouping_code"))
 
   raw_comp <- specimen_dat %>%
-    select(year, sample_id, age, weight, grouping_code) %>%
-    group_by(year, sample_id, grouping_code, age) %>%
+    select(year, sample_id, !!value, weight, grouping_code) %>%
+    group_by(year, sample_id, grouping_code, !!value) %>%
     summarise(freq = n())
 
   strat_areas <- select(strat_dat, year, grouping_code, area_km2) %>%
@@ -85,7 +89,7 @@ join_comps_survey <- function(specimen_dat, survey_tows) {
     inner_join(strat_dens, by = c("year", "grouping_code")) %>%
     inner_join(strat_areas, by = c("year", "grouping_code")) %>%
     ungroup() %>%
-    arrange(year, sample_id, age)
+    arrange(year, sample_id, !!value)
 }
 
 weight_comps <- function(dat) {
