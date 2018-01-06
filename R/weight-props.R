@@ -1,7 +1,21 @@
-join_comps_commercial <- function(specimen_dat, catch_dat, value = age) {
+bin_lengths <- function(dat, value, bin_size) {
+  value <- enquo(value)
+  bin_range <- dat %>% select(!!value) %>% pull() %>% range()
+  bins <- seq(min(bin_range), max(bin_range), by = bin_size)
+
+  dat %>%
+    mutate(!!quo_name(value) := bins[findInterval(!!value, bins)] + bin_size/2)
+}
+
+join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NULL) {
   library(dplyr)
 
   value <- enquo(value)
+
+  specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
+
+  if (!is.null(bin_size))
+    specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
 
   dat <- mutate(specimen_dat, month = lubridate::month(trip_start_date),
     quarter = case_when(
@@ -48,11 +62,13 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value = age) {
     ungroup()
 }
 
-
-join_comps_survey <- function(specimen_dat, survey_tows, value = age) {
+join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL) {
   library(dplyr)
-
   value <- enquo(value)
+  specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
+
+  if (!is.null(bin_size))
+    specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
 
   sample_trip_ids <- readRDS("data-cache/sample-trip-id-lookup.rds")
   areas <- readRDS("data-cache/stratum-areas.rds")

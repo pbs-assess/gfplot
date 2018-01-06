@@ -155,7 +155,7 @@ tidyr::gather(comp_length_raw, proportion_type, length_prop, -bin, -year) %>%
 
 
 ```{r}
-bio <- readRDS("data-cache/all-commercial-bio.rds") %>% 
+bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>% 
   filter(species_common_name %in% "pacific ocean perch")
 catch <- readRDS("data-cache/all-catches.rds") %>% 
   filter(species_common_name %in% "pacific ocean perch")
@@ -166,25 +166,16 @@ survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
   filter(species_common_name %in% "pacific ocean perch") %>%
   filter(survey_series_id %in% 1)
 
-bin_size <- 2
-length_bins <-  seq(0, 70, bin_size)
-
 # ------------
 
-bio %>% filter(!is.na(age)) %>% 
-  join_comps_commercial(catch, value = age) %>% 
+bio_specs %>% join_comps_commercial(catch, age) %>% 
   weight_comps()
-bio %>% filter(!is.na(length)) %>% 
-  mutate(length_bin = length_bins[findInterval(length, length_bins)] + bin_size/2) %>% 
-  join_comps_commercial(catch, value = length_bin) %>% 
+bio_specs %>% join_comps_commercial(catch, length, bin_size = 2) %>% 
   weight_comps()
 
-survey_specimens %>% filter(!is.na(age)) %>% 
-  join_comps_survey(survey_tows, value = age) %>% 
+survey_specimens %>% join_comps_survey(survey_tows, age) %>% 
   weight_comps()
-survey_specimens %>% filter(!is.na(length)) %>% 
-  mutate(length_bin = length_bins[findInterval(length, length_bins)] + bin_size/2) %>% 
-  join_comps_survey(survey_tows, value = length_bin) %>% 
+survey_specimens %>% join_comps_survey(survey_tows, length, bin_size = 2) %>% 
   weight_comps()
 
 ```
