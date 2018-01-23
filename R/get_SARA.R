@@ -26,4 +26,11 @@ h <- read_html("http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cf
 d <- h %>% html_nodes("table") %>%
   .[[1]] %>%
   html_table() %>%
-  .[-(1:2), ]
+  .[-(1:2), ] %>%
+  as_tibble() %>%
+  filter(Taxon %in% "Fishes") %>%
+  filter(!grepl("Salmon",  `Common name *`))
+names(d) <- tolower(names(d))
+names(d) <- gsub(" ", "_", names(d))
+names(d) <- gsub("_\\*", "", names(d))
+d
