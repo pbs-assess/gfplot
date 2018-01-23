@@ -1,4 +1,6 @@
 library(dplyr)
+library(rio)
+
 
 db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
   DBI::dbConnect(odbc::odbc(), driver = "SQL Server",
@@ -109,10 +111,10 @@ get_survey_specimens <- function(spp) {
 get_commercial_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
-  i <- grep("HAVING SP.SPECIMEN_SEX_CODE", q) - 1
+  i <- grep("WHERE TRIP_SUB_TYPE_CODE", q) + 1
   q <- c(q[seq(1, i)],
-    paste("SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[seq(i+1, length(q))])
+         paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+         q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
 
 
@@ -193,8 +195,8 @@ get_all_data <- function(species, path = "data-cache") {
 #  d <- get_survey_specimens(species)
 # saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
 
-  # d <- get_commercial_specimens(species)
-  # saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
+  d <- get_commercial_specimens(species)
+  saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
 
  # d <- get_landings(species)
  # saveRDS(d, file = file.path(path, "all-catches.rds"))
@@ -216,4 +218,4 @@ get_all_data <- function(species, path = "data-cache") {
 source("R/make-spp-list.R")
 species <- get_spp_names()$species_common_name
 
-get_all_data("canary rockfish")
+get_all_data("yelloweye rockfish")
