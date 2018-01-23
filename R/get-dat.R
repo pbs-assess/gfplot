@@ -82,15 +82,15 @@ collapse_spp_names <- function(x) {
 get_survey_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-survey-biology.sql")
-  i <- grep("ORDER BY", q) - 1
+  i <- grep("WHERE SPECIMEN_SEX_CODE", q)
   q <- c(q[seq(1, i)],
-    paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[seq(i+1, length(q))])
+         paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+         q[seq(i+1, length(q))])
   survey_bio_sql <- paste(q, collapse = "\n")
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), survey_bio_sql)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT * FROM SURVEY_SERIES")
+                             "SELECT * FROM SURVEY_SERIES")
   ss <- dplyr::select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(ss) <- tolower(names(ss))
 
