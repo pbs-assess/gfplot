@@ -82,15 +82,15 @@ collapse_spp_names <- function(x) {
 get_survey_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-survey-biology.sql")
-  i <- grep("ORDER BY", q) - 1
+  i <- grep("WHERE SPECIMEN_SEX_CODE", q)
   q <- c(q[seq(1, i)],
-    paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[seq(i+1, length(q))])
+         paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+         q[seq(i+1, length(q))])
   survey_bio_sql <- paste(q, collapse = "\n")
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), survey_bio_sql)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT * FROM SURVEY_SERIES")
+                             "SELECT * FROM SURVEY_SERIES")
   ss <- dplyr::select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(ss) <- tolower(names(ss))
 
@@ -109,10 +109,10 @@ get_survey_specimens <- function(spp) {
 get_commercial_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
-  i <- grep("HAVING SP.SPECIMEN_SEX_CODE", q) - 1
+  i <- grep("WHERE TRIP_SUB_TYPE_CODE", q) + 1
   q <- c(q[seq(1, i)],
-    paste("SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-    q[seq(i+1, length(q))])
+         paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+         q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
 
 
@@ -187,33 +187,33 @@ get_bio_indices <- function(spp) {
 get_all_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
-#  d_survs_df <- get_spatial_survey(species)
-# saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
+ d_survs_df <- get_spatial_survey(species)
+saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
 
-#  d <- get_survey_specimens(species)
-# saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
+ d <- get_survey_specimens(species)
+saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
 
-  # d <- get_commercial_specimens(species)
-  # saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
+  d <- get_commercial_specimens(species)
+  saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
 
- # d <- get_landings(species)
- # saveRDS(d, file = file.path(path, "all-catches.rds"))
+ d <- get_landings(species)
+ saveRDS(d, file = file.path(path, "all-catches.rds"))
 
 #  d <- get_cpue(species)
 #  saveRDS(d, file = file.path(path, "all-spatial-cpue.rds"))
 
-#  d <- get_bio_indices(species)
-#  saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
+ d <- get_bio_indices(species)
+ saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
 
-#  d <- get_sample_trip_id_lookup()
-#  saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
+ d <- get_sample_trip_id_lookup()
+ saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
 
-# d <- get_stratum_areas()
-#  saveRDS(d, file = file.path(path, "stratum-areas.rds"))
+d <- get_stratum_areas()
+ saveRDS(d, file = file.path(path, "stratum-areas.rds"))
 
 }
 
 source("R/make-spp-list.R")
 species <- get_spp_names()$species_common_name
 
-get_all_data("canary rockfish")
+get_all_data(species)
