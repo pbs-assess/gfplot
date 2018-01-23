@@ -109,9 +109,9 @@ get_survey_specimens <- function(spp) {
 get_commercial_specimens <- function(spp) {
   spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
-  i <- grep("ORDER BY TRIP_ID", q) - 1
+  i <- grep("HAVING SP.SPECIMEN_SEX_CODE", q) - 1
   q <- c(q[seq(1, i)],
-    paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+    paste("SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
     q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
 
@@ -193,11 +193,11 @@ get_all_data <- function(species, path = "data-cache") {
 #  d <- get_survey_specimens(species)
 # saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
 
-  d <- get_commercial_specimens(species)
-  saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
+  # d <- get_commercial_specimens(species)
+  # saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
 
-#  d <- get_landings(species)
-#  saveRDS(d, file = file.path(path, "all-catches.rds"))
+ # d <- get_landings(species)
+ # saveRDS(d, file = file.path(path, "all-catches.rds"))
 
 #  d <- get_cpue(species)
 #  saveRDS(d, file = file.path(path, "all-spatial-cpue.rds"))
@@ -216,4 +216,4 @@ get_all_data <- function(species, path = "data-cache") {
 source("R/make-spp-list.R")
 species <- get_spp_names()$species_common_name
 
-get_all_data(species)
+get_all_data("canary rockfish")
