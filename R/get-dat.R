@@ -1,6 +1,4 @@
 library(dplyr)
-library(rio)
-
 
 db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
   DBI::dbConnect(odbc::odbc(), driver = "SQL Server",
@@ -189,33 +187,33 @@ get_bio_indices <- function(spp) {
 get_all_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
-#  d_survs_df <- get_spatial_survey(species)
-# saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
+ d_survs_df <- get_spatial_survey(species)
+saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
 
-#  d <- get_survey_specimens(species)
-# saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
+ d <- get_survey_specimens(species)
+saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
 
   d <- get_commercial_specimens(species)
   saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
 
- # d <- get_landings(species)
- # saveRDS(d, file = file.path(path, "all-catches.rds"))
+ d <- get_landings(species)
+ saveRDS(d, file = file.path(path, "all-catches.rds"))
 
 #  d <- get_cpue(species)
 #  saveRDS(d, file = file.path(path, "all-spatial-cpue.rds"))
 
-#  d <- get_bio_indices(species)
-#  saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
+ d <- get_bio_indices(species)
+ saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
 
-#  d <- get_sample_trip_id_lookup()
-#  saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
+ d <- get_sample_trip_id_lookup()
+ saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
 
-# d <- get_stratum_areas()
-#  saveRDS(d, file = file.path(path, "stratum-areas.rds"))
+d <- get_stratum_areas()
+ saveRDS(d, file = file.path(path, "stratum-areas.rds"))
 
 }
 
 source("R/make-spp-list.R")
 species <- get_spp_names()$species_common_name
 
-get_all_data("yelloweye rockfish")
+get_all_data(species)
