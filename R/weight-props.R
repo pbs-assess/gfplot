@@ -22,7 +22,7 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NUL
       month %in% seq(10, 12) ~ 4
     )) %>% select(-month)
 
-  catch_dat <- filter(all_catch, !is.na(fe_end_date)) %>%
+  catch_dat <- filter(catch_dat, !is.na(fe_end_date)) %>%
     mutate(month = lubridate::month(fe_end_date),
       quarter = case_when(
         month %in% seq(1, 3) ~ 1,
@@ -103,44 +103,6 @@ join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL)
     inner_join(strat_areas, by = c("year", "grouping_code")) %>%
     ungroup() %>%
     arrange(year, sample_id, !!value)
-}
-
-weight_comps <- function(dat) {
-  library(dplyr)
-
-  group_by(dat, year, grouping_code) %>% # pre D.4 / # quarter
-
-    # first level (within quarters by catch or within strata by survey catch):
-    mutate(density_prop = density/total_density) %>% # D.4
-    # re-weight:
-    group_by(year, grouping_code, area_km2, total_area_km2, age) %>% # pre D.5
-    summarise(weighted_freq1 = sum(freq * density_prop), # D.5
-      sum_freq = sum(freq)) %>% # needed for D.6
-
-    # re-standardize:
-    mutate(weighted_freq1_scaled =
-        weighted_freq1 * sum(sum_freq)/sum(weighted_freq1)) %>%  # D.6
-    group_by(year) %>% # pre D.7
-
-    # second level (within years by catch or within survey-years by area):
-    mutate(area_annual_prop = area_km2/sum(total_area_km2)) %>% # D.7
-    group_by(year, age) %>% # pre D.8
-
-    # re-weight:
-    summarise(
-      weighted_freq2 = sum(weighted_freq1_scaled * area_annual_prop), # D.8
-      sum_weighted_freq1 = sum(weighted_freq1_scaled)) %>% # needed for D.9
-    group_by(year) %>% # pre D.9
-
-    # re-standardize:
-    mutate(weighted_freq2_scaled = weighted_freq2 *
-        (sum(sum_weighted_freq1) / sum(weighted_freq2))) %>% # D.9
-    group_by(year) %>%
-
-    # calculate proportions:
-    mutate(weighted_age_prop =
-        weighted_freq2_scaled / sum(weighted_freq2_scaled)) %>% # D.10
-    select(-contains("freq"))
 }
 
 weight_comps_base <- function(dat) {
