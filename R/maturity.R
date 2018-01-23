@@ -41,11 +41,37 @@ nd$est <- plogis(apply(pp, 2, median))
 nd$lwr <- plogis(apply(pp, 2, quantile, probs = 0.05))
 nd$upr <- plogis(apply(pp, 2, quantile, probs = 0.95))
 
+logit_50 <- function(a, b) {
+  -(log(1) + a) / b
+}
+
+e <- as.data.frame(m)
+lg <- logit_50(e$`(Intercept)`, e$length)
+lg <- quantile(lg, probs = c(0.025, 0.5, 0.975))
+
+l50 <- data.frame(
+  lwr = lg[[1]],
+  est = lg[[2]],
+  upr = lg[[3]])
+
+bins <- seq(min(xx$length), max(xx$length), length.out = 25)
+xx$bin <- bins[findInterval(xx$length, bins)]
+bin_diff <- diff(bins)[1]
+p <- group_by(xx, bin) %>%
+  summarise(p = mean(mature), mean_length = mean(length),
+    n = n())
+
+# plot:
+par(mfrow = c(1, 1), mar = c(3.5, 3, 0, 0),
+  oma = c(0, 0, .5, .5), cex = 0.7,
+  tcl = -0.2, mgp = c(2, 0.4, 0))
 
 plot(nd$length, nd$est, ylim = c(0, 1),
   yaxs = "i", xlab = "Length", ylab = "Proportion mature",
-  las = 1, type = "n")
-
+  las = 1, type = "n", axes = FALSE)
+axis(1, las = 1, col = "grey60", col.axis = "grey40", col.ticks = "grey70")
+axis(2, las = 1, col = "grey60", col.axis = "grey40", col.ticks = "grey70")
+box(col = "grey60")
 
 # polygon(c(nd$length, rev(nd$length)), c(nd$lwr, rev(nd$upr)),
   # col = "#00000020", border = NA)
@@ -54,29 +80,6 @@ points(xx$length,
   col = "#00000005", pch = 19, cex = 0.7)
 summary(m)
 
-a <- coef(m)[[1]]
-b <- coef(m)[[2]]
-pi <- rstanarm::posterior_interval(m, prob = 0.95)
-
-logit_50 <- function(a, b) {
-  -(log(1) + a) / b
-}
-
-e <- as.data.frame(m)
-lg <- logit_50(e$`(Intercept)`, e$length)
-qg <- quantile(lg, probs = c(0.025, 0.5, 0.975))
-
-l50 <- data.frame(
-  est = qg[[2]],
-  lwr = qg[[1]],
-  upr = qg[[3]])
-
-bins <- seq(min(xx$length), max(xx$length), length.out = 25)
-xx$bin <- bins[findInterval(xx$length, bins)]
-bin_diff <- diff(bins)[1]
-p <- group_by(xx, bin) %>%
-  summarise(p = mean(mature), mean_length = mean(length),
-    n = n())
 # points(p$mean_length, p$p)
 radius <- function(area) {
   sqrt(area / 3.141592)
@@ -92,8 +95,6 @@ rect(xleft = l50$lwr, xright = l50$upr, ybottom = 0, ytop = 1,
   border = NA, col = "#00000040")
 lines(nd$length, nd$est, col = "red", lwd = 2)
 
-
-l50
 
 source("R/add-label.R")
 add_label(0.1, 0.1, label =
