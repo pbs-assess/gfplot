@@ -91,11 +91,6 @@ summary(m)
 radius <- function(area) {
   sqrt(area / 3.141592)
 }
-par(xpd = NA)
-symbols(p$mean_length, y = p$p,
-  circles = radius(p$n / max(p$n)) + 0.25,
-  inches = FALSE, add = TRUE, bg = "grey40", fg = "grey40")
-par(xpd = FALSE)
 
 abline(v = l50$est, lty = 2, col = "grey40", lwd = 1.5)
 abline(v = l95, lty = 2, col = "grey40", lwd = 1.5)
@@ -108,6 +103,11 @@ abline(v = l05, lty = 2, col = "grey40", lwd = 1.5)
 # rect(xleft = l50$lwr, xright = l50$upr, ybottom = 0, ytop = 1,
   # border = NA, col = "#00000040")
 lines(nd$length, nd$est, col = "red", lwd = 2.2)
+par(xpd = NA)
+symbols(p$mean_length, y = p$p,
+  circles = radius(p$n / max(p$n)) + 0.45,
+  inches = FALSE, add = TRUE, bg = "grey40", fg = "grey40")
+par(xpd = FALSE)
 
 source("R/add-label.R")
 ytop <- 0.09
