@@ -68,7 +68,7 @@ cols_dark <- c(
 # cols <- c("QCS" = cols_dark[3], "WCVI" = cols_dark[4], "HS" = cols_dark[2])
 
 
-
+age_bins <- seq(0, 200, 2)
 
 dir.create("bubbles-gg", showWarnings = FALSE)
 for (ii in seq_along(spp[1:8])) {
@@ -78,7 +78,9 @@ for (ii in seq_along(spp[1:8])) {
   # if (spp[[ii]] %in% dbio_ages$species_common_name) {
   d <- filter(dbio_ages, species_common_name == spp[[ii]],
     !is.na(age))
-  ds <- group_by(d, year, age, survey_series_desc, sex, surv_short) %>%
+  ds <- d %>%
+    mutate(age = age_bins[findInterval(age, age_bins)]) %>%
+    group_by(year, age, survey_series_desc, sex, surv_short) %>%
     summarise(n = n()) %>%
     group_by(year, surv_short) %>%
     mutate(n_scaled = n / max(n)) %>%
@@ -124,8 +126,8 @@ for (ii in seq_along(spp[1:8])) {
       expand = FALSE) +
     guides(colour = FALSE, size = FALSE, fill = FALSE)
     # theme(panel.spacing = unit(0, "lines"))
-  ggsave(paste0("bubbles-gg/", gsub("/", "-", gsub(" ", "-", spp[[ii]])), ".pdf"),
-    width = 10, height = 4.5)
+  ggsave(paste0("bubbles-gg/", gsub("/", "-", gsub(" ", "-", spp[[ii]])), "-2.pdf"),
+    width = 10, height = 6.0)
 }
 
 
