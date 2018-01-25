@@ -8,7 +8,7 @@ dbio <- dbio %>%
     maturity_code, sex, survey_series_desc,
     maturity_convention_desc, maturity_convention_maxvalue)
 
-mat_df <- read_csv("data/maturity_assignment.csv") %>%
+mat_df <- readr::read_csv("data/maturity_assignment.csv") %>%
   rename(sex = specimen_sex_code,
     maturity_convention_desc = maturity_convention_description) %>%
   select(-maturity_convention_maxvalue)

@@ -44,53 +44,56 @@ get_spatial_survey <- function(spp, survey_codes = c(1, 3, 4, 16)) {
     "SELECT * FROM SPECIES")
 
   survey_ids <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
-    d_survs <- list()
-    k <- 0
-    for (i in seq_along(species_codes)) {
-      message(paste("Extracting spatial survey data for species code", species_codes[i]))
-      for (j in seq_along(survey_ids$SURVEY_ID)) {
-        k <- k + 1
-        d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-          paste0("EXEC proc_catmat_2011 ", survey_ids$SURVEY_ID[j], ", '",
-            species_codes[i], "'"))
-      }
+  d_survs <- list()
+  k <- 0
+  for (i in seq_along(species_codes)) {
+    message(paste("Extracting spatial survey data for species code", species_codes[i]))
+    for (j in seq_along(survey_ids$SURVEY_ID)) {
+      k <- k + 1
+      d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+        paste0("EXEC proc_catmat_2011 ", survey_ids$SURVEY_ID[j], ", '",
+          species_codes[i], "'"))
     }
-    d_survs_df <- dplyr::bind_rows(d_survs)
-    d_survs_df <- dplyr::inner_join(d_survs_df,
-      unique(dplyr::select(survey_ids,
-          SURVEY_SERIES_ID,
-          SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
-    d_survs_df <- dplyr::inner_join(d_survs_df,
-      unique(select(species,
-          SPECIES_CODE,
-          SPECIES_COMMON_NAME,
-          SPECIES_SCIENCE_NAME,
-          SPECIES_DESC)), by = "SPECIES_CODE")
-    names(d_survs_df) <- tolower(names(d_survs_df))
-    stopifnot(all(species_codes %in% d_survs_df$species_code))
-    d_survs_df <- dplyr::mutate(d_survs_df,
-      species_science_name = tolower(species_science_name),
-      species_desc = tolower(species_desc),
-      species_common_name = tolower(species_common_name))
-    d_survs_df
+  }
+  d_survs_df <- dplyr::bind_rows(d_survs)
+  d_survs_df <- dplyr::inner_join(d_survs_df,
+    unique(dplyr::select(survey_ids,
+      SURVEY_SERIES_ID,
+      SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
+  d_survs_df <- dplyr::inner_join(d_survs_df,
+    unique(select(species,
+      SPECIES_CODE,
+      SPECIES_COMMON_NAME,
+      SPECIES_SCIENCE_NAME,
+      SPECIES_DESC)), by = "SPECIES_CODE")
+  names(d_survs_df) <- tolower(names(d_survs_df))
+  stopifnot(all(species_codes %in% d_survs_df$species_code))
+  d_survs_df <- dplyr::mutate(d_survs_df,
+    species_science_name = tolower(species_science_name),
+    species_desc = tolower(species_desc),
+    species_common_name = tolower(species_common_name))
+  d_survs_df
 }
 
 collapse_spp_names <- function(x) {
   paste0("'", paste(x, collapse = "','"), "'")
 }
 
+inject_species <- function(x, spp, sql_code) {
+  i <- grep("-- insert species here", sql_code)
+  out <-c(sql_code[seq(1,i-1)],
+    paste0(x, " (", collapse_spp_names(common2codes(spp)), ")"),
+    sql_code[seq(i+1, length(sql_code))])
+  paste(out, collapse = "\n")
+}
+
 get_survey_specimens <- function(spp) {
-  spp <- common2codes(spp)
   q <- readLines("inst/sql/get-survey-biology.sql")
-  i <- grep("WHERE SPECIMEN_SEX_CODE", q)
-  q <- c(q[seq(1, i)],
-         paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-         q[seq(i+1, length(q))])
-  survey_bio_sql <- paste(q, collapse = "\n")
-  dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), survey_bio_sql)
+  q <- inject_species("AND SM.SPECIES_CODE IN", spp, sql_code = q)
+  dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-                             "SELECT * FROM SURVEY_SERIES")
+    "SELECT * FROM SURVEY_SERIES")
   ss <- dplyr::select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(ss) <- tolower(names(ss))
 
@@ -107,16 +110,11 @@ get_survey_specimens <- function(spp) {
 }
 
 get_commercial_specimens <- function(spp) {
-  spp <- common2codes(spp)
   q <- readLines("inst/sql/get-commercial-biology.sql")
-  i <- grep("WHERE TRIP_SUB_TYPE_CODE", q) + 1
-  q <- c(q[seq(1, i)],
-         paste("AND SM.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
-         q[seq(i+1, length(q))])
-  sql <- paste(q, collapse = "\n")
+  q <- inject_species("AND SM.SPECIES_CODE IN", spp, sql_code = q)
 
 
-  dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
+  dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
 
   names(dbio_c) <- tolower(names(dbio_c))
   dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
@@ -184,36 +182,38 @@ get_bio_indices <- function(spp) {
   d
 }
 
+#' @param species A character vector of species common names
+#' @param path The folder where the cached data will be saved
+#'
 get_all_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
- d_survs_df <- get_spatial_survey(species)
-saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
+  d_survs_df <- get_spatial_survey(species)
+  saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
 
- d <- get_survey_specimens(species)
-saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
+  d <- get_survey_specimens(species)
+  saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
 
   d <- get_commercial_specimens(species)
   saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
 
- d <- get_landings(species)
- saveRDS(d, file = file.path(path, "all-catches.rds"))
+  d <- get_landings(species)
+  saveRDS(d, file = file.path(path, "all-catches.rds"))
 
-#  d <- get_cpue(species)
-#  saveRDS(d, file = file.path(path, "all-spatial-cpue.rds"))
+  d <- get_cpue(species)
+  saveRDS(d, file = file.path(path, "all-spatial-cpue.rds"))
 
- d <- get_bio_indices(species)
- saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
+  d <- get_bio_indices(species)
+  saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
 
- d <- get_sample_trip_id_lookup()
- saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
+  d <- get_sample_trip_id_lookup()
+  saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
 
-d <- get_stratum_areas()
- saveRDS(d, file = file.path(path, "stratum-areas.rds"))
-
+  d <- get_stratum_areas()
+  saveRDS(d, file = file.path(path, "stratum-areas.rds"))
 }
 
 source("R/make-spp-list.R")
 species <- get_spp_names()$species_common_name
 
-get_all_data(species)
+get_all_data(c("canary rockfish","pacific ocean perch"))
