@@ -10,9 +10,10 @@ dbio <- dbio %>%
 
 mat_df <- readr::read_csv("data/maturity_assignment.csv") %>%
   rename(sex = specimen_sex_code,
-    maturity_convention_desc = maturity_convention_description)
+    maturity_convention_desc = maturity_convention_description) %>%
+  select(-maturity_convention_maxvalue)
 
-dbio <- left_join(dbio, mat_df)
+dbio <- left_join(dbio, mat_df, by = c("sex", "maturity_convention_desc"))
 dbio <- mutate(dbio, mature = maturity_code >= mature_at)
 
 xx <- filter(dbio, species_common_name == "canary rockfish",
