@@ -95,7 +95,7 @@ join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL)
     inner_join(strat_dat,
       by = c("year", "survey_id", "sample_id", "grouping_code")) %>%
     group_by(year, grouping_code, sample_id) %>%
-    summarise(density = mean(density_kgpm2*1e6))
+    summarise(density = mean(density_kgpm2*1e6)) # should be one unique value
 
   inner_join(raw_comp, sample_dens,
     by = c("year", "sample_id", "grouping_code")) %>%
