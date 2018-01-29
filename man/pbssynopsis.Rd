@@ -4,7 +4,7 @@
 \name{pbssynopsis}
 \alias{pbssynopsis}
 \alias{pbssynopsis-package}
-\title{\pkg{pbssynopsis} package}
+\title{\pkg{PBSsynopsis} package}
 \description{
 PBS Synopsis Report package
 }

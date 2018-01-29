@@ -1,4 +1,4 @@
-#' \pkg{pbssynopsis} package
+#' \pkg{PBSsynopsis} package
 #'
 #' PBS Synopsis Report package
 #'
