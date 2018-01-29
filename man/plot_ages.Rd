@@ -8,11 +8,13 @@ plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)")
 }
 \arguments{
-\item{dat}{A properly formatted data frame. The input data frame must have
-the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"}
-and \code{"F"}), \code{age}, \code{survey}, \code{n_scaled}.}
+\item{dat}{A properly formatted data frame. For example, from
+\code{\link{prep_pbs_ages}}. The input data frame must have the columns (in
+any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
+\code{age}, \code{survey}, \code{n_scaled}.}
 
-\item{max_size}{Maximum dot size (passed to \code\link[ggplot2]{scale_size_area})}
+\item{max_size}{Maximum dot size (passed to
+\code{\link[ggplot2]{scale_size_area}})}
 
 \item{sex_gap}{Horizontal gap between male and female bubbles}
 

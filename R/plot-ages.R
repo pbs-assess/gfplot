@@ -75,10 +75,12 @@ prep_pbs_ages <- function(species_common_name, path = "data-cache",
 
 #' Plot age frequencies with bubble plots
 #'
-#' @param dat A properly formatted data frame. The input data frame must have
-#'   the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"}
-#'   and \code{"F"}), \code{age}, \code{survey}, \code{n_scaled}.
-#' @param max_size Maximum dot size (passed to \code\link[ggplot2]{scale_size_area})
+#' @param dat A properly formatted data frame. For example, from
+#'   \code{\link{prep_pbs_ages}}. The input data frame must have the columns (in
+#'   any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
+#'   \code{age}, \code{survey}, \code{n_scaled}.
+#' @param max_size Maximum dot size (passed to
+#'   \code{\link[ggplot2]{scale_size_area}})
 #' @param sex_gap Horizontal gap between male and female bubbles
 #' @param year_increment Increment between year labels on x-axis
 #' @param ylab Y-axis label

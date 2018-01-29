@@ -14,7 +14,7 @@
 #' @importFrom dplyr "%>%"
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_vline scale_fill_manual
 #'   scale_colour_manual scale_x_continuous scale_size_area coord_cartesian
-#'   guides geom_point facet_wrap xlab ylab
+#'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
 
 # from: https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
 # quiets concerns of R CMD check re: the .'s that appear in pipelines
@@ -51,5 +51,15 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(
   "weighting1",
   "weighting1_total",
   "weighting2",
-  "weighting2_total"
+  "weighting2_total",
+
+  # plotting:
+
+  "age",
+  "maturity_code",
+  "n_spp",
+  "sex",
+  "survey",
+  "variable"
+
   ))
