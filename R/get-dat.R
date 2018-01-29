@@ -142,7 +142,7 @@ get_commercial_specimens <- function(spp) {
 #' @export
 get_landings <- function(spp) {
   spp <- common2codes(spp)
-  q <- readLines("inst/sql/get-landings.sql")
+  q <- readLines(system.file("sql", "get-landings.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY BEST", q) - 1
   q <- c(q[seq(1, i)],
     paste("WHERE SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
@@ -171,7 +171,7 @@ get_landings <- function(spp) {
 #' @export
 get_cpue <- function(spp) {
   spp <- common2codes(spp)
-  q <- readLines("inst/sql/get-cpue.sql")
+  q <- readLines(system.file("sql", "get-cpue.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY YEAR", q) - 1
   q <- c(q[seq(1, i)],
     paste("AND SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
@@ -193,7 +193,7 @@ get_cpue <- function(spp) {
 #' @export
 get_bio_indices <- function(spp) {
   spp <- common2codes(spp)
-  q <- readLines("inst/sql/get-survey-boot.sql")
+  q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
   q <- c(q[seq(1, i)],
     paste("WHERE SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
