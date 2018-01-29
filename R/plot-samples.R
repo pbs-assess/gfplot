@@ -6,6 +6,7 @@ firstup <- function(x) {
 round_nice <- function(x) {
   out <- plyr::round_any(x, 100)
   out[out == 0] <- x[out == 0]
+  out[x == 0] <- ""
   out
 }
 
@@ -30,24 +31,26 @@ prep_pbs_samples <- function() {
 #' @examples
 #' d <- expand.grid(year = 1996:2016,
 #'   type = c("maturity", "weight", "length", "age"), stringsAsFactors = FALSE)
-#' d$n <- rpois(nrow(d), 100)
+#' d$n <- round(runif(nrow(d), 0, 800))
+#' d$n[10] <- 0 # example zero
 #' plot_samples(d)
 #'
 #' @export
 
 plot_samples <- function(dat) {
 
-  d$n_plot <- log(d$n + 1)
-  d$n_text <- round_nice(d$n)
-  d$type <- paste("#", firstup(d$type))
+  dat$n_plot <- log(dat$n + 1)
+  dat$n_text <- round_nice(dat$n)
+  dat$type <- paste("#", firstup(dat$type))
 
-  ggplot(d, aes_string("year", "type")) +
+  ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90", width = 1.5) +
     theme_pbs() +
-    coord_cartesian(expand = FALSE, xlim = range(d$year) + c(-0.75, 0.25)) +
-    ggplot2::scale_fill_continuous(limits = c(0, max(d$n_plot)), low = "white", high = "grey10") +
-    ggplot2::scale_x_continuous(breaks = seq(min(d$year), max(d$year), 2)) +
-    theme(axis.text.x = element_text(hjust = .7),
+    coord_cartesian(expand = FALSE, xlim = range(dat$year) + c(-0.75, 0.25)) +
+    ggplot2::scale_fill_distiller(palette = "Greys",
+      limits = c(log(1), max(dat$n_plot)), direction = 1) +
+    ggplot2::scale_x_continuous(breaks = seq(min(dat$year), max(dat$year), 2)) +
+    theme(axis.text.x = element_text(hjust = .75),
       axis.ticks.x = element_blank(),
       axis.ticks.y = element_blank()) +
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
