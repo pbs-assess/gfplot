@@ -19,6 +19,7 @@ Imports:
     assertthat,
     sp,
     readr,
+    rlang,
     rgdal,
     RColorBrewer,
     viridis,

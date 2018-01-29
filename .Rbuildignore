@@ -22,3 +22,6 @@
 ^.*\.pdf$
 \.o$
 \.so$
+^generated-data$
+^data-cache$
+^inst/stan/*\.rds$
