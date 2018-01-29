@@ -6,9 +6,19 @@ dbio <- dbio %>%
   select(species_common_name, species_science_name,
     year, age, length, weight,
     maturity_code, sex, survey_series_desc,
-    maturity_convention_desc, maturity_convention_maxvalue)
+    maturity_convention_desc, maturity_convention_maxvalue,
+    specimen_id, sample_id, trip_start_date)
 
-mat_df <- readr::read_csv("data/maturity_assignment.csv") %>%
+dbio <- mutate(dbio, month = lubridate::month(trip_start_date))
+
+library(readr)
+mat_df <- readr::read_csv("data/maturity_assignment.csv",
+  col_types = readr::cols(
+  maturity_convention_code = col_integer(),
+  maturity_convention_description = col_character(),
+  specimen_sex_code = col_integer(),
+  maturity_convention_maxvalue = col_integer(),
+  mature_at = col_integer())) %>%
   rename(sex = specimen_sex_code,
     maturity_convention_desc = maturity_convention_description) %>%
   select(-maturity_convention_maxvalue)
@@ -27,11 +37,94 @@ library(rstanarm)
 options(mc.cores = parallel::detectCores())
 
 # m <- glm(mature ~ length, data = xx, family = binomial)
-m <- rstanarm::stan_glm(mature ~ length,
+m <- stan_glm(mature ~ length,
   data = xx, family = binomial, iter = 600, chains = 1,
   prior_intercept = normal(0, 25),
   prior = normal(0, 5, autoscale = TRUE))
 prior_summary(m)
+#
+# m_re <- stan_glmer(mature ~ length + (1 | sample_id),
+#   data = xx, family = binomial, iter = 600, chains = 1,
+#   prior_intercept = normal(0, 25),
+#   prior = normal(0, 5, autoscale = TRUE))
+
+
+tows <- readRDS("data-cache/all-survey-spatial-tows.rds")
+tows <- readRDS("data-cache/")
+xx <- left_join(xx, select(tows, ))
+
+
+m <- glm(mature ~ length,
+  data = xx, family = binomial)
+
+library(glmmTMB)
+m_re <- glmmTMB(mature ~ 0 + length + as.factor(month) + (1 | sample_id),
+  data = xx, family = binomial)
+
+confint(m)
+confint(m_re)
+b <- fixef(m_re)[[1]]
+
+l <- seq(min(xx$length), max(xx$length), length.out = 100)
+nd <- expand.grid(length = l, sample_id = unique(xx$sample_id), stringsAsFactors = FALSE)
+nd$glm <- plogis(predict(m, newdata = nd))
+nd$glmm <- predict(m_re, newdata = nd, se.fit = FALSE)
+nd$glmm_fe <- plogis(b[[1]] + b[[2]] * nd$l)
+nd_fe <- filter(nd, sample_id == xx$sample_id[[1]]) %>%
+  select(-glmm)
+
+library(ggplot2)
+reshape2::melt(nd_fe, id.vars = c("length", "sample_id")) %>%
+  ggplot(aes(length, value,
+    colour = variable, alpha = variable, size = variable)) +
+  geom_line(data = nd, aes(length, glmm, group = sample_id),
+     inherit.aes = FALSE, alpha = 0.03) +
+  geom_line() +
+  theme_light() +
+  scale_alpha_manual(values = c("glm" = 1, "glmm_fe" = 1, "glmm" = 0.1)) +
+  scale_size_manual(values = c("glm" = 1.5, "glmm_fe" = 1.5, "glmm" = 0.3)) +
+  scale_colour_manual(values = c("glm" = "blue", "glmm_fe" = "black", "glmm" = "black")) +
+  ggtitle("Sample ID random intercepts") +
+  labs(subtitle = "Canary rockfish") + ylab("Probability mature") + xlab("Length")
+ggsave("figs/canary-mature-re-int.png", width = 6, height = 4)
+
+########
+
+m_re <- glmmTMB(mature ~ length + (1 + length | sample_id),
+  data = xx, family = binomial)
+
+confint(m)
+confint(m_re)
+b <- fixef(m_re)[[1]]
+
+nd$glm <- plogis(predict(m, newdata = nd))
+nd$glmm <- predict(m_re, newdata = nd, se.fit = FALSE)
+nd$glmm_fe <- plogis(b[[1]] + b[[2]] * nd$l)
+nd_fe <- filter(nd, sample_id == xx$sample_id[[1]]) %>%
+  select(-glmm)
+
+library(ggplot2)
+reshape2::melt(nd_fe, id.vars = c("length", "sample_id")) %>%
+  ggplot(aes(length, value,
+    colour = variable, alpha = variable, size = variable)) +
+  geom_line(data = nd, aes(length, glmm, group = sample_id),
+    inherit.aes = FALSE, alpha = 0.03) +
+  geom_line() +
+  theme_light() +
+  scale_alpha_manual(values = c("glm" = 1, "glmm_fe" = 1, "glmm" = 0.1)) +
+  scale_size_manual(values = c("glm" = 1.5, "glmm_fe" = 1.5, "glmm" = 0.3)) +
+  scale_colour_manual(values = c("glm" = "blue", "glmm_fe" = "black", "glmm" = "black")) +
+  ggtitle("Sample ID random intercepts and slopes") +
+  labs(subtitle = "Canary rockfish") + ylab("Probability mature") + xlab("Length")
+ggsave("figs/canary-mature-re-slope.png", width = 6, height = 4)
+
+
+
+
+
+
+
+
 
 l <- seq(min(xx$length), max(xx$length), length.out = 200)
 nd <- data.frame(length = l)

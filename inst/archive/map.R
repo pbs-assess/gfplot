@@ -93,7 +93,7 @@ mpc <- ggplot2::map_data("worldHires", ".")
 # mpc <- ggplot2::map_data("world", ".") # low res
 dcpue <- readRDS("~/Dropbox/dfo/data/all-spatial-cpue.rds")
 names(dcpue) <- tolower(names(dcpue))
-dat <- filter(dcpue, year %in% c(2013:4000), species_common_name %in% "PACIFIC OCEAN PERCH") %>% 
+dat <- filter(dcpue, year %in% c(2013:4000), species_common_name %in% "PACIFIC OCEAN PERCH") %>%
   rename(X = lon, Y = lat)
 # dat <- filter(d_loc_cpue_pop, year %in% c(2013:3000))
 
@@ -125,6 +125,7 @@ bin_width <- 7
 #   viridis::scale_fill_viridis()
 # g
 
+browser()
 # use ggplot to compute hexagons:
 g <- ggplot(dat, aes(X, Y)) +
   coord_equal(xlim = range(dat$X), ylim = range(dat$Y)) +
@@ -190,11 +191,11 @@ gd1$custom_fill <- paste0(substr(gd1$custom_fill, 1, 7), "FF")
 dx <- ggplot2::resolution(gd1$x, FALSE)
 dy <- resolution(gd1$y, FALSE) / 2 * 1.15
 plyr::a_ply(gd1, 1, function(i)
-  hexagon(i$x, i$y, dx, dy, col = i$custom_fill, border = i$custom_fill, 
+  hexagon(i$x, i$y, dx, dy, col = i$custom_fill, border = i$custom_fill,
     lwd = 0.02))
 
 zlev <- c(100, 200, 500)
-isobath_UTM <- convUL(clipPolys(filter(isobath, PID %in% zlev), 
+isobath_UTM <- convUL(clipPolys(filter(isobath, PID %in% zlev),
   xlim = xlim_ll, ylim = ylim_ll))
 PBSmapping::addLines(isobath_UTM, col = rev(c("#00000060", "#00000045", "#00000030")), lwd = 0.6)
 # PBSmapping::addLines(isobath_UTM, col = c("red", "green", "blue"), lwd = 0.7)
