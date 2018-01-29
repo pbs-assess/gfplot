@@ -24,4 +24,9 @@ d$n <- round(runif(nrow(d), 0, 800))
 d$n[10] <- 0 # example zero
 plot_samples(d)
 
+\dontrun{
+x <- prep_pbs_samples(year_range = c(1996, 2016))
+x <- dplyr::filter(x, species_common_name == "abyssal skate")
+plot_samples(x)
+}
 }

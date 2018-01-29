@@ -12,10 +12,52 @@ round_nice <- function(x) {
 
 #' Prepare PBS samples data for \code{\link{plot_samples}}
 #'
+#' @param path Path to cached data
+#' @param year_range Either \code{NULL}, in which case all years are returned,
+#'   or a numeric vector of length two giving the lower and upper years to
+#'   include.
+#'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' x <- prep_pbs_samples(year_range = c(1996, 2016))
+#' }
 
-prep_pbs_samples <- function() {
+prep_pbs_samples <- function(path = "data-cache",
+  year_range = NULL) {
+  dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
 
+  if (!is.null(year_range))
+    dbio <- dbio[dbio$year >= year_range[[1]] & dbio$year <= year_range[[2]], ]
+
+  dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
+
+  dbio <- dbio %>%
+    dplyr::select(.data$species_common_name, .data$year,
+      .data$age, .data$length, .data$weight, .data$maturity_code)
+
+  out <- dplyr::group_by(dbio,
+    .data$species_common_name, .data$year) %>%
+    dplyr::summarise(
+      age = sum(!is.na(age) & age > 0),
+      length = sum(!is.na(length) & length > 0),
+      weight = sum(!is.na(weight) & weight > 0),
+      maturity = sum(!is.na(maturity_code) & maturity_code > 0)
+    ) %>% dplyr::ungroup()
+
+  all_years <- expand.grid(year = seq(min(dbio$year), max(dbio$year), 1),
+    species_common_name = unique(dbio$species_common_name),
+    stringsAsFactors = FALSE)
+
+  out <- dplyr::left_join(all_years, out, by = c("year", "species_common_name"))
+
+  out <- reshape2::melt(out,
+    id.vars = c("species_common_name", "year"),
+    variable.name = "type", value.name = "n") %>%
+    dplyr::as_tibble()
+  out$n[is.na(out$n)] <- 0
+  out
 }
 
 
@@ -35,13 +77,18 @@ prep_pbs_samples <- function() {
 #' d$n[10] <- 0 # example zero
 #' plot_samples(d)
 #'
+#' \dontrun{
+#' x <- prep_pbs_samples(year_range = c(1996, 2016))
+#' x <- dplyr::filter(x, species_common_name == "abyssal skate")
+#' plot_samples(x)
+#' }
 #' @export
 
 plot_samples <- function(dat) {
 
   dat$n_plot <- log(dat$n + 1)
   dat$n_text <- round_nice(dat$n)
-  dat$type <- paste("#", firstup(dat$type))
+  dat$type <- paste("#", firstup(as.character(dat$type)))
 
   ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90", width = 1.5) +
