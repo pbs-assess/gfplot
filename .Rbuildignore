@@ -25,3 +25,4 @@
 ^generated-data$
 ^data-cache$
 ^inst/stan/*\.rds$
+^\.travis\.yml$
