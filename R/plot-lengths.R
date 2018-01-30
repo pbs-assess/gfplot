@@ -1,11 +1,17 @@
 plot_lengths <- function() {
-  dbio <- readRDS("data-cache/all-survey-bio.rds")
-  dbio <- filter(dbio, survey_series_desc %in% c(
+
+  survs <- c(
     "West Coast Haida Gwaii Synoptic Survey",
-    "Queen Charlotte Sound Synoptic Survey",
     "Hecate Strait Synoptic Survey",
-    "West Coast Vancouver Island Synoptic Survey"
-  ))
+    "Queen Charlotte Sound Synoptic Survey",
+    "West Coast Vancouver Island Synoptic Survey",
+    "IPHC Longline Survey",
+    "IRF Longline Survey (South)",
+    "IRF Longline Survey (North)")
+
+  dbio <- readRDS("data-cache/all-survey-bio.rds")
+
+  dbio <- filter(dbio, survey_series_desc %in% survs)
   dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
   dbio <- dbio %>%
     select(species_common_name, .data$species_science_name,
@@ -21,7 +27,7 @@ plot_lengths <- function() {
   dbio <- dbio[!(dbio$length < 10 & dbio$weight/1000 > 1.0 &
       dbio$species_common_name == "pacific flatnose"), ]
 
-  dat <- filter(dbio, species_common_name == "pacific ocean perch")
+  dat <- filter(dbio, species_common_name == "walleye pollock")
 
   #
   #
@@ -35,11 +41,7 @@ plot_lengths <- function() {
   #   filter(species_common_name %in% "pacific ocean perch")
   #
   #
-  survs <- c(
-    "West Coast Haida Gwaii Synoptic Survey",
-    "Hecate Strait Synoptic Survey",
-    "Queen Charlotte Sound Synoptic Survey",
-    "West Coast Vancouver Island Synoptic Survey")
+
   #
   # out <- purrr::map_df(survs, function(x) {
   #   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
@@ -61,28 +63,32 @@ plot_lengths <- function() {
   #
 
 
-  lengths <- seq(0, 90, 2)
+  lengths <- seq(0, 300, 2)
 
-  su <- dplyr::tibble(survey = c("WCHG", "HS", "QCS", "WCVI"),
+  su <- dplyr::tibble(survey = c("WCHG", "HS", "QCS", "WCVI", "IPHC", "IRF LL (S)", "IRF LL (N)"),
     survey_series_desc = survs)
 
-  dat %>% inner_join(su, by = "survey_series_desc") %>%
+  dd <- dat %>% full_join(su, by = "survey_series_desc") %>%
     filter(!is.na(length)) %>%
     mutate(length = lengths[findInterval(length, lengths)]) %>%
     group_by(year, sex, survey, length) %>%
     summarise(n = n()) %>%
+    filter(n >= 5) %>%
     group_by(year, survey) %>%
-    mutate(n = n / max(n)) %>%
+    mutate(total = sum(n), n = n / max(n)) %>%
     mutate(sex = ifelse(sex == 1, "M", "F")) %>%
-    ungroup() %>%
+    ungroup()
 
-    # plot_lengths <- function()
-    ggplot(aes_string("length", "n")) +
+  counts <- select(dd, total, year, survey) %>% unique()
+
+  # plot_lengths <- function()
+  ggplot(dd, aes_string("length", "n")) +
     ggplot2::geom_col(width = 2, aes_string(colour = "sex",
       fill = "sex"),
       position = ggplot2::position_identity()) +
-    ggplot2::facet_grid(forcats::fct_rev(as.character(year))~forcats::fct_relevel(survey,
-      su$survey), switch = "y") +
+    ggplot2::facet_grid(forcats::fct_rev(as.character(year))~
+        forcats::fct_relevel(survey,
+          su$survey), switch = "y") +
     theme_pbs() +
     scale_fill_manual(values = c("M" = "grey90", "F" = "#FF000010")) +
     scale_colour_manual(values = c("M" = "grey50", "F" = "red")) +
@@ -92,5 +98,9 @@ plot_lengths <- function() {
     xlab("Length (cm)") +
     ylab("") +
     theme(axis.text.y = ggplot2::element_blank(),
-      axis.ticks.y = ggplot2::element_blank())
+      axis.ticks.y = ggplot2::element_blank()) +
+    labs(colour = "Sex", fill = "Sex") +
+    geom_text(data = counts, x = max(dd$length) * 0.05, y = 0.8,
+      aes_string(label = "total"),
+      inherit.aes = FALSE, colour = "grey50", size = 2.75, hjust = 0)
 }
