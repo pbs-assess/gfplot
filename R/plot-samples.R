@@ -101,5 +101,7 @@ plot_samples <- function(dat) {
       axis.ticks.x = element_blank(),
       axis.ticks.y = element_blank()) +
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
-    geom_text(aes_string(x = "year - 0.25", label = "n_text"), colour = "white")
+    geom_text(aes_string(x = "year - 0.25", label = "n_text"), colour = "white",
+      size = 2.5, alpha = 0.8) +
+    scale_y_discrete(position = "right")
 }

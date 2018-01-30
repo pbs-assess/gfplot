@@ -21,7 +21,7 @@ mround <- function(x, base){
 #'
 
 prep_pbs_bioindex <- function(d,
-  species = "lingcod",
+  species,
   surveys = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -127,11 +127,13 @@ plot_bioindex <- function(d, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)]
     ylim(-0.03, NA) +
     coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5)) +
     xlab("") +
-    ylab("") +
-    theme(axis.text.y = ggplot2::element_blank(),
-      axis.ticks.y = ggplot2::element_blank(),
+    ylab("Relative biomass") +
+    theme(
+      axis.text.y = ggplot2::element_text(colour = "white"),
+      # axis.ticks.y = ggplot2::element_blank(),
       strip.background = element_blank(),
       strip.text.x = element_blank()) +
+    scale_y_continuous(breaks = 0) +
     labs(title = title) +
     geom_text(data = labs, x = yrs[1] + 0.5, y = 0.88,
       aes_string(label = "survey_name"),

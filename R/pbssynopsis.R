@@ -1,4 +1,4 @@
-#' \pkg{PBSsynopsis} package
+#' PBSsynopsis package
 #'
 #' PBS Synopsis Report package
 #'
@@ -6,7 +6,7 @@
 #' \href{https://github.com/seananderson/pbs-synopsis#readme}{GitHub}
 #'
 #' @docType package
-#' @name pbssynopsis
+#' @name PBSsynopsis
 #' @importFrom dplyr filter mutate summarise select group_by n arrange ungroup
 #' @importFrom dplyr inner_join left_join right_join anti_join full_join
 #' @importFrom dplyr bind_rows case_when pull contains tibble
@@ -15,7 +15,7 @@
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_vline scale_fill_manual
 #'   scale_colour_manual scale_x_continuous scale_size_area coord_cartesian
 #'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
-#'   geom_text scale_fill_continuous geom_line labs
+#'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
 
 # from: https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
 # quiets concerns of R CMD check re: the .'s that appear in pipelines

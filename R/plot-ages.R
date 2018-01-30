@@ -1,6 +1,6 @@
 #' Prepare PBS age data for \code{\link{plot_ages}}
 #'
-#' @param species_common_name A species common name
+#' @param spp A species common name
 #' @param path A path to cached data
 #' @param survey_series_desc A character vector of survey series to include
 #' @param survey A character vector of shorter/cleaner survey names to use in
@@ -14,13 +14,16 @@
 #' prep_pbs_ages("canary rockfish")
 #' }
 
-prep_pbs_ages <- function(species_common_name, path = "data-cache",
+prep_pbs_ages <- function(spp, path = "data-cache",
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
     "Queen Charlotte Sound Synoptic Survey",
-    "West Coast Vancouver Island Synoptic Survey"),
-  survey = c("WCHG", "HS", "QCS", "WCVI")) {
+    "West Coast Vancouver Island Synoptic Survey",
+    "PHMA Rockfish Longline Survey - Outside North",
+    "PHMA Rockfish Longline Survey - Outside South",
+    "IPHC Longline Survey"),
+  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA N", "PHMA S", "IPHC")) {
 
   dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
   dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)
@@ -51,7 +54,7 @@ prep_pbs_ages <- function(species_common_name, path = "data-cache",
     mutate(n_ages = n()) %>%
     ungroup()
 
-  d <- dplyr::filter(dbio_ages, species_common_name == species_common_name,
+  d <- dplyr::filter(dbio_ages, species_common_name == spp,
     !is.na(age))
   ds <- d %>% mutate(sex = ifelse(sex == 2, "F", "M"))
 
@@ -69,6 +72,7 @@ prep_pbs_ages <- function(species_common_name, path = "data-cache",
 
   ds <- full_join(ds, all_surveys, by = "survey") %>%
     select(-survey_series_desc)
+  ds$survey <- factor(ds$survey, levels = survey)
   ds
 }
 
@@ -108,6 +112,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     mutate(n_scaled = n / max(n)) %>%
     ungroup()
 
+  dat$sex[is.na(dat$sex)] <- "F" # just for legend
+
   ggplot(dat, aes_string("year", "age")) +
     geom_vline(xintercept = seq(year_min, year_max, 1), col = "grey92", lwd = 0.4) +
     geom_hline(yintercept = seq(0, age_max, 10), col = "grey92",
@@ -124,8 +130,9 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     coord_cartesian(
       xlim = c(year_min, year_max) + c(-0.5 - sex_gap/2, 0.5 + sex_gap/2),
       ylim = c(0, age_max + 1), expand = FALSE) +
-    guides(colour = FALSE, size = FALSE, fill = FALSE) +
+    # guides(colour = FALSE, size = FALSE, fill = FALSE) +
+    guides(size = FALSE) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-    labs(title = "Age frequencies")
+    labs(title = "Age frequencies", colour = "Sex", fill = "Sex")
 }

@@ -6,8 +6,8 @@ plot_lengths <- function() {
     "Queen Charlotte Sound Synoptic Survey",
     "West Coast Vancouver Island Synoptic Survey",
     "IPHC Longline Survey",
-    "IRF Longline Survey (South)",
-    "IRF Longline Survey (North)")
+    "PHMA Rockfish Longline Survey - Outside North",
+    "PHMA Rockfish Longline Survey - Outside South")
 
   dbio <- readRDS("data-cache/all-survey-bio.rds")
 
@@ -27,7 +27,7 @@ plot_lengths <- function() {
   dbio <- dbio[!(dbio$length < 10 & dbio$weight/1000 > 1.0 &
       dbio$species_common_name == "pacific flatnose"), ]
 
-  dat <- filter(dbio, species_common_name == "walleye pollock",
+  dat <- filter(dbio, species_common_name == "pacific ocean perch",
     !is.na(length), !is.na(sex))
 
   #
@@ -63,21 +63,23 @@ plot_lengths <- function() {
   #   coord_cartesian(expand = FALSE)
   #
 
-  bin_size = diff(stats::quantile(dat$length, probs = c(.05, .95)))[[1]]/15
+  bin_size <- diff(stats::quantile(dat$length, probs = c(.05, .95)))[[1]]/15
   lengths <- seq(0, 300, bin_size)
 
-  surveys <- c("WCHG", "HS", "QCS", "WCVI", "IPHC", "IRF LL (S)", "IRF LL (N)")
+  surveys <- c("WCHG", "HS", "QCS", "WCVI", "IPHC", "PHMA LL (N)", "PHMA LL (S)")
   su <- dplyr::tibble(survey = surveys,
     survey_series_desc = survs)
   all <- expand.grid(survey = surveys, year = seq(min(dat$year), max(dat$year)),
     stringsAsFactors = FALSE)
 
-  dd <- dat %>% left_join(su, by = "survey_series_desc") %>%
+  dd <- dat %>% ungroup() %>%
+    left_join(su, by = "survey_series_desc") %>%
     filter(!is.na(length)) %>%
     mutate(length = lengths[findInterval(.data$length, lengths)]) %>%
     group_by(.data$year, .data$sex, .data$survey, .data$length) %>%
     summarise(n = n()) %>%
     filter(.data$n >= 5) %>%
+    ungroup() %>%
     group_by(.data$year, .data$survey) %>%
     mutate(total = sum(.data$n), proportion = .data$n / max(.data$n)) %>%
     mutate(sex = ifelse(.data$sex == 1, "M", "F")) %>%
@@ -94,17 +96,18 @@ plot_lengths <- function() {
       position = ggplot2::position_identity()) +
     ggplot2::facet_grid(forcats::fct_rev(as.character(year))~
         forcats::fct_relevel(survey,
-          su$survey), switch = "y") +
+          su$survey)) + # , switch = "y") +
     theme_pbs() +
     scale_fill_manual(values = c("M" = "grey80", "F" = "#FF000001")) +
     scale_colour_manual(values = c("M" = "grey40", "F" = "red")) +
-    theme(panel.spacing = unit(-0.1, "lines")) +
-    ylim(0, NA) +
+    # theme() +
     coord_cartesian(expand = FALSE) +
     xlab("Length (cm)") +
-    ylab("") +
-    theme(axis.text.y = ggplot2::element_blank(),
-      axis.ticks.y = ggplot2::element_blank()) +
+    ylab("Relative length frequency") +
+    ylim(0, NA) +
+    ggplot2::scale_y_continuous(breaks = c(0)) +
+    # theme(axis.text.y = ggplot2::element_blank(),
+    #   axis.ticks.y = ggplot2::element_blank()) +
     labs(colour = "Sex", fill = "Sex") +
     geom_text(data = counts, x = max(dd$length, na.rm = TRUE) * 0.95, y = 0.8,
       aes_string(label = "total"),
