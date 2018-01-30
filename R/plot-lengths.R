@@ -83,7 +83,7 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
 
   dd$sex[is.na(dd$sex)] <- "M"
 
-  x_breaks <- pretty(dd$length_bin)
+  x_breaks <- pretty(dd$length_bin, 4)
   N <- length(x_breaks)
   x_breaks <- x_breaks[seq(1, N - 1)]
   range_lengths <- diff(range(dd$length_bin, na.rm = TRUE))
@@ -103,7 +103,7 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
     ggplot2::scale_x_continuous(breaks = x_breaks) +
     xlab("Length (cm)") +
     ylab("Relative length frequency") +
-    ylim(0, 1.1) +
+    ylim(-0.06, 1.1) +
     theme(
       axis.text.y = ggplot2::element_text(colour = "white"),
       axis.ticks.y = ggplot2::element_line(colour = "white")) +
@@ -111,8 +111,9 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
     geom_text(data = counts,
       x = min(dd$length_bin, na.rm = TRUE) + 0.02 * range_lengths, y = 0.8,
       aes_string(label = "total"),
-      inherit.aes = FALSE, colour = "grey50", size = 2.5, hjust = 0) +
-    labs(title = "Length frequencies")
+      inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0) +
+    labs(title = "Length frequencies") +
+    theme(panel.grid.major.x = ggplot2::element_line(colour = "grey92"))
 }
 
 

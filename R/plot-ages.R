@@ -105,17 +105,21 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   year_max <- max(dat$year, na.rm = TRUE)
   age_max <- max(dat$age, na.rm = TRUE)
 
-  dat <- dat %>% mutate(year = ifelse(sex == "M",
+  dat <- dat %>% mutate(year_jitter = ifelse(sex == "M",
     year + sex_gap/2, year - sex_gap/2)) %>%
-    group_by(year, age, sex, survey) %>%
+    group_by(year, .data$year_jitter, age, sex, survey) %>%
     summarise(n = n()) %>%
     group_by(year, survey) %>%
-    mutate(n_scaled = n / max(n)) %>%
+    mutate(n_scaled = n / max(n), total = sum(n)) %>%
     ungroup()
 
-  dat$sex[is.na(dat$sex)] <- "F" # just for legend
+  counts <- select(dat, .data$total, .data$year,
+    .data$survey) %>% unique()
 
-  ggplot(dat, aes_string("year", "age")) +
+  dat$sex[is.na(dat$sex)] <- "F" # just for legend
+  age_range <- diff(range(dat$age, na.rm = TRUE))
+
+  ggplot(dat, aes_string("year_jitter", "age")) +
     geom_vline(xintercept = seq(year_min, year_max, 1), col = "grey92", lwd = 0.4) +
     geom_hline(yintercept = seq(0, age_max, 10), col = "grey92",
       lwd = 0.4) +
@@ -130,9 +134,12 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     scale_size_area(max_size = max_size) +
     coord_cartesian(
       xlim = c(year_min, year_max) + c(-0.5 - sex_gap/2, 0.5 + sex_gap/2),
-      ylim = c(0, age_max + 1), expand = FALSE) +
+      ylim = c(0, age_max + 0.02 * age_range), expand = FALSE) +
     guides(size = FALSE) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    geom_text(data = counts, y = age_max + 0.005 * age_range,
+      aes_string(x = "year", label = "total"),
+      inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 1, angle = 90) +
     labs(title = "Age frequencies", colour = "Sex", fill = "Sex")
 }
