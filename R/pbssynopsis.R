@@ -61,6 +61,7 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(
   "n_spp",
   "sex",
   "survey",
-  "variable"
+  "variable",
+  "survey_series_desc"
 
   ))
