@@ -5,7 +5,7 @@
 \title{Plot age frequencies with bubble plots}
 \usage{
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)")
+  ylab = "Age (years)", year_range = NULL)
 }
 \arguments{
 \item{dat}{A properly formatted data frame. For example, from
@@ -21,6 +21,8 @@ any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
 \item{year_increment}{Increment between year labels on x-axis}
 
 \item{ylab}{Y-axis label}
+
+\item{year_range}{TODO}
 }
 \description{
 Plot age frequencies with bubble plots

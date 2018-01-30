@@ -10,7 +10,8 @@ prep_pbs_ages(dat,
   "West Coast Vancouver Island Synoptic Survey",
   "PHMA Rockfish Longline Survey - Outside North",
   "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
-  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA N", "PHMA S", "IPHC"))
+  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
+  "IPHC"))
 }
 \arguments{
 \item{dat}{TODO}

@@ -20,5 +20,8 @@ Prepare PBS samples data for \code{\link{plot_samples}}
 \dontrun{
 d <- get_pbs_survsamples("lingcod")
 prep_pbs_samples(d)
+
+d <- get_pbs_commsamples("lingcod")
+prep_pbs_samples(d)
 }
 }

@@ -13,11 +13,10 @@ prep_pbs_bioindex(dat, surveys = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Multispecies Assemblage Survey", "IPHC Longline Survey"),
   survey_names = c("West Coast Haida Gwaii Synoptic",
   "Hecate Strait Synoptic", "Queen Charlotte Sound Synoptic",
-  "West Coast Vancouver Island Synoptic",
-  "PHMA Rockfish Longline - Outside North",
-  "PHMA Rockfish Longline - Outside South", "IRF Longline Survey North",
-  "IRF Longline Survey South", "Hecate Strait Multispecies Assemblage",
-  "IPHC Longline"), min_years = 3, year_range = NULL)
+  "West Coast Vancouver Island Synoptic", "PHMA Rockfish LL - North",
+  "PHMA Rockfish LL - South", "IRF LL Survey North", "IRF LL Survey South",
+  "Hecate Strait Multispecies Assemblage", "IPHC Longline"), min_years = 3,
+  year_range = NULL)
 }
 \arguments{
 \item{dat}{TODO}
