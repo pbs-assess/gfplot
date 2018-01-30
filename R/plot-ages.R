@@ -126,5 +126,6 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       ylim = c(0, age_max + 1), expand = FALSE) +
     guides(colour = FALSE, size = FALSE, fill = FALSE) +
     theme_pbs() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    labs(title = "Age frequencies")
 }

@@ -34,6 +34,7 @@ theme_pbs <- function(base_size = 11, base_family = "") {
       legend.key.size = unit(0.9, "lines"),
       legend.text = element_text(size = rel(0.7), colour = "grey30"),
       legend.key = element_rect(colour = NA, fill = NA),
-      legend.background = element_rect(colour = NA, fill = NA)
+      legend.background = element_rect(colour = NA, fill = NA),
+      plot.title = element_text(colour = "grey10", size = rel(1))
     )
 }

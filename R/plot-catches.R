@@ -112,7 +112,8 @@ plot_catch <- function(dat,
     coord_cartesian(xlim = range(dat$year) + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
     ggplot2::theme(legend.position = "top") +
-    ggplot2::labs(fill = "", colour = "")
+    ggplot2::labs(fill = "", colour = "") +
+    labs(title = "Commercial catch")
 
   g
 }
