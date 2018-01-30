@@ -127,7 +127,7 @@ plot_bioindex <- function(dat, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7
     ylab("Relative biomass") +
     theme(
       axis.text.y = ggplot2::element_text(colour = "white"),
-      axis.ticks.y = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_line(colour = "white"),
       strip.background = element_blank(),
       strip.text.x = element_blank()) +
     labs(title = title) +

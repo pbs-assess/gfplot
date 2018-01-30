@@ -8,7 +8,10 @@
 #' TODO
 #'
 #' @param dat TODO
-plot_lengths <- function(dat) {
+#' @param n_bins TODO
+#' @param bin_size TODO
+#' @param min_specimens TODO
+plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L) {
 
   survs <- c(
     "West Coast Haida Gwaii Synoptic Survey",
@@ -19,29 +22,24 @@ plot_lengths <- function(dat) {
     "PHMA Rockfish Longline Survey - Outside North",
     "PHMA Rockfish Longline Survey - Outside South")
 
-  dbio <- dat
-
-  dbio <- filter(dbio, survey_series_desc %in% survs)
-  dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
-  dbio <- dbio %>%
+  dat <- filter(dat, survey_series_desc %in% survs)
+  dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
+  dat <- dat %>%
     select(species_common_name, .data$species_science_name,
+      .data$sample_id,
       .data$year, .data$age, .data$length, .data$weight,
       .data$maturity_code, .data$sex, .data$survey_series_desc)
 
   # bad data:
-  dbio <- dbio[!(dbio$length > 600 & dbio$species_common_name == "north pacific spiny dogfish"), ]
-  dbio <- dbio[!(dbio$length > 600 & dbio$species_common_name == "big skate"), ]
-  dbio <- dbio[!(dbio$length > 600 & dbio$species_common_name == "longnose skate"), ]
-  dbio <- dbio[!(dbio$length > 60 & dbio$species_common_name == "pacific tomcod"), ]
-  dbio <- dbio[!(dbio$length > 50 & dbio$species_common_name == "quillback rockfish"), ]
-  dbio <- dbio[!(dbio$length < 10 & dbio$weight/1000 > 1.0 &
-      dbio$species_common_name == "pacific flatnose"), ]
+  dat <- dat[!(dat$length > 600 & dat$species_common_name == "north pacific spiny dogfish"), ]
+  dat <- dat[!(dat$length > 600 & dat$species_common_name == "big skate"), ]
+  dat <- dat[!(dat$length > 600 & dat$species_common_name == "longnose skate"), ]
+  dat <- dat[!(dat$length > 60 & dat$species_common_name == "pacific tomcod"), ]
+  dat <- dat[!(dat$length > 50 & dat$species_common_name == "quillback rockfish"), ]
+  dat <- dat[!(dat$length < 10 & dat$weight/1000 > 1.0 &
+      dat$species_common_name == "pacific flatnose"), ]
 
-  dat <- filter(dbio, species_common_name == "pacific ocean perch",
-    !is.na(length), !is.na(sex))
-
-  bin_size <- diff(stats::quantile(dat$length, probs = c(.05, .95)))[[1]]/15
-  lengths <- seq(0, 300, bin_size)
+  dat <- filter(dat, !is.na(length), !is.na(sex))
 
   surveys <- c("WCHG", "HS", "QCS", "WCVI", "IPHC", "PHMA LL (N)", "PHMA LL (S)")
   su <- dplyr::tibble(survey = surveys,
@@ -49,46 +47,71 @@ plot_lengths <- function(dat) {
   all <- expand.grid(survey = surveys, year = seq(min(dat$year), max(dat$year)),
     stringsAsFactors = FALSE)
 
-  dd <- dat %>% ungroup() %>%
+  surv_year_counts <- dat %>%
     left_join(su, by = "survey_series_desc") %>%
-    filter(!is.na(length)) %>%
-    mutate(length = lengths[findInterval(.data$length, lengths)]) %>%
-    group_by(.data$year, .data$sex, .data$survey, .data$length) %>%
-    summarise(n = n()) %>%
-    filter(.data$n >= 5) %>%
-    ungroup() %>%
     group_by(.data$year, .data$survey) %>%
-    mutate(total = sum(.data$n), proportion = .data$n / max(.data$n)) %>%
-    mutate(sex = ifelse(.data$sex == 1, "M", "F")) %>%
+    summarise(total = n(), max_length = max(.data$length)) %>%
     ungroup() %>%
     full_join(all, by = c("year", "survey"))
+
+  counts <- select(surv_year_counts, .data$total, .data$year,
+    .data$survey, .data$max_length) %>% unique()
+
+  max_length <- filter(counts, .data$total >= min_specimens) %>%
+    dplyr::pull(.data$max_length) %>% max()
+
+  if (is.null(bin_size)) {
+    lengths <- seq(0, max_length + 0.1, length.out = n_bins)
+  } else {
+    lengths <- seq(0, max_length + 0.1, bin_size)
+  }
+
+  dd <- dat %>%
+    left_join(su, by = "survey_series_desc") %>%
+    mutate(length_bin = lengths[findInterval(.data$length, lengths)]) %>%
+    group_by(.data$year, .data$survey, .data$length_bin, .data$sex) %>%
+    summarise(n = n()) %>%
+    ungroup() %>%
+    group_by(.data$year, .data$survey) %>%
+    mutate(max_n = max(.data$n)) %>%
+    ungroup() %>%
+    mutate(proportion = .data$n/.data$max_n) %>%
+    mutate(sex = ifelse(.data$sex == 1, "M", "F")) %>%
+    full_join(all, by = c("year", "survey")) %>%
+    left_join(counts, by = c("year", "survey")) %>%
+    mutate(proportion = ifelse(.data$total >= min_specimens, .data$proportion, NA))
+
   dd$sex[is.na(dd$sex)] <- "M"
 
-  counts <- select(dd, .data$total, .data$year, .data$survey) %>% unique()
+  x_breaks <- pretty(dd$length_bin)
+  N <- length(x_breaks)
+  x_breaks <- x_breaks[seq(1, N - 1)]
+  range_lengths <- diff(range(dd$length_bin, na.rm = TRUE))
 
   # plot_lengths <- function()
-  ggplot(dd, aes_string("length", "proportion")) +
+  ggplot(dd, aes_string("length_bin", "proportion")) +
     ggplot2::geom_col(width = bin_size, aes_string(colour = "sex",
       fill = "sex"), size = 0.3,
       position = ggplot2::position_identity()) +
     ggplot2::facet_grid(forcats::fct_rev(as.character(year))~
         forcats::fct_relevel(survey,
-          su$survey)) + # , switch = "y") +
+          su$survey)) +
     theme_pbs() +
-    scale_fill_manual(values = c("M" = "grey80", "F" = "#FF000001")) +
+    scale_fill_manual(values = c("M" = "grey80", "F" = "#FF000010")) +
     scale_colour_manual(values = c("M" = "grey40", "F" = "red")) +
-    # theme() +
     coord_cartesian(expand = FALSE) +
+    ggplot2::scale_x_continuous(breaks = x_breaks) +
     xlab("Length (cm)") +
     ylab("Relative length frequency") +
-    ylim(0, NA) +
-    # ggplot2::scale_y_continuous(breaks = c(0)) +
-    theme(axis.text.y = ggplot2::element_blank(),
-      axis.ticks.y = ggplot2::element_blank()) +
+    ylim(0, 1.1) +
+    theme(
+      axis.text.y = ggplot2::element_text(colour = "white"),
+      axis.ticks.y = ggplot2::element_line(colour = "white")) +
     labs(colour = "Sex", fill = "Sex") +
-    geom_text(data = counts, x = max(dd$length, na.rm = TRUE) * 0.95, y = 0.8,
+    geom_text(data = counts,
+      x = min(dd$length_bin, na.rm = TRUE) + 0.02 * range_lengths, y = 0.8,
       aes_string(label = "total"),
-      inherit.aes = FALSE, colour = "grey50", size = 2.75, hjust = 1) +
+      inherit.aes = FALSE, colour = "grey50", size = 2.5, hjust = 0) +
     labs(title = "Length frequencies")
 }
 

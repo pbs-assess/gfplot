@@ -1,32 +1,41 @@
 library("PBSsynopsis")
 library("tidyverse")
 
-spp <- "pacific ocean perch"
-
 d_index <- readRDS("data-cache/all-boot-biomass-indices.rds")
 d_surv_samp <- readRDS("data-cache/all-survey-bio.rds")
 d_catch <- readRDS("data-cache/all-catches.rds")
 
-filter(d_index, species_common_name == spp) %>%
+# filter(d_surv_samp, survey_series_desc=="PHMA Rockfish Longline Survey - Outside South", !is.na(length)) %>% pull(species_common_name) %>% table %>% sort() %>% rev()
+#
+# filter(d_surv_samp, survey_series_desc=="IRF Longline Survey (North)", !is.na(length)) %>% pull(species_common_name) %>% table %>% sort() %>% rev()
+#
+# filter(d_surv_samp, survey_series_desc=="IPHC Longline Survey", !is.na(length)) %>% pull(species_common_name) %>% table %>% sort() %>% rev()
+
+
+
+spp <- "yelloweye rockfish"
+
+g <- filter(d_index, species_common_name == spp) %>%
   prep_pbs_bioindex() %>%
   plot_bioindex()
-ggplot2::ggsave("report/bioindex.pdf", width = 5, height = 5)
+ggsave("report/bioindex.pdf", width = 5, height = 5)
 
-filter(d_surv_samp, species_common_name == spp) %>%
+g <- filter(d_surv_samp, species_common_name == spp) %>%
   prep_pbs_ages() %>%
   plot_ages(max_size = 3.7, sex_gap = 0.25)
-ggplot2::ggsave("report/ages.pdf", width = 13, height = 5)
+ggsave("report/ages.pdf", width = 13, height = 5)
 
 # TODO:
-plot_lengths(d_surv_samp)
-ggplot2::ggsave("report/lengths.pdf", width = 9, height = 6)
+g <- filter(d_surv_samp, species_common_name == spp) %>%
+  plot_lengths(n_bins = 25)
+ggsave("report/lengths.pdf", width = 8, height = 6)
 
-filter(d_catch, species_common_name == spp) %>%
+g <- filter(d_catch, species_common_name == spp) %>%
   prep_pbs_catch() %>%
   plot_catch()
-ggplot2::ggsave("report/catch.pdf", width = 6, height = 2)
+ggsave("report/catch.pdf", width = 6, height = 2)
 
-filter(d_surv_samp, species_common_name == spp) %>%
+g <- filter(d_surv_samp, species_common_name == spp) %>%
   prep_pbs_samples(year_range = c(1996, 2016)) %>%
-  plot_samples(x)
-ggplot2::ggsave("report/samples.pdf", width = 6, height = 1.5)
+  plot_samples()
+ggsave("report/samples.pdf", width = 6, height = 1.5)

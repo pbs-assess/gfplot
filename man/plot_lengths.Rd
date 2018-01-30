@@ -4,10 +4,16 @@
 \alias{plot_lengths}
 \title{TODO}
 \usage{
-plot_lengths(dat)
+plot_lengths(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
 }
 \arguments{
 \item{dat}{TODO}
+
+\item{n_bins}{TODO}
+
+\item{bin_size}{TODO}
+
+\item{min_specimens}{TODO}
 }
 \description{
 TODO
