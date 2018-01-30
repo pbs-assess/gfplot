@@ -63,7 +63,7 @@ plot_lengths <- function() {
   #   coord_cartesian(expand = FALSE)
   #
 
-  bin_size = diff(quantile(dat$length, probs = c(.05, .95)))[[1]]/15
+  bin_size = diff(stats::quantile(dat$length, probs = c(.05, .95)))[[1]]/15
   lengths <- seq(0, 300, bin_size)
 
   surveys <- c("WCHG", "HS", "QCS", "WCVI", "IPHC", "IRF LL (S)", "IRF LL (N)")
@@ -74,18 +74,18 @@ plot_lengths <- function() {
 
   dd <- dat %>% left_join(su, by = "survey_series_desc") %>%
     filter(!is.na(length)) %>%
-    mutate(length = lengths[findInterval(length, lengths)]) %>%
-    group_by(year, sex, survey, length) %>%
+    mutate(length = lengths[findInterval(.data$length, lengths)]) %>%
+    group_by(.data$year, .data$sex, .data$survey, .data$length) %>%
     summarise(n = n()) %>%
-    filter(n >= 5) %>%
-    group_by(year, survey) %>%
-    mutate(total = sum(n), proportion = n / max(n)) %>%
-    mutate(sex = ifelse(sex == 1, "M", "F")) %>%
+    filter(.data$n >= 5) %>%
+    group_by(.data$year, .data$survey) %>%
+    mutate(total = sum(.data$n), proportion = .data$n / max(.data$n)) %>%
+    mutate(sex = ifelse(.data$sex == 1, "M", "F")) %>%
     ungroup() %>%
     full_join(all, by = c("year", "survey"))
   dd$sex[is.na(dd$sex)] <- "M"
 
-  counts <- select(dd, total, year, survey) %>% unique()
+  counts <- select(dd, .data$total, .data$year, .data$survey) %>% unique()
 
   # plot_lengths <- function()
   ggplot(dd, aes_string("length", "proportion")) +
