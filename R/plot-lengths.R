@@ -27,7 +27,8 @@ plot_lengths <- function() {
   dbio <- dbio[!(dbio$length < 10 & dbio$weight/1000 > 1.0 &
       dbio$species_common_name == "pacific flatnose"), ]
 
-  dat <- filter(dbio, species_common_name == "walleye pollock")
+  dat <- filter(dbio, species_common_name == "walleye pollock",
+    !is.na(length), !is.na(sex))
 
   #
   #
@@ -62,37 +63,42 @@ plot_lengths <- function() {
   #   coord_cartesian(expand = FALSE)
   #
 
+  bin_size = diff(quantile(dat$length, probs = c(.05, .95)))[[1]]/15
+  lengths <- seq(0, 300, bin_size)
 
-  lengths <- seq(0, 300, 2)
-
-  su <- dplyr::tibble(survey = c("WCHG", "HS", "QCS", "WCVI", "IPHC", "IRF LL (S)", "IRF LL (N)"),
+  surveys <- c("WCHG", "HS", "QCS", "WCVI", "IPHC", "IRF LL (S)", "IRF LL (N)")
+  su <- dplyr::tibble(survey = surveys,
     survey_series_desc = survs)
+  all <- expand.grid(survey = surveys, year = seq(min(dat$year), max(dat$year)),
+    stringsAsFactors = FALSE)
 
-  dd <- dat %>% full_join(su, by = "survey_series_desc") %>%
+  dd <- dat %>% left_join(su, by = "survey_series_desc") %>%
     filter(!is.na(length)) %>%
     mutate(length = lengths[findInterval(length, lengths)]) %>%
     group_by(year, sex, survey, length) %>%
     summarise(n = n()) %>%
     filter(n >= 5) %>%
     group_by(year, survey) %>%
-    mutate(total = sum(n), n = n / max(n)) %>%
+    mutate(total = sum(n), proportion = n / max(n)) %>%
     mutate(sex = ifelse(sex == 1, "M", "F")) %>%
-    ungroup()
+    ungroup() %>%
+    full_join(all, by = c("year", "survey"))
+  dd$sex[is.na(dd$sex)] <- "M"
 
   counts <- select(dd, total, year, survey) %>% unique()
 
   # plot_lengths <- function()
-  ggplot(dd, aes_string("length", "n")) +
-    ggplot2::geom_col(width = 2, aes_string(colour = "sex",
-      fill = "sex"),
+  ggplot(dd, aes_string("length", "proportion")) +
+    ggplot2::geom_col(width = bin_size, aes_string(colour = "sex",
+      fill = "sex"), size = 0.3,
       position = ggplot2::position_identity()) +
     ggplot2::facet_grid(forcats::fct_rev(as.character(year))~
         forcats::fct_relevel(survey,
           su$survey), switch = "y") +
     theme_pbs() +
-    scale_fill_manual(values = c("M" = "grey90", "F" = "#FF000010")) +
-    scale_colour_manual(values = c("M" = "grey50", "F" = "red")) +
-    theme(panel.spacing = unit(-0.5, "lines")) +
+    scale_fill_manual(values = c("M" = "grey80", "F" = "#FF000001")) +
+    scale_colour_manual(values = c("M" = "grey40", "F" = "red")) +
+    theme(panel.spacing = unit(-0.1, "lines")) +
     ylim(0, NA) +
     coord_cartesian(expand = FALSE) +
     xlab("Length (cm)") +
@@ -100,7 +106,8 @@ plot_lengths <- function() {
     theme(axis.text.y = ggplot2::element_blank(),
       axis.ticks.y = ggplot2::element_blank()) +
     labs(colour = "Sex", fill = "Sex") +
-    geom_text(data = counts, x = max(dd$length) * 0.05, y = 0.8,
+    geom_text(data = counts, x = max(dd$length, na.rm = TRUE) * 0.95, y = 0.8,
       aes_string(label = "total"),
-      inherit.aes = FALSE, colour = "grey50", size = 2.75, hjust = 0)
+      inherit.aes = FALSE, colour = "grey50", size = 2.75, hjust = 1) +
+    labs(title = "Length frequencies")
 }
