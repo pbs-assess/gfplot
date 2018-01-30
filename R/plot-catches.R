@@ -97,7 +97,7 @@ plot_catch <- function(dat,
     for (i in seq_along(unreliable))
       g <- g + ggplot2::annotate("rect",
         xmin = min(dat$year) - 1, xmax = unreliable[[i]], ymin = 0,
-        ymax = max(dat$value / scale_val) * 1.05, alpha = unreliable_alpha,
+        ymax = max(dat$value / scale_val) * 1.5, alpha = unreliable_alpha,
         fill = "black")
   }
 

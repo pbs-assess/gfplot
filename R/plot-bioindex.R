@@ -28,10 +28,10 @@ prep_pbs_bioindex <- function(dat,
     "Hecate Strait Synoptic",
     "Queen Charlotte Sound Synoptic",
     "West Coast Vancouver Island Synoptic",
-    "PHMA Rockfish Longline - Outside North",
-    "PHMA Rockfish Longline - Outside South",
-    "IRF Longline Survey North",
-    "IRF Longline Survey South",
+    "PHMA Rockfish LL - North",
+    "PHMA Rockfish LL - South",
+    "IRF LL Survey North",
+    "IRF LL Survey South",
     "Hecate Strait Multispecies Assemblage",
     "IPHC Longline"),
   min_years = 3, year_range = NULL) {
@@ -98,7 +98,7 @@ prep_pbs_bioindex <- function(dat,
 #' plot_bioindex(d)
 #' }
 
-plot_bioindex <- function(dat, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)],
+plot_bioindex <- function(dat, col = RColorBrewer::brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices") {
 
   d <- dat %>%
@@ -133,6 +133,6 @@ plot_bioindex <- function(dat, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7
     labs(title = title) +
     geom_text(data = labs, x = yrs[1] + 0.5, y = 0.88,
       aes_string(label = "survey_name"),
-      inherit.aes = FALSE, colour = "grey50", size = 2.75, hjust = 0) +
+      inherit.aes = FALSE, colour = "grey30", size = 2.75, hjust = 0) +
     scale_x_continuous(breaks = seq(0, yrs[2], 10))
 }

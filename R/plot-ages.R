@@ -23,7 +23,7 @@ prep_pbs_ages <- function(dat,
     "PHMA Rockfish Longline Survey - Outside North",
     "PHMA Rockfish Longline Survey - Outside South",
     "IPHC Longline Survey"),
-  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA N", "PHMA S", "IPHC")) {
+  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)", "IPHC")) {
 
   dbio <- dat
   # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
@@ -88,6 +88,7 @@ prep_pbs_ages <- function(dat,
 #' @param sex_gap Horizontal gap between male and female bubbles
 #' @param year_increment Increment between year labels on x-axis
 #' @param ylab Y-axis label
+#' @param year_range TODO
 #'
 #' @export
 #'
@@ -99,7 +100,7 @@ prep_pbs_ages <- function(dat,
 #' }
 
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)") {
+  ylab = "Age (years)", year_range = NULL) {
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
@@ -119,8 +120,11 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   dat$sex[is.na(dat$sex)] <- "F" # just for legend
   age_range <- diff(range(dat$age, na.rm = TRUE))
 
+  if (is.null(year_range))
+    year_range <- c(year_min, year_max)
+
   ggplot(dat, aes_string("year_jitter", "age")) +
-    geom_vline(xintercept = seq(year_min, year_max, 1), col = "grey92", lwd = 0.4) +
+    geom_vline(xintercept = seq(year_range[1], year_range[2], 1), col = "grey92", lwd = 0.4) +
     geom_hline(yintercept = seq(0, age_max, 10), col = "grey92",
       lwd = 0.4) +
     geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
@@ -128,14 +132,16 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     facet_wrap(~survey, nrow = 1) +
     scale_fill_manual(values = c("M" = "grey50", "F" = "#f44256")) +
     scale_colour_manual(values = c("M" = "grey50", "F" = "#f44256")) +
-    scale_x_continuous(breaks = seq(year_min, year_max, year_increment)) +
+    scale_x_continuous(
+      breaks = seq(round_down_even(year_range[1]), year_range[2], year_increment)) +
     xlab("") +
     ylab(ylab) +
     scale_size_area(max_size = max_size) +
     coord_cartesian(
-      xlim = c(year_min, year_max) + c(-0.5 - sex_gap/2, 0.5 + sex_gap/2),
+      xlim = year_range + c(-0.5 - sex_gap/2, 0.5 + sex_gap/2),
       ylim = c(0, age_max + 0.02 * age_range), expand = FALSE) +
-    guides(size = FALSE) +
+    guides(size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
+      fill = guide_legend(override.aes = list(size = 3.5))) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     geom_text(data = counts, y = age_max + 0.005 * age_range,

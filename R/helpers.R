@@ -37,3 +37,7 @@ round_nice <- function(x) {
 mround <- function(x, base){
   base * round(x / base)
 }
+
+round_down_even <- function(x, base = 2){
+  base * floor(x / base)
+}

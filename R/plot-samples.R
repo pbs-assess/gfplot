@@ -11,6 +11,9 @@
 #' \dontrun{
 #' d <- get_pbs_survsamples("lingcod")
 #' prep_pbs_samples(d)
+#'
+#' d <- get_pbs_commsamples("lingcod")
+#' prep_pbs_samples(d)
 #' }
 
 prep_pbs_samples <- function(dat, year_range = NULL) {
@@ -47,7 +50,6 @@ prep_pbs_samples <- function(dat, year_range = NULL) {
   out
 }
 
-
 #' Plot sample availability
 #'
 #' @param dat An input data frame from, for example,
@@ -59,7 +61,9 @@ prep_pbs_samples <- function(dat, year_range = NULL) {
 #'   capitalizing the first letter.}
 #'   \item{\code{n}}{The number of samples available for that sample type.}
 #' }
+#' @param year_range TODO
 #' @param title A title for the plot. Use \code{title = ""} to omit.
+#' @param palette TODO
 #'
 #' @examples
 #' d <- expand.grid(year = 1996:2016,
@@ -71,29 +75,49 @@ prep_pbs_samples <- function(dat, year_range = NULL) {
 #' \dontrun{
 #' d <- get_pbs_survsamples("lingcod")
 #' d <- prep_pbs_samples(d, year_range = c(1996, 2016))
-#' plot_samples(d)
+#' plot_samples(d, year_range = c(1996, 2016),
+#'   title = "Survey samples")
+#'
+#' d <- get_pbs_commsamples("lingcod")
+#' d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+#' plot_samples(d, year_range = c(1996, 2016),
+#'   title = "Commercial samples")
 #' }
 #' @export
 
-plot_samples <- function(dat, title = "Survey samples") {
+plot_samples <- function(dat, year_range = NULL, title = "Biological samples",
+  palette = "Greys") {
 
   dat$n_plot <- log(dat$n + 1)
   dat$n_text <- round_nice(dat$n)
   dat$type <- paste("#", firstup(as.character(dat$type)))
 
+  year_min <- min(dat$year, na.rm = TRUE)
+  year_max <- max(dat$year, na.rm = TRUE)
+  if (is.null(year_range))
+    year_range <- c(year_min, year_max)
+
+  all <- expand.grid(
+    type = unique(dat$type),
+    year = seq(year_range[1], year_range[2]),
+    stringsAsFactors = FALSE)
+  dat <- full_join(dat, all, by = c("type", "year"))
+  dat$n_plot[is.na(dat$n_plot)] <- 0
+
   ggplot(dat, aes_string("year", "type")) +
-    ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90", width = 1.5) +
+    ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
     theme_pbs() +
-    coord_cartesian(expand = FALSE, xlim = range(dat$year) + c(-0.75, 0.25)) +
-    ggplot2::scale_fill_distiller(palette = "Greys",
+    coord_cartesian(expand = FALSE, xlim = year_range + c(-0.5, 0.5)) +
+    ggplot2::scale_fill_distiller(palette = palette,
       limits = c(log(1), max(dat$n_plot)), direction = 1) +
-    ggplot2::scale_x_continuous(breaks = seq(min(dat$year), max(dat$year), 2)) +
-    theme(axis.text.x = element_text(hjust = .75),
+    ggplot2::scale_x_continuous(
+      breaks = seq(round_down_even(year_range[1]), year_range[2], 2)) +
+    theme(
       axis.ticks.x = element_blank(),
       axis.ticks.y = element_blank()) +
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
-    geom_text(aes_string(x = "year - 0.25", label = "n_text"), colour = "white",
-      size = 2.5, alpha = 0.8) +
+    geom_text(aes_string(x = "year", label = "n_text"), colour = "white",
+      size = 2.25, alpha = 0.8) +
     ggplot2::scale_y_discrete(position = "right") +
     ggplot2::ggtitle(title)
 }
