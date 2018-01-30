@@ -30,7 +30,8 @@ Plot catches
 }
 \examples{
 \dontrun{
-d <- prep_pbs_catch("canary rockfish")
+d <- get_pbs_catch("lingcod")
+d <- prep_pbs_catch(d)
 plot_catch(d)
 }
 }

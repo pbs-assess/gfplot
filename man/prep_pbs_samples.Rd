@@ -4,10 +4,10 @@
 \alias{prep_pbs_samples}
 \title{Prepare PBS samples data for \code{\link{plot_samples}}}
 \usage{
-prep_pbs_samples(path = "data-cache", year_range = NULL)
+prep_pbs_samples(dat, year_range = NULL)
 }
 \arguments{
-\item{path}{Path to cached data}
+\item{dat}{Input data frame from \code{\link{get_pbs_survsamples}}.}
 
 \item{year_range}{Either \code{NULL}, in which case all years are returned,
 or a numeric vector of length two giving the lower and upper years to
@@ -18,6 +18,7 @@ Prepare PBS samples data for \code{\link{plot_samples}}
 }
 \examples{
 \dontrun{
-x <- prep_pbs_samples(year_range = c(1996, 2016))
+d <- get_pbs_survsamples("lingcod")
+prep_pbs_samples(d)
 }
 }

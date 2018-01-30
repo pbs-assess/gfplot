@@ -1,23 +1,17 @@
-db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
-  DBI::dbConnect(odbc::odbc(), driver = "SQL Server",
-    server = server, database = database)
-}
-
-common2codes <- function(common) {
-  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT * FROM SPECIES")
-  dd <- dplyr::filter(species, SPECIES_COMMON_NAME %in% toupper(common))
-  dd$SPECIES_CODE
-}
-
-get_sample_trip_id_lookup <- function() {
+#' Title here TODO
+#'
+#' @export
+get_pbs_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
   names(x) <- tolower(names(x))
   x
 }
 
-get_stratum_areas <- function() {
+#' Title here TODO
+#'
+#' @export
+get_pbs_strata <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SG.SURVEY_ID,
     SG.GROUPING_CODE,
@@ -29,26 +23,14 @@ get_stratum_areas <- function() {
   x
 }
 
-collapse_spp_names <- function(x) {
-  paste0("'", paste(x, collapse = "','"), "'")
-}
-
-inject_species <- function(x, spp, sql_code) {
-  i <- grep("-- insert species here", sql_code)
-  out <-c(sql_code[seq(1,i-1)],
-    paste0(x, " (", collapse_spp_names(common2codes(spp)), ")"),
-    sql_code[seq(i+1, length(sql_code))])
-  paste(out, collapse = "\n")
-}
-
-#' Get spatial trawl survey data
+#' Get PBS spatial trawl survey data
 #'
-#' @param spp A character vector of species common names
+#' @param species A character vector of species common names
 #' @param survey_codes A numeric vector of survey series IDs
 #'
 #' @export
-get_spatial_survey <- function(spp, survey_codes = c(1, 3, 4, 16)) {
-  species_codes <- common2codes(spp)
+get_pbs_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
+  species_codes <- common2codes(species)
 
   q <- paste("SELECT S.SURVEY_ID, SS.SURVEY_SERIES_ID, SS.SURVEY_SERIES_DESC
     FROM SURVEY S
@@ -90,13 +72,13 @@ get_spatial_survey <- function(spp, survey_codes = c(1, 3, 4, 16)) {
   d_survs_df
 }
 
-#' Get survey specimen data
+#' Get PBS survey specimen data
 #'
-#' @param spp A character vector of species common names
+#' @param species A character vector of species common names
 #' @export
-get_survey_specimens <- function(spp) {
+get_pbs_survsamples <- function(species) {
   q <- readLines("inst/sql/get-survey-biology.sql")
-  q <- inject_species("AND SM.SPECIES_CODE IN", spp, sql_code = q)
+  q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -116,17 +98,14 @@ get_survey_specimens <- function(spp) {
   dbio
 }
 
-#' Get commercial specimen data
+#' Get PBS commercial specimen data
 #'
-#' @param spp A character vector of species common names
+#' @param species A character vector of species common names
 #' @export
-get_commercial_specimens <- function(spp) {
+get_pbs_commsamples <- function(species) {
   q <- readLines("inst/sql/get-commercial-biology.sql")
-  q <- inject_species("AND SM.SPECIES_CODE IN", spp, sql_code = q)
-
-
+  q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
-
   names(dbio_c) <- tolower(names(dbio_c))
   dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
   dbio_c$species_science_name <- tolower(dbio_c$species_science_name)
@@ -135,17 +114,16 @@ get_commercial_specimens <- function(spp) {
   dbio_c
 }
 
-
-#' Get commercial landings data
+#' Get PBS commercial landings data
 #'
-#' @param spp A character vector of species common names
+#' @param species A character vector of species common names
 #' @export
-get_landings <- function(spp) {
-  spp <- common2codes(spp)
+get_pbs_catch <- function(species) {
+  species <- common2codes(species)
   q <- readLines(system.file("sql", "get-landings.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY BEST", q) - 1
   q <- c(q[seq(1, i)],
-    paste("WHERE SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+    paste("WHERE SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
     q[seq(i+1, length(q))])
   landings_sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), landings_sql)
@@ -165,16 +143,16 @@ get_landings <- function(spp) {
   d
 }
 
-#' Get commercial CPUE data
+#' Get PBS commercial CPUE data
 #'
-#' @param spp A character vector of species common names
+#' @param species A character vector of species common names
 #' @export
-get_cpue <- function(spp) {
-  spp <- common2codes(spp)
+get_pbs_cpue <- function(species) {
+  species <- common2codes(species)
   q <- readLines(system.file("sql", "get-cpue.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY YEAR", q) - 1
   q <- c(q[seq(1, i)],
-    paste("AND SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+    paste("AND SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
     q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
   dcpue <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
@@ -187,16 +165,16 @@ get_cpue <- function(spp) {
   d
 }
 
-#' Get biological index data
+#' Get PBS biological index data
 #'
-#' @param spp A character vector of species common names
+#' @param species A character vector of species common names
 #' @export
-get_bio_indices <- function(spp) {
-  spp <- common2codes(spp)
+get_pbs_bioindex <- function(species) {
+  species <- common2codes(species)
   q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
   q <- c(q[seq(1, i)],
-    paste("WHERE SP.SPECIES_CODE IN (", collapse_spp_names(spp), ")"),
+    paste("WHERE SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
     q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
@@ -206,35 +184,35 @@ get_bio_indices <- function(spp) {
   d
 }
 
-#' Get (and cache) all PBS groundfish data for one or more species
+#' Cache all PBS groundfish data for one or more species
 #'
 #' @param species A character vector of species common names
 #' @param path The folder where the cached data will be saved
 #' @export
-get_all_data <- function(species, path = "data-cache") {
+cache_pbs_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_spatial_survey(species)
-  saveRDS(d_survs_df, file = file.path(path, "all-survey-spatial-tows.rds"))
+  d_survs_df <- get_pbs_survey(species)
+  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
 
-  d <- get_survey_specimens(species)
-  saveRDS(d, file = file.path(path, "all-survey-bio.rds"))
+  d <- get_pbs_survsamples(species)
+  saveRDS(d, file = file.path(path, "pbs-survey-specimens.rds"))
 
-  d <- get_commercial_specimens(species)
-  saveRDS(d, file = file.path(path, "all-commercial-bio.rds"))
+  d <- get_pbs_commsamples(species)
+  saveRDS(d, file = file.path(path, "pbs-commercial-specimens.rds"))
 
-  d <- get_landings(species)
-  saveRDS(d, file = file.path(path, "all-catches.rds"))
+  d <- get_pbs_catch(species)
+  saveRDS(d, file = file.path(path, "pbs-catch.rds"))
 
-  d <- get_cpue(species)
-  saveRDS(d, file = file.path(path, "all-spatial-cpue.rds"))
+  d <- get_pbs_cpue(species)
+  saveRDS(d, file = file.path(path, "pbs-cpue.rds"))
 
-  d <- get_bio_indices(species)
-  saveRDS(d, file = file.path(path, "all-boot-biomass-indices.rds"))
+  d <- get_pbs_bioindex(species)
+  saveRDS(d, file = file.path(path, "pbs-bioindex.rds"))
 
-  d <- get_sample_trip_id_lookup()
-  saveRDS(d, file = file.path(path, "sample-trip-id-lookup.rds"))
+  d <- get_pbs_sample_trips()
+  saveRDS(d, file = file.path(path, "pbs-sample-trips.rds"))
 
-  d <- get_stratum_areas()
-  saveRDS(d, file = file.path(path, "stratum-areas.rds"))
+  d <- get_pbs_strata()
+  saveRDS(d, file = file.path(path, "pbs-strata.rds"))
 }

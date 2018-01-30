@@ -1,18 +1,6 @@
-firstup <- function(x) {
-  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
-  x
-}
-
-round_nice <- function(x) {
-  out <- plyr::round_any(x, 100)
-  out[out == 0] <- x[out == 0]
-  out[x == 0] <- ""
-  out
-}
-
 #' Prepare PBS samples data for \code{\link{plot_samples}}
 #'
-#' @param path Path to cached data
+#' @param dat Input data frame from \code{\link{get_pbs_survsamples}}.
 #' @param year_range Either \code{NULL}, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
@@ -21,23 +9,22 @@ round_nice <- function(x) {
 #'
 #' @examples
 #' \dontrun{
-#' x <- prep_pbs_samples(year_range = c(1996, 2016))
+#' d <- get_pbs_survsamples("lingcod")
+#' prep_pbs_samples(d)
 #' }
 
-prep_pbs_samples <- function(path = "data-cache",
-  year_range = NULL) {
-  dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
+prep_pbs_samples <- function(dat, year_range = NULL) {
 
   if (!is.null(year_range))
-    dbio <- dbio[dbio$year >= year_range[[1]] & dbio$year <= year_range[[2]], ]
+    dat <- dat[dat$year >= year_range[[1]] & dat$year <= year_range[[2]], ]
 
-  dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
+  dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
 
-  dbio <- dbio %>%
+  dat <- dat %>%
     dplyr::select(.data$species_common_name, .data$year,
       .data$age, .data$length, .data$weight, .data$maturity_code)
 
-  out <- dplyr::group_by(dbio,
+  out <- dplyr::group_by(dat,
     .data$species_common_name, .data$year) %>%
     dplyr::summarise(
       age = sum(!is.na(age) & age > 0),
@@ -46,8 +33,8 @@ prep_pbs_samples <- function(path = "data-cache",
       maturity = sum(!is.na(maturity_code) & maturity_code > 0)
     ) %>% dplyr::ungroup()
 
-  all_years <- expand.grid(year = seq(min(dbio$year), max(dbio$year), 1),
-    species_common_name = unique(dbio$species_common_name),
+  all_years <- expand.grid(year = seq(min(dat$year), max(dat$year), 1),
+    species_common_name = unique(dat$species_common_name),
     stringsAsFactors = FALSE)
 
   out <- dplyr::left_join(all_years, out, by = c("year", "species_common_name"))
@@ -63,12 +50,16 @@ prep_pbs_samples <- function(path = "data-cache",
 
 #' Plot sample availability
 #'
-#' @param dat A properly formatted data frame. For example, from
-#'   \code{\link{prep_pbs_samples}}. The input data frame must have the columns
-#'   (in any order): \code{year}, \code{type} (with the types of samples to
-#'   plot, e.g. maturity, weight), and \code{n} (with the numbers of samples).
-#'   The axis labels will be derived from \code{type} after capitalizing the
-#'   first letter.
+#' @param dat An input data frame from, for example,
+#' \code{\link{prep_pbs_samples}}. The input data frame must have the columns:
+#' \describe{
+#'   \item{\code{year}}{The year.}
+#'   \item{\code{type}}{The types of samples to plot, e.g. "maturity",
+#'   "weight", "age". The axis labels will be derived from \code{type} after
+#'   capitalizing the first letter.}
+#'   \item{\code{n}}{The number of samples available for that sample type.}
+#' }
+#' @param title A title for the plot. Use \code{title = ""} to omit.
 #'
 #' @examples
 #' d <- expand.grid(year = 1996:2016,
@@ -78,13 +69,13 @@ prep_pbs_samples <- function(path = "data-cache",
 #' plot_samples(d)
 #'
 #' \dontrun{
-#' x <- prep_pbs_samples(year_range = c(1996, 2016))
-#' x <- dplyr::filter(x, species_common_name == "abyssal skate")
-#' plot_samples(x)
+#' d <- get_pbs_survsamples("lingcod")
+#' d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+#' plot_samples(d)
 #' }
 #' @export
 
-plot_samples <- function(dat) {
+plot_samples <- function(dat, title = "Survey samples") {
 
   dat$n_plot <- log(dat$n + 1)
   dat$n_text <- round_nice(dat$n)
@@ -103,5 +94,6 @@ plot_samples <- function(dat) {
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
     geom_text(aes_string(x = "year - 0.25", label = "n_text"), colour = "white",
       size = 2.5, alpha = 0.8) +
-    scale_y_discrete(position = "right")
+    ggplot2::scale_y_discrete(position = "right") +
+    ggplot2::ggtitle(title)
 }

@@ -4,12 +4,10 @@
 \alias{prep_pbs_catch}
 \title{Prepare PBS catch data for \code{\link{plot_catch}}}
 \usage{
-prep_pbs_catch(species_common_name, path = "data-cache")
+prep_pbs_catch(dat)
 }
 \arguments{
-\item{species_common_name}{A species common name}
-
-\item{path}{A path to cached data}
+\item{dat}{TODO}
 }
 \value{
 A data frame formatted for \code{\link{plot_catch}}
@@ -19,6 +17,7 @@ Prepare PBS catch data for \code{\link{plot_catch}}
 }
 \examples{
 \dontrun{
-prep_pbs_catch("canary rockfish")
+d <- get_pbs_catch("lingcod")
+prep_pbs_catch(d)
 }
 }

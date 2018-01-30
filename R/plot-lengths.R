@@ -1,4 +1,14 @@
-plot_lengths <- function() {
+# TODO
+#
+# @param dat
+# prep_pbs_lengths <- function(dat) {
+
+# }
+
+#' TODO
+#'
+#' @param dat TODO
+plot_lengths <- function(dat) {
 
   survs <- c(
     "West Coast Haida Gwaii Synoptic Survey",
@@ -9,7 +19,7 @@ plot_lengths <- function() {
     "PHMA Rockfish Longline Survey - Outside North",
     "PHMA Rockfish Longline Survey - Outside South")
 
-  dbio <- readRDS("data-cache/all-survey-bio.rds")
+  dbio <- dat
 
   dbio <- filter(dbio, survey_series_desc %in% survs)
   dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
@@ -29,39 +39,6 @@ plot_lengths <- function() {
 
   dat <- filter(dbio, species_common_name == "pacific ocean perch",
     !is.na(length), !is.na(sex))
-
-  #
-  #
-  # # bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>%
-  # #   filter(species_common_name %in% "pacific ocean perch")
-  # # catch <- readRDS("data-cache/all-catches.rds") %>%
-  # #   filter(species_common_name %in% "pacific ocean perch")
-  # survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
-  #   filter(species_common_name %in% "pacific ocean perch")
-  # survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
-  #   filter(species_common_name %in% "pacific ocean perch")
-  #
-  #
-
-  #
-  # out <- purrr::map_df(survs, function(x) {
-  #   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
-  #   surv_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
-  #   o <- surv_spec %>% join_comps_survey(surv_tows, length, bin_size = 2) %>%
-  #     weight_comps()
-  #   o$survey_series_desc <- x
-  #   o
-  # })
-  #
-  # ggplot(out, aes_string("value", "weighted_prop")) +
-  #   ggplot2::geom_col(width = 2) +
-  #   facet_grid(forcats::fct_rev(as.character(year))~forcats::fct_relevel(survey_series_desc,
-  #     survs)) +
-  #   theme_pbs() +
-  #   theme(panel.spacing = unit(-0.5, "lines")) +
-  #   ylim(0, NA) +
-  #   coord_cartesian(expand = FALSE)
-  #
 
   bin_size <- diff(stats::quantile(dat$length, probs = c(.05, .95)))[[1]]/15
   lengths <- seq(0, 300, bin_size)
@@ -105,12 +82,41 @@ plot_lengths <- function() {
     xlab("Length (cm)") +
     ylab("Relative length frequency") +
     ylim(0, NA) +
-    ggplot2::scale_y_continuous(breaks = c(0)) +
-    # theme(axis.text.y = ggplot2::element_blank(),
-    #   axis.ticks.y = ggplot2::element_blank()) +
+    # ggplot2::scale_y_continuous(breaks = c(0)) +
+    theme(axis.text.y = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_blank()) +
     labs(colour = "Sex", fill = "Sex") +
     geom_text(data = counts, x = max(dd$length, na.rm = TRUE) * 0.95, y = 0.8,
       aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.75, hjust = 1) +
     labs(title = "Length frequencies")
 }
+
+
+# weighting:
+# # bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>%
+# #   filter(species_common_name %in% "pacific ocean perch")
+# # catch <- readRDS("data-cache/all-catches.rds") %>%
+# #   filter(species_common_name %in% "pacific ocean perch")
+# survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
+#   filter(species_common_name %in% "pacific ocean perch")
+# survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
+#   filter(species_common_name %in% "pacific ocean perch")
+#
+# out <- purrr::map_df(survs, function(x) {
+#   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
+#   surv_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
+#   o <- surv_spec %>% join_comps_survey(surv_tows, length, bin_size = 2) %>%
+#     weight_comps()
+#   o$survey_series_desc <- x
+#   o
+# })
+#
+# ggplot(out, aes_string("value", "weighted_prop")) +
+#   ggplot2::geom_col(width = 2) +
+#   facet_grid(forcats::fct_rev(as.character(year))~forcats::fct_relevel(survey_series_desc,
+#     survs)) +
+#   theme_pbs() +
+#   theme(panel.spacing = unit(-0.5, "lines")) +
+#   ylim(0, NA) +
+#   coord_cartesian(expand = FALSE)

@@ -4,16 +4,16 @@
 \alias{prep_pbs_ages}
 \title{Prepare PBS age data for \code{\link{plot_ages}}}
 \usage{
-prep_pbs_ages(species_common_name, path = "data-cache",
+prep_pbs_ages(dat,
   survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-  "West Coast Vancouver Island Synoptic Survey"), survey = c("WCHG", "HS",
-  "QCS", "WCVI"))
+  "West Coast Vancouver Island Synoptic Survey",
+  "PHMA Rockfish Longline Survey - Outside North",
+  "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
+  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA N", "PHMA S", "IPHC"))
 }
 \arguments{
-\item{species_common_name}{A species common name}
-
-\item{path}{A path to cached data}
+\item{dat}{TODO}
 
 \item{survey_series_desc}{A character vector of survey series to include}
 
@@ -28,6 +28,7 @@ Prepare PBS age data for \code{\link{plot_ages}}
 }
 \examples{
 \dontrun{
-prep_pbs_ages("canary rockfish")
+d <- get_pbs_survsamples("lingcod")
+prep_pbs_ages(d)
 }
 }

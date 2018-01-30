@@ -1,27 +1,18 @@
-mround <- function(x, base){
-  base * round(x / base)
-}
-
 #' Title
 #'
-#' @param d TODO
-#' @param species TODO
+#' @param dat TODO
 #' @param surveys TODO
 #' @param survey_names TODO
-#' @param year_min TODO
 #' @param min_years TODO
-#'
+#' @param year_range TODO
+#' @export
 #' @examples
 #' \dontrun{
-#' d <- get_bio_indices("lingcod")
-#' d <- prep_pbs_bioindex(d)
-#' d
-#' plot_bioindex(d)
+#' d <- get_pbs_bioindex("lingcod")
+#' prep_pbs_bioindex(d)
 #' }
-#'
 
-prep_pbs_bioindex <- function(d,
-  species,
+prep_pbs_bioindex <- function(dat,
   surveys = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -43,15 +34,18 @@ prep_pbs_bioindex <- function(d,
     "IRF Longline Survey South",
     "Hecate Strait Multispecies Assemblage",
     "IPHC Longline"),
-  year_min = 1975, min_years = 3) {
+  min_years = 3, year_range = NULL) {
 
-  d <- dplyr::filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
+  d <- dplyr::filter(dat, species_science_name != "ophiodontinae") # lingcod duplicate spp.
   d <- dplyr::filter(d, species_science_name != "cetorhinidae") # basking shark duplicate spp.
 
+  if (is.null(year_range))
+    year_range <- range(dat$year, na.rm = TRUE)
+
   d <- dplyr::filter(d,
-    .data$species_common_name %in% species,
+    # .data$species_common_name %in% species,
     .data$survey_series_desc %in% surveys,
-    year >= year_min[[1]])
+    year >= year_range[[1]], year <= year_range[[2]])
 
   dup <- dplyr::group_by(d, species_common_name) %>%
     dplyr::summarise(n_spp = length(unique(species_science_name))) %>%
@@ -74,21 +68,24 @@ prep_pbs_bioindex <- function(d,
     dplyr::ungroup() %>%
     dplyr::filter(.data$n_years >= min_years)
 
-  all_surv <- dplyr::tibble(survey_series_desc = surveys)
-  d <- dplyr::left_join(all_surv, d, by = "survey_series_desc")
+  all_surv <- expand.grid(survey_series_desc = surveys,
+    species_common_name = unique(d$species_common_name),
+    stringsAsFactors = FALSE)
+  d <- dplyr::left_join(all_surv, d, by = c("species_common_name",
+      "survey_series_desc"))
 
   trans <- dplyr::tibble(survey_series_desc = surveys, survey_name = survey_names,
     surv_order = seq(1, length(survey_names)))
   d <- inner_join(d, trans, by = "survey_series_desc") %>%
     mutate(survey_name = forcats::fct_reorder(.data$survey_name, .data$surv_order))
-  select(d, .data$survey_name, .data$year, .data$biomass, .data$lowerci,
-    .data$upperci, .data$mean_cv, .data$num_sets,
-    .data$num_pos_sets)
+  select(d, .data$species_common_name, .data$survey_name, .data$year,
+    .data$biomass, .data$lowerci, .data$upperci, .data$mean_cv,
+    .data$num_sets, .data$num_pos_sets)
 }
 
-#' Title
+#' Title TODO
 #'
-#' @param d TODO
+#' @param dat TODO
 #' @param col TODO
 #' @param title TODO
 #'
@@ -96,15 +93,15 @@ prep_pbs_bioindex <- function(d,
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_bio_indices("lingcod")
+#' d <- get_pbs_bioindex("lingcod")
 #' d <- prep_pbs_bioindex(d)
 #' plot_bioindex(d)
 #' }
 
-plot_bioindex <- function(d, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)],
+plot_bioindex <- function(dat, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)],
   title = "Biomass indices") {
 
-  d <- d %>%
+  d <- dat %>%
     dplyr::group_by(.data$survey_name) %>%
     dplyr::mutate(biomass_scaled = .data$biomass / max(.data$upperci),
       lowerci_scaled = .data$lowerci / max(.data$upperci),
@@ -130,10 +127,9 @@ plot_bioindex <- function(d, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)]
     ylab("Relative biomass") +
     theme(
       axis.text.y = ggplot2::element_text(colour = "white"),
-      # axis.ticks.y = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_blank(),
       strip.background = element_blank(),
       strip.text.x = element_blank()) +
-    scale_y_continuous(breaks = 0) +
     labs(title = title) +
     geom_text(data = labs, x = yrs[1] + 0.5, y = 0.88,
       aes_string(label = "survey_name"),

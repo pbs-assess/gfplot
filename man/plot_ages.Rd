@@ -27,7 +27,8 @@ Plot age frequencies with bubble plots
 }
 \examples{
 \dontrun{
-d <- prep_pbs_ages("canary rockfish")
+d <- get_pbs_survsamples("canary rockfish")
+d <- prep_pbs_ages(d)
 plot_ages(d)
 }
 }

@@ -26,3 +26,4 @@
 ^data-cache$
 ^inst/stan/*\.rds$
 ^\.travis\.yml$
+^report$

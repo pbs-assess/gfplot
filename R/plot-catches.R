@@ -1,20 +1,17 @@
 #' Prepare PBS catch data for \code{\link{plot_catch}}
 #'
-#' @param species_common_name A species common name
-#' @param path A path to cached data
+#' @param dat TODO
 #'
 #' @return A data frame formatted for \code{\link{plot_catch}}
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' prep_pbs_catch("canary rockfish")
+#' d <- get_pbs_catch("lingcod")
+#' prep_pbs_catch(d)
 #' }
 
-prep_pbs_catch <- function(species_common_name, path = "data-cache") {
-
-  dat <- readRDS(file.path(path, "all-catches.rds"))
-  dat <- dat[dat$species_common_name %in% species_common_name, ]
+prep_pbs_catch <- function(dat) {
 
   catches <- dplyr::mutate(dat,
     gear = dplyr::recode(gear,
@@ -72,7 +69,8 @@ prep_pbs_catch <- function(species_common_name, path = "data-cache") {
 #'
 #' @examples
 #' \dontrun{
-#' d <- prep_pbs_catch("canary rockfish")
+#' d <- get_pbs_catch("lingcod")
+#' d <- prep_pbs_catch(d)
 #' plot_catch(d)
 #' }
 plot_catch <- function(dat,

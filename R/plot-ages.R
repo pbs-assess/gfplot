@@ -1,7 +1,6 @@
 #' Prepare PBS age data for \code{\link{plot_ages}}
 #'
-#' @param spp A species common name
-#' @param path A path to cached data
+#' @param dat TODO
 #' @param survey_series_desc A character vector of survey series to include
 #' @param survey A character vector of shorter/cleaner survey names to use in
 #'   the same order as \code{survey_series_desc}
@@ -11,10 +10,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' prep_pbs_ages("canary rockfish")
+#' d <- get_pbs_survsamples("lingcod")
+#' prep_pbs_ages(d)
 #' }
 
-prep_pbs_ages <- function(spp, path = "data-cache",
+prep_pbs_ages <- function(dat,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -25,7 +25,8 @@ prep_pbs_ages <- function(spp, path = "data-cache",
     "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA N", "PHMA S", "IPHC")) {
 
-  dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
+  dbio <- dat
+  # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
   dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)
   dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
   dup <- group_by(dbio, species_common_name) %>%
@@ -54,8 +55,7 @@ prep_pbs_ages <- function(spp, path = "data-cache",
     mutate(n_ages = n()) %>%
     ungroup()
 
-  d <- dplyr::filter(dbio_ages, species_common_name == spp,
-    !is.na(age))
+  d <- dplyr::filter(dbio_ages, !is.na(.data$age))
   ds <- d %>% mutate(sex = ifelse(sex == 2, "F", "M"))
 
   all_surveys <- tibble(survey = survey)
@@ -93,7 +93,8 @@ prep_pbs_ages <- function(spp, path = "data-cache",
 #'
 #' @examples
 #' \dontrun{
-#' d <- prep_pbs_ages("canary rockfish")
+#' d <- get_pbs_survsamples("canary rockfish")
+#' d <- prep_pbs_ages(d)
 #' plot_ages(d)
 #' }
 
@@ -130,7 +131,6 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     coord_cartesian(
       xlim = c(year_min, year_max) + c(-0.5 - sex_gap/2, 0.5 + sex_gap/2),
       ylim = c(0, age_max + 1), expand = FALSE) +
-    # guides(colour = FALSE, size = FALSE, fill = FALSE) +
     guides(size = FALSE) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +

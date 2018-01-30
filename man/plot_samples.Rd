@@ -4,15 +4,20 @@
 \alias{plot_samples}
 \title{Plot sample availability}
 \usage{
-plot_samples(dat)
+plot_samples(dat, title = "Survey samples")
 }
 \arguments{
-\item{dat}{A properly formatted data frame. For example, from
-\code{\link{prep_pbs_samples}}. The input data frame must have the columns
-(in any order): \code{year}, \code{type} (with the types of samples to
-plot, e.g. maturity, weight), and \code{n} (with the numbers of samples).
-The axis labels will be derived from \code{type} after capitalizing the
-first letter.}
+\item{dat}{An input data frame from, for example,
+\code{\link{prep_pbs_samples}}. The input data frame must have the columns:
+\describe{
+  \item{\code{year}}{The year.}
+  \item{\code{type}}{The types of samples to plot, e.g. "maturity",
+  "weight", "age". The axis labels will be derived from \code{type} after
+  capitalizing the first letter.}
+  \item{\code{n}}{The number of samples available for that sample type.}
+}}
+
+\item{title}{A title for the plot. Use \code{title = ""} to omit.}
 }
 \description{
 Plot sample availability
@@ -25,8 +30,8 @@ d$n[10] <- 0 # example zero
 plot_samples(d)
 
 \dontrun{
-x <- prep_pbs_samples(year_range = c(1996, 2016))
-x <- dplyr::filter(x, species_common_name == "abyssal skate")
-plot_samples(x)
+d <- get_pbs_survsamples("lingcod")
+d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+plot_samples(d)
 }
 }

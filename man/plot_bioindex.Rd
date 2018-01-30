@@ -2,24 +2,24 @@
 % Please edit documentation in R/plot-bioindex.R
 \name{plot_bioindex}
 \alias{plot_bioindex}
-\title{Title}
+\title{Title TODO}
 \usage{
-plot_bioindex(d, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)],
+plot_bioindex(dat, col = RColorBrewer::brewer.pal(9, "Blues")[c(3, 7)],
   title = "Biomass indices")
 }
 \arguments{
-\item{d}{TODO}
+\item{dat}{TODO}
 
 \item{col}{TODO}
 
 \item{title}{TODO}
 }
 \description{
-Title
+Title TODO
 }
 \examples{
 \dontrun{
-d <- get_bio_indices("lingcod")
+d <- get_pbs_bioindex("lingcod")
 d <- prep_pbs_bioindex(d)
 plot_bioindex(d)
 }

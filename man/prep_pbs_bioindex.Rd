@@ -4,8 +4,7 @@
 \alias{prep_pbs_bioindex}
 \title{Title}
 \usage{
-prep_pbs_bioindex(d, species = "lingcod",
-  surveys = c("West Coast Haida Gwaii Synoptic Survey",
+prep_pbs_bioindex(dat, surveys = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
   "West Coast Vancouver Island Synoptic Survey",
   "PHMA Rockfish Longline Survey - Outside North",
@@ -18,30 +17,25 @@ prep_pbs_bioindex(d, species = "lingcod",
   "PHMA Rockfish Longline - Outside North",
   "PHMA Rockfish Longline - Outside South", "IRF Longline Survey North",
   "IRF Longline Survey South", "Hecate Strait Multispecies Assemblage",
-  "IPHC Longline"), year_min = 1975, min_years = 3)
+  "IPHC Longline"), min_years = 3, year_range = NULL)
 }
 \arguments{
-\item{d}{TODO}
-
-\item{species}{TODO}
+\item{dat}{TODO}
 
 \item{surveys}{TODO}
 
 \item{survey_names}{TODO}
 
-\item{year_min}{TODO}
-
 \item{min_years}{TODO}
+
+\item{year_range}{TODO}
 }
 \description{
 Title
 }
 \examples{
 \dontrun{
-d <- get_bio_indices("lingcod")
-d <- prep_pbs_bioindex(d)
-d
-plot_bioindex(d)
+d <- get_pbs_bioindex("lingcod")
+prep_pbs_bioindex(d)
 }
-
 }
