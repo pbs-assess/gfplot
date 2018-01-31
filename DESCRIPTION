@@ -5,7 +5,7 @@ Date: 2017-12-07
 Authors@R: person("Sean", "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre"))
 Description: Facilitates the creation of reproducible data synopsis report for
-    DFO PBS groundfish stocks in British Columbia, Canada
+    DFO PBS groundfish stocks in British Columbia, Canada.
 Depends: R (>= 3.4.0)
 License: GPL (>=2)
 Encoding: UTF-8
@@ -19,18 +19,20 @@ Imports:
     assertthat,
     sp,
     readr,
+    rlang,
+    grid,
     rgdal,
     RColorBrewer,
     viridis,
     lubridate,
     DBI,
+    odbc,
     forcats,
     hexbin,
     glmmfields,
     PBSmapping,
     PBSdata
 RoxygenNote: 6.0.1
-VignetteBuilder: knitr
 Remotes: github::seananderson/glmmfields,
     github::pbs-software/pbs-data/PBSdata
 

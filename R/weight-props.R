@@ -1,13 +1,19 @@
 bin_lengths <- function(dat, value, bin_size) {
-  library(dplyr)
   value <- enquo(value)
   bin_range <- dat %>% select(!!value) %>% pull() %>% range()
   bins <- seq(min(bin_range), max(bin_range), by = bin_size)
   mutate(dat, !!quo_name(value) := bins[findInterval(!!value, bins)] + bin_size/2)
 }
 
+#' Join commercial catch and composition data for weighting
+#'
+#' @param specimen_dat Specimen data
+#' @param catch_dat Catch data
+#' @param value The unquoted column name with the values to re-weight (age or length)
+#' @param bin_size The binning size (if length data)
+#'
+#' @export
 join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NULL) {
-  library(dplyr)
   value <- enquo(value)
   specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
 
@@ -59,8 +65,15 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NUL
     ungroup()
 }
 
+#' Join survey and composition data for weighting
+#'
+#' @param specimen_dat Specimen data
+#' @param survey_tows Survey tow data
+#' @param value The unquoted column name with the values to re-weight (age or length)
+#' @param bin_size The binning size (if length data)
+#'
+#' @export
 join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL) {
-  library(dplyr)
   value <- enquo(value)
   specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
 
@@ -105,10 +118,9 @@ join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL)
     arrange(year, sample_id, !!value)
 }
 
+# Internal function that actually does the weighting
 weight_comps_base <- function(dat) {
-  library(dplyr)
-
-  # value (age or length)
+   # value (age or length)
 
   # grouping1 (quarter or grouping_code)
 
@@ -153,6 +165,11 @@ weight_comps_base <- function(dat) {
     select(-contains("freq"))
 }
 
+#' Weight age or length composition data
+#'
+#' @param dat A properly formatted data frame. See Details. TODO
+#'
+#' @export
 weight_comps <- function(dat) {
   names(dat) <- c("year", "id", "grouping1", "value", "freq",
     "weighting1", "weighting1_total",

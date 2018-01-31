@@ -51,7 +51,7 @@ If we include much more (and even now) we might need two pages per stock.
 Do we want to show effort through time at least for recent years?
 
 Do we want to show length or age plotted against maturity? This could include
-a model fit similarly to the length-age and length-weight panels. 
+a model fit similarly to the length-age and length-weight panels.
 
 Are there other plots that people would find useful to include?
 
@@ -136,7 +136,7 @@ I extracted data for the survey samples from GFBioSQL with:
 
 I then removed duplicate specimen IDs in R since these can be duplicated across
 multiple survey groupings (and my R skills greatly exceed my SQL skills!).
-                                                   
+
 I extracted data for the commercial samples from GFBioSQL with:
 
 \verbatiminput{../R/get-commercial-biology.sql}
@@ -174,7 +174,7 @@ do not model the two separately.
 Uses the same SQL query as for Section \ref{sec:bio-samples}.
 
 These are probability density plots for the fish lengths by year and survey.
-Effectively these are a continuous version of a histogram. 
+Effectively these are a continuous version of a histogram.
 
 Coloured represents females. Grey represents males. I've been trying to figure
 out what the best way to indicate that on the plot is.
@@ -220,7 +220,7 @@ See Appendix \ref{sec:spatial-app} for details on the methods.
 
 At this point I'm only using bottom depth as a predictor but there's no reason
 why we couldn't include other predictors such as bottom temperature and
-substrate type. 
+substrate type.
 
 I still need to tweak the interpolation algorithm to go from the
 bathymetry grid layer to the locations of the grid cells in the final
