@@ -77,7 +77,7 @@ get_pbs_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
 #' @param species A character vector of species common names
 #' @export
 get_pbs_survsamples <- function(species) {
-  q <- readLines("inst/sql/get-survey-biology.sql")
+  q <- readLines(system.file("sql", "get-survey-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
 
@@ -103,7 +103,7 @@ get_pbs_survsamples <- function(species) {
 #' @param species A character vector of species common names
 #' @export
 get_pbs_commsamples <- function(species) {
-  q <- readLines("inst/sql/get-commercial-biology.sql")
+  q <- readLines(system.file("sql", "get-commercial-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
   names(dbio_c) <- tolower(names(dbio_c))
@@ -163,6 +163,21 @@ get_pbs_cpue <- function(species) {
   d$species_scientific_name <- tolower(d$species_scientific_name)
   d$year <- lubridate::year(d$best_date)
   d
+}
+
+
+#' Title
+#'
+#' @param species TODO
+#'
+#' @export
+#'
+get_pbs_aging_precision <- function(species) {
+  q <- readLines(system.file("sql", "aging-precision.sql", package = "PBSsynopsis"))
+  q <- inject_species("AND C.SPECIES_CODE IN", species, q)
+  dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
+  names(dbio) <- tolower(names(dbio))
+  dbio
 }
 
 #' Get PBS biological index data
