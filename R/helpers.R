@@ -16,10 +16,8 @@ collapse_species_names <- function(x) {
 
 inject_species <- function(x, species, sql_code) {
   i <- grep("-- insert species here", sql_code)
-  out <-c(sql_code[seq(1,i-1)],
-    paste0(x, " (", collapse_species_names(common2codes(species)), ")"),
-    sql_code[seq(i+1, length(sql_code))])
-  paste(out, collapse = "\n")
+  sql_code[i] <- paste0(x, " (", collapse_species_names(common2codes(species)), ")")
+  paste(sql_code, collapse = "\n")
 }
 
 firstup <- function(x) {
