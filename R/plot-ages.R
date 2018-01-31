@@ -141,7 +141,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       xlim = year_range + c(-0.5 - sex_gap/2, 0.5 + sex_gap/2),
       ylim = c(0, age_max + 0.02 * age_range), expand = FALSE) +
     guides(size = FALSE, colour = ggplot2::guide_legend(override.aes = list(size = 3.5)),
-      fill = guide_legend(override.aes = list(size = 3.5))) +
+      fill = ggplot2::guide_legend(override.aes = list(size = 3.5))) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     geom_text(data = counts, y = age_max + 0.005 * age_range,
