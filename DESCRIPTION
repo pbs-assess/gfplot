@@ -31,7 +31,9 @@ Imports:
     hexbin,
     glmmfields,
     PBSmapping,
-    PBSdata
+    PBSdata,
+    rvest,
+    xml2
 RoxygenNote: 6.0.1
 Remotes: github::seananderson/glmmfields,
     github::pbs-software/pbs-data/PBSdata
