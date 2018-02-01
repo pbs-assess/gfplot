@@ -174,8 +174,8 @@ get_pbs_cpue <- function(species) {
 #'
 #' @export
 #'
-get_pbs_aging_precision <- function(species) {
-  q <- readLines(system.file("sql", "aging-precision.sql", package = "PBSsynopsis"))
+get_pbs_ageing_precision <- function(species) {
+  q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
   names(dbio) <- tolower(names(dbio))
@@ -232,4 +232,7 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   d <- get_pbs_strata()
   saveRDS(d, file = file.path(path, "pbs-strata.rds"))
+
+  d <- get_pbs_ageing_precision(species)
+  saveRDS(d, file = file.path(path, "pbs-ageing-precision.rds"))
 }
