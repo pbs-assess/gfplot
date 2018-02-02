@@ -163,7 +163,6 @@ get_pbs_cpue <- function(species) {
   names(d) <- tolower(names(d))
   d$species_common_name <- tolower(d$species_common_name)
   d$species_scientific_name <- tolower(d$species_scientific_name)
-  d$year <- lubridate::year(d$best_date)
   d
 }
 
