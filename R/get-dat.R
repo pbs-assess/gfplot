@@ -157,8 +157,8 @@ get_pbs_cpue <- function(species) {
     paste("AND SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
     q[seq(i+1, length(q))])
   sql <- paste(q, collapse = "\n")
-  dcpue <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
-  dcpue$SPECIES_COMMON_NAME[dcpue$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+  d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
+  d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(d) <- tolower(names(d))
   d$species_common_name <- tolower(d$species_common_name)
