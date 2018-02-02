@@ -168,12 +168,10 @@ get_pbs_cpue <- function(species) {
 }
 
 
-#' Title
+#' Get PBS ageing precision data
 #'
-#' @param species TODO
-#'
+#' @param species A character vector of a species common names
 #' @export
-#'
 get_pbs_ageing_precision <- function(species) {
   q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)

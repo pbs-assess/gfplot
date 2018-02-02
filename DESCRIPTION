@@ -15,6 +15,7 @@ Imports:
     ggplot2 (>= 2.2.0),
     dplyr (>= 0.7.0),
     plyr,
+    tidyr,
     reshape2,
     assertthat,
     sp,
@@ -32,7 +33,8 @@ Imports:
     PBSmapping,
     PBSdata,
     rvest,
-    xml2
+    xml2,
+    glmmTMB
 RoxygenNote: 6.0.1
 Remotes: github::pbs-software/pbs-data/PBSdata
 

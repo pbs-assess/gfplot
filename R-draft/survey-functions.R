@@ -2,7 +2,7 @@ library(tidyverse)
 
 get_surv_data <- function(species, survey, years) {
   library(dplyr)
-  d <- readRDS("data-cache/select-survey-spatial-tows.rds")
+  d <- readRDS("data-cache/all-survey-spatial-tows.rds")
 
 # TODO filter these outside:
   d <- filter(d, species_science_name != "ophiodontinae") # lingcod duplicate spp.
@@ -19,7 +19,7 @@ get_surv_data <- function(species, survey, years) {
   dat <- mutate(dat, present = ifelse(density > 0, 1, 0))
 
   attr(dat, "projection") <- "LL"
-  attr(dat, "zone") <- 8
+  attr(dat, "zone") <- 9
   dat$lat <- dat$Y
   dat$lon <- dat$X
 
@@ -36,7 +36,7 @@ join_noaa_bathy <- function(dat, plot = FALSE) {
 
   bath <- rename(bctopo, X = x, Y = y, depth = z)
   attr(bath, "projection") <- "LL"
-  attr(bath, "zone") <- 8
+  attr(bath, "zone") <- 9
   bath <- suppressMessages(PBSmapping::convUL(bath))
 
   # reduce size first:
@@ -146,14 +146,14 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
     pred_grid <- expand.grid(X = seq(min(dat$X), max(dat$X), length.out = n),
       Y = seq(min(dat$Y), max(dat$Y), length.out = n), year = unique(dat$year))
   } else {
-    setwd("data/SynopticTrawlSurveyBoundaries/")
+    setwd("inst/extdata/SynopticTrawlSurveyBoundaries/")
     library(rgdal)
     shape <- rgdal::readOGR(dsn = ".", layer = paste0(region, "_BLOB"), verbose = FALSE)
-    setwd("../../")
+    setwd("../../../")
     shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
     names(shape) <- c("X", "Y")
     attr(shape, "projection") <- "LL"
-    attr(shape, "zone") <- 8
+    attr(shape, "zone") <- 9
     shapeUTM <- suppressMessages(PBSmapping::convUL(shape))
     sp_poly <- SpatialPolygons(list(Polygons(list(Polygon(shapeUTM)), ID=1)))
     sp_poly_df <- SpatialPolygonsDataFrame(sp_poly, data=data.frame(ID=1))
@@ -192,7 +192,7 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL) {
 
   pred_grid <- left_join(pred_grid, z, by = c("X", "Y"))
   pred_grid <- mutate(pred_grid, akima_depth = exp(akima_depth))
-  assertthat::assert_that(sum(is.na(pred_grid$akima_depth)) == 0)
+  # assertthat::assert_that(sum(is.na(pred_grid$akima_depth)) == 0)
 
   # all under water!
   # pred_grid <- filter(pred_grid, akima_depth > 0)
@@ -220,7 +220,7 @@ plot_bc_map <- function(pred_dat, raw_dat, fill_column,
 
   library(PBSmapping)
   data("nepacLLhigh")
-  attr(nepacLLhigh, "zone") <- 8
+  attr(nepacLLhigh, "zone") <- 9
   nepacUTM <- suppressMessages(convUL(clipPolys(nepacLLhigh,
     xlim = range(raw_dat$lon) + c(-2, 2),
     ylim = range(raw_dat$lat) + c(-2, 2))))
@@ -265,7 +265,7 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
     xlim <- range(raw_dat$X) + c(-10, 10)
     ylim <- range(raw_dat$Y) + c(-10, 10)
   } else {
-    b <- readRDS("data/boxes.rds")
+    # b <- readRDS("data/boxes.rds")
     xlim <- b[[region]]$xlim * 10
     ylim <- b[[region]]$ylim * 10
   }
@@ -285,7 +285,7 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
 
   library(PBSmapping)
   data("nepacLLhigh")
-  attr(nepacLLhigh, "zone") <- 8
+  attr(nepacLLhigh, "zone") <- 9
   nepacUTM <- suppressMessages(convUL(clipPolys(nepacLLhigh,
     xlim = range(raw_dat$lon) + c(-2, 2),
     ylim = range(raw_dat$lat) + c(-2, 2))))
@@ -333,7 +333,7 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   shape <- as.data.frame(shape@polygons[[1]]@Polygons[[1]]@coords)
   names(shape) <- c("X", "Y")
   attr(shape, "projection") <- "LL"
-  attr(shape, "zone") <- 8
+  attr(shape, "zone") <- 9
   shapeUTM <- suppressMessages(PBSmapping::convUL(shape))
 
   # get colour with bad hack:
@@ -364,7 +364,7 @@ plot_bc_map_base <- function(pred_dat, raw_dat, fill_column,
   ylim_ll <- c(48.4, 54.25)
   isobath <- PBSmapping::clipPolys(dplyr::filter(isobath, PID %in% zlev),
     xlim = xlim_ll + c(-5, 5), ylim = ylim_ll + c(-5, 5))
-  attr(isobath, "zone") <- 8
+  attr(isobath, "zone") <- 9
   isobath_UTM <- suppressMessages(convUL(isobath))
   PBSmapping::addLines(isobath_UTM,
     col = rev(c("#00000070", "#00000055", "#00000040")), lwd = 0.8)

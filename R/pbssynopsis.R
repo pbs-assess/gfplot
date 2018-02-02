@@ -62,6 +62,12 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(
   "sex",
   "survey",
   "variable",
-  "survey_series_desc"
+  "survey_series_desc",
 
+  #
+  "age_reading_id", "age_reading_type_code", "ageing_method_desc",
+  "ageing_param", "employee_id", "female", "glmm", "has_precision", "mature",
+  "mature_at", "maturity_convention_desc", "maturity_convention_description",
+  "maturity_convention_maxvalue", "n_employee", "p", "species_code",
+  "specimen_id", "specimen_sex_code"
   ))

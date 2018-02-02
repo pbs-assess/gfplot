@@ -49,7 +49,6 @@ prep_pbs_bioindex <- function(dat,
 
   dup <- dplyr::group_by(d, species_common_name) %>%
     dplyr::summarise(n_spp = length(unique(species_science_name))) %>%
-    dplyr::arrange(-n_spp) %>%
     dplyr::filter(n_spp > 1L)
   assertthat::are_equal(nrow(dup), 0L)
 

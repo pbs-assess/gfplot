@@ -27,26 +27,26 @@ for (i in seq_along(sn$species_common_name)) {
   spp_f <- sn$spp_w_hyphens[i]
   message(spp)
 
-  # g <- filter(d_index, species_common_name == spp) %>%
-  #   prep_pbs_bioindex() %>%
-  #   plot_bioindex()
-  # ggsave(paste0("report/figs/", spp_f, "-bioindex.pdf"), width = 5, height = 5)
+  g <- filter(d_index, species_common_name == spp) %>%
+    prep_pbs_bioindex() %>%
+    plot_bioindex()
+  ggsave(paste0("report/figs/", spp_f, "-bioindex.pdf"), width = 5, height = 5)
 
-  # g <- filter(d_surv_samp, species_common_name == spp) %>%
-  #   prep_pbs_ages() %>%
-  #   plot_ages(max_size = 3.7, sex_gap = 0.25, year_range = c(2003, 2016))
-  # ggsave(paste0("report/figs/", spp_f, "-ages.pdf"), width = 13, height = 5)
+  g <- filter(d_surv_samp, species_common_name == spp) %>%
+    prep_pbs_ages() %>%
+    plot_ages(max_size = 3.7, sex_gap = 0.25, year_range = c(2003, 2016))
+  ggsave(paste0("report/figs/", spp_f, "-ages.pdf"), width = 13, height = 5)
 
-  # # # TODO:
-  # g <- filter(d_surv_samp, species_common_name == spp) %>%
-  #   plot_lengths(n_bins = 25)
-  # ggsave(paste0("report/figs/", spp_f, "-lengths.pdf"), width = 8, height = 6)
-  #
-  # g <- filter(d_catch, species_common_name == spp) %>%
-  #   prep_pbs_catch() %>%
-  #   plot_catch()
-  # ggsave(paste0("report/figs/", spp_f, "-catch.pdf"), width = 6, height = 2)
-  #
+  # # TODO:
+  g <- filter(d_surv_samp, species_common_name == spp) %>%
+    plot_lengths(n_bins = 25)
+  ggsave(paste0("report/figs/", spp_f, "-lengths.pdf"), width = 8, height = 6)
+
+  g <- filter(d_catch, species_common_name == spp) %>%
+    prep_pbs_catch() %>%
+    plot_catch()
+  ggsave(paste0("report/figs/", spp_f, "-catch.pdf"), width = 6, height = 2)
+
   g <- filter(d_surv_samp, species_common_name == spp) %>%
     prep_pbs_samples(year_range = c(1996, 2016)) %>%
     plot_samples(year_range = c(1996, 2016), title = "Survey samples")
