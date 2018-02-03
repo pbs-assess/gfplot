@@ -12,3 +12,9 @@ prep_pbs_ageing_precision(dat)
 \description{
 Prepare PBS ageing precision data
 }
+\examples{
+\dontrun{
+d <- get_pbs_ageing_precision("pacific ocean perch")
+prep_pbs_ageing_precision(d)
+}
+}

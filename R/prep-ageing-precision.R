@@ -1,18 +1,13 @@
-# Bring in ageing precision data
-# source("R/make-spp-list.R")
-# species <- get_spp_names()$species_common_name
-#
-
-
-# to test
-
-dbio <- get_pbs_ageing_precision("pacific ocean perch")
-b <- prep_pbs_ageing_precision(dbio)
-
 #' Prepare PBS ageing precision data
 #'
 #' @param dat A data frame from \code{\link{get_pbs_ageing_precision}}
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' d <- get_pbs_ageing_precision("pacific ocean perch")
+#' prep_pbs_ageing_precision(d)
+#' }
 prep_pbs_ageing_precision <- function(dat) {
 
   # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
@@ -24,8 +19,8 @@ prep_pbs_ageing_precision <- function(dat) {
 
   # organize dataframe with one record for each specimen id, age reading type and age parameter
   dbio <- tidyr::gather(dbio, ageing_param, age, -(specimen_id:ageing_method_desc),
-      -employee_id, -age_reading_id) %>%
-      arrange(age_reading_id) %>%
+    -employee_id, -age_reading_id) %>%
+    arrange(age_reading_id) %>%
     group_by(specimen_id, age_reading_type_code, year, species_code,
       ageing_param) %>%
     summarise(age = age[[1]], employee_id = employee_id[[1]])
@@ -47,31 +42,30 @@ prep_pbs_ageing_precision <- function(dat) {
   names(ageing_prec) <- sub("maximum", "max", names(ageing_prec))
   names(ageing_prec) <- sub("minimum", "min", names(ageing_prec))
   names(ageing_prec) <- sub("specimen_", "", names(ageing_prec))
+
+  ageing_prec
 }
-
-
 
 #' Plot pbs ageing precision data
 #'
-#' @param dat
+#' @param dat TODO
 #'
 #' @export
 #'
-plot_ageing_prec <- function(dat) {
-# [ageing_prec$species_code == common2codes(species),]
-
-a <- ageing_prec
-a %>%
-  ggplot(aes(prim_age, prec_age)) +
-  geom_point(pch = 19, colour = "grey10", size = 1.2) +
-  stat_smooth(method="lm", color = "grey10", se = FALSE, size = 0.72) +
-  theme_pbs() +
-  geom_linerange(ymin = a$prec_min_age, ymax = a$prec_max_age) +
-  ggstance::geom_linerangeh(xmin = a$prim_min_age, xmax = a$prim_max_age) +
-  labs(title = "Ageing Precision", x = "Primary Age", y = "Precision Age") +
-  theme(plot.title = element_text(hjust = 0.5))
+#' @examples
+#' \dontrun{
+#' d <- get_pbs_ageing_precision("pacific ocean perch")
+#' d <- prep_pbs_ageing_precision(d)
+#' plot_ageing_precision(d)
+#' }
+plot_ageing_precision <- function(dat) {
+    ggplot(dat, aes_string("prim_age", "prec_age")) +
+    geom_point(pch = 19, colour = "grey10", size = 1.2) +
+    ggplot2::geom_abline(intercept = 0, slope = 1, col = "grey50", lty = 2) +
+    ggplot2::geom_segment(aes_string(x = "prim_min_age", xend = "prim_min_age",
+      y = "prec_age", yend = "prec_age"), alpha = 0.6) +
+    ggplot2::geom_segment(aes_string(x = "prim_age", xend = "prim_age",
+      y = "prec_min_age", yend = "prec_max_age"), alpha = 0.6) +
+    labs(title = "Ageing Precision", x = "Primary Age", y = "Precision Age") +
+    theme_pbs()
 }
-
-
-
-
