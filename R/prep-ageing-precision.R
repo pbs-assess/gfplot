@@ -1,8 +1,21 @@
+# Bring in ageing precision data
+# source("R/make-spp-list.R")
+# species <- get_spp_names()$species_common_name
+#
+
+
+# to test
+
+dbio <- get_pbs_ageing_precision("pacific ocean perch")
+b <- prep_pbs_ageing_precision(dbio)
+
 #' Prepare PBS ageing precision data
 #'
 #' @param dat A data frame from \code{\link{get_pbs_ageing_precision}}
 #' @export
 prep_pbs_ageing_precision <- function(dat) {
+
+  # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
 
   # remove specimen id's for which there is no precision reading
   dbio <- group_by(dbio, specimen_id, species_code) %>%
@@ -26,11 +39,39 @@ prep_pbs_ageing_precision <- function(dat) {
     filter(!specimen_id %in% precision_aged_by_same)
 
   # organize data into individual columns for aging parameter + age reading type
-  dbio <- dbio %>%
+  ageing_prec <- dbio %>%
     mutate(temp = paste(age_reading_type_code, ageing_param, sep = "_")) %>%
     reshape2::dcast(specimen_id + year + species_code ~ temp, value.var = "age")
-  names(dbio) <- sub("2", "primary", names(dbio))
-  names(dbio) <- sub("3", "precision", names(dbio))
-  dbio
+  names(ageing_prec) <- sub("2", "prim", names(ageing_prec))
+  names(ageing_prec) <- sub("3", "prec", names(ageing_prec))
+  names(ageing_prec) <- sub("maximum", "max", names(ageing_prec))
+  names(ageing_prec) <- sub("minimum", "min", names(ageing_prec))
+  names(ageing_prec) <- sub("specimen_", "", names(ageing_prec))
 }
+
+
+
+#' Plot pbs ageing precision data
+#'
+#' @param dat
+#'
+#' @export
+#'
+plot_ageing_prec <- function(dat) {
+# [ageing_prec$species_code == common2codes(species),]
+
+a <- ageing_prec
+a %>%
+  ggplot(aes(prim_age, prec_age)) +
+  geom_point(pch = 19, colour = "grey10", size = 1.2) +
+  stat_smooth(method="lm", color = "grey10", se = FALSE, size = 0.72) +
+  theme_pbs() +
+  geom_linerange(ymin = a$prec_min_age, ymax = a$prec_max_age) +
+  ggstance::geom_linerangeh(xmin = a$prim_min_age, xmax = a$prim_max_age) +
+  labs(title = "Ageing Precision", x = "Primary Age", y = "Precision Age") +
+  theme(plot.title = element_text(hjust = 0.5))
+}
+
+
+
 
