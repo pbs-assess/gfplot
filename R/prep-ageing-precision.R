@@ -18,7 +18,7 @@ prep_pbs_ageing_precision <- function(dat) {
   # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
 
   # remove specimen id's for which there is no precision reading
-  dbio <- group_by(dbio, specimen_id, species_code) %>%
+  dbio <- group_by(dat, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%
     filter(has_precision) %>% select(-has_precision)
 
