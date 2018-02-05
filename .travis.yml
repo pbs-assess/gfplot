@@ -6,6 +6,8 @@ cache: packages
 
 dist: trusty
 
+warnings_are_errors: false
+
 addons:
   apt:
     packages:
