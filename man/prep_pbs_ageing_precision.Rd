@@ -4,12 +4,12 @@
 \alias{prep_pbs_ageing_precision}
 \title{Prepare PBS ageing precision data}
 \usage{
-prep_pbs_ageing_precision(dat, method_codes = c(3, 17))
+prep_pbs_ageing_precision(dat, ageing_method_codes = c(3, 17))
 }
 \arguments{
 \item{dat}{A data frame from \code{\link{get_pbs_ageing_precision}}}
 
-\item{method_codes}{A numeric vector of ageing method codes to filter on. Default
+\item{ageing_method_codes}{A numeric vector of ageing method codes to filter on. Default
 codes 3 and 17, which represent otolith 'break and burn' and 'break and
 bake' methods.}
 }

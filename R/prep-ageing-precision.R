@@ -1,7 +1,7 @@
 #' Prepare PBS ageing precision data
 #'
 #' @param dat A data frame from \code{\link{get_pbs_ageing_precision}}
-#' @param method_codes A numeric vector of ageing method codes to filter on. Default
+#' @param ageing_method_codes A numeric vector of ageing method codes to filter on. Default
 #'   codes 3 and 17, which represent otolith 'break and burn' and 'break and
 #'   bake' methods.
 #'
@@ -12,9 +12,9 @@
 #' d <- get_pbs_ageing_precision("pacific ocean perch")
 #' prep_pbs_ageing_precision(d)
 #' }
-prep_pbs_ageing_precision <- function(dat, method_codes = c(3, 17)) {
+prep_pbs_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 
-  dbio <- filter(dbio, .data$method_code %in% method_codes)
+  dbio <- filter(dbio, .data$ageing_method %in% ageing_method_codes)
   # remove specimen id's for which there is no precision reading
   dbio <- group_by(dat, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%
