@@ -56,7 +56,7 @@ prep_pbs_ageing_precision <- function(dat, method_codes = c(3, 17)) {
 #' @param n Number of fish to sample if there are more fish than n.
 #' @param jitter Amount to randomly jitter ages. Same jitter values are used for
 #'   the precision and primary ages.
-#' @param seed If a numberic value, set the random seed so that the same rows
+#' @param seed If a numeric value, set the random seed so that the same rows
 #'   are sampled each time and the same jitter values are generated. If
 #'   \code{NULL} different fish will be sampled each time function is run.
 #'
