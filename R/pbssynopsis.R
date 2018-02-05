@@ -16,6 +16,15 @@
 #'   scale_colour_manual scale_x_continuous scale_size_area coord_cartesian
 #'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
 #'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
+NULL
+
+#' PBSsynopsis exported functions
+#'
+#' @importFrom dplyr %>%
+#' @name %>%
+#' @rdname re-exports
+#' @export
+NULL
 
 # from: https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
 # quiets concerns of R CMD check re: the .'s that appear in pipelines

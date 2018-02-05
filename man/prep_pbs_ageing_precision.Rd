@@ -9,16 +9,16 @@ prep_pbs_ageing_precision(dat, method_codes = c(3, 17))
 \arguments{
 \item{dat}{A data frame from \code{\link{get_pbs_ageing_precision}}}
 
-\item{method_codes}{A numeric vector of ageing method codes to filter on. Default
-codes 3 and 17, which represent otolith 'break and burn' and 'break and
-bake' methods.}
+\item{method_codes}{A numeric vector of ageing method codes to filter on. Defaults
+to codes \code{3} and \code{17}, which represent otolith 'break and burn'
+and 'break and bake' methods.}
 }
 \description{
 Prepare PBS ageing precision data
 }
 \examples{
 \dontrun{
-d <- get_pbs_ageing_precision("pacific ocean perch")
-prep_pbs_ageing_precision(d)
+get_pbs_ageing_precision("pacific ocean perch") \%>\%
+  prep_pbs_ageing_precision()
 }
 }

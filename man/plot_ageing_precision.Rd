@@ -7,9 +7,11 @@
 plot_ageing_precision(dat, n = 250, jitter = 0.25, seed = NULL)
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{A properly formatted data frame, for example, from
+\code{\link{prep_pbs_ageing_precision}}. Should have columns named
+TODO.}
 
-\item{n}{Number of fish to sample if there are more fish than n.}
+\item{n}{Number of fish to sample if there are more fish than \code{n}.}
 
 \item{jitter}{Amount to randomly jitter ages. Same jitter values are used for
 the precision and primary ages.}
@@ -23,8 +25,8 @@ Plot pbs ageing precision data
 }
 \examples{
 \dontrun{
-d <- get_pbs_ageing_precision("pacific ocean perch")
-d <- prep_pbs_ageing_precision(d)
-plot_ageing_precision(d)
+get_pbs_ageing_precision("pacific ocean perch") \%>\%
+  prep_pbs_ageing_precision() \%>\%
+  plot_ageing_precision(n = 200)
 }
 }
