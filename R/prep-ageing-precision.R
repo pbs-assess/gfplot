@@ -1,6 +1,10 @@
 #' Prepare PBS ageing precision data
 #'
 #' @param dat A data frame from \code{\link{get_pbs_ageing_precision}}
+#' @param method_codes A numeric vector of ageing method codes to filter on. Default
+#'   codes 3 and 17, which represent otolith 'break and burn' and 'break and
+#'   bake' methods.
+#'
 #' @export
 #'
 #' @examples
@@ -8,16 +12,16 @@
 #' d <- get_pbs_ageing_precision("pacific ocean perch")
 #' prep_pbs_ageing_precision(d)
 #' }
-prep_pbs_ageing_precision <- function(dat) {
+prep_pbs_ageing_precision <- function(dat, method_codes = c(3, 17)) {
 
-  # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
-
+  dbio <- filter(dbio, .data$method_code %in% method_codes)
   # remove specimen id's for which there is no precision reading
   dbio <- group_by(dat, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%
     filter(has_precision) %>% select(-has_precision)
 
-  # organize dataframe with one record for each specimen id, age reading type and age parameter
+  # organize dataframe with one record for each specimen id, age reading type
+  # and age parameter
   dbio <- tidyr::gather(dbio, ageing_param, age, -(specimen_id:ageing_method_desc),
     -employee_id, -age_reading_id) %>%
     arrange(age_reading_id) %>%
@@ -43,12 +47,18 @@ prep_pbs_ageing_precision <- function(dat) {
   names(ageing_prec) <- sub("minimum", "min", names(ageing_prec))
   names(ageing_prec) <- sub("specimen_", "", names(ageing_prec))
 
-  ageing_prec
+  dplyr::as_tibble(ageing_prec)
 }
 
 #' Plot pbs ageing precision data
 #'
 #' @param dat TODO
+#' @param n Number of fish to sample if there are more fish than n.
+#' @param jitter Amount to randomly jitter ages. Same jitter values are used for
+#'   the precision and primary ages.
+#' @param seed If a numberic value, set the random seed so that the same rows
+#'   are sampled each time and the same jitter values are generated. If
+#'   \code{NULL} different fish will be sampled each time function is run.
 #'
 #' @export
 #'
@@ -58,11 +68,17 @@ prep_pbs_ageing_precision <- function(dat) {
 #' d <- prep_pbs_ageing_precision(d)
 #' plot_ageing_precision(d)
 #' }
-plot_ageing_precision <- function(dat) {
-    ggplot(dat, aes_string("prim_age", "prec_age")) +
+plot_ageing_precision <- function(dat, n = 250, jitter = 0.25, seed = NULL) {
+  if (!is.null(seed)) set.seed(seed)
+  if (n < nrow(dat))
+    dat <- dplyr::sample_n(dat, size = n)
+  jit <- stats::runif(nrow(dat), -jitter, jitter)
+  dat$prec_age <- dat$prec_age + jit
+  dat$prim_age <- dat$prim_age + jit
+  ggplot(dat, aes_string("prim_age", "prec_age")) +
     geom_point(pch = 19, colour = "grey10", size = 1.2) +
     ggplot2::geom_abline(intercept = 0, slope = 1, col = "grey50", lty = 2) +
-    ggplot2::geom_segment(aes_string(x = "prim_min_age", xend = "prim_min_age",
+    ggplot2::geom_segment(aes_string(x = "prim_min_age", xend = "prim_max_age",
       y = "prec_age", yend = "prec_age"), alpha = 0.6) +
     ggplot2::geom_segment(aes_string(x = "prim_age", xend = "prim_age",
       y = "prec_min_age", yend = "prec_max_age"), alpha = 0.6) +

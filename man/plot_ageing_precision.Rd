@@ -4,10 +4,19 @@
 \alias{plot_ageing_precision}
 \title{Plot pbs ageing precision data}
 \usage{
-plot_ageing_precision(dat)
+plot_ageing_precision(dat, n = 250, jitter = 0.25, seed = NULL)
 }
 \arguments{
 \item{dat}{TODO}
+
+\item{n}{Number of fish to sample if there are more fish than n.}
+
+\item{jitter}{Amount to randomly jitter ages. Same jitter values are used for
+the precision and primary ages.}
+
+\item{seed}{If a numberic value, set the random seed so that the same rows
+are sampled each time and the same jitter values are generated. If
+\code{NULL} different fish will be sampled each time function is run.}
 }
 \description{
 Plot pbs ageing precision data
