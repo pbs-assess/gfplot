@@ -7,7 +7,9 @@
 tidy_cpue_index(object, center = TRUE)
 }
 \arguments{
-\item{dat}{Input data frame}
+\item{object}{A model object from \code{\link{fit_cpue_index}}}
+
+\item{center}{Should the index be centered by subtracting the mean in log space?}
 }
 \description{
 Tidy a delta-lognormal commercial CPUE standardization model

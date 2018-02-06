@@ -200,10 +200,6 @@ fit_cpue_index <- function(dat,
     gradient = obj$gr, control = list(iter.max = 1000L,
       eval.max = 1000L))
 
-  # mcmc <- tmbstan::tmbstan(obj, chains = 1,
-  #   iter = 50, init = list(opt$par),
-  #   silent = FALSE)
-
   message("Getting sdreport ...")
   r <- TMB::sdreport(obj)
 
@@ -213,7 +209,8 @@ fit_cpue_index <- function(dat,
 
 #' Tidy a delta-lognormal commercial CPUE standardization model
 #'
-#' @param dat Input data frame
+#' @param object A model object from \code{\link{fit_cpue_index}}
+#' @param center Should the index be centered by subtracting the mean in log space?
 #'
 #' @export
 
