@@ -6,10 +6,7 @@
 get_pbs_trawl_cpue <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-trawl-cpue.sql", package = "PBSsynopsis"))
-  i <- grep("ORDER BY YEAR", q) - 1
-  q <- c(q[seq(1, i)],
-    paste("AND SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
-    q[seq(i+1, length(q))])
+  q <- inject_species("AND C.SPECIES_CODE IN", species, q)
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
   d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
