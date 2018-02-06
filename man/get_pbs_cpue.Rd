@@ -2,7 +2,7 @@
 % Please edit documentation in R/get-dat.R
 \name{get_pbs_cpue}
 \alias{get_pbs_cpue}
-\title{Get PBS commercial CPUE data}
+\title{Get PBS commercial CPUE data (for mapping)}
 \usage{
 get_pbs_cpue(species)
 }
@@ -10,5 +10,5 @@ get_pbs_cpue(species)
 \item{species}{A character vector of species common names}
 }
 \description{
-Get PBS commercial CPUE data
+Get PBS commercial CPUE data (for mapping)
 }
