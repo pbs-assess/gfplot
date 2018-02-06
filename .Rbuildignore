@@ -27,3 +27,4 @@
 ^inst/stan/*\.rds$
 ^\.travis\.yml$
 ^report$
+^data-raw$

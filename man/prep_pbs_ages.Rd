@@ -11,7 +11,7 @@ prep_pbs_ages(dat,
   "PHMA Rockfish Longline Survey - Outside North",
   "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"))
+  "IPHC"), spp_cat_code = 1)
 }
 \arguments{
 \item{dat}{TODO}
@@ -20,6 +20,10 @@ prep_pbs_ages(dat,
 
 \item{survey}{A character vector of shorter/cleaner survey names to use in
 the same order as \code{survey_series_desc}}
+
+\item{spp_cat_code}{A numeric vector of species categorical codes to include
+for the commercial samples. Defaults to \code{1}, which refers to unsorted
+samples.}
 }
 \value{
 A data frame formatted for \code{\link{plot_ages}}

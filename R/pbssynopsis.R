@@ -78,5 +78,13 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(
   "ageing_param", "employee_id", "female", "glmm", "has_precision", "mature",
   "mature_at", "maturity_convention_desc", "maturity_convention_description",
   "maturity_convention_maxvalue", "n_employee", "p", "species_code",
-  "specimen_id", "specimen_sex_code"
+  "specimen_id", "specimen_sex_code",
+
+  # cpue:
+
+  "best_date", "best_depth", "fe_start_date", "hours_fished", "latitude",
+  "locality_code", "longitude", "n_trips_per_year", "n_years", "pos_catch",
+  "scrambled_vessel", "species_category_code", "spp_catch", "spp_in_fe",
+  "spp_in_row", "sum_catch", "total_positive_tows", "trips_over_thresh",
+  "trips_over_treshold_this_year", "vessel_name"
   ))
