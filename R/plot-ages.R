@@ -4,6 +4,9 @@
 #' @param survey_series_desc A character vector of survey series to include
 #' @param survey A character vector of shorter/cleaner survey names to use in
 #'   the same order as \code{survey_series_desc}
+#' @param spp_cat_code A numeric vector of species categorical codes to include
+#'   for the commercial samples. Defaults to \code{1}, which refers to unsorted
+#'   samples.
 #'
 #' @return A data frame formatted for \code{\link{plot_ages}}
 #' @export
@@ -23,7 +26,14 @@ prep_pbs_ages <- function(dat,
     "PHMA Rockfish Longline Survey - Outside North",
     "PHMA Rockfish Longline Survey - Outside South",
     "IPHC Longline Survey"),
-  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)", "IPHC")) {
+  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)", "IPHC"),
+  spp_cat_code = 1) {
+
+  if (!"survey_series_desc" %in% names(dat)) {
+    dat <- filter(dat, species_category_code %in% spp_cat_code) # TODO not in data yet
+    dat <- filter(dat, !is.na(year))
+    dat$survey_series_desc <- "Commercial"
+  }
 
   dbio <- dat
   # dbio <- readRDS(file.path(path, "all-survey-bio.rds"))
