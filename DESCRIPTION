@@ -34,7 +34,9 @@ Imports:
     PBSdata,
     rvest,
     xml2,
-    glmmTMB
+    glmmTMB,
+    speedglm,
+    TMB
 RoxygenNote: 6.0.1
 Remotes: github::pbs-software/pbs-data/PBSdata
 
