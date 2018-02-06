@@ -6,7 +6,12 @@ db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
 common2codes <- function(common) {
   species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT * FROM SPECIES")
+  common_df <- data.frame(SPECIES_COMMON_NAME = toupper(common), order_by = seq_along(common), stringsAsFactors = FALSE)
   dd <- dplyr::filter(species, SPECIES_COMMON_NAME %in% toupper(common))
+  # Remove erroneous species codes for basking shark and lingcod
+  dd <- dplyr::filter(dd, !SPECIES_CODE %in% c("033", "465"))
+  dd <- left_join(dd, common_df, by = "SPECIES_COMMON_NAME") %>%
+    arrange(order_by)
   dd$SPECIES_CODE
 }
 
