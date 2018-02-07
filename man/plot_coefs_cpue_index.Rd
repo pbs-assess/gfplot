@@ -6,7 +6,7 @@
 \usage{
 plot_coefs_cpue_index(object, coef_sub = c(depth_band = "depth", dfo_locality
   = "locality", vessel_name = "vessel", month_factor = "month", latitude_band =
-  "latitude"), model_prefixes = c("Bin.", "Pos."))
+  "latitude"))
 }
 \arguments{
 \item{object}{Model output from \code{\link{fit_cpue_index}}}
@@ -14,12 +14,9 @@ plot_coefs_cpue_index(object, coef_sub = c(depth_band = "depth", dfo_locality
 \item{coef_sub}{A named character vector of any substitutions to make on the
 coefficient names. Can be used to abbreviate coefficient names for the
 plot.}
-
-\item{model_prefixes}{Text to distinguish the binary and positive component
-model coefficients}
 }
 \value{
-A ggplot
+A ggplot object
 }
 \description{
 Plot coefficients from a CPUE index standardization model

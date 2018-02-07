@@ -21,21 +21,22 @@
 # @examples
 # prep_pbs_cpue_index(catch, species = "walleye pollock")
 prep_pbs_cpue_index <- function(dat, species_common,
-  year_range = c(1996, 2015),
+  year_range = c(1996, Inf),
   lat_range = c(48, Inf),
   min_positive_tows = 100,
   min_annual_positive_trips = 4,
   min_years_with_min_positive_trips = 4,
   area_grep_pattern = "5[CDE]+",
-  lat_bands = seq(48, 60, 0.1),
-  depth_bands = seq(50, 550, 25),
+  lat_bands = seq(48, 59, 0.1),
+  depth_bands = seq(50, 450, 25),
   gear = "BOTTOM TRAWL") {
 
-  # areas and species are package data
+  # pbs_areas and pbs_species are package data
   pbs_areas <- pbs_areas[grep(area_grep_pattern, pbs_areas$major_stat_area_description), ]
   names(catch) <- tolower(names(catch))
   catch <- inner_join(catch, pbs_species, by = "species_code")
 
+  # basic filtering:
   catch <- catch %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
     mutate(year = lubridate::year(best_date)) %>%
@@ -55,7 +56,8 @@ prep_pbs_cpue_index <- function(dat, species_common,
     filter(n_date < Inf) %>% select(-n_date) %>% # remove FE_IDs with multiple dates
     ungroup()
 
-  catch <- group_by(catch, fishing_event_id, month, locality_code,
+  # catch for target spp:
+  catch <- group_by(catch, fishing_event_id, best_date, month, locality_code,
     vessel_name, year, trip_id, hours_fished) %>%
     mutate(
       spp_in_fe = toupper(species_common) %in% species_common_name,
@@ -68,7 +70,7 @@ prep_pbs_cpue_index <- function(dat, species_common,
       latitude = mean(latitude, na.rm = TRUE)) %>%
     ungroup()
 
-  # figure out which vessels should be considered part of our fleet
+  # figure out which vessels should be considered part of the spp. fleet
   fleet <- catch %>%
     group_by(vessel_name) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
@@ -109,9 +111,8 @@ prep_pbs_cpue_index <- function(dat, species_common,
     select(-vessel_name) %>%
     dplyr::rename(vessel_name = scrambled_vessel)
 
-  d_retained <- arrange(d_retained, .data$year, .data$vessel_name)
-
-  dplyr::as_tibble(d_retained)
+  arrange(d_retained, .data$year, .data$vessel_name) %>%
+    dplyr::as_tibble()
 }
 
 factor_bin_clean <- function(x, bins, clean = TRUE) {
@@ -119,15 +120,20 @@ factor_bin_clean <- function(x, bins, clean = TRUE) {
   max_char <- max(nchar(out))
   ndec <- ndecimals(out)
   if (clean & ndec == 0)
-    out <- sprintf(paste0("%0", max_char, "d"), out)
+    out <- sprintf(paste0("%0", max_char, "d"), out) # pad with zeros
   if (clean & ndec > 0)
-    out <- sprintf(paste0("%.", ndec, "f"), out)
+    out <- sprintf(paste0("%.", ndec, "f"), out) # pad after decimal
   as.factor(out)
 }
 
 factor_clean <- function(x) {
   max_char <- max(nchar(x))
-  as.factor(sprintf(paste0("%0", max_char, "d"), x))
+  ndec <- ndecimals(x)
+  if (ndec == 0)
+    out <- sprintf(paste0("%0", max_char, "d"), x) # pad with zeros
+  if (ndec > 0)
+    out <- sprintf(paste0("%.", ndec, "f"), x) # pad after decimal
+  as.factor(out)
 }
 
 ndecimals <- function(x) {
@@ -136,7 +142,7 @@ ndecimals <- function(x) {
   out
 }
 
-# make prediction model matrix
+# make prediction [m]odel [m]atrix
 make_pred_mm <- function(x, years) {
   mm_pred <- x[seq_along(years), ]
   for (i in 1:ncol(mm_pred)) {
@@ -152,7 +158,7 @@ make_pred_mm <- function(x, years) {
   mm_pred
 }
 
-# Force factors to be sequential within the positive or binary data sets:
+# Force factors to be sequential within the positive or binary data sets for TMB:
 f <- function(x) as.factor(as.character(x))
 
 #' Fit a delta-lognormal commercial CPUE standardization model
@@ -182,7 +188,6 @@ fit_cpue_index <- function(dat,
 
   mm1 <- model.matrix(formula_binomial, data = dat)
   mm2 <- model.matrix(formula_lognormal, data = pos_dat)
-
   mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
   mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
 
@@ -253,6 +258,7 @@ tidy_cpue_index <- function(object, center = TRUE) {
 #'
 #' @export
 #' @family CPUE index functions
+#' @return A ggplot object
 #'
 plot_cpue_index <- function(dat) {
   ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
@@ -309,8 +315,6 @@ plot_cpue_index <- function(dat) {
 #' @param coef_sub A named character vector of any substitutions to make on the
 #'   coefficient names. Can be used to abbreviate coefficient names for the
 #'   plot.
-#' @param model_prefixes Text to distinguish the binary and positive component
-#'   model coefficients
 #'
 #' @details Note that the coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
@@ -318,9 +322,8 @@ plot_cpue_index <- function(dat) {
 #'   alpha-numericaly. For example, months 02 to 12 represent the estimated
 #'   difference between that month and month 01.
 #'
-#' @return A ggplot
+#' @return A ggplot object
 #' @export
-#'
 #' @family CPUE index functions
 
 plot_coefs_cpue_index <- function(object,
@@ -329,8 +332,9 @@ plot_coefs_cpue_index <- function(object,
     "dfo_locality" = "locality",
     "vessel_name" = "vessel",
     "month_factor" = "month",
-    "latitude_band" = "latitude"),
-  model_prefixes = c("Bin.", "Pos.")) {
+    "latitude_band" = "latitude")) {
+
+  model_prefixes <- c("Bin.", "Pos.")
 
   sm <- summary(object$sdreport)
   pars <- row.names(sm)
@@ -338,12 +342,16 @@ plot_coefs_cpue_index <- function(object,
   sm <- as.data.frame(sm)
   sm$pars <- pars
   sm <- sm %>% dplyr::rename(se = .data$`Std. Error`) %>%
-    dplyr::rename(est = .data$Estimate)
+    dplyr::rename(est = .data$Estimate) %>%
+    filter(!pars %in% c("prediction"))
   sm$par_name <- c(
     paste(model_prefixes[[1]], colnames(object$mm_bin)),
     paste(model_prefixes[[2]], colnames(object$mm_pos)),
     "log_sigma",
     paste("log-prediction", object$years))
+  sm <- sm %>% filter(!grepl("Intercept", par_name)) %>%
+    filter(!grepl("log-prediction", par_name)) %>%
+    filter(!grepl("year", par_name))
 
   for (i in seq_along(coef_sub))
     sm$par_name <- sub(names(coef_sub)[i], coef_sub[[i]], sm$par_name)
@@ -354,21 +362,21 @@ plot_coefs_cpue_index <- function(object,
   sm$par_name <- sub("([0-9.]+$)", " \\1", sm$par_name)
   sm$par_group <- forcats::fct_relevel(sm$par_group , "log_sigma", after = Inf)
   sm <- mutate(sm, se_too_big = se > 10, se = ifelse(se > 10, NA, se))
+  sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
 
-  filter(sm, !pars %in% c("prediction")) %>%
-    filter(!grepl("Intercept", par_name)) %>%
-    filter(!grepl("log-prediction", par_name)) %>%
-    filter(!grepl("year", par_group)) %>%
-    ggplot(aes_string("est", "forcats::fct_rev(par_name)",
-      yend = "forcats::fct_rev(par_name)")) +
-    geom_vline(xintercept = 0, lty = 2, col = "grey65") +
+  cols <- RColorBrewer::brewer.pal(3, "Blues")
+
+  ggplot(sm, aes_string("est", "forcats::fct_rev(par_name)",
+    yend = "forcats::fct_rev(par_name)", colour = "type")) +
+    # geom_vline(xintercept = 0, lty = 2, col = "grey65") +
     ggplot2::geom_segment(aes_string(x = "est - 1.96 * se",
-      xend = "est + 1.96 * se"), col = "grey30", lwd = 0.5) +
+      xend = "est + 1.96 * se"), lwd = 0.5) +
     ggplot2::geom_segment(aes_string(x = "est - 0.67 * se",
-      xend = "est + 0.67 * se"), col = "grey10", lwd = 1.25) +
-    geom_point(aes_string(shape = "se_too_big"), bg = "grey95", col = "grey10") +
+      xend = "est + 0.67 * se"), lwd = 1.25) +
+    geom_point(aes_string(shape = "se_too_big"), bg = "white") +
     ggplot2::scale_shape_manual(values = c("TRUE" = 4, "FALSE" = 21)) +
+    ggplot2::scale_colour_manual(values = c("TRUE" = "grey30", "FALSE" = cols[[3]])) +
     facet_wrap(~par_group, scales = "free") +
-    theme_pbs() + guides(shape = FALSE) +
+    theme_pbs() + guides(shape = FALSE, colour = FALSE) +
     ggplot2::labs(y = "", x = "Coefficient value")
 }

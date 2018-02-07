@@ -9,6 +9,9 @@ plot_cpue_index(dat)
 \arguments{
 \item{dat}{Input data frame, for example from \code{\link{tidy_cpue_index}}}
 }
+\value{
+A ggplot object
+}
 \description{
 Plot a delta-lognormal commercial CPUE standardization model
 }
