@@ -6,7 +6,7 @@
 #' @param min_years TODO
 #' @param year_range TODO
 #' @export
-#' @family prepare data functions
+#' @family tidy data functions
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_bioindex("lingcod")

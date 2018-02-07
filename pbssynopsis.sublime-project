@@ -4,7 +4,7 @@
 		{
 			"path": ".",
 			"folder_exclude_patterns": ["joy", "figs", "bubbles*", "maturity", "sparks",
-				"junk", "*data*", "catches", "cpue", "man", "spatial-survey"]
+				"junk", "*data*", "catches", "cpue", "man", "spatial-survey", ".Rproj.user"]
 		}
 	]
 

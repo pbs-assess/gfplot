@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-ages.R
 \name{tidy_pbs_ages}
 \alias{tidy_pbs_ages}
-\title{Prepare PBS age data for \code{\link{plot_ages}}}
+\title{Tidy PBS age data for \code{\link{plot_ages}}}
 \usage{
 tidy_pbs_ages(dat,
   survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
@@ -29,7 +29,7 @@ samples.}
 A data frame formatted for \code{\link{plot_ages}}
 }
 \description{
-Prepare PBS age data for \code{\link{plot_ages}}
+Tidy PBS age data for \code{\link{plot_ages}}
 }
 \examples{
 \dontrun{
@@ -38,7 +38,7 @@ tidy_pbs_ages(d)
 }
 }
 \seealso{
-Other prepare data functions: \code{\link{tidy_pbs_bioindex}},
+Other tidy data functions: \code{\link{tidy_pbs_bioindex}},
   \code{\link{tidy_pbs_catch}},
   \code{\link{tidy_pbs_cpue_index}}
 }

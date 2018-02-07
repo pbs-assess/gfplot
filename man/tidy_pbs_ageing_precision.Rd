@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-ageing-precision.R
 \name{tidy_pbs_ageing_precision}
 \alias{tidy_pbs_ageing_precision}
-\title{Prepare PBS ageing precision data}
+\title{Tidy PBS ageing precision data}
 \usage{
 tidy_pbs_ageing_precision(dat, ageing_method_codes = c(3, 17))
 }
@@ -14,7 +14,7 @@ codes \code{3} and \code{17}, which represent otolith 'break and burn' and 'brea
 bake' methods.}
 }
 \description{
-Prepare PBS ageing precision data
+Tidy PBS ageing precision data
 }
 \examples{
 \dontrun{

@@ -1,10 +1,10 @@
-#' Prepare PBS catch data for \code{\link{plot_catch}}
+#' Tidy PBS catch data for \code{\link{plot_catch}}
 #'
 #' @param dat TODO
 #'
 #' @return A data frame formatted for \code{\link{plot_catch}}
 #' @export
-#' @family prepare data functions
+#' @family tidy data functions
 #'
 #' @examples
 #' \dontrun{

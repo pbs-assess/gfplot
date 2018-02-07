@@ -39,7 +39,7 @@ tidy_pbs_bioindex(d)
 }
 }
 \seealso{
-Other prepare data functions: \code{\link{tidy_pbs_ages}},
+Other tidy data functions: \code{\link{tidy_pbs_ages}},
   \code{\link{tidy_pbs_catch}},
   \code{\link{tidy_pbs_cpue_index}}
 }

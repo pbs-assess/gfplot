@@ -1,4 +1,4 @@
-#' Prepare PBS age data for \code{\link{plot_ages}}
+#' Tidy PBS age data for \code{\link{plot_ages}}
 #'
 #' @param dat TODO
 #' @param survey_series_desc A character vector of survey series to include
@@ -10,7 +10,7 @@
 #'
 #' @return A data frame formatted for \code{\link{plot_ages}}
 #' @export
-#' @family prepare data functions
+#' @family tidy data functions
 #'
 #' @examples
 #' \dontrun{

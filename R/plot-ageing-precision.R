@@ -1,4 +1,4 @@
-#' Prepare PBS ageing precision data
+#' Tidy PBS ageing precision data
 #'
 #' @param dat A data frame from \code{\link{get_pbs_ageing_precision}}
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter on. Default

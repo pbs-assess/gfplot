@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-samples.R
 \name{tidy_pbs_samples}
 \alias{tidy_pbs_samples}
-\title{Prepare PBS samples data for \code{\link{plot_samples}}}
+\title{Tidy PBS samples data for \code{\link{plot_samples}}}
 \usage{
 tidy_pbs_samples(dat, year_range = NULL)
 }
@@ -14,7 +14,7 @@ or a numeric vector of length two giving the lower and upper years to
 include.}
 }
 \description{
-Prepare PBS samples data for \code{\link{plot_samples}}
+Tidy PBS samples data for \code{\link{plot_samples}}
 }
 \examples{
 \dontrun{

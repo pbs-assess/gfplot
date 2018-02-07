@@ -1,4 +1,4 @@
-#' Prepare PBS samples data for \code{\link{plot_samples}}
+#' Tidy PBS samples data for \code{\link{plot_samples}}
 #'
 #' @param dat Input data frame from \code{\link{get_pbs_survsamples}}.
 #' @param year_range Either \code{NULL}, in which case all years are returned,

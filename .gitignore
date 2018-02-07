@@ -43,3 +43,5 @@ text/spatial-appendix.tex
 *.docx
 *.o
 *.so
+*.sublime-project
+*.sublime-workspace

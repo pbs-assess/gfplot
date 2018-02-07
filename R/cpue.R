@@ -1,4 +1,4 @@
-#' Prepare commercial PBS CPUE data
+#' Tidy commercial PBS CPUE data
 #'
 #' @param dat An input data frame from \code{\link{get_pbs_cpue_index}}
 #' @param species_common The species common name
@@ -15,7 +15,7 @@
 #' @param gear Gear types
 #'
 #' @family CPUE index functions
-#' @family prepare data functions
+#' @family tidy data functions
 #'
 #' @export
 #'

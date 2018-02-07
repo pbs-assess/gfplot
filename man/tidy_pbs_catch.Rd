@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-catches.R
 \name{tidy_pbs_catch}
 \alias{tidy_pbs_catch}
-\title{Prepare PBS catch data for \code{\link{plot_catch}}}
+\title{Tidy PBS catch data for \code{\link{plot_catch}}}
 \usage{
 tidy_pbs_catch(dat)
 }
@@ -13,7 +13,7 @@ tidy_pbs_catch(dat)
 A data frame formatted for \code{\link{plot_catch}}
 }
 \description{
-Prepare PBS catch data for \code{\link{plot_catch}}
+Tidy PBS catch data for \code{\link{plot_catch}}
 }
 \examples{
 \dontrun{
@@ -22,7 +22,7 @@ tidy_pbs_catch(d)
 }
 }
 \seealso{
-Other prepare data functions: \code{\link{tidy_pbs_ages}},
+Other tidy data functions: \code{\link{tidy_pbs_ages}},
   \code{\link{tidy_pbs_bioindex}},
   \code{\link{tidy_pbs_cpue_index}}
 }

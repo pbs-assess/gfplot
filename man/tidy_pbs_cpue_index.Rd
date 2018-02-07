@@ -2,7 +2,7 @@
 % Please edit documentation in R/cpue.R
 \name{tidy_pbs_cpue_index}
 \alias{tidy_pbs_cpue_index}
-\title{Prepare commercial PBS CPUE data}
+\title{Tidy commercial PBS CPUE data}
 \usage{
 tidy_pbs_cpue_index(dat, species_common, year_range = c(1996, Inf),
   lat_range = c(48, Inf), min_positive_tows = 100,
@@ -36,7 +36,7 @@ of interest}
 \item{gear}{Gear types}
 }
 \description{
-Prepare commercial PBS CPUE data
+Tidy commercial PBS CPUE data
 }
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
@@ -44,7 +44,7 @@ Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{plot_cpue_index}},
   \code{\link{predict_cpue_index}}
 
-Other prepare data functions: \code{\link{tidy_pbs_ages}},
+Other tidy data functions: \code{\link{tidy_pbs_ages}},
   \code{\link{tidy_pbs_bioindex}},
   \code{\link{tidy_pbs_catch}}
 }
