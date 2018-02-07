@@ -181,10 +181,7 @@ get_pbs_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q[i] <- paste0("GEAR IN('", toupper(gear), "') AND YEAR(BEST_DATE) >= ", min_year, " AND")
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
-  d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
-    toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(d) <- tolower(names(d))
-  d$species_common_name <- tolower(d$species_common_name)
   d
 }
 
