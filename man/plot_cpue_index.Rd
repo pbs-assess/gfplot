@@ -17,12 +17,12 @@ Plot a delta-lognormal commercial CPUE standardization model
 }
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
-  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index_coefs}},
   \code{\link{prep_pbs_cpue_index}},
   \code{\link{tidy_cpue_index}}
 
 Other plotting functions: \code{\link{plot_bioindex}},
   \code{\link{plot_catch}},
-  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_maturity}}
 }

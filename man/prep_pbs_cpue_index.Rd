@@ -40,7 +40,7 @@ Prepare commercial PBS CPUE data
 }
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
-  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{tidy_cpue_index}}
 

@@ -37,7 +37,7 @@ plot_catch(d)
 }
 \seealso{
 Other plotting functions: \code{\link{plot_bioindex}},
-  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_maturity}}
 }

@@ -290,7 +290,7 @@ plot_cpue_index <- function(dat) {
 #' @family CPUE index functions
 #' @family plotting functions
 
-plot_coefs_cpue_index <- function(object,
+plot_cpue_index_coefs <- function(object,
   coef_sub = c(
     "depth_band" = "depth",
     "dfo_locality" = "locality",
