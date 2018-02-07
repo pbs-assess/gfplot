@@ -174,11 +174,11 @@ get_pbs_cpue <- function(species) {
 #' @param min_year Minimum year to return
 #'
 #' @export
-get_pbs_all_catch <- function(gear = "bottom trawl", min_year = 1996) {
+get_pbs_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
   i <- grep("-- insert filters here", q)
   # TODO allow for multiple gear types?
-  q[i] <- paste0("GEAR IN('", toupper(gear), "') AND YEAR(BEST_DATE) >= ", min_year, " AND")
+  q[i] <- paste0("GEAR IN('", toupper(gear), "') AND YEAR >= ", min_year, " AND")
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
   d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
