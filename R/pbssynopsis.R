@@ -87,5 +87,6 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(
   "scrambled_vessel", "species_category_code", "spp_catch", "spp_in_fe",
   "spp_in_row", "sum_catch", "total_positive_tows", "trips_over_thresh",
   "trips_over_treshold_this_year", "vessel_name",
-  "est", "est_log", "lwr", "se_log", "upr"
+  "est", "est_log", "lwr", "se_log", "upr",
+  "n_date", "pars", "par_group", "par_name_short", "se"
   ))

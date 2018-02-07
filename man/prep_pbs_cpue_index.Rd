@@ -8,8 +8,7 @@ prep_pbs_cpue_index(dat, species_common, year_range = c(1996, 2015),
   lat_range = c(48, Inf), min_positive_tows = 100,
   min_annual_positive_trips = 4, min_years_with_min_positive_trips = 4,
   area_grep_pattern = "5[CDE]+", lat_bands = seq(48, 60, 0.1),
-  depth_bands = seq(50, 550, 25), anonymous_vessels = TRUE,
-  gear = "BOTTOM TRAWL")
+  depth_bands = seq(50, 550, 25), gear = "BOTTOM TRAWL")
 }
 \arguments{
 \item{dat}{An input data frame from TODO}
@@ -34,10 +33,14 @@ of interest}
 
 \item{depth_bands}{A sequence of depth bands}
 
-\item{anonymous_vessels}{Should the vessel names be anonymized?}
-
 \item{gear}{Gear types}
 }
 \description{
 Prepare commercial PBS CPUE data
+}
+\seealso{
+Other CPUE index functions: \code{\link{fit_cpue_index}},
+  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index}},
+  \code{\link{tidy_cpue_index}}
 }

@@ -9,7 +9,6 @@ gg_cpue_coefs <- function(sm, mm1, mm2, re = TRUE) {
     mutate(par_num = 1:n()) %>%
     ungroup()
   # ii <- grep("b1_j", row.names(sm))
-
   if (re) {
     sm$par_name <- c(paste("bin", colnames(mm1)),
       paste("pos", colnames(mm2)),

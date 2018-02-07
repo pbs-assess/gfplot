@@ -14,3 +14,9 @@ tidy_cpue_index(object, center = TRUE)
 \description{
 Tidy a delta-lognormal commercial CPUE standardization model
 }
+\seealso{
+Other CPUE index functions: \code{\link{fit_cpue_index}},
+  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index}},
+  \code{\link{prep_pbs_cpue_index}}
+}
