@@ -32,16 +32,16 @@ tidy_pbs_cpue_index <- function(dat, species_common,
   depth_bands = seq(50, 450, 25),
   gear = "BOTTOM TRAWL") {
 
-  # pbs_areas and pbs_species are package data
-  pbs_areas <- pbs_areas[grep(area_grep_pattern, pbs_areas$major_stat_area_description), ]
+  pbs_areas <- PBSsynopsis::pbs_areas[grep(area_grep_pattern,
+    PBSsynopsis::pbs_areas$major_stat_area_description), ]
   names(catch) <- tolower(names(catch))
-  catch <- inner_join(catch, pbs_species, by = "species_code")
+  catch <- inner_join(catch, PBSsynopsis::pbs_species, by = "species_code")
 
   # basic filtering:
   catch <- catch %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
     mutate(year = lubridate::year(best_date)) %>%
-    filter(!fishing_event_id %in% c(0, 1)) %>% # bad events; many duplicates
+    filter(!fishing_event_id %in% c(0, 1)) %>% # bad events; many duplicates?
     filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
     filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
     filter(!is.na(latitude), !is.na(longitude)) %>%
@@ -234,7 +234,6 @@ fit_cpue_index <- function(dat,
 #'
 #' @export
 #' @family CPUE index functions
-#' @family Tidy functions
 
 predict_cpue_index <- function(object, center = TRUE) {
   report_sum <- summary(object$sdreport)

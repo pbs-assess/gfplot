@@ -11,6 +11,8 @@
 #' @param n_bins TODO
 #' @param bin_size TODO
 #' @param min_specimens TODO
+#' @family plotting functions
+#' @export
 plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L) {
 
   survs <- c(

@@ -44,7 +44,8 @@ Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{plot_cpue_index}},
   \code{\link{predict_cpue_index}}
 
-Other tidy data functions: \code{\link{tidy_pbs_ages}},
+Other tidy data functions: \code{\link{tidy_pbs_ageing_precision}},
+  \code{\link{tidy_pbs_ages}},
   \code{\link{tidy_pbs_bioindex}},
   \code{\link{tidy_pbs_catch}}
 }
