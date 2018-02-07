@@ -146,6 +146,9 @@ make_pred_mm <- function(x, years) {
   mm_pred
 }
 
+# Force factors to be sequential within the positive or binary data sets:
+f <- function(x) as.factor(as.character(x))
+
 #' Fit a delta-lognormal commercial CPUE standardization model
 #'
 #' @param dat A data frame from \code{\link{prep_pbs_cpue}}, or a similarly
@@ -158,8 +161,11 @@ make_pred_mm <- function(x, years) {
 #' @importFrom stats coef model.matrix lm binomial rnorm
 
 fit_cpue_index <- function(dat,
-  formula_binomial = pos_catch ~ year_factor,
-  formula_lognormal = log(spp_catch/hours_fished) ~ year_factor) {
+  formula_binomial = pos_catch ~ year_factor + f(month_factor) + f(vessel_name) +
+      f(dfo_locality) + f(depth_band) + f(latitude_band),
+  formula_lognormal = log(spp_catch/hours_fished) ~ year_factor +
+    f(month_factor) + f(vessel_name) +
+      f(dfo_locality) + f(depth_band) + f(latitude_band)) {
 
   tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "PBSsynopsis")
   TMB::compile(tmb_cpp)
