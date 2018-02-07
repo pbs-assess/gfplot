@@ -9,7 +9,7 @@ plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 }
 \arguments{
 \item{dat}{A properly formatted data frame. For example, from
-\code{\link{prep_pbs_ages}}. The input data frame must have the columns (in
+\code{\link{tidy_pbs_ages}}. The input data frame must have the columns (in
 any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
 \code{age}, \code{survey}, \code{n_scaled}.}
 
@@ -30,7 +30,7 @@ Plot age frequencies with bubble plots
 \examples{
 \dontrun{
 d <- get_pbs_survsamples("canary rockfish")
-d <- prep_pbs_ages(d)
+d <- tidy_pbs_ages(d)
 plot_ages(d)
 }
 }

@@ -9,7 +9,7 @@ plot_catch(dat, ylab = "Landings", units = c(`1000 tons` = 1e+06, tons =
 }
 \arguments{
 \item{dat}{A properly formatted data frame. For example, from
-\code{\link{prep_pbs_catch}}. The input data frame must have the columns
+\code{\link{tidy_pbs_catch}}. The input data frame must have the columns
 (in any order): \code{year}, \code{gear}, \code{value} (containing catches
 or landings).}
 
@@ -31,7 +31,7 @@ Plot catches
 \examples{
 \dontrun{
 d <- get_pbs_catch("lingcod")
-d <- prep_pbs_catch(d)
+d <- tidy_pbs_catch(d)
 plot_catch(d)
 }
 }

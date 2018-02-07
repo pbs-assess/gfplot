@@ -175,7 +175,7 @@ get_pbs_cpue <- function(species) {
 
 #' Get PBS catch and effort data for all species for CPUE index calculation
 #'
-#' Can be used to extract data for \code{\link{prep_pbs_cpue_index}}.
+#' Can be used to extract data for \code{\link{tidy_pbs_cpue_index}}.
 #'
 #' @param gear A single gear type to include
 #' @param min_year Minimum year to return

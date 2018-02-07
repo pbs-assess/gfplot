@@ -12,7 +12,7 @@ get_pbs_cpue_index(gear = "bottom trawl", min_year = 1996)
 \item{min_year}{Minimum year to return}
 }
 \description{
-Can be used to extract data for \code{\link{prep_pbs_cpue_index}}.
+Can be used to extract data for \code{\link{tidy_pbs_cpue_index}}.
 }
 \seealso{
 Other get PBS data functions: \code{\link{cache_pbs_data}},

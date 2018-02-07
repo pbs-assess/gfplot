@@ -20,7 +20,7 @@ Title TODO
 \examples{
 \dontrun{
 d <- get_pbs_bioindex("lingcod")
-d <- prep_pbs_bioindex(d)
+d <- tidy_pbs_bioindex(d)
 plot_bioindex(d)
 }
 }

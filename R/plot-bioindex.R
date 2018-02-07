@@ -10,10 +10,10 @@
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_bioindex("lingcod")
-#' prep_pbs_bioindex(d)
+#' tidy_pbs_bioindex(d)
 #' }
 
-prep_pbs_bioindex <- function(dat,
+tidy_pbs_bioindex <- function(dat,
   surveys = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -95,7 +95,7 @@ prep_pbs_bioindex <- function(dat,
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_bioindex("lingcod")
-#' d <- prep_pbs_bioindex(d)
+#' d <- tidy_pbs_bioindex(d)
 #' plot_bioindex(d)
 #' }
 

@@ -10,13 +10,13 @@
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_survsamples("lingcod")
-#' prep_pbs_samples(d)
+#' tidy_pbs_samples(d)
 #'
 #' d <- get_pbs_commsamples("lingcod")
-#' prep_pbs_samples(d)
+#' tidy_pbs_samples(d)
 #' }
 
-prep_pbs_samples <- function(dat, year_range = NULL) {
+tidy_pbs_samples <- function(dat, year_range = NULL) {
 
   if (!is.null(year_range))
     dat <- dat[dat$year >= year_range[[1]] & dat$year <= year_range[[2]], ]
@@ -53,7 +53,7 @@ prep_pbs_samples <- function(dat, year_range = NULL) {
 #' Plot sample availability
 #'
 #' @param dat An input data frame from, for example,
-#' \code{\link{prep_pbs_samples}}. The input data frame must have the columns:
+#' \code{\link{tidy_pbs_samples}}. The input data frame must have the columns:
 #' \describe{
 #'   \item{\code{year}}{The year.}
 #'   \item{\code{type}}{The types of samples to plot, e.g. "maturity",
@@ -74,12 +74,12 @@ prep_pbs_samples <- function(dat, year_range = NULL) {
 #'
 #' \dontrun{
 #' d <- get_pbs_survsamples("lingcod")
-#' d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+#' d <- tidy_pbs_samples(d, year_range = c(1996, 2016))
 #' plot_samples(d, year_range = c(1996, 2016),
 #'   title = "Survey samples")
 #'
 #' d <- get_pbs_commsamples("lingcod")
-#' d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+#' d <- tidy_pbs_samples(d, year_range = c(1996, 2016))
 #' plot_samples(d, year_range = c(1996, 2016),
 #'   title = "Commercial samples")
 #' }

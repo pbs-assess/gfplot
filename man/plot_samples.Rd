@@ -9,7 +9,7 @@ plot_samples(dat, year_range = NULL, title = "Biological samples",
 }
 \arguments{
 \item{dat}{An input data frame from, for example,
-\code{\link{prep_pbs_samples}}. The input data frame must have the columns:
+\code{\link{tidy_pbs_samples}}. The input data frame must have the columns:
 \describe{
   \item{\code{year}}{The year.}
   \item{\code{type}}{The types of samples to plot, e.g. "maturity",
@@ -36,12 +36,12 @@ plot_samples(d)
 
 \dontrun{
 d <- get_pbs_survsamples("lingcod")
-d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+d <- tidy_pbs_samples(d, year_range = c(1996, 2016))
 plot_samples(d, year_range = c(1996, 2016),
   title = "Survey samples")
 
 d <- get_pbs_commsamples("lingcod")
-d <- prep_pbs_samples(d, year_range = c(1996, 2016))
+d <- tidy_pbs_samples(d, year_range = c(1996, 2016))
 plot_samples(d, year_range = c(1996, 2016),
   title = "Commercial samples")
 }

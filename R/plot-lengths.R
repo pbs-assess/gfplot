@@ -1,7 +1,7 @@
 # TODO
 #
 # @param dat
-# prep_pbs_lengths <- function(dat) {
+# tidy_pbs_lengths <- function(dat) {
 
 # }
 

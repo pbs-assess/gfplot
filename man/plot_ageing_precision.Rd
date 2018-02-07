@@ -8,7 +8,7 @@ plot_ageing_precision(dat, n = 250, jitter = 0.25, seed = NULL)
 }
 \arguments{
 \item{dat}{A properly formatted data frame, for example, from
-\code{\link{prep_pbs_ageing_precision}}. Should have columns named
+\code{\link{tidy_pbs_ageing_precision}}. Should have columns named
 TODO.}
 
 \item{n}{Number of fish to sample if there are more fish than \code{n}.}
@@ -26,7 +26,7 @@ Plot pbs ageing precision data
 \examples{
 \dontrun{
 get_pbs_ageing_precision("pacific ocean perch") \%>\%
-  prep_pbs_ageing_precision() \%>\%
+  tidy_pbs_ageing_precision() \%>\%
   plot_ageing_precision(n = 200)
 }
 }

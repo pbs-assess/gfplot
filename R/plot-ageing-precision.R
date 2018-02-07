@@ -10,9 +10,9 @@
 #' @examples
 #' \dontrun{
 #' get_pbs_ageing_precision("pacific ocean perch") %>%
-#'   prep_pbs_ageing_precision()
+#'   tidy_pbs_ageing_precision()
 #' }
-prep_pbs_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
+tidy_pbs_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 
   dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   # remove specimen id's for which there is no precision reading
@@ -53,7 +53,7 @@ prep_pbs_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' Plot pbs ageing precision data
 #'
 #' @param dat A properly formatted data frame, for example, from
-#'   \code{\link{prep_pbs_ageing_precision}}. Should have columns named
+#'   \code{\link{tidy_pbs_ageing_precision}}. Should have columns named
 #'   TODO.
 #' @param n Number of fish to sample if there are more fish than \code{n}.
 #' @param jitter Amount to randomly jitter ages. Same jitter values are used for
@@ -67,7 +67,7 @@ prep_pbs_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' @examples
 #' \dontrun{
 #' get_pbs_ageing_precision("pacific ocean perch") %>%
-#'   prep_pbs_ageing_precision() %>%
+#'   tidy_pbs_ageing_precision() %>%
 #'   plot_ageing_precision(n = 200)
 #' }
 plot_ageing_precision <- function(dat, n = 250, jitter = 0.25, seed = NULL) {

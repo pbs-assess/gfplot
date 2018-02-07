@@ -7,7 +7,7 @@
 plot_cpue_index(dat)
 }
 \arguments{
-\item{dat}{Input data frame, for example from \code{\link{tidy_cpue_index}}}
+\item{dat}{Input data frame, for example from \code{\link{predict_cpue_index}}}
 }
 \value{
 A ggplot object
@@ -18,8 +18,8 @@ Plot a delta-lognormal commercial CPUE standardization model
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
-  \code{\link{prep_pbs_cpue_index}},
-  \code{\link{tidy_cpue_index}}
+  \code{\link{predict_cpue_index}},
+  \code{\link{tidy_pbs_cpue_index}}
 
 Other plotting functions: \code{\link{plot_bioindex}},
   \code{\link{plot_catch}},

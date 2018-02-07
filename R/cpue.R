@@ -20,8 +20,8 @@
 #' @export
 #'
 # @examples
-# prep_pbs_cpue_index(catch, species = "walleye pollock")
-prep_pbs_cpue_index <- function(dat, species_common,
+# tidy_pbs_cpue_index(catch, species = "walleye pollock")
+tidy_pbs_cpue_index <- function(dat, species_common,
   year_range = c(1996, Inf),
   lat_range = c(48, Inf),
   min_positive_tows = 100,
@@ -164,7 +164,7 @@ f <- function(x) as.factor(as.character(x))
 
 #' Fit a delta-lognormal commercial CPUE standardization model
 #'
-#' @param dat A data frame from \code{\link{prep_pbs_cpue_index}}, or a similarly
+#' @param dat A data frame from \code{\link{tidy_pbs_cpue_index}}, or a similarly
 #'   formatted data frame
 #' @param formula_binomial Formula for the binomial model
 #' @param formula_lognormal Formula for the lognormal model
@@ -236,7 +236,7 @@ fit_cpue_index <- function(dat,
 #' @family CPUE index functions
 #' @family Tidy functions
 
-tidy_cpue_index <- function(object, center = TRUE) {
+predict_cpue_index <- function(object, center = TRUE) {
   report_sum <- summary(object$sdreport)
   ii <- grep("log_prediction", row.names(report_sum))
   row.names(report_sum) <- NULL
@@ -257,7 +257,7 @@ tidy_cpue_index <- function(object, center = TRUE) {
 
 #' Plot a delta-lognormal commercial CPUE standardization model
 #'
-#' @param dat Input data frame, for example from \code{\link{tidy_cpue_index}}
+#' @param dat Input data frame, for example from \code{\link{predict_cpue_index}}
 #'
 #' @export
 #' @family CPUE index functions

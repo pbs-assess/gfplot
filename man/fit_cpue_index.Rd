@@ -11,7 +11,7 @@ fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor +
   f(depth_band) + f(latitude_band))
 }
 \arguments{
-\item{dat}{A data frame from \code{\link{prep_pbs_cpue_index}}, or a similarly
+\item{dat}{A data frame from \code{\link{tidy_pbs_cpue_index}}, or a similarly
 formatted data frame}
 
 \item{formula_binomial}{Formula for the binomial model}
@@ -24,6 +24,6 @@ Fit a delta-lognormal commercial CPUE standardization model
 \seealso{
 Other CPUE index functions: \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
-  \code{\link{prep_pbs_cpue_index}},
-  \code{\link{tidy_cpue_index}}
+  \code{\link{predict_cpue_index}},
+  \code{\link{tidy_pbs_cpue_index}}
 }

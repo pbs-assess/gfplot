@@ -15,10 +15,10 @@
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_survsamples("lingcod")
-#' prep_pbs_ages(d)
+#' tidy_pbs_ages(d)
 #' }
 
-prep_pbs_ages <- function(dat,
+tidy_pbs_ages <- function(dat,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -91,7 +91,7 @@ prep_pbs_ages <- function(dat,
 #' Plot age frequencies with bubble plots
 #'
 #' @param dat A properly formatted data frame. For example, from
-#'   \code{\link{prep_pbs_ages}}. The input data frame must have the columns (in
+#'   \code{\link{tidy_pbs_ages}}. The input data frame must have the columns (in
 #'   any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
 #'   \code{age}, \code{survey}, \code{n_scaled}.
 #' @param max_size Maximum dot size (passed to
@@ -106,7 +106,7 @@ prep_pbs_ages <- function(dat,
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_survsamples("canary rockfish")
-#' d <- prep_pbs_ages(d)
+#' d <- tidy_pbs_ages(d)
 #' plot_ages(d)
 #' }
 
