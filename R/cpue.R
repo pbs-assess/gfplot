@@ -270,6 +270,7 @@ predict_cpue_index <- function(object, center = FALSE) {
 #' Plot a delta-lognormal commercial CPUE standardization model
 #'
 #' @param dat Input data frame, for example from \code{\link{predict_cpue_index}}
+#' @param all_models TODO
 #'
 #' @export
 #' @family CPUE index functions

@@ -8,6 +8,8 @@ plot_cpue_index(dat, all_models = TRUE)
 }
 \arguments{
 \item{dat}{Input data frame, for example from \code{\link{predict_cpue_index}}}
+
+\item{all_models}{TODO}
 }
 \value{
 A ggplot object
