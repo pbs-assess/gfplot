@@ -4,8 +4,11 @@
 \alias{fit_cpue_index}
 \title{Fit a delta-lognormal commercial CPUE standardization model}
 \usage{
-fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor,
-  formula_lognormal = log(spp_catch/hours_fished) ~ year_factor)
+fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor +
+  f(month_factor) + f(vessel_name) + f(dfo_locality) + f(depth_band) +
+  f(latitude_band), formula_lognormal = log(spp_catch/hours_fished) ~
+  year_factor + f(month_factor) + f(vessel_name) + f(dfo_locality) +
+  f(depth_band) + f(latitude_band))
 }
 \arguments{
 \item{dat}{A data frame from \code{\link{prep_pbs_cpue}}, or a similarly
