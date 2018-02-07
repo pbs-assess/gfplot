@@ -18,7 +18,7 @@
 #' @export
 #'
 # @examples
-# prep_pbs_cpue(catch, species = "arrowtooth flounder")
+# prep_pbs_cpue_index(catch, species = "arrowtooth flounder")
 prep_pbs_cpue_index <- function(dat, species_common,
   year_range = c(1996, 2015),
   lat_range = c(48, Inf),
@@ -126,7 +126,7 @@ f <- function(x) as.factor(as.character(x))
 
 #' Fit a delta-lognormal commercial CPUE standardization model
 #'
-#' @param dat A data frame from \code{\link{prep_pbs_cpue}}, or a similarly
+#' @param dat A data frame from \code{\link{prep_pbs_cpue_index}}, or a similarly
 #'   formatted data frame
 #' @param formula_binomial Formula for the binomial model
 #' @param formula_lognormal Formula for the lognormal model
