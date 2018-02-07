@@ -13,13 +13,13 @@
 #' @param lat_bands A sequence of latitude bans
 #' @param depth_bands A sequence of depth bands
 #' @param anonymous_vessels Should the vessel names be anonymized?
+#' @param gear Gear types
 #'
 #' @export
 #'
 # @examples
-# # catch <- readRDS("~/Dropbox/dfo/selected-data/gf_merged_catch_1996_onwards.rds")
 # prep_pbs_cpue(catch, species = "arrowtooth flounder")
-prep_pbs_cpue <- function(dat, species_common,
+prep_pbs_cpue_index <- function(dat, species_common,
   year_range = c(1996, 2015),
   lat_range = c(48, Inf),
   min_positive_tows = 100,
@@ -28,7 +28,8 @@ prep_pbs_cpue <- function(dat, species_common,
   area_grep_pattern = "5[CDE]+",
   lat_bands = seq(47, 62, 0.1),
   depth_bands = seq(0, 900, 25),
-  anonymous_vessels = TRUE) {
+  anonymous_vessels = TRUE,
+  gear = "BOTTOM TRAWL") {
 
   # areas and species are package data
   pbs_areas <- pbs_areas[grep(area_grep_pattern, pbs_areas$major_stat_area_description), ]
@@ -38,8 +39,8 @@ prep_pbs_cpue <- function(dat, species_common,
   d <- inner_join(catch, pbs_areas, by = "major_stat_area_code") %>%
     mutate(year = lubridate::year(best_date)) %>%
     filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
-    filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
     filter(gear %in% toupper(gear)) %>%
+    filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
     filter(!is.na(latitude), !is.na(longitude)) %>%
     filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
     mutate(month = lubridate::month(best_date)) %>%
@@ -59,6 +60,27 @@ prep_pbs_cpue <- function(dat, species_common,
       latitude = mean(latitude, na.rm = TRUE)) %>%
     ungroup()
 
+  # caught_something <- d_fe %>%
+  #   group_by(vessel_name) %>%
+  #   mutate(total_positive_tows = sum(pos_catch)) %>%
+  #   filter(total_positive_tows >= min_positive_tows) %>%
+  #   filter(spp_catch > 0) %>%
+  #   group_by(year, vessel_name, trip_id) %>%
+  #   summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
+  #   filter(sum_catch > 0) %>%
+  #   group_by(vessel_name) %>%
+  #   mutate(n_years = length(unique(year))) %>%
+  #   # for speed (filter early known cases):
+  #   filter(n_years >= min_years_with_min_positive_trips) %>%
+  #   group_by(year, vessel_name) %>%
+  #   summarise(n_trips_per_year = length(unique(trip_id))) %>%
+  #   mutate(trips_over_treshold_this_year =
+  #       n_trips_per_year >= min_annual_positive_trips) %>%
+  #   group_by(vessel_name) %>%
+  #   summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
+  #   filter(trips_over_thresh >= min_years_with_min_positive_trips) %>%
+  #   ungroup()
+
   caught_something <- d_fe %>%
     group_by(vessel_name) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
@@ -67,12 +89,16 @@ prep_pbs_cpue <- function(dat, species_common,
     group_by(year, vessel_name, trip_id) %>%
     summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
     filter(sum_catch > 0) %>%
+    group_by(year, vessel_name) %>%
+    mutate(n_trips_per_year = length(unique(trip_id))) %>%
     group_by(vessel_name) %>%
     mutate(n_years = length(unique(year))) %>%
-    # for speed (filter early known cases):
-    filter(n_years >= min_years_with_min_positive_trips) %>%
+    filter(n_years >= 4) %>%
+    group_by(vessel_name) %>%
+    mutate(n_trips_total = length(unique(trip_id))) %>%
     group_by(year, vessel_name) %>%
-    summarise(n_trips_per_year = length(unique(trip_id))) %>%
+    summarise(n_trips_per_year = unique(n_trips_per_year)) %>%
+    group_by(vessel_name) %>%
     mutate(trips_over_treshold_this_year =
         n_trips_per_year >= min_annual_positive_trips) %>%
     group_by(vessel_name) %>%
@@ -87,7 +113,8 @@ prep_pbs_cpue <- function(dat, species_common,
       vessel_name = as.factor(vessel_name),
       latitude_band = as.factor(lat_bands[findInterval(latitude, lat_bands)]),
       dfo_locality = as.factor(locality_code),
-      year = as.factor(year)) %>%
+      year_factor = as.factor(year),
+      month_factor = as.factor(month)) %>%
     mutate(pos_catch = ifelse(spp_catch > 0, 1, 0))
 
   if (anonymous_vessels) {
@@ -97,6 +124,8 @@ prep_pbs_cpue <- function(dat, species_common,
       select(-vessel_name) %>%
       dplyr::rename(vessel_name = scrambled_vessel)
   }
+
+  d_retained <- arrange(d_retained, .data$year, .data$vessel_name)
 
   dplyr::as_tibble(d_retained)
 }
@@ -128,9 +157,9 @@ make_pred_mm <- function(x, years) {
 #'
 #' @importFrom stats coef model.matrix lm binomial rnorm
 
-fit_cpue <- function(dat,
-  formula_binomial = pos_catch ~ year,
-  formula_lognormal = log(spp_catch/hours_fished) ~ year) {
+fit_cpue_index <- function(dat,
+  formula_binomial = pos_catch ~ year_factor,
+  formula_lognormal = log(spp_catch/hours_fished) ~ year_factor) {
 
   tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "PBSsynopsis")
   TMB::compile(tmb_cpp)
@@ -141,8 +170,8 @@ fit_cpue <- function(dat,
   mm1 <- model.matrix(formula_binomial, data = dat)
   mm2 <- model.matrix(formula_lognormal, data = pos_dat)
 
-  mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year))
-  mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year))
+  mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
+  mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
 
   # get some close starting values:
   m_bin <- speedglm::speedglm(formula_binomial, data = dat,
@@ -159,17 +188,61 @@ fit_cpue <- function(dat,
     parameters = list(
       b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
       b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
-      log_sigma = log(summary(m_pos)$sigma)),
+      # b1_j = rnorm(ncol(mm_pred1), 0, 0.2),
+      # b2_j = rnorm(ncol(mm_pred2), 0, 0.2),
+      log_sigma = log(summary(m_pos)$sigma) + rnorm(1, 0, 0.001)),
+    # log_sigma = rnorm(1, 0, 0.2)),
     DLL = "deltalognormal")
 
-    opt <- stats::nlminb(
-      start = obj$par,
-      objective = obj$fn,
-      gradient = obj$gr, control = list(iter.max = 1000,
-        eval.max = 1000))
+  opt <- stats::nlminb(
+    start = obj$par,
+    objective = obj$fn,
+    gradient = obj$gr, control = list(iter.max = 1000L,
+      eval.max = 1000L))
 
   message("Getting sdreport ...")
   r <- TMB::sdreport(obj)
 
-  list(model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)))
+  list(model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)),
+    years = sort(unique(dat$year)))
+}
+
+#' Tidy a delta-lognormal commercial CPUE standardization model
+#'
+#' @param object A model object from \code{\link{fit_cpue_index}}
+#' @param center Should the index be centered by subtracting the mean in log space?
+#'
+#' @export
+
+tidy_cpue_index <- function(object, center = TRUE) {
+  report_sum <- summary(object$sdreport)
+  ii <- grep("log_prediction", row.names(report_sum))
+  row.names(report_sum) <- NULL
+  df <- as.data.frame(report_sum[ii, ])
+  df$year <- object$years
+
+  if (center)
+    df$Estimate <- df$Estimate - mean(df$Estimate)
+
+  df %>% dplyr::rename(se_log = .data$`Std. Error`) %>%
+    dplyr::rename(est_log = .data$Estimate) %>%
+    mutate(
+      lwr = exp(est_log - 1.96 * se_log),
+      upr = exp(est_log + 1.96 * se_log),
+      est = exp(est_log)) %>%
+    select(year, est_log, se_log, est, lwr, upr)
+}
+
+#' Plot a delta-lognormal commercial CPUE standardization model
+#'
+#' @param dat Input data frame, for example from \code{\link{tidy_cpue_index}}
+#'
+#' @export
+
+plot_cpue_index <- function(dat) {
+  ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
+    ggplot2::geom_ribbon(alpha = 0.5) +
+    geom_line() +
+    theme_pbs() +
+    labs(y = "CPUE index", x = "")
 }

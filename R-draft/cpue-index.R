@@ -15,7 +15,7 @@ depth_bands <- seq(50, 550, 25)
 
 d <- inner_join(catch, areas, by = "major_stat_area_code") %>%
   mutate(year = lubridate::year(best_date)) %>%
-  filter(year >= 1996) %>%
+  filter(year >= 1996 & year <= 2015) %>%
   filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
   filter(gear == "BOTTOM TRAWL") %>%
   filter(!is.na(latitude), !is.na(longitude)) %>%

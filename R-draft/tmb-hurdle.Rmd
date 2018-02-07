@@ -155,7 +155,7 @@ f1 <- pos_catch ~ year_factor
 f2 <- log(spp_catch/hours_fished) ~ year_factor
 
 if (!file.exists("cpue-glm-eg-year.rda")) {
-  source("R/delta-cpue-tmb-glm.R")
+  source("R-draft/delta-cpue-tmb-glm.R")
   save(r, mm1, mm2, obj, that_took, file = "cpue-glm-eg-year.rda") 
 } else {
   load("cpue-glm-eg-year.rda")

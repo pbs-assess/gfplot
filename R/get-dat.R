@@ -145,7 +145,7 @@ get_pbs_catch <- function(species) {
   d
 }
 
-#' Get PBS commercial CPUE data
+#' Get PBS commercial CPUE data (for mapping)
 #'
 #' @param species A character vector of species common names
 #' @export
@@ -166,6 +166,27 @@ get_pbs_cpue <- function(species) {
   d
 }
 
+#' Get PBS catch and effort data for all species for CPUE index calculation
+#'
+#' Can be used to extract data for \code{\link{prep_pbs_cpue_index}}.
+#'
+#' @param gear A single gear type to include
+#' @param min_year Minimum year to return
+#'
+#' @export
+get_pbs_all_catch <- function(gear = "bottom trawl", min_year = 1996) {
+  q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
+  i <- grep("-- insert filters here", q)
+  # TODO allow for multiple gear types?
+  q[i] <- paste0("GEAR IN('", toupper(gear), "') AND YEAR(BEST_DATE) >= ", min_year, " AND")
+  sql <- paste(q, collapse = "\n")
+  d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
+  d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+    toupper("north pacific spiny dogfish") # to match GFBioSQL
+  names(d) <- tolower(names(d))
+  d$species_common_name <- tolower(d$species_common_name)
+  d
+}
 
 #' Get PBS ageing precision data
 #'
