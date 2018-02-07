@@ -21,3 +21,8 @@ d <- get_pbs_catch("lingcod")
 prep_pbs_catch(d)
 }
 }
+\seealso{
+Other prepare data functions: \code{\link{prep_pbs_ages}},
+  \code{\link{prep_pbs_bioindex}},
+  \code{\link{prep_pbs_cpue_index}}
+}

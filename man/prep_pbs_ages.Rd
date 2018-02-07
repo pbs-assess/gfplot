@@ -37,3 +37,8 @@ d <- get_pbs_survsamples("lingcod")
 prep_pbs_ages(d)
 }
 }
+\seealso{
+Other prepare data functions: \code{\link{prep_pbs_bioindex}},
+  \code{\link{prep_pbs_catch}},
+  \code{\link{prep_pbs_cpue_index}}
+}

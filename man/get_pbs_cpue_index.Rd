@@ -14,3 +14,16 @@ get_pbs_cpue_index(gear = "bottom trawl", min_year = 1996)
 \description{
 Can be used to extract data for \code{\link{prep_pbs_cpue_index}}.
 }
+\seealso{
+Other get PBS data functions: \code{\link{cache_pbs_data}},
+  \code{\link{get_pbs_ageing_precision}},
+  \code{\link{get_pbs_bioindex}},
+  \code{\link{get_pbs_catch}},
+  \code{\link{get_pbs_commsamples}},
+  \code{\link{get_pbs_cpue}},
+  \code{\link{get_pbs_sample_trips}},
+  \code{\link{get_pbs_strata}},
+  \code{\link{get_pbs_survey}},
+  \code{\link{get_pbs_survsamples}},
+  \code{\link{get_sara_dat}}
+}

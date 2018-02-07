@@ -4,6 +4,7 @@
 #'
 #' @return A data frame formatted for \code{\link{plot_catch}}
 #' @export
+#' @family prepare data functions
 #'
 #' @examples
 #' \dontrun{
@@ -66,6 +67,7 @@ prep_pbs_catch <- function(dat) {
 #'   rectangles.
 #'
 #' @export
+#' @family plotting functions
 #'
 #' @examples
 #' \dontrun{

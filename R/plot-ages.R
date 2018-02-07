@@ -10,6 +10,7 @@
 #'
 #' @return A data frame formatted for \code{\link{plot_ages}}
 #' @export
+#' @family prepare data functions
 #'
 #' @examples
 #' \dontrun{

@@ -5,6 +5,7 @@
 #'
 #' @importFrom stats binomial plogis predict
 #' @export
+#' @family plotting functions
 
 plot_maturity <- function(dat, type = "age") {
 

@@ -24,3 +24,9 @@ d <- prep_pbs_bioindex(d)
 plot_bioindex(d)
 }
 }
+\seealso{
+Other plotting functions: \code{\link{plot_catch}},
+  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index}},
+  \code{\link{plot_maturity}}
+}

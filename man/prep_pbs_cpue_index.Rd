@@ -4,14 +4,14 @@
 \alias{prep_pbs_cpue_index}
 \title{Prepare commercial PBS CPUE data}
 \usage{
-prep_pbs_cpue_index(dat, species_common, year_range = c(1996, 2016),
+prep_pbs_cpue_index(dat, species_common, year_range = c(1996, Inf),
   lat_range = c(48, Inf), min_positive_tows = 100,
   min_annual_positive_trips = 4, min_years_with_min_positive_trips = 4,
   area_grep_pattern = "5[CDE]+", lat_bands = seq(48, 59, 0.1),
   depth_bands = seq(50, 450, 25), gear = "BOTTOM TRAWL")
 }
 \arguments{
-\item{dat}{An input data frame from TODO}
+\item{dat}{An input data frame from \code{\link{get_pbs_cpue_index}}}
 
 \item{species_common}{The species common name}
 
@@ -43,4 +43,8 @@ Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{plot_coefs_cpue_index}},
   \code{\link{plot_cpue_index}},
   \code{\link{tidy_cpue_index}}
+
+Other prepare data functions: \code{\link{prep_pbs_ages}},
+  \code{\link{prep_pbs_bioindex}},
+  \code{\link{prep_pbs_catch}}
 }

@@ -14,3 +14,9 @@ plot_maturity(dat, type = "age")
 \description{
 TODO
 }
+\seealso{
+Other plotting functions: \code{\link{plot_bioindex}},
+  \code{\link{plot_catch}},
+  \code{\link{plot_coefs_cpue_index}},
+  \code{\link{plot_cpue_index}}
+}

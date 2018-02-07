@@ -14,3 +14,16 @@ cache_pbs_data(species, path = "data-cache")
 \description{
 Cache all PBS groundfish data for one or more species
 }
+\seealso{
+Other get PBS data functions: \code{\link{get_pbs_ageing_precision}},
+  \code{\link{get_pbs_bioindex}},
+  \code{\link{get_pbs_catch}},
+  \code{\link{get_pbs_commsamples}},
+  \code{\link{get_pbs_cpue_index}},
+  \code{\link{get_pbs_cpue}},
+  \code{\link{get_pbs_sample_trips}},
+  \code{\link{get_pbs_strata}},
+  \code{\link{get_pbs_survey}},
+  \code{\link{get_pbs_survsamples}},
+  \code{\link{get_sara_dat}}
+}

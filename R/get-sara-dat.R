@@ -1,6 +1,7 @@
 #' Get SARA and COSEWIC data
 #'
 #' @export
+#' @family get PBS data functions
 get_sara_dat <- function() {
   h <- xml2::read_html("http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm")
   d <- h %>% rvest::html_nodes("table") %>%

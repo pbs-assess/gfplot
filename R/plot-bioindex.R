@@ -6,6 +6,7 @@
 #' @param min_years TODO
 #' @param year_range TODO
 #' @export
+#' @family prepare data functions
 #' @examples
 #' \dontrun{
 #' d <- get_pbs_bioindex("lingcod")
@@ -89,6 +90,7 @@ prep_pbs_bioindex <- function(dat,
 #' @param title TODO
 #'
 #' @export
+#' @family plotting functions
 #'
 #' @examples
 #' \dontrun{

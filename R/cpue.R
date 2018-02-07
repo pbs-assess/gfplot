@@ -1,6 +1,6 @@
 #' Prepare commercial PBS CPUE data
 #'
-#' @param dat An input data frame from TODO
+#' @param dat An input data frame from \code{\link{get_pbs_cpue_index}}
 #' @param species_common The species common name
 #' @param year_range The range of years to include
 #' @param lat_range The range of latitudes to include
@@ -15,6 +15,7 @@
 #' @param gear Gear types
 #'
 #' @family CPUE index functions
+#' @family prepare data functions
 #'
 #' @export
 #'
@@ -172,6 +173,7 @@ f <- function(x) as.factor(as.character(x))
 #'
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #' @family CPUE index functions
+#' @family Fitting functions
 
 fit_cpue_index <- function(dat,
   formula_binomial = pos_catch ~ year_factor + f(month_factor) + f(vessel_name) +
@@ -232,7 +234,8 @@ fit_cpue_index <- function(dat,
 #'
 #' @export
 #' @family CPUE index functions
-#'
+#' @family Tidy functions
+
 tidy_cpue_index <- function(object, center = TRUE) {
   report_sum <- summary(object$sdreport)
   ii <- grep("log_prediction", row.names(report_sum))
@@ -258,8 +261,9 @@ tidy_cpue_index <- function(object, center = TRUE) {
 #'
 #' @export
 #' @family CPUE index functions
+#' @family plotting functions
 #' @return A ggplot object
-#'
+
 plot_cpue_index <- function(dat) {
   ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
     ggplot2::geom_ribbon(alpha = 0.5) +
@@ -267,47 +271,6 @@ plot_cpue_index <- function(dat) {
     theme_pbs() +
     labs(y = "CPUE index", x = "")
 }
-
-# jackknife_cpue <- function(f_bin, f_pos, terms) {
-#
-#   mm1 <- model.matrix(f_bin, data = d_retained)
-#   mm2 <- model.matrix(f_pos, data = subset(d_retained, pos_catch == 1))
-#   mm1 <- make_pred_mm(mm1)
-#   mm2 <- make_pred_mm(mm2)
-#
-#   m_bin <- speedglm::speedglm(f_bin, data = d_retained,
-#     family = binomial(link = "logit"))
-#   m_pos <- lm(f_pos, data = subset(d_retained, pos_catch == 1))
-#
-#   p1 <- plogis(mm1 %*% coef(m_bin))
-#   p2 <- exp(mm2 %*% coef(m_pos))
-#   full <- data.frame(year = 1996:2015, term = "all", pred = p1 * p2)
-#
-#   fitm <- function(drop_term) {
-#     f1 <- update.formula(formula(m_bin), as.formula(paste0(". ~ . -", drop_term)))
-#     f2 <- update.formula(formula(m_pos), as.formula(paste0(". ~ . -", drop_term)))
-#     mm1 <- model.matrix(f1, data = d_retained)
-#     mm2 <- model.matrix(f2, data = subset(d_retained, pos_catch == 1))
-#     mm1 <- make_pred_mm(mm1)
-#     mm2 <- make_pred_mm(mm2)
-#     m_bin <- speedglm::speedglm(f1, data = d_retained,
-#       family = binomial(link = "logit"))
-#     m_pos <- lm(f2, data = subset(d_retained, pos_catch == 1))
-#     p1 <- plogis(mm1 %*% coef(m_bin))
-#     p2 <- exp(mm2 %*% coef(m_pos))
-#     o <- data.frame(year = 1996:2015, term = drop_term, pred = p1 * p2)
-#     o
-#   }
-#
-#   out <- plyr::ldply(terms, fitm)
-#   suppressWarnings(out <- bind_rows(full, out))
-#   out <- group_by(out, term) %>% mutate(pred = pred / exp(mean(log(pred)))) %>%
-#     ungroup()
-#   out
-# }
-
-# jk <- jackknife_cpue(f1, f2, terms = c("f(depth_band)", "f(vessel_name)",
-# "f(latitude_band)", "f(dfo_locality)", "f(month_factor)"))
 
 #' Plot coefficients from a CPUE index standardization model
 #'
@@ -325,6 +288,7 @@ plot_cpue_index <- function(dat) {
 #' @return A ggplot object
 #' @export
 #' @family CPUE index functions
+#' @family plotting functions
 
 plot_coefs_cpue_index <- function(object,
   coef_sub = c(
@@ -380,3 +344,45 @@ plot_coefs_cpue_index <- function(object,
     theme_pbs() + guides(shape = FALSE, colour = FALSE) +
     ggplot2::labs(y = "", x = "Coefficient value")
 }
+
+# jackknife_cpue <- function(f_bin, f_pos, terms) {
+#
+#   mm1 <- model.matrix(f_bin, data = d_retained)
+#   mm2 <- model.matrix(f_pos, data = subset(d_retained, pos_catch == 1))
+#   mm1 <- make_pred_mm(mm1)
+#   mm2 <- make_pred_mm(mm2)
+#
+#   m_bin <- speedglm::speedglm(f_bin, data = d_retained,
+#     family = binomial(link = "logit"))
+#   m_pos <- lm(f_pos, data = subset(d_retained, pos_catch == 1))
+#
+#   p1 <- plogis(mm1 %*% coef(m_bin))
+#   p2 <- exp(mm2 %*% coef(m_pos))
+#   full <- data.frame(year = 1996:2015, term = "all", pred = p1 * p2)
+#
+#   fitm <- function(drop_term) {
+#     f1 <- update.formula(formula(m_bin), as.formula(paste0(". ~ . -", drop_term)))
+#     f2 <- update.formula(formula(m_pos), as.formula(paste0(". ~ . -", drop_term)))
+#     mm1 <- model.matrix(f1, data = d_retained)
+#     mm2 <- model.matrix(f2, data = subset(d_retained, pos_catch == 1))
+#     mm1 <- make_pred_mm(mm1)
+#     mm2 <- make_pred_mm(mm2)
+#     m_bin <- speedglm::speedglm(f1, data = d_retained,
+#       family = binomial(link = "logit"))
+#     m_pos <- lm(f2, data = subset(d_retained, pos_catch == 1))
+#     p1 <- plogis(mm1 %*% coef(m_bin))
+#     p2 <- exp(mm2 %*% coef(m_pos))
+#     o <- data.frame(year = 1996:2015, term = drop_term, pred = p1 * p2)
+#     o
+#   }
+#
+#   out <- plyr::ldply(terms, fitm)
+#   suppressWarnings(out <- bind_rows(full, out))
+#   out <- group_by(out, term) %>% mutate(pred = pred / exp(mean(log(pred)))) %>%
+#     ungroup()
+#   out
+# }
+
+# jk <- jackknife_cpue(f1, f2, terms = c("f(depth_band)", "f(vessel_name)",
+# "f(latitude_band)", "f(dfo_locality)", "f(month_factor)"))
+

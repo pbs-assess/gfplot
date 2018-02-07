@@ -1,6 +1,7 @@
 #' Title here TODO
 #'
 #' @export
+#' @family get PBS data functions
 get_pbs_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
@@ -11,6 +12,7 @@ get_pbs_sample_trips <- function() {
 #' Title here TODO
 #'
 #' @export
+#' @family get PBS data functions
 get_pbs_strata <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SG.SURVEY_ID,
@@ -29,6 +31,7 @@ get_pbs_strata <- function() {
 #' @param survey_codes A numeric vector of survey series IDs
 #'
 #' @export
+#' @family get PBS data functions
 get_pbs_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
@@ -76,6 +79,7 @@ get_pbs_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
 #'
 #' @param species A character vector of species common names
 #' @export
+#' @family get PBS data functions
 get_pbs_survsamples <- function(species) {
   q <- readLines(system.file("sql", "get-survey-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
@@ -104,6 +108,7 @@ get_pbs_survsamples <- function(species) {
 #'
 #' @param species A character vector of species common names
 #' @export
+#' @family get PBS data functions
 get_pbs_commsamples <- function(species) {
   q <- readLines(system.file("sql", "get-commercial-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
@@ -120,6 +125,7 @@ get_pbs_commsamples <- function(species) {
 #'
 #' @param species A character vector of species common names
 #' @export
+#' @family get PBS data functions
 get_pbs_catch <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-landings.sql", package = "PBSsynopsis"))
@@ -149,6 +155,7 @@ get_pbs_catch <- function(species) {
 #'
 #' @param species A character vector of species common names
 #' @export
+#' @family get PBS data functions
 get_pbs_cpue <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-cpue.sql", package = "PBSsynopsis"))
@@ -174,6 +181,7 @@ get_pbs_cpue <- function(species) {
 #' @param min_year Minimum year to return
 #'
 #' @export
+#' @family get PBS data functions
 get_pbs_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
   i <- grep("-- insert filters here", q)
@@ -189,6 +197,7 @@ get_pbs_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 #'
 #' @param species A character vector of a species common names
 #' @export
+#' @family get PBS data functions
 get_pbs_ageing_precision <- function(species) {
   q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)
@@ -201,6 +210,7 @@ get_pbs_ageing_precision <- function(species) {
 #'
 #' @param species A character vector of species common names
 #' @export
+#' @family get PBS data functions
 get_pbs_bioindex <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))
@@ -221,6 +231,7 @@ get_pbs_bioindex <- function(species) {
 #' @param species A character vector of species common names
 #' @param path The folder where the cached data will be saved
 #' @export
+#' @family get PBS data functions
 cache_pbs_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 

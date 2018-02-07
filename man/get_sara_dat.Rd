@@ -9,3 +9,16 @@ get_sara_dat()
 \description{
 Get SARA and COSEWIC data
 }
+\seealso{
+Other get PBS data functions: \code{\link{cache_pbs_data}},
+  \code{\link{get_pbs_ageing_precision}},
+  \code{\link{get_pbs_bioindex}},
+  \code{\link{get_pbs_catch}},
+  \code{\link{get_pbs_commsamples}},
+  \code{\link{get_pbs_cpue_index}},
+  \code{\link{get_pbs_cpue}},
+  \code{\link{get_pbs_sample_trips}},
+  \code{\link{get_pbs_strata}},
+  \code{\link{get_pbs_survey}},
+  \code{\link{get_pbs_survsamples}}
+}
