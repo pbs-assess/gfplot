@@ -309,6 +309,8 @@ plot_cpue_index <- function(dat) {
 #' @param coef_sub A named character vector of any substitutions to make on the
 #'   coefficient names. Can be used to abbreviate coefficient names for the
 #'   plot.
+#' @param model_prefixes Text to distinguish the binary and positive component
+#'   model coefficients
 #'
 #' @details Note that the coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
