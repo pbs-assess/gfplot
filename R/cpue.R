@@ -18,7 +18,7 @@
 #' @export
 #'
 # @examples
-# prep_pbs_cpue(catch, species = "arrowtooth flounder")
+# prep_pbs_cpue_index(catch, species = "arrowtooth flounder")
 prep_pbs_cpue_index <- function(dat, species_common,
   year_range = c(1996, 2015),
   lat_range = c(48, Inf),
@@ -60,27 +60,6 @@ prep_pbs_cpue_index <- function(dat, species_common,
       latitude = mean(latitude, na.rm = TRUE)) %>%
     ungroup()
 
-  # caught_something <- d_fe %>%
-  #   group_by(vessel_name) %>%
-  #   mutate(total_positive_tows = sum(pos_catch)) %>%
-  #   filter(total_positive_tows >= min_positive_tows) %>%
-  #   filter(spp_catch > 0) %>%
-  #   group_by(year, vessel_name, trip_id) %>%
-  #   summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
-  #   filter(sum_catch > 0) %>%
-  #   group_by(vessel_name) %>%
-  #   mutate(n_years = length(unique(year))) %>%
-  #   # for speed (filter early known cases):
-  #   filter(n_years >= min_years_with_min_positive_trips) %>%
-  #   group_by(year, vessel_name) %>%
-  #   summarise(n_trips_per_year = length(unique(trip_id))) %>%
-  #   mutate(trips_over_treshold_this_year =
-  #       n_trips_per_year >= min_annual_positive_trips) %>%
-  #   group_by(vessel_name) %>%
-  #   summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
-  #   filter(trips_over_thresh >= min_years_with_min_positive_trips) %>%
-  #   ungroup()
-
   caught_something <- d_fe %>%
     group_by(vessel_name) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
@@ -89,16 +68,12 @@ prep_pbs_cpue_index <- function(dat, species_common,
     group_by(year, vessel_name, trip_id) %>%
     summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
     filter(sum_catch > 0) %>%
-    group_by(year, vessel_name) %>%
-    mutate(n_trips_per_year = length(unique(trip_id))) %>%
     group_by(vessel_name) %>%
     mutate(n_years = length(unique(year))) %>%
-    filter(n_years >= 4) %>%
-    group_by(vessel_name) %>%
-    mutate(n_trips_total = length(unique(trip_id))) %>%
+    # for speed (filter early known cases):
+    filter(n_years >= min_years_with_min_positive_trips) %>%
     group_by(year, vessel_name) %>%
-    summarise(n_trips_per_year = unique(n_trips_per_year)) %>%
-    group_by(vessel_name) %>%
+    summarise(n_trips_per_year = length(unique(trip_id))) %>%
     mutate(trips_over_treshold_this_year =
         n_trips_per_year >= min_annual_positive_trips) %>%
     group_by(vessel_name) %>%
@@ -151,7 +126,7 @@ f <- function(x) as.factor(as.character(x))
 
 #' Fit a delta-lognormal commercial CPUE standardization model
 #'
-#' @param dat A data frame from \code{\link{prep_pbs_cpue}}, or a similarly
+#' @param dat A data frame from \code{\link{prep_pbs_cpue_index}}, or a similarly
 #'   formatted data frame
 #' @param formula_binomial Formula for the binomial model
 #' @param formula_lognormal Formula for the lognormal model

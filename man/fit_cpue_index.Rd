@@ -11,7 +11,7 @@ fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor +
   f(depth_band) + f(latitude_band))
 }
 \arguments{
-\item{dat}{A data frame from \code{\link{prep_pbs_cpue}}, or a similarly
+\item{dat}{A data frame from \code{\link{prep_pbs_cpue_index}}, or a similarly
 formatted data frame}
 
 \item{formula_binomial}{Formula for the binomial model}
