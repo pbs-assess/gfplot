@@ -4,7 +4,7 @@
 \alias{plot_cpue_index}
 \title{Plot a delta-lognormal commercial CPUE standardization model}
 \usage{
-plot_cpue_index(dat)
+plot_cpue_index(dat, all_models = TRUE)
 }
 \arguments{
 \item{dat}{Input data frame, for example from \code{\link{predict_cpue_index}}}

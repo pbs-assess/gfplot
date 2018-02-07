@@ -230,28 +230,41 @@ fit_cpue_index <- function(dat,
 #' Tidy a delta-lognormal commercial CPUE standardization model
 #'
 #' @param object A model object from \code{\link{fit_cpue_index}}
-#' @param center Should the index be centered by subtracting the mean in log space?
+#' @param center Should the index be centered by subtracting the mean in link space?
 #'
 #' @export
 #' @family CPUE index functions
 
-predict_cpue_index <- function(object, center = TRUE) {
+predict_cpue_index <- function(object, center = FALSE) {
+
   report_sum <- summary(object$sdreport)
-  ii <- grep("log_prediction", row.names(report_sum))
+  ii <- grep("log_prediction|linear_prediction1_i|linear_prediction2_i",
+    row.names(report_sum))
   row.names(report_sum) <- NULL
-  df <- as.data.frame(report_sum[ii, ])
-  df$year <- object$years
+  df <- as.data.frame(report_sum[ii, , drop = FALSE])
+  df$year <- rep(object$years, 3L)
+  df$model <- rep(c("Combined", "Binomial", "Lognormal"), each = nrow(df)/3L)
+  df$model <- factor(df$model, levels = c("Combined", "Binomial", "Lognormal"))
 
-  if (center)
-    df$Estimate <- df$Estimate - mean(df$Estimate)
+  if (center) {
+    df <- df %>% group_by(model) %>%
+      mutate(Estimate = .data$Estimate - mean(.data$Estimate)) %>%
+      ungroup()
+  }
 
-  df %>% dplyr::rename(se_log = .data$`Std. Error`) %>%
-    dplyr::rename(est_log = .data$Estimate) %>%
+  df %>% dplyr::rename(se_link = .data$`Std. Error`) %>%
+    dplyr::rename(est_link = .data$Estimate) %>%
     mutate(
-      lwr = exp(est_log - 1.96 * se_log),
-      upr = exp(est_log + 1.96 * se_log),
-      est = exp(est_log)) %>%
-    select(year, est_log, se_log, est, lwr, upr)
+      lwr = ifelse(model == "Binomial",
+        plogis(est_link - 1.96 * se_link),
+        exp(est_link - 1.96 * se_link)),
+      upr = ifelse(model == "Binomial",
+        plogis(est_link - 1.96 * se_link),
+        exp(est_link - 1.96 * se_link)),
+      est = ifelse(model == "Binomial",
+        plogis(est_link),
+        exp(est_link))) %>%
+    select(year, model, est_link, se_link, est, lwr, upr)
 }
 
 #' Plot a delta-lognormal commercial CPUE standardization model
@@ -263,12 +276,16 @@ predict_cpue_index <- function(object, center = TRUE) {
 #' @family plotting functions
 #' @return A ggplot object
 
-plot_cpue_index <- function(dat) {
-  ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
+plot_cpue_index <- function(dat, all_models = TRUE) {
+  g <- ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
     ggplot2::geom_ribbon(alpha = 0.5) +
     geom_line() +
     theme_pbs() +
-    labs(y = "CPUE index", x = "")
+    labs(y = "CPUE index", x = "") +
+    ylim(0, NA)
+  if (all_models)
+    g <- g + facet_wrap(~model, scales = "free_y")
+  g
 }
 
 #' Plot coefficients from a CPUE index standardization model
@@ -304,16 +321,15 @@ plot_cpue_index_coefs <- function(object,
   row.names(sm) <- seq_len(nrow(sm))
   sm <- as.data.frame(sm)
   sm$pars <- pars
+
   sm <- sm %>% dplyr::rename(se = .data$`Std. Error`) %>%
     dplyr::rename(est = .data$Estimate) %>%
-    filter(!pars %in% c("prediction"))
+    filter(!grepl("prediction", pars))
   sm$par_name <- c(
     paste(model_prefixes[[1]], colnames(object$mm_bin)),
     paste(model_prefixes[[2]], colnames(object$mm_pos)),
-    "log_sigma",
-    paste("log-prediction", object$years))
+    "log_sigma")
   sm <- sm %>% filter(!grepl("Intercept", par_name)) %>%
-    filter(!grepl("log-prediction", par_name)) %>%
     filter(!grepl("year", par_name))
 
   for (i in seq_along(coef_sub))

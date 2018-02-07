@@ -4,12 +4,12 @@
 \alias{predict_cpue_index}
 \title{Tidy a delta-lognormal commercial CPUE standardization model}
 \usage{
-predict_cpue_index(object, center = TRUE)
+predict_cpue_index(object, center = FALSE)
 }
 \arguments{
 \item{object}{A model object from \code{\link{fit_cpue_index}}}
 
-\item{center}{Should the index be centered by subtracting the mean in log space?}
+\item{center}{Should the index be centered by subtracting the mean in link space?}
 }
 \description{
 Tidy a delta-lognormal commercial CPUE standardization model

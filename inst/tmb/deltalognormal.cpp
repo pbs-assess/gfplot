@@ -17,8 +17,6 @@ Type objective_function<Type>::operator() ()
   int n2 = y2_i.size(); // get number of data points to loop over
   Type jnll = 0.0; // initialize joint negative log likelihood
 
-  // parallel_accumulator<Type> jnll(this);
-
   // Linear predictor
   vector<Type> linear_predictor1_i(n1);
   vector<Type> linear_predictor2_i(n2);
@@ -44,11 +42,16 @@ Type objective_function<Type>::operator() ()
   vector<Type> prediction =
     exp(linear_prediction1_i) / (exp(linear_prediction1_i) + 1) *
     exp(linear_prediction2_i);
-
   vector<Type> log_prediction = log(prediction);
-  REPORT(prediction);
+
   REPORT(log_prediction);
   ADREPORT(log_prediction);
+
+  REPORT(linear_prediction1_i);
+  ADREPORT(linear_prediction1_i);
+
+  REPORT(linear_prediction2_i);
+  ADREPORT(linear_prediction2_i);
 
   return jnll;
 }
