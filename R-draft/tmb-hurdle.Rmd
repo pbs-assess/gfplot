@@ -137,7 +137,7 @@ Now let's try fitting our model to some real CPUE data. As an example, I will wo
 ```{r}
 grep_pattern <- "5[CDE]+"
 if (!file.exists("d_retained.rda")) {
-  source("R/cpue-index.R")
+  source("R-draft/cpue-index.R")
   save(d_retained, file = "d_retained.rda") 
 } else {
   load("d_retained.rda")
@@ -193,7 +193,7 @@ f2 <- log(spp_catch/hours_fished) ~ year_factor + f(month_factor) +
   f(dfo_locality)
 
 if (!file.exists("cpue-glm-eg.rda")) {
-  source("R/delta-cpue-tmb-glm.R")
+  source("R-draft/delta-cpue-tmb-glm.R")
   save(r, mm1, mm2, that_took, obj, file = "cpue-glm-eg.rda") 
 } else {
   load("cpue-glm-eg.rda")

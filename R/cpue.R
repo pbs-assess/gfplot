@@ -18,7 +18,7 @@
 #' @export
 #'
 # @examples
-# prep_pbs_cpue_index(catch, species = "arrowtooth flounder")
+# prep_pbs_cpue_index(catch, species = "walleye pollock")
 prep_pbs_cpue_index <- function(dat, species_common,
   year_range = c(1996, 2015),
   lat_range = c(48, Inf),
@@ -26,8 +26,8 @@ prep_pbs_cpue_index <- function(dat, species_common,
   min_annual_positive_trips = 4,
   min_years_with_min_positive_trips = 4,
   area_grep_pattern = "5[CDE]+",
-  lat_bands = seq(47, 62, 0.1),
-  depth_bands = seq(0, 900, 25),
+  lat_bands = seq(48, 60, 0.1),
+  depth_bands = seq(50, 550, 25),
   anonymous_vessels = TRUE,
   gear = "BOTTOM TRAWL") {
 
