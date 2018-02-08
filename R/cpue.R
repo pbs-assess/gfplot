@@ -306,10 +306,10 @@ plot_cpue_index <- function(dat, all_models = TRUE) {
 #'
 #' @param object Model output from \code{\link{fit_cpue_index}}
 #'
-#' @details Note that the coefficients for predictors treated as factors (i.e.
+#' @details Note that for coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
 #'   from the base level factor, which would be the first factor level
-#'   alpha-numericaly. For example, month 02 represents the estimated
+#'   alpha-numerically. For example, month 02 represents the estimated
 #'   difference between February and January.
 #'
 #' @return A ggplot object

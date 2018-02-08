@@ -16,10 +16,10 @@ A ggplot object
 Plot coefficients from a CPUE index standardization model
 }
 \details{
-Note that the coefficients for predictors treated as factors (i.e.
+Note that for coefficients for predictors treated as factors (i.e.
   likely all of the predictors), the coefficients represent the difference
   from the base level factor, which would be the first factor level
-  alpha-numericaly. For example, month 02 represents the estimated
+  alpha-numerically. For example, month 02 represents the estimated
   difference between February and January.
 }
 \examples{

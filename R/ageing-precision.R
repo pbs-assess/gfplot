@@ -51,7 +51,7 @@ tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
   dplyr::as_tibble(ageing_prec)
 }
 
-#' Plot pbs ageing precision data
+#' Plot ageing precision data
 #'
 #' @param dat A properly formatted data frame, for example, from
 #'   \code{\link{tidy_ageing_precision}}. Should have columns named

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ageing-precision.R
 \name{plot_ageing_precision}
 \alias{plot_ageing_precision}
-\title{Plot pbs ageing precision data}
+\title{Plot ageing precision data}
 \usage{
 plot_ageing_precision(dat, n = 250, jitter = 0.25, seed = NULL)
 }
@@ -21,7 +21,7 @@ are sampled each time and the same jitter values are generated. If
 \code{NULL} different fish will be sampled each time function is run.}
 }
 \description{
-Plot pbs ageing precision data
+Plot ageing precision data
 }
 \examples{
 \dontrun{
