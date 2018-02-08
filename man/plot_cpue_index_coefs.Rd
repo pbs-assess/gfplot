@@ -4,16 +4,10 @@
 \alias{plot_cpue_index_coefs}
 \title{Plot coefficients from a CPUE index standardization model}
 \usage{
-plot_cpue_index_coefs(object, coef_sub = c(depth_band = "depth", dfo_locality
-  = "locality", vessel_name = "vessel", month_factor = "month", latitude_band =
-  "latitude"))
+plot_cpue_index_coefs(object)
 }
 \arguments{
 \item{object}{Model output from \code{\link{fit_cpue_index}}}
-
-\item{coef_sub}{A named character vector of any substitutions to make on the
-coefficient names. Can be used to abbreviate coefficient names for the
-plot.}
 }
 \value{
 A ggplot object
@@ -25,16 +19,18 @@ Plot coefficients from a CPUE index standardization model
 Note that the coefficients for predictors treated as factors (i.e.
   likely all of the predictors), the coefficients represent the difference
   from the base level factor, which would be the first factor level
-  alpha-numericaly. For example, months 02 to 12 represent the estimated
-  difference between that month and month 01.
+  alpha-numericaly. For example, month 02 represents the estimated
+  difference between February and January.
 }
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
+  \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index}},
   \code{\link{predict_cpue_index}},
   \code{\link{tidy_pbs_cpue_index}}
 
-Other plotting functions: \code{\link{plot_bioindex}},
-  \code{\link{plot_catch}}, \code{\link{plot_cpue_index}},
+Other plotting functions: \code{\link{jackknife_cpue_index}},
+  \code{\link{plot_bioindex}}, \code{\link{plot_catch}},
+  \code{\link{plot_cpue_index}},
   \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
 }

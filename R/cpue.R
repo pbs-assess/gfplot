@@ -97,22 +97,22 @@ tidy_pbs_cpue_index <- function(dat, species_common,
   d_retained <- dplyr::semi_join(catch, fleet, by = "vessel_name") %>%
     filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
     mutate(
-      depth_band = factor_bin_clean(best_depth, depth_bands),
-      vessel_name = as.factor(vessel_name),
-      latitude_band = factor_bin_clean(latitude, lat_bands),
-      dfo_locality = factor_clean(locality_code),
+      depth = factor_bin_clean(best_depth, depth_bands),
+      vessel = as.factor(vessel_name),
+      latitude = factor_bin_clean(latitude, lat_bands),
+      locality = factor_clean(locality_code),
       year_factor = factor_clean(year),
-      month_factor = factor_clean(month)) %>%
+      month = factor_clean(month)) %>%
     mutate(pos_catch = ifelse(spp_catch > 0, 1, 0))
 
   # anonymize the vessels
-  vessel_df <- dplyr::tibble(vessel_name = unique(d_retained$vessel_name),
-    scrambled_vessel = factor_clean(seq_along(vessel_name)))
-  d_retained <- left_join(d_retained, vessel_df, by = "vessel_name") %>%
-    select(-vessel_name) %>%
-    dplyr::rename(vessel_name = scrambled_vessel)
+  vessel_df <- dplyr::tibble(vessel = unique(d_retained$vessel),
+    scrambled_vessel = factor_clean(seq_along(vessel)))
+  d_retained <- left_join(d_retained, vessel_df, by = "vessel") %>%
+    select(-vessel) %>%
+    dplyr::rename(vessel = scrambled_vessel)
 
-  arrange(d_retained, .data$year, .data$vessel_name) %>%
+  arrange(d_retained, .data$year, .data$vessel) %>%
     dplyr::as_tibble()
 }
 
@@ -176,11 +176,11 @@ f <- function(x) as.factor(as.character(x))
 #' @family Fitting functions
 
 fit_cpue_index <- function(dat,
-  formula_binomial = pos_catch ~ year_factor + f(month_factor) + f(vessel_name) +
-    f(dfo_locality) + f(depth_band) + f(latitude_band),
+  formula_binomial = pos_catch ~ year_factor + f(month) + f(vessel) +
+    f(locality) + f(depth) + f(latitude),
   formula_lognormal = log(spp_catch/hours_fished) ~ year_factor +
-    f(month_factor) + f(vessel_name) +
-    f(dfo_locality) + f(depth_band) + f(latitude_band)) {
+    f(month) + f(vessel) +
+    f(locality) + f(depth) + f(latitude)) {
 
   tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "PBSsynopsis")
   TMB::compile(tmb_cpp)
@@ -224,7 +224,9 @@ fit_cpue_index <- function(dat,
   r <- TMB::sdreport(obj)
 
   list(model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)),
-    years = sort(unique(dat$year)), mm_bin = mm1, mm_pos = mm2)
+    years = sort(unique(dat$year)), mm_bin = mm1, mm_pos = mm2,
+    f_bin = formula_binomial, f_pos = formula_lognormal,
+    data = dat)
 }
 
 #' Tidy a delta-lognormal commercial CPUE standardization model
@@ -278,6 +280,10 @@ predict_cpue_index <- function(object, center = FALSE) {
 #' @return A ggplot object
 
 plot_cpue_index <- function(dat, all_models = TRUE) {
+
+  if (!all_models)
+    dat <- filter(dat, model == "Combined")
+
   g <- ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
     ggplot2::geom_ribbon(alpha = 0.5) +
     geom_line() +
@@ -286,34 +292,26 @@ plot_cpue_index <- function(dat, all_models = TRUE) {
     ylim(0, NA)
   if (all_models)
     g <- g + facet_wrap(~model, scales = "free_y")
+
   g
 }
 
 #' Plot coefficients from a CPUE index standardization model
 #'
 #' @param object Model output from \code{\link{fit_cpue_index}}
-#' @param coef_sub A named character vector of any substitutions to make on the
-#'   coefficient names. Can be used to abbreviate coefficient names for the
-#'   plot.
 #'
 #' @details Note that the coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
 #'   from the base level factor, which would be the first factor level
-#'   alpha-numericaly. For example, months 02 to 12 represent the estimated
-#'   difference between that month and month 01.
+#'   alpha-numericaly. For example, month 02 represents the estimated
+#'   difference between February and January.
 #'
 #' @return A ggplot object
 #' @export
 #' @family CPUE index functions
 #' @family plotting functions
 
-plot_cpue_index_coefs <- function(object,
-  coef_sub = c(
-    "depth_band" = "depth",
-    "dfo_locality" = "locality",
-    "vessel_name" = "vessel",
-    "month_factor" = "month",
-    "latitude_band" = "latitude")) {
+plot_cpue_index_coefs <- function(object) {
 
   model_prefixes <- c("Bin.", "Pos.")
 
@@ -332,9 +330,6 @@ plot_cpue_index_coefs <- function(object,
     "log_sigma")
   sm <- sm %>% filter(!grepl("Intercept", par_name)) %>%
     filter(!grepl("year", par_name))
-
-  for (i in seq_along(coef_sub))
-    sm$par_name <- sub(names(coef_sub)[i], coef_sub[[i]], sm$par_name)
 
   sm$par_name <- sub("f\\(", "", sm$par_name)
   sm$par_name <- sub("\\)", "", sm$par_name)
@@ -361,44 +356,85 @@ plot_cpue_index_coefs <- function(object,
     ggplot2::labs(y = "", x = "Coefficient value")
 }
 
-# jackknife_cpue <- function(f_bin, f_pos, terms) {
-#
-#   mm1 <- model.matrix(f_bin, data = d_retained)
-#   mm2 <- model.matrix(f_pos, data = subset(d_retained, pos_catch == 1))
-#   mm1 <- make_pred_mm(mm1)
-#   mm2 <- make_pred_mm(mm2)
-#
-#   m_bin <- speedglm::speedglm(f_bin, data = d_retained,
-#     family = binomial(link = "logit"))
-#   m_pos <- lm(f_pos, data = subset(d_retained, pos_catch == 1))
-#
-#   p1 <- plogis(mm1 %*% coef(m_bin))
-#   p2 <- exp(mm2 %*% coef(m_pos))
-#   full <- data.frame(year = 1996:2015, term = "all", pred = p1 * p2)
-#
-#   fitm <- function(drop_term) {
-#     f1 <- update.formula(formula(m_bin), as.formula(paste0(". ~ . -", drop_term)))
-#     f2 <- update.formula(formula(m_pos), as.formula(paste0(". ~ . -", drop_term)))
-#     mm1 <- model.matrix(f1, data = d_retained)
-#     mm2 <- model.matrix(f2, data = subset(d_retained, pos_catch == 1))
-#     mm1 <- make_pred_mm(mm1)
-#     mm2 <- make_pred_mm(mm2)
-#     m_bin <- speedglm::speedglm(f1, data = d_retained,
-#       family = binomial(link = "logit"))
-#     m_pos <- lm(f2, data = subset(d_retained, pos_catch == 1))
-#     p1 <- plogis(mm1 %*% coef(m_bin))
-#     p2 <- exp(mm2 %*% coef(m_pos))
-#     o <- data.frame(year = 1996:2015, term = drop_term, pred = p1 * p2)
-#     o
-#   }
-#
-#   out <- plyr::ldply(terms, fitm)
-#   suppressWarnings(out <- bind_rows(full, out))
-#   out <- group_by(out, term) %>% mutate(pred = pred / exp(mean(log(pred)))) %>%
-#     ungroup()
-#   out
-# }
+#' Title
+#'
+#' @param object TODO
+#' @param terms TODO
+#'
+#' @return TODO
+#' @export
+#'
+#' @family CPUE index functions
+#' @family plotting functions
 
-# jk <- jackknife_cpue(f1, f2, terms = c("f(depth_band)", "f(vessel_name)",
-# "f(latitude_band)", "f(dfo_locality)", "f(month_factor)"))
+jackknife_cpue_index <- function(object,
+  terms = c("f(month)", "f(vessel)", "f(locality)",
+    "f(depth)", "f(latitude)")){
+  pos_dat <- object$data[object$data$pos_catch == 1, , drop = FALSE]
 
+  mm1 <- model.matrix(pos_catch ~ year_factor, data = object$data)
+  mm2 <- model.matrix(log(spp_catch/hours_fished) ~ year_factor, data = pos_dat)
+  mm1 <- make_pred_mm(mm1, years = m$years)
+  mm2 <- make_pred_mm(mm2, years = m$years)
+  m_bin <- speedglm::speedglm(pos_catch ~ year_factor, data = object$data,
+    family = binomial(link = "logit"))
+  m_pos <- lm(log(spp_catch/hours_fished) ~ year_factor, data = pos_dat)
+  p1 <- plogis(mm1 %*% coef(m_bin))
+  p2 <- exp(mm2 %*% coef(m_pos))
+  none <- data.frame(year = object$years, term = "none", pred = p1 * p2,
+    stringsAsFactors = FALSE)
+
+  mm1 <- model.matrix(object$f_bin, data = object$data)
+  mm2 <- model.matrix(object$f_pos, data = pos_dat)
+  mm1 <- make_pred_mm(mm1, years = m$years)
+  mm2 <- make_pred_mm(mm2, years = m$years)
+  m_bin <- speedglm::speedglm(object$f_bin, data = object$data,
+    family = binomial(link = "logit"))
+  m_pos <- lm(object$f_pos, data = pos_dat)
+  p1 <- plogis(mm1 %*% coef(m_bin))
+  p2 <- exp(mm2 %*% coef(m_pos))
+  full <- data.frame(year = object$years, term = "all", pred = p1 * p2,
+    stringsAsFactors = FALSE)
+
+  fitm <- function(drop_term) {
+    message(paste("Dropping", drop_term, "..."))
+    f1 <- update.formula(formula(m_bin), as.formula(paste0(". ~ . -", drop_term)))
+    f2 <- update.formula(formula(m_pos), as.formula(paste0(". ~ . -", drop_term)))
+    mm1 <- model.matrix(f1, data = object$data)
+    mm2 <- model.matrix(f2, data = pos_dat)
+    mm1 <- make_pred_mm(mm1, years = m$years)
+    mm2 <- make_pred_mm(mm2, years = m$years)
+    m_bin <- speedglm::speedglm(f1, data = object$data,
+      family = binomial(link = "logit"))
+    m_pos <- lm(f2, data = pos_dat)
+    p1 <- plogis(mm1 %*% coef(m_bin))
+    p2 <- exp(mm2 %*% coef(m_pos))
+    o <- data.frame(year = object$years, term = drop_term, pred = p1 * p2,
+      stringsAsFactors = FALSE)
+    o
+  }
+
+  out <- lapply(terms, fitm)
+  out <- do.call("rbind", out)
+  out <- dplyr::bind_rows(none, full) %>% dplyr::bind_rows(out)
+  out <- group_by(out, term) %>%
+    mutate(pred = pred / exp(mean(log(pred)))) %>%
+    ungroup()
+
+  out$term <- sub("f\\(", "", out$term)
+  out$term <- sub("\\)", "", out$term)
+  out$term <- paste("Without", out$term)
+
+  all <- filter(out, term == "Without all") %>% select(-term)
+  out$term <- sub("Without none", "Unstandardized", out$term)
+
+  ggplot(filter(out, term != "Without all"),
+    aes_string("year", "pred", colour = "term")) +
+    geom_line(data = all, lty = "31", lwd = 1.0,
+      aes_string("year", "pred"), colour = "grey70", inherit.aes = FALSE) +
+    geom_line(lwd = 1.0) +
+    ggplot2::scale_color_manual(values = cols) +
+    theme_pbs() + guides(size = FALSE, colour = FALSE) +
+    labs(colour = "Excluded", y = "Relative CPUE index", x = "") +
+    facet_wrap(~term)
+}

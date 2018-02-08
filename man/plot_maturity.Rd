@@ -15,8 +15,8 @@ plot_maturity(dat, type = "age")
 TODO
 }
 \seealso{
-Other plotting functions: \code{\link{plot_bioindex}},
-  \code{\link{plot_catch}},
+Other plotting functions: \code{\link{jackknife_cpue_index}},
+  \code{\link{plot_bioindex}}, \code{\link{plot_catch}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}}, \code{\link{plot_lengths}}
 }

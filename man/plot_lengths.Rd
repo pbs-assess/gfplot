@@ -19,8 +19,8 @@ plot_lengths(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
 TODO
 }
 \seealso{
-Other plotting functions: \code{\link{plot_bioindex}},
-  \code{\link{plot_catch}},
+Other plotting functions: \code{\link{jackknife_cpue_index}},
+  \code{\link{plot_bioindex}}, \code{\link{plot_catch}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_maturity}}
