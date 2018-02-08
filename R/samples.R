@@ -1,6 +1,6 @@
 #' Tidy PBS samples data for \code{\link{plot_samples}}
 #'
-#' @param dat Input data frame from \code{\link{get_pbs_survsamples}}.
+#' @param dat Input data frame from \code{\link{get_survsamples}}.
 #' @param year_range Either \code{NULL}, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
@@ -9,14 +9,14 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_pbs_survsamples("lingcod")
-#' tidy_pbs_samples(d)
+#' d <- get_survsamples("lingcod")
+#' tidy_samples(d)
 #'
-#' d <- get_pbs_commsamples("lingcod")
-#' tidy_pbs_samples(d)
+#' d <- get_commsamples("lingcod")
+#' tidy_samples(d)
 #' }
 
-tidy_pbs_samples <- function(dat, year_range = NULL) {
+tidy_samples <- function(dat, year_range = NULL) {
 
   if (!is.null(year_range))
     dat <- dat[dat$year >= year_range[[1]] & dat$year <= year_range[[2]], ]
@@ -53,7 +53,7 @@ tidy_pbs_samples <- function(dat, year_range = NULL) {
 #' Plot sample availability
 #'
 #' @param dat An input data frame from, for example,
-#' \code{\link{tidy_pbs_samples}}. The input data frame must have the columns:
+#' \code{\link{tidy_samples}}. The input data frame must have the columns:
 #' \describe{
 #'   \item{\code{year}}{The year.}
 #'   \item{\code{type}}{The types of samples to plot, e.g. "maturity",
@@ -73,13 +73,13 @@ tidy_pbs_samples <- function(dat, year_range = NULL) {
 #' plot_samples(d)
 #'
 #' \dontrun{
-#' d <- get_pbs_survsamples("lingcod")
-#' d <- tidy_pbs_samples(d, year_range = c(1996, 2016))
+#' d <- get_survsamples("lingcod")
+#' d <- tidy_samples(d, year_range = c(1996, 2016))
 #' plot_samples(d, year_range = c(1996, 2016),
 #'   title = "Survey samples")
 #'
-#' d <- get_pbs_commsamples("lingcod")
-#' d <- tidy_pbs_samples(d, year_range = c(1996, 2016))
+#' d <- get_commsamples("lingcod")
+#' d <- tidy_samples(d, year_range = c(1996, 2016))
 #' plot_samples(d, year_range = c(1996, 2016),
 #'   title = "Commercial samples")
 #' }

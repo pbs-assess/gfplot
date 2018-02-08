@@ -2,7 +2,7 @@
 % Please edit documentation in R/cpue.R
 \name{predict_cpue_index}
 \alias{predict_cpue_index}
-\title{Tidy a delta-lognormal commercial CPUE standardization model}
+\title{Predit from a delta-lognormal commercial CPUE standardization model}
 \usage{
 predict_cpue_index(object, center = FALSE)
 }
@@ -12,12 +12,27 @@ predict_cpue_index(object, center = FALSE)
 \item{center}{Should the index be centered by subtracting the mean in link space?}
 }
 \description{
-Tidy a delta-lognormal commercial CPUE standardization model
+Predit from a delta-lognormal commercial CPUE standardization model
+}
+\examples{
+\dontrun{
+d <- get_cpue_index(gear = "bottom trawl")
+walleye <- tidy_cpue_index(d, "walleye pollock",
+  area_grep_pattern = "5[CDE]+")
+m <- fit_cpue_index(walleye)
+
+plot_cpue_index_coefs(m)
+
+predict_cpue_index(m) \%>\%
+  plot_cpue_index()
+
+jackknife_cpue_index(m)
+}
 }
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
-  \code{\link{tidy_pbs_cpue_index}}
+  \code{\link{tidy_cpue_index}}
 }

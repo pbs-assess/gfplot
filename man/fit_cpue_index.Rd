@@ -10,7 +10,7 @@ fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor + f(month) +
   f(vessel) + f(locality) + f(depth) + f(latitude))
 }
 \arguments{
-\item{dat}{A data frame from \code{\link{tidy_pbs_cpue_index}}, or a similarly
+\item{dat}{A data frame from \code{\link{tidy_cpue_index}}, or a similarly
 formatted data frame}
 
 \item{formula_binomial}{Formula for the binomial model}
@@ -20,10 +20,25 @@ formatted data frame}
 \description{
 Fit a delta-lognormal commercial CPUE standardization model
 }
+\examples{
+\dontrun{
+d <- get_cpue_index(gear = "bottom trawl")
+walleye <- tidy_cpue_index(d, "walleye pollock",
+  area_grep_pattern = "5[CDE]+")
+m <- fit_cpue_index(walleye)
+
+plot_cpue_index_coefs(m)
+
+predict_cpue_index(m) \%>\%
+  plot_cpue_index()
+
+jackknife_cpue_index(m)
+}
+}
 \seealso{
 Other CPUE index functions: \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{predict_cpue_index}},
-  \code{\link{tidy_pbs_cpue_index}}
+  \code{\link{tidy_cpue_index}}
 }

@@ -17,12 +17,27 @@ A ggplot object
 \description{
 Plot a delta-lognormal commercial CPUE standardization model
 }
+\examples{
+\dontrun{
+d <- get_cpue_index(gear = "bottom trawl")
+walleye <- tidy_cpue_index(d, "walleye pollock",
+  area_grep_pattern = "5[CDE]+")
+m <- fit_cpue_index(walleye)
+
+plot_cpue_index_coefs(m)
+
+predict_cpue_index(m) \%>\%
+  plot_cpue_index()
+
+jackknife_cpue_index(m)
+}
+}
 \seealso{
 Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{predict_cpue_index}},
-  \code{\link{tidy_pbs_cpue_index}}
+  \code{\link{tidy_cpue_index}}
 
 Other plotting functions: \code{\link{jackknife_cpue_index}},
   \code{\link{plot_bioindex}}, \code{\link{plot_catch}},

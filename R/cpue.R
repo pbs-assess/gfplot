@@ -1,6 +1,6 @@
 #' Tidy commercial PBS CPUE data
 #'
-#' @param dat An input data frame from \code{\link{get_pbs_cpue_index}}
+#' @param dat An input data frame from \code{\link{get_cpue_index}}
 #' @param species_common The species common name
 #' @param year_range The range of years to include
 #' @param lat_range The range of latitudes to include
@@ -19,9 +19,9 @@
 #'
 #' @export
 #'
-# @examples
-# tidy_pbs_cpue_index(catch, species = "walleye pollock")
-tidy_pbs_cpue_index <- function(dat, species_common,
+#' @template cpue-examples
+
+tidy_cpue_index <- function(dat, species_common,
   year_range = c(1996, Inf),
   lat_range = c(48, Inf),
   min_positive_tows = 100,
@@ -164,7 +164,7 @@ f <- function(x) as.factor(as.character(x))
 
 #' Fit a delta-lognormal commercial CPUE standardization model
 #'
-#' @param dat A data frame from \code{\link{tidy_pbs_cpue_index}}, or a similarly
+#' @param dat A data frame from \code{\link{tidy_cpue_index}}, or a similarly
 #'   formatted data frame
 #' @param formula_binomial Formula for the binomial model
 #' @param formula_lognormal Formula for the lognormal model
@@ -174,6 +174,8 @@ f <- function(x) as.factor(as.character(x))
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #' @family CPUE index functions
 #' @family Fitting functions
+#'
+#' @template cpue-examples
 
 fit_cpue_index <- function(dat,
   formula_binomial = pos_catch ~ year_factor + f(month) + f(vessel) +
@@ -229,13 +231,15 @@ fit_cpue_index <- function(dat,
     data = dat)
 }
 
-#' Tidy a delta-lognormal commercial CPUE standardization model
+#' Predit from a delta-lognormal commercial CPUE standardization model
 #'
 #' @param object A model object from \code{\link{fit_cpue_index}}
 #' @param center Should the index be centered by subtracting the mean in link space?
 #'
 #' @export
 #' @family CPUE index functions
+#'
+#' @template cpue-examples
 
 predict_cpue_index <- function(object, center = FALSE) {
 
@@ -278,6 +282,8 @@ predict_cpue_index <- function(object, center = FALSE) {
 #' @family CPUE index functions
 #' @family plotting functions
 #' @return A ggplot object
+#'
+#' @template cpue-examples
 
 plot_cpue_index <- function(dat, all_models = TRUE) {
 
@@ -310,6 +316,8 @@ plot_cpue_index <- function(dat, all_models = TRUE) {
 #' @export
 #' @family CPUE index functions
 #' @family plotting functions
+#'
+#' @template cpue-examples
 
 plot_cpue_index_coefs <- function(object) {
 
@@ -366,6 +374,8 @@ plot_cpue_index_coefs <- function(object) {
 #'
 #' @family CPUE index functions
 #' @family plotting functions
+#'
+#' @template cpue-examples
 
 jackknife_cpue_index <- function(object,
   terms = c("f(month)", "f(vessel)", "f(locality)",

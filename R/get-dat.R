@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @family get PBS data functions
-get_pbs_sample_trips <- function() {
+get_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
   names(x) <- tolower(names(x))
@@ -13,7 +13,7 @@ get_pbs_sample_trips <- function() {
 #'
 #' @export
 #' @family get PBS data functions
-get_pbs_strata <- function() {
+get_strata <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SG.SURVEY_ID,
     SG.GROUPING_CODE,
@@ -32,7 +32,7 @@ get_pbs_strata <- function() {
 #'
 #' @export
 #' @family get PBS data functions
-get_pbs_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
+get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
   q <- paste("SELECT S.SURVEY_ID, SS.SURVEY_SERIES_ID, SS.SURVEY_SERIES_DESC
@@ -80,7 +80,7 @@ get_pbs_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
 #' @param species A character vector of species common names
 #' @export
 #' @family get PBS data functions
-get_pbs_survsamples <- function(species) {
+get_survsamples <- function(species) {
   q <- readLines(system.file("sql", "get-survey-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
@@ -109,7 +109,7 @@ get_pbs_survsamples <- function(species) {
 #' @param species A character vector of species common names
 #' @export
 #' @family get PBS data functions
-get_pbs_commsamples <- function(species) {
+get_commsamples <- function(species) {
   q <- readLines(system.file("sql", "get-commercial-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
@@ -126,7 +126,7 @@ get_pbs_commsamples <- function(species) {
 #' @param species A character vector of species common names
 #' @export
 #' @family get PBS data functions
-get_pbs_catch <- function(species) {
+get_catch <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-landings.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY BEST", q) - 1
@@ -156,7 +156,7 @@ get_pbs_catch <- function(species) {
 #' @param species A character vector of species common names
 #' @export
 #' @family get PBS data functions
-get_pbs_cpue <- function(species) {
+get_cpue <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-cpue.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY YEAR", q) - 1
@@ -175,14 +175,14 @@ get_pbs_cpue <- function(species) {
 
 #' Get PBS catch and effort data for all species for CPUE index calculation
 #'
-#' Can be used to extract data for \code{\link{tidy_pbs_cpue_index}}.
+#' Can be used to extract data for \code{\link{tidy_cpue_index}}.
 #'
 #' @param gear A single gear type to include
 #' @param min_year Minimum year to return
 #'
 #' @export
 #' @family get PBS data functions
-get_pbs_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
+get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
   i <- grep("-- insert filters here", q)
   # TODO allow for multiple gear types?
@@ -198,7 +198,7 @@ get_pbs_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 #' @param species A character vector of a species common names
 #' @export
 #' @family get PBS data functions
-get_pbs_ageing_precision <- function(species) {
+get_ageing_precision <- function(species) {
   q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
@@ -211,7 +211,7 @@ get_pbs_ageing_precision <- function(species) {
 #' @param species A character vector of species common names
 #' @export
 #' @family get PBS data functions
-get_pbs_bioindex <- function(species) {
+get_bioindex <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))
   i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
@@ -235,30 +235,30 @@ get_pbs_bioindex <- function(species) {
 cache_pbs_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_pbs_survey(species)
+  d_survs_df <- get_survey(species)
   saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
 
-  d <- get_pbs_survsamples(species)
+  d <- get_survsamples(species)
   saveRDS(d, file = file.path(path, "pbs-survey-specimens.rds"))
 
-  d <- get_pbs_commsamples(species)
+  d <- get_commsamples(species)
   saveRDS(d, file = file.path(path, "pbs-commercial-specimens.rds"))
 
-  d <- get_pbs_catch(species)
+  d <- get_catch(species)
   saveRDS(d, file = file.path(path, "pbs-catch.rds"))
 
-  d <- get_pbs_cpue(species)
+  d <- get_cpue(species)
   saveRDS(d, file = file.path(path, "pbs-cpue.rds"))
 
-  d <- get_pbs_bioindex(species)
+  d <- get_bioindex(species)
   saveRDS(d, file = file.path(path, "pbs-bioindex.rds"))
 
-  d <- get_pbs_sample_trips()
+  d <- get_sample_trips()
   saveRDS(d, file = file.path(path, "pbs-sample-trips.rds"))
 
-  d <- get_pbs_strata()
+  d <- get_strata()
   saveRDS(d, file = file.path(path, "pbs-strata.rds"))
 
-  d <- get_pbs_ageing_precision(species)
+  d <- get_ageing_precision(species)
   saveRDS(d, file = file.path(path, "pbs-ageing-precision.rds"))
 }

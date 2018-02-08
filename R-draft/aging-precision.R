@@ -47,7 +47,7 @@
 #Final code for getting aging precision data
 ##############################################
 
-get_pbs_aging_precision("canary rockfish") <- function(species) {
+get_aging_precision("canary rockfish") <- function(species) {
   q <- readLines(system.file("sql", "aging-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)

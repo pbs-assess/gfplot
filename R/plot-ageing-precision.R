@@ -1,9 +1,9 @@
 #' Tidy PBS ageing precision data
 #'
 #' @param dat A data frame from \code{\link{get_ageing_precision}}
-#' @param ageing_method_codes A numeric vector of ageing method codes to filter
-#'   on. Defaults to codes \code{3} and \code{17}, which represent otolith
-#'   'break and burn' and 'break and bake' methods.
+#' @param ageing_method_codes A numeric vector of ageing method codes to filter on. Default
+#'   codes \code{3} and \code{17}, which represent otolith 'break and burn' and 'break and
+#'   bake' methods.
 #'
 #' @export
 #'
