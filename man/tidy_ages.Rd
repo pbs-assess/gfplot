@@ -42,3 +42,4 @@ Other tidy data functions: \code{\link{tidy_ageing_precision}},
   \code{\link{tidy_bioindex}}, \code{\link{tidy_catch}},
   \code{\link{tidy_cpue_index}}
 }
+\concept{tidy data functions}

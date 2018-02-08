@@ -42,3 +42,5 @@ Other CPUE index functions: \code{\link{jackknife_cpue_index}},
   \code{\link{predict_cpue_index}},
   \code{\link{tidy_cpue_index}}
 }
+\concept{CPUE index functions}
+\concept{Fitting functions}

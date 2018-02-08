@@ -37,6 +37,9 @@ Imports:
     glmmTMB,
     speedglm,
     TMB
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Remotes: github::pbs-software/pbs-data/PBSdata
-
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)

@@ -3,9 +3,7 @@
 .RData
 
 *.pdf
-
 *.rda
-
 *.png
 marmap_coord_-129.04825;47.74815;-124.415633;51.0058_res_1.csv
 marmap_coord_-131.708066;50.505316;-127.449483;53.183_res_1.csv
@@ -45,3 +43,4 @@ text/spatial-appendix.tex
 *.so
 *.sublime-project
 *.sublime-workspace
+inst/doc

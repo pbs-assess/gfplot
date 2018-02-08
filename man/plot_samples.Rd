@@ -11,11 +11,11 @@ plot_samples(dat, year_range = NULL, title = "Biological samples",
 \item{dat}{An input data frame from, for example,
 \code{\link{tidy_samples}}. The input data frame must have the columns:
 \describe{
-  \item{\code{year}}{The year.}
-  \item{\code{type}}{The types of samples to plot, e.g. "maturity",
-  "weight", "age". The axis labels will be derived from \code{type} after
-  capitalizing the first letter.}
-  \item{\code{n}}{The number of samples available for that sample type.}
+\item{\code{year}}{The year.}
+\item{\code{type}}{The types of samples to plot, e.g. "maturity",
+"weight", "age". The axis labels will be derived from \code{type} after
+capitalizing the first letter.}
+\item{\code{n}}{The number of samples available for that sample type.}
 }}
 
 \item{year_range}{TODO}

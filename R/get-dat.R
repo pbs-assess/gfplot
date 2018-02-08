@@ -1,7 +1,29 @@
-#' Title here TODO
+#' Get PBS data
 #'
+#' Long description here
+#'
+#' @details
+#'
+#' * `get_sample_trips()` does...
+#' * `get_strata()` does...
+#' * `get_survey()` does...
+#' * `get_survsamples()` does...
+#' * `get_commsamples()` does...
+#' * `get_catch()` does...
+#' * `get_cpue()` does...
+#' * `get_cpue_index()` does...
+#' * `get_ageing_precision()` does...
+#' * `get_sara_dat()` does...
+#' * `get_bioindex()` does...
+#' * `cache_pbs_data()` does...
+#'
+#' @param species A character vector of species common names
+#' @param survey_codes A numeric vector of survey series IDs
+#' @name get
+NULL
+
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
@@ -9,10 +31,8 @@ get_sample_trips <- function() {
   x
 }
 
-#' Title here TODO
-#'
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_strata <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SG.SURVEY_ID,
@@ -25,13 +45,8 @@ get_strata <- function() {
   x
 }
 
-#' Get PBS spatial trawl survey data
-#'
-#' @param species A character vector of species common names
-#' @param survey_codes A numeric vector of survey series IDs
-#'
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
@@ -75,11 +90,8 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   d_survs_df
 }
 
-#' Get PBS survey specimen data
-#'
-#' @param species A character vector of species common names
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_survsamples <- function(species) {
   q <- readLines(system.file("sql", "get-survey-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
@@ -102,13 +114,8 @@ get_survsamples <- function(species) {
   dbio
 }
 
-#blah
-
-#' Get PBS commercial specimen data
-#'
-#' @param species A character vector of species common names
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_commsamples <- function(species) {
   q <- readLines(system.file("sql", "get-commercial-biology.sql", package = "PBSsynopsis"))
   q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
@@ -121,11 +128,8 @@ get_commsamples <- function(species) {
   dbio_c
 }
 
-#' Get PBS commercial landings data
-#'
-#' @param species A character vector of species common names
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_catch <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-landings.sql", package = "PBSsynopsis"))
@@ -151,11 +155,8 @@ get_catch <- function(species) {
   d
 }
 
-#' Get PBS commercial CPUE data (for mapping)
-#'
-#' @param species A character vector of species common names
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 get_cpue <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-cpue.sql", package = "PBSsynopsis"))
@@ -173,16 +174,10 @@ get_cpue <- function(species) {
   d
 }
 
-#' Get PBS catch and effort data for all species for CPUE index calculation
-#'
-#' Can be used to extract data for \code{\link{tidy_cpue_index}}.
-#'
 #' @param gear A single gear type to include
 #' @param min_year Minimum year to return
-#'
 #' @export
-#' @family get PBS data functions
-#' @template ageing-precision-examples
+#' @rdname get
 get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
   i <- grep("-- insert filters here", q)
@@ -194,12 +189,8 @@ get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   d
 }
 
-#' Get PBS ageing precision data
-#'
-#' @param species A character vector of a species common names
 #' @export
-#' @family get PBS data functions
-#' @template ageing-precision-examples
+#' @rdname get
 get_ageing_precision <- function(species) {
   q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)
@@ -208,12 +199,8 @@ get_ageing_precision <- function(species) {
   dbio
 }
 
-#' Get PBS biological index data
-#'
-#' @param species A character vector of species common names
 #' @export
-#' @family get PBS data functions
-#' @template bioindex-examples
+#' @rdname get
 get_bioindex <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))
@@ -229,12 +216,26 @@ get_bioindex <- function(species) {
   d
 }
 
-#' Cache all PBS groundfish data for one or more species
-#'
-#' @param species A character vector of species common names
+#' @export
+#' @rdname get
+get_sara_dat <- function() {
+  h <- xml2::read_html("http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm")
+  d <- h %>% rvest::html_nodes("table") %>%
+    .[[1]] %>%
+    rvest::html_table() %>%
+    .[-(1:2), ] %>%
+    dplyr::as_tibble() %>%
+    dplyr::filter(.data$Taxon %in% "Fishes") %>%
+    dplyr::filter(!grepl("Salmon",  .data$`Common name *`))
+  names(d) <- tolower(names(d))
+  names(d) <- gsub(" ", "_", names(d))
+  names(d) <- gsub("_\\*", "", names(d))
+  d
+}
+
 #' @param path The folder where the cached data will be saved
 #' @export
-#' @family get PBS data functions
+#' @rdname get
 cache_pbs_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 

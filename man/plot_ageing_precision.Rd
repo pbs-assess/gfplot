@@ -35,7 +35,6 @@ get_ageing_precision("pacific ocean perch") \%>\%
 }
 }
 \seealso{
-Other ageing precision functions: \code{\link{get_ageing_precision}},
-  \code{\link{get_cpue_index}},
-  \code{\link{tidy_ageing_precision}}
+Other ageing precision functions: \code{\link{tidy_ageing_precision}}
 }
+\concept{ageing precision functions}

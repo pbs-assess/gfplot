@@ -42,3 +42,4 @@ Other plotting functions: \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
 }
+\concept{plotting functions}

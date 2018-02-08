@@ -53,6 +53,7 @@ Other tidy data functions: \code{\link{tidy_ageing_precision}},
   \code{\link{tidy_ages}}, \code{\link{tidy_catch}},
   \code{\link{tidy_cpue_index}}
 
-Other survey biomass index functions: \code{\link{get_bioindex}},
-  \code{\link{plot_bioindex}}
+Other survey biomass index functions: \code{\link{plot_bioindex}}
 }
+\concept{survey biomass index functions}
+\concept{tidy data functions}

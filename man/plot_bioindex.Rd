@@ -40,6 +40,7 @@ Other plotting functions: \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
 
-Other survey biomass index functions: \code{\link{get_bioindex}},
-  \code{\link{tidy_bioindex}}
+Other survey biomass index functions: \code{\link{tidy_bioindex}}
 }
+\concept{plotting functions}
+\concept{survey biomass index functions}

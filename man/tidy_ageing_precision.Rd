@@ -32,7 +32,7 @@ Other tidy data functions: \code{\link{tidy_ages}},
   \code{\link{tidy_bioindex}}, \code{\link{tidy_catch}},
   \code{\link{tidy_cpue_index}}
 
-Other ageing precision functions: \code{\link{get_ageing_precision}},
-  \code{\link{get_cpue_index}},
-  \code{\link{plot_ageing_precision}}
+Other ageing precision functions: \code{\link{plot_ageing_precision}}
 }
+\concept{ageing precision functions}
+\concept{tidy data functions}

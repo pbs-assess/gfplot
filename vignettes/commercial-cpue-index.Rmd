@@ -1,0 +1,45 @@
+---
+title: "Commercial CPUE"
+author: "Sean Anderson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, eval=FALSE}
+library("PBSsynopsis")
+d <- get_cpue_index(gear = "bottom trawl")
+```
+
+```{r, eval=FALSE}
+walleye <- tidy_cpue_index(d, "walleye pollock",
+  area_grep_pattern = "5[CDE]+")
+```
+
+```{r, eval=FALSE}
+m <- fit_cpue_index(walleye)
+```
+
+```{r, eval=FALSE}
+plot_cpue_index_coefs(m)
+```
+
+```{r, eval=FALSE}
+predict_cpue_index(m) %>%
+  plot_cpue_index()
+```
+
+```{r, eval=FALSE}
+jackknife_cpue_index(m)
+```
+

@@ -17,10 +17,10 @@ Plot coefficients from a CPUE index standardization model
 }
 \details{
 Note that for coefficients for predictors treated as factors (i.e.
-  likely all of the predictors), the coefficients represent the difference
-  from the base level factor, which would be the first factor level
-  alpha-numerically. For example, month 02 represents the estimated
-  difference between February and January.
+likely all of the predictors), the coefficients represent the difference
+from the base level factor, which would be the first factor level
+alpha-numerically. For example, month 02 represents the estimated
+difference between February and January.
 }
 \examples{
 \dontrun{
@@ -49,3 +49,5 @@ Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{predict_cpue_index}},
   \code{\link{tidy_cpue_index}}
 }
+\concept{CPUE index functions}
+\concept{plotting functions}
