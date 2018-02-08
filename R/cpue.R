@@ -32,11 +32,11 @@ tidy_cpue_index <- function(dat, species_common,
 
   pbs_areas <- PBSsynopsis::pbs_areas[grep(area_grep_pattern,
     PBSsynopsis::pbs_areas$major_stat_area_description), ]
-  names(catch) <- tolower(names(catch))
-  catch <- inner_join(catch, PBSsynopsis::pbs_species, by = "species_code")
+  names(dat) <- tolower(names(dat))
+  dat <- inner_join(dat, PBSsynopsis::pbs_species, by = "species_code")
 
   # basic filtering:
-  catch <- catch %>%
+  catch <- dat %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
     mutate(year = lubridate::year(best_date)) %>%
     filter(!fishing_event_id %in% c(0, 1)) %>% # bad events; many duplicates?
