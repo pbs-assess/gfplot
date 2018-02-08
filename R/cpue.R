@@ -13,8 +13,6 @@
 #' @param lat_bands A sequence of latitude bans
 #' @param depth_bands A sequence of depth bands
 #' @param gear Gear types
-#'
-#' @family CPUE index functions
 #' @family tidy data functions
 #'
 #' @export
@@ -172,7 +170,6 @@ f <- function(x) as.factor(as.character(x))
 #' @export
 #'
 #' @importFrom stats coef model.matrix lm binomial rnorm
-#' @family CPUE index functions
 #' @family Fitting functions
 #'
 #' @template cpue-examples
@@ -237,7 +234,6 @@ fit_cpue_index <- function(dat,
 #' @param center Should the index be centered by subtracting the mean in link space?
 #'
 #' @export
-#' @family CPUE index functions
 #'
 #' @template cpue-examples
 
@@ -279,7 +275,6 @@ predict_cpue_index <- function(object, center = FALSE) {
 #' @param all_models TODO
 #'
 #' @export
-#' @family CPUE index functions
 #' @family plotting functions
 #' @return A ggplot object
 #'
@@ -314,7 +309,6 @@ plot_cpue_index <- function(dat, all_models = TRUE) {
 #'
 #' @return A ggplot object
 #' @export
-#' @family CPUE index functions
 #' @family plotting functions
 #'
 #' @template cpue-examples
@@ -371,8 +365,6 @@ plot_cpue_index_coefs <- function(object) {
 #'
 #' @return TODO
 #' @export
-#'
-#' @family CPUE index functions
 #' @family plotting functions
 #'
 #' @template cpue-examples

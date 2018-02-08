@@ -1,3 +1,4 @@
+#' @family CPUE index functions
 #' @examples
 #' \dontrun{
 #' d <- get_cpue_index(gear = "bottom trawl")

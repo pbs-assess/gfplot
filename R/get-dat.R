@@ -182,6 +182,7 @@ get_cpue <- function(species) {
 #'
 #' @export
 #' @family get PBS data functions
+#' @template ageing-precision-examples
 get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
   i <- grep("-- insert filters here", q)
@@ -198,6 +199,7 @@ get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 #' @param species A character vector of a species common names
 #' @export
 #' @family get PBS data functions
+#' @template ageing-precision-examples
 get_ageing_precision <- function(species) {
   q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
   q <- inject_species("AND C.SPECIES_CODE IN", species, q)
@@ -211,6 +213,7 @@ get_ageing_precision <- function(species) {
 #' @param species A character vector of species common names
 #' @export
 #' @family get PBS data functions
+#' @template bioindex-examples
 get_bioindex <- function(species) {
   species <- common2codes(species)
   q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))

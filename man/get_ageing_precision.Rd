@@ -12,6 +12,17 @@ get_ageing_precision(species)
 \description{
 Get PBS ageing precision data
 }
+\examples{
+\dontrun{
+get_ageing_precision("shortraker rockfish") \%>\%
+  tidy_ageing_precision() \%>\%
+  plot_ageing_precision()
+
+get_ageing_precision("pacific ocean perch") \%>\%
+  tidy_ageing_precision() \%>\%
+  plot_ageing_precision(n = 200)
+}
+}
 \seealso{
 Other get PBS data functions: \code{\link{cache_pbs_data}},
   \code{\link{get_bioindex}}, \code{\link{get_catch}},
@@ -20,4 +31,8 @@ Other get PBS data functions: \code{\link{cache_pbs_data}},
   \code{\link{get_sample_trips}},
   \code{\link{get_sara_dat}}, \code{\link{get_strata}},
   \code{\link{get_survey}}, \code{\link{get_survsamples}}
+
+Other ageing precision functions: \code{\link{get_cpue_index}},
+  \code{\link{plot_ageing_precision}},
+  \code{\link{tidy_ageing_precision}}
 }

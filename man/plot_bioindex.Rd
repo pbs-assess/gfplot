@@ -19,9 +19,18 @@ Title TODO
 }
 \examples{
 \dontrun{
+get_bioindex("lingcod") \%>\%
+  tidy_bioindex() \%>\%
+  plot_bioindex()
+
+# Or without pipes:
 d <- get_bioindex("lingcod")
-d <- tidy_bioindex(d)
-plot_bioindex(d)
+head(d)
+
+d_tidy <- tidy_bioindex(d)
+head(d_tidy)
+
+plot_bioindex(d_tidy)
 }
 }
 \seealso{
@@ -30,4 +39,7 @@ Other plotting functions: \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
+
+Other survey biomass index functions: \code{\link{get_bioindex}},
+  \code{\link{tidy_bioindex}}
 }

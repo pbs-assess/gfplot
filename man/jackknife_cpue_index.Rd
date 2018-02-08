@@ -34,15 +34,15 @@ jackknife_cpue_index(m)
 }
 }
 \seealso{
-Other CPUE index functions: \code{\link{fit_cpue_index}},
-  \code{\link{plot_cpue_index_coefs}},
-  \code{\link{plot_cpue_index}},
-  \code{\link{predict_cpue_index}},
-  \code{\link{tidy_cpue_index}}
-
 Other plotting functions: \code{\link{plot_bioindex}},
   \code{\link{plot_catch}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
+
+Other CPUE index functions: \code{\link{fit_cpue_index}},
+  \code{\link{plot_cpue_index_coefs}},
+  \code{\link{plot_cpue_index}},
+  \code{\link{predict_cpue_index}},
+  \code{\link{tidy_cpue_index}}
 }

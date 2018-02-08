@@ -14,6 +14,17 @@ get_cpue_index(gear = "bottom trawl", min_year = 1996)
 \description{
 Can be used to extract data for \code{\link{tidy_cpue_index}}.
 }
+\examples{
+\dontrun{
+get_ageing_precision("shortraker rockfish") \%>\%
+  tidy_ageing_precision() \%>\%
+  plot_ageing_precision()
+
+get_ageing_precision("pacific ocean perch") \%>\%
+  tidy_ageing_precision() \%>\%
+  plot_ageing_precision(n = 200)
+}
+}
 \seealso{
 Other get PBS data functions: \code{\link{cache_pbs_data}},
   \code{\link{get_ageing_precision}},
@@ -22,4 +33,8 @@ Other get PBS data functions: \code{\link{cache_pbs_data}},
   \code{\link{get_sample_trips}},
   \code{\link{get_sara_dat}}, \code{\link{get_strata}},
   \code{\link{get_survey}}, \code{\link{get_survsamples}}
+
+Other ageing precision functions: \code{\link{get_ageing_precision}},
+  \code{\link{plot_ageing_precision}},
+  \code{\link{tidy_ageing_precision}}
 }

@@ -12,6 +12,22 @@ get_bioindex(species)
 \description{
 Get PBS biological index data
 }
+\examples{
+\dontrun{
+get_bioindex("lingcod") \%>\%
+  tidy_bioindex() \%>\%
+  plot_bioindex()
+
+# Or without pipes:
+d <- get_bioindex("lingcod")
+head(d)
+
+d_tidy <- tidy_bioindex(d)
+head(d_tidy)
+
+plot_bioindex(d_tidy)
+}
+}
 \seealso{
 Other get PBS data functions: \code{\link{cache_pbs_data}},
   \code{\link{get_ageing_precision}},
@@ -20,4 +36,7 @@ Other get PBS data functions: \code{\link{cache_pbs_data}},
   \code{\link{get_sample_trips}},
   \code{\link{get_sara_dat}}, \code{\link{get_strata}},
   \code{\link{get_survey}}, \code{\link{get_survsamples}}
+
+Other survey biomass index functions: \code{\link{plot_bioindex}},
+  \code{\link{tidy_bioindex}}
 }

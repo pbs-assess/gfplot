@@ -8,11 +8,7 @@
 #' @export
 #'
 #' @family tidy data functions
-#' @examples
-#' \dontrun{
-#' get_ageing_precision("pacific ocean perch") %>%
-#'   tidy_ageing_precision()
-#' }
+#' @template ageing-precision-examples
 tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 
   dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
@@ -65,12 +61,7 @@ tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #'
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' get_ageing_precision("pacific ocean perch") %>%
-#'   tidy_ageing_precision() %>%
-#'   plot_ageing_precision(n = 200)
-#' }
+#' @template ageing-precision-examples
 plot_ageing_precision <- function(dat, n = 250, jitter = 0.25, seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
   if (n < nrow(dat))

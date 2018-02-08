@@ -7,11 +7,7 @@
 #' @param year_range TODO
 #' @export
 #' @family tidy data functions
-#' @examples
-#' \dontrun{
-#' d <- get_bioindex("lingcod")
-#' tidy_bioindex(d)
-#' }
+#' @template bioindex-examples
 
 tidy_bioindex <- function(dat,
   surveys = c(
@@ -92,12 +88,7 @@ tidy_bioindex <- function(dat,
 #' @export
 #' @family plotting functions
 #'
-#' @examples
-#' \dontrun{
-#' d <- get_bioindex("lingcod")
-#' d <- tidy_bioindex(d)
-#' plot_bioindex(d)
-#' }
+#' @template bioindex-examples
 
 plot_bioindex <- function(dat, col = RColorBrewer::brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices") {

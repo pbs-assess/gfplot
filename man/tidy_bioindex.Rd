@@ -34,12 +34,25 @@ Title
 }
 \examples{
 \dontrun{
+get_bioindex("lingcod") \%>\%
+  tidy_bioindex() \%>\%
+  plot_bioindex()
+
+# Or without pipes:
 d <- get_bioindex("lingcod")
-tidy_bioindex(d)
+head(d)
+
+d_tidy <- tidy_bioindex(d)
+head(d_tidy)
+
+plot_bioindex(d_tidy)
 }
 }
 \seealso{
 Other tidy data functions: \code{\link{tidy_ageing_precision}},
   \code{\link{tidy_ages}}, \code{\link{tidy_catch}},
   \code{\link{tidy_cpue_index}}
+
+Other survey biomass index functions: \code{\link{get_bioindex}},
+  \code{\link{plot_bioindex}}
 }
