@@ -435,7 +435,6 @@ jackknife_cpue_index <- function(object,
     geom_line(data = all, lty = "31", lwd = 1.0,
       aes_string("year", "pred"), colour = "grey70", inherit.aes = FALSE) +
     geom_line(lwd = 1.0) +
-    ggplot2::scale_color_manual(values = cols) +
     theme_pbs() + guides(size = FALSE, colour = FALSE) +
     labs(colour = "Excluded", y = "Relative CPUE index", x = "") +
     facet_wrap(~term)
