@@ -118,15 +118,17 @@ get_survsamples <- function(species, remove_bad_data = TRUE) {
 
   if (remove_bad_data) {
     dbio <- dbio[!(dbio$length > 600 &
-      dbio$species_common_name == "north pacific spiny dogfish"), ]
+      dbio$species_common_name == "north pacific spiny dogfish"), drop = FALSE]
     dbio <- dbio[!(dbio$length > 600 &
-      dbio$species_common_name == "big skate"), ]
+      dbio$species_common_name == "big skate"), drop = FALSE]
     dbio <- dbio[!(dbio$length > 600 &
-      dbio$species_common_name == "longnose skate"), ]
+      dbio$species_common_name == "longnose skate"), drop = FALSE]
     dbio <- dbio[!(dbio$length > 60 &
-      dbio$species_common_name == "pacific tomcod"), ]
+      dbio$species_common_name == "pacific tomcod"), drop = FALSE]
     dbio <- dbio[!(dbio$length > 50 &
-      dbio$species_common_name == "quillback-rockfish"), ]
+      dbio$species_common_name == "quillback-rockfish"), drop = FALSE]
+    dat <- dat[!(dat$length < 10 & dat$weight/1000 > 1.0 &
+        dat$species_common_name == "pacific flatnose"), drop = FALSE]
   }
 
   dbio

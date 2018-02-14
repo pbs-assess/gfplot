@@ -2,7 +2,7 @@
 #'
 #' @param dat A data frame from \code{\link{get_ageing_precision}}
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
-#'   on. Defaults to codes \code{3} and \code{17}, which represent otolith
+#'   on. Defaults to codes `3` and `17`, which represent otolith
 #'   'break and burn' and 'break and bake' methods.
 #'
 #' @export
@@ -19,8 +19,8 @@ tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 
   # organize dataframe with one record for each specimen id, age reading type
   # and age parameter
-  dbio <- tidyr::gather(dbio, ageing_param, age, -(specimen_id:ageing_method_desc),
-    -employee_id, -age_reading_id) %>%
+  dbio <- tidyr::gather(dbio, ageing_param, age,
+    -(specimen_id:ageing_method_desc), -employee_id, -age_reading_id) %>%
     arrange(age_reading_id) %>%
     group_by(specimen_id, age_reading_type_code, year, species_code,
       ageing_param) %>%

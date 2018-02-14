@@ -37,10 +37,10 @@ plot_maturity <- function(dat, type = "age") {
 
   if (type == "age") {
     dbio <- filter(dbio, !is.na(mature), !is.na(age), !is.na(sex))
-    xx <- dbio %>% rename(age_or_length = age)
+    xx <- dbio %>% dplyr::rename(age_or_length = age)
   } else {
     dbio <- filter(dbio, !is.na(mature), !is.na(length), !is.na(sex))
-    xx <- dbio %>% rename(age_or_length = length)
+    xx <- dbio %>% dplyr::rename(age_or_length = length)
   }
 
   xx <- mutate(xx, female = ifelse(sex == 2, 1, 0))

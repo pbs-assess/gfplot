@@ -13,7 +13,8 @@
 #' @param min_specimens TODO
 #' @family plotting functions
 #' @export
-plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L) {
+plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
+  min_specimens = 20L) {
 
   survs <- c(
     "West Coast Haida Gwaii Synoptic Survey",
@@ -31,15 +32,6 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
       .data$sample_id,
       .data$year, .data$age, .data$length, .data$weight,
       .data$maturity_code, .data$sex, .data$survey_series_desc)
-
-  # bad data:
-  dat <- dat[!(dat$length > 600 & dat$species_common_name == "north pacific spiny dogfish"), ]
-  dat <- dat[!(dat$length > 600 & dat$species_common_name == "big skate"), ]
-  dat <- dat[!(dat$length > 600 & dat$species_common_name == "longnose skate"), ]
-  dat <- dat[!(dat$length > 60 & dat$species_common_name == "pacific tomcod"), ]
-  dat <- dat[!(dat$length > 50 & dat$species_common_name == "quillback rockfish"), ]
-  dat <- dat[!(dat$length < 10 & dat$weight/1000 > 1.0 &
-      dat$species_common_name == "pacific flatnose"), ]
 
   dat <- filter(dat, !is.na(length), !is.na(sex))
 
@@ -77,7 +69,7 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
     group_by(.data$year, .data$survey) %>%
     mutate(max_n = max(.data$n)) %>%
     ungroup() %>%
-    mutate(proportion = .data$n/.data$max_n) %>%
+    mutate(proportion = .data$n / .data$max_n) %>%
     mutate(sex = ifelse(.data$sex == 1, "M", "F")) %>%
     full_join(all, by = c("year", "survey")) %>%
     left_join(counts, by = c("year", "survey")) %>%
