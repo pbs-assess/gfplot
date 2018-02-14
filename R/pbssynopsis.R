@@ -9,13 +9,19 @@
 #' @name PBSsynopsis
 #' @importFrom dplyr filter mutate summarise select group_by n arrange ungroup
 #' @importFrom dplyr inner_join left_join right_join anti_join full_join
-#' @importFrom dplyr bind_rows case_when pull contains tibble
+#' @importFrom dplyr bind_rows case_when pull contains tibble rename
 #' @importFrom rlang enquo quo_name ":=" "!!" .data
+#' @importFrom forcats fct_reorder
+#' @importFrom assertthat assert_that are_equal
+#' @importFrom RColorBrewer brewer.pal
 #' @importFrom dplyr "%>%"
 #' @importFrom ggplot2 ggplot aes_string geom_hline geom_vline scale_fill_manual
 #'   scale_colour_manual scale_x_continuous scale_size_area coord_cartesian
 #'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
 #'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
+#'   guide_legend geom_ribbon element_text scale_shape_manual element_line
+#' @importFrom stats coef model.matrix lm binomial rnorm
+#'   update.formula formula as.formula
 NULL
 
 #' PBSsynopsis exported functions
@@ -28,8 +34,8 @@ NULL
 
 # from: https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
 # quiets concerns of R CMD check re: the .'s that appear in pipelines
-if(getRversion() >= "2.15.1") utils::globalVariables(c("."))
-if(getRversion() >= "2.15.1") utils::globalVariables(c(
+if (getRversion() >= "2.15.1") utils::globalVariables(c("."))
+if (getRversion() >= "2.15.1") utils::globalVariables(c(
   "SURVEY_SERIES_TYPE_CODE", "trip_start_date", "SPECIES_CODE",
   "SPECIES_COMMON_NAME", "SPECIES_DESC", "SPECIES_SCIENCE_NAME",
   "SURVEY_SERIES_DESC", "SURVEY_SERIES_ID", "SURVEY_SERIES_TYPE_CODE",
@@ -88,5 +94,6 @@ if(getRversion() >= "2.15.1") utils::globalVariables(c(
   "spp_in_row", "sum_catch", "total_positive_tows", "trips_over_thresh",
   "trips_over_treshold_this_year", "vessel_name",
   "est", "est_log", "lwr", "se_log", "upr",  "est_link", "model", "se_link",
-  "n_date", "pars", "par_name", "par_group", "par_name_short", "se"
+  "n_date", "pars", "par_name", "par_group", "par_name_short", "se",
+  "vessel", "pred", "term"
   ))

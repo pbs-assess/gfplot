@@ -11,7 +11,8 @@ join_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
 
 \item{survey_tows}{Survey tow data}
 
-\item{value}{The unquoted column name with the values to re-weight (age or length)}
+\item{value}{The unquoted column name with the values to re-weight (age or
+length)}
 
 \item{bin_size}{The binning size (if length data)}
 }

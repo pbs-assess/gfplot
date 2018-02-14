@@ -5,10 +5,10 @@
 \title{Tidy commercial PBS CPUE data}
 \usage{
 tidy_cpue_index(dat, species_common, year_range = c(1996, Inf),
-  lat_range = c(48, Inf), min_positive_tows = 100,
-  min_annual_positive_trips = 4, min_years_with_min_positive_trips = 4,
-  area_grep_pattern = "5[CDE]+", lat_bands = seq(48, 59, 0.1),
-  depth_bands = seq(50, 450, 25), gear = "BOTTOM TRAWL")
+  lat_range = c(48, Inf), min_positive_tows = 100, min_positive_trips = 4,
+  min_yrs_with_trips = 4, area_grep_pattern = "5[CDE]+",
+  lat_bands = seq(48, 59, 0.1), depth_bands = seq(50, 450, 25),
+  gear = "BOTTOM TRAWL")
 }
 \arguments{
 \item{dat}{An input data frame from \code{\link{get_cpue_index}}}
@@ -21,10 +21,10 @@ tidy_cpue_index(dat, species_common, year_range = c(1996, Inf),
 
 \item{min_positive_tows}{The minimum number of positive tows over all years}
 
-\item{min_annual_positive_trips}{The minimum number of annual positive trips}
+\item{min_positive_trips}{The minimum number of annual positive trips}
 
-\item{min_years_with_min_positive_trips}{The number of years in which the
-\code{min_annual_positive_trips} criteria needs to be met}
+\item{min_yrs_with_trips}{The number of years in which the
+\code{min_positive_trips} criteria needs to be met}
 
 \item{area_grep_pattern}{A regular expression to extract the management areas
 of interest}

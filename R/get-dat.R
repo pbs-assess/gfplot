@@ -50,9 +50,13 @@ get_strata <- function() {
 get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
-  q <- paste("SELECT S.SURVEY_ID, SS.SURVEY_SERIES_ID, SS.SURVEY_SERIES_DESC
+  q <- paste(
+    "SELECT S.SURVEY_ID,
+      SS.SURVEY_SERIES_ID,
+      SS.SURVEY_SERIES_DESC
     FROM SURVEY S
-    INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
+    INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
+      SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
     WHERE S.SURVEY_SERIES_ID IN (", paste(survey_codes, collapse = ", "), ")")
 
   species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -62,7 +66,6 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   d_survs <- list()
   k <- 0
   for (i in seq_along(species_codes)) {
-    message(paste("Extracting spatial survey data for species code", species_codes[i]))
     for (j in seq_along(survey_ids$SURVEY_ID)) {
       k <- k + 1
       d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -92,9 +95,10 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
 
 #' @export
 #' @rdname get
-get_survsamples <- function(species) {
-  q <- readLines(system.file("sql", "get-survey-biology.sql", package = "PBSsynopsis"))
-  q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
+#' @param remove_bad_data Remove known bad data?
+get_survsamples <- function(species, remove_bad_data = TRUE) {
+  q <- read_sql("get-survey-biology.sql")
+  q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -108,8 +112,22 @@ get_survsamples <- function(species) {
   dbio <- dplyr::mutate(dbio, year = lubridate::year(trip_start_date))
   dbio <- dplyr::inner_join(dbio, ss, by = "survey_series_id")
 
-  warning("Duplicate specimen IDs still present! Filter them yourself.")
-  # dbio <- dbio[!duplicated(dbio$specimen_id), ]
+  warning(paste("Duplicate specimen IDs may still be present.",
+      "Filter them yourself after selecting specific surveys.",
+      "E.g. dat <- dat[!duplicated(dat$specimen_id), ]"))
+
+  if (remove_bad_data) {
+    dbio <- dbio[!(dbio$length > 600 &
+      dbio$species_common_name == "north pacific spiny dogfish"), ]
+    dbio <- dbio[!(dbio$length > 600 &
+      dbio$species_common_name == "big skate"), ]
+    dbio <- dbio[!(dbio$length > 600 &
+      dbio$species_common_name == "longnose skate"), ]
+    dbio <- dbio[!(dbio$length > 60 &
+      dbio$species_common_name == "pacific tomcod"), ]
+    dbio <- dbio[!(dbio$length > 50 &
+      dbio$species_common_name == "quillback-rockfish"), ]
+  }
 
   dbio
 }
@@ -117,8 +135,8 @@ get_survsamples <- function(species) {
 #' @export
 #' @rdname get
 get_commsamples <- function(species) {
-  q <- readLines(system.file("sql", "get-commercial-biology.sql", package = "PBSsynopsis"))
-  q <- inject_species("AND SM.SPECIES_CODE IN", species, sql_code = q)
+  q <- read_sql("get-commercial-biology.sql")
+  q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = q)
   dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
   names(dbio_c) <- tolower(names(dbio_c))
   dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
@@ -132,11 +150,11 @@ get_commsamples <- function(species) {
 #' @rdname get
 get_catch <- function(species) {
   species <- common2codes(species)
-  q <- readLines(system.file("sql", "get-landings.sql", package = "PBSsynopsis"))
+  q <- read_sql("get-landings.sql")
   i <- grep("ORDER BY BEST", q) - 1
   q <- c(q[seq(1, i)],
     paste("WHERE SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
-    q[seq(i+1, length(q))])
+    q[seq(i + 1, length(q))])
   landings_sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), landings_sql)
   names(d) <- tolower(names(d))
@@ -159,11 +177,11 @@ get_catch <- function(species) {
 #' @rdname get
 get_cpue <- function(species) {
   species <- common2codes(species)
-  q <- readLines(system.file("sql", "get-cpue.sql", package = "PBSsynopsis"))
+  q <- read_sql("get-cpue.sql")
   i <- grep("ORDER BY YEAR", q) - 1
   q <- c(q[seq(1, i)],
     paste("AND SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
-    q[seq(i+1, length(q))])
+    q[seq(i + 1, length(q))])
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
   d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
@@ -179,10 +197,11 @@ get_cpue <- function(species) {
 #' @export
 #' @rdname get
 get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
-  q <- readLines(system.file("sql", "get-all-merged-catch.sql", package = "PBSsynopsis"))
+  q <- read_sql("get-all-merged-catch.sql")
   i <- grep("-- insert filters here", q)
   # TODO allow for multiple gear types?
-  q[i] <- paste0("GEAR IN('", toupper(gear), "') AND YEAR(BEST_DATE) >= ", min_year, " AND")
+  q[i] <- paste0("GEAR IN('", toupper(gear),
+    "') AND YEAR(BEST_DATE) >= ", min_year, " AND")
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
   names(d) <- tolower(names(d))
@@ -192,8 +211,8 @@ get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 #' @export
 #' @rdname get
 get_ageing_precision <- function(species) {
-  q <- readLines(system.file("sql", "ageing-precision.sql", package = "PBSsynopsis"))
-  q <- inject_species("AND C.SPECIES_CODE IN", species, q)
+  q <- read_sql("ageing-precision.sql")
+  q <- inject_species_filter("AND C.SPECIES_CODE IN", species, q)
   dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
   names(dbio) <- tolower(names(dbio))
   dbio
@@ -203,11 +222,11 @@ get_ageing_precision <- function(species) {
 #' @rdname get
 get_bioindex <- function(species) {
   species <- common2codes(species)
-  q <- readLines(system.file("sql", "get-survey-boot.sql", package = "PBSsynopsis"))
+  q <- read_sql("get-survey-boot.sql")
   i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
   q <- c(q[seq(1, i)],
     paste("WHERE SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
-    q[seq(i+1, length(q))])
+    q[seq(i + 1, length(q))])
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
   names(d) <- tolower(names(d))
@@ -219,11 +238,12 @@ get_bioindex <- function(species) {
 #' @export
 #' @rdname get
 get_sara_dat <- function() {
-  h <- xml2::read_html("http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm")
+  h <- xml2::read_html(
+    "http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm")
   d <- h %>% rvest::html_nodes("table") %>%
     .[[1]] %>%
     rvest::html_table() %>%
-    .[-(1:2), ] %>%
+    .[- (1:2), ] %>%
     dplyr::as_tibble() %>%
     dplyr::filter(.data$Taxon %in% "Fishes") %>%
     dplyr::filter(!grepl("Salmon",  .data$`Common name *`))

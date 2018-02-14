@@ -1,4 +1,4 @@
-maturity_convention_code,maturity_convention_description,specimen_sex_code,maturity_convention_maxvalue,mature_at
+maturity_convention_code,maturity_convention_desc,sex,maturity_convention_maxvalue,mature_at
 1,ROCKFISH (1977+),1,7,3
 1,ROCKFISH (1977+),2,7,3
 2,HAKE (1977+),1,12,3

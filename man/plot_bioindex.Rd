@@ -4,7 +4,7 @@
 \alias{plot_bioindex}
 \title{Title TODO}
 \usage{
-plot_bioindex(dat, col = RColorBrewer::brewer.pal(9, "Greys")[c(3, 7)],
+plot_bioindex(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices")
 }
 \arguments{

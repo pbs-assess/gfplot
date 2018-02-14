@@ -2,18 +2,22 @@ bin_lengths <- function(dat, value, bin_size) {
   value <- enquo(value)
   bin_range <- dat %>% select(!!value) %>% pull() %>% range()
   bins <- seq(min(bin_range), max(bin_range), by = bin_size)
-  mutate(dat, !!quo_name(value) := bins[findInterval(!!value, bins)] + bin_size/2)
+  mutate(dat, !!quo_name(value) :=
+    bins[findInterval(!!value, bins)] + bin_size / 2)
 }
 
 #' Join commercial catch and composition data for weighting
 #'
 #' @param specimen_dat Specimen data
 #' @param catch_dat Catch data
-#' @param value The unquoted column name with the values to re-weight (age or length)
+#' @param value The unquoted column name with the values to re-weight (age or
+#'   length)
 #' @param bin_size The binning size (if length data)
 #'
 #' @export
-join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NULL) {
+join_comps_commercial <- function(specimen_dat, catch_dat, value,
+  bin_size = NULL) {
+
   value <- enquo(value)
   specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
 
@@ -46,7 +50,7 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NUL
     group_by(year, quarter) %>%
     summarise(samp_catch_weight_quarter = sum(samp_trip_catch_weight))
 
-  freq_and_catch_by_trip <- dat %>% group_by(year, trip_id, quarter, !!value) %>%
+  freq_and_catch_by_trip <- group_by(dat, year, trip_id, quarter, !!value) %>%
     summarise(freq = n()) %>%
     inner_join(sampled_trip_id_catch, by = c("year", "trip_id", "quarter"))
 
@@ -60,7 +64,7 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NUL
     inner_join(quarter_sampled_catch, by = c("year", "quarter")) %>%
     select(year, trip_id, quarter, !!value, freq,
       samp_trip_catch_weight, samp_catch_weight_quarter,
-      landed_kg_quarter, landed_kg_year) %>% # re-order
+      landed_kg_quarter, landed_kg_year) %>% # re-order columns
     arrange(year, trip_id, !!value) %>%
     ungroup()
 }
@@ -69,11 +73,14 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value, bin_size = NUL
 #'
 #' @param specimen_dat Specimen data
 #' @param survey_tows Survey tow data
-#' @param value The unquoted column name with the values to re-weight (age or length)
+#' @param value The unquoted column name with the values to re-weight (age or
+#'   length)
 #' @param bin_size The binning size (if length data)
 #'
 #' @export
-join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL) {
+join_comps_survey <- function(specimen_dat, survey_tows, value,
+  bin_size = NULL) {
+
   value <- enquo(value)
   specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
 
@@ -85,7 +92,8 @@ join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL)
 
   strat_dat <- survey_tows %>%
     left_join(sample_trip_ids, by = "fishing_event_id") %>%
-    select(year, survey_id, fishing_event_id, sample_id, grouping_code, density_kgpm2)
+    select(year, survey_id, fishing_event_id, sample_id, grouping_code,
+      density_kgpm2)
   strat_dat <- left_join(strat_dat, areas, by = c("survey_id", "grouping_code"))
 
   raw_comp <- specimen_dat %>%
@@ -102,13 +110,13 @@ join_comps_survey <- function(specimen_dat, survey_tows, value, bin_size = NULL)
     grouping_code, density_kgpm2) %>%
     unique() %>%
     group_by(year, grouping_code) %>%
-    summarise(total_density = sum(density_kgpm2*1e6))
+    summarise(total_density = sum(density_kgpm2 * 1e6))
 
   sample_dens <- select(specimen_dat, -area_km2) %>%
     inner_join(strat_dat,
       by = c("year", "survey_id", "sample_id", "grouping_code")) %>%
     group_by(year, grouping_code, sample_id) %>%
-    summarise(density = mean(density_kgpm2*1e6)) # should be one unique value
+    summarise(density = mean(density_kgpm2 * 1e6)) # should be one unique value
 
   inner_join(raw_comp, sample_dens,
     by = c("year", "sample_id", "grouping_code")) %>%
@@ -133,7 +141,7 @@ weight_comps_base <- function(dat) {
   group_by(dat, year, grouping1) %>% # pre D.4 / # quarter
 
     # first level (within quarters by catch or within strata by survey catch):
-    mutate(prop = weighting1/weighting1_total) %>% # D.4
+    mutate(prop = weighting1 / weighting1_total) %>% # D.4
     # re-weight:
     group_by(year, grouping1, weighting2, weighting2_total, value) %>% # pre D.5
     summarise(weighted_freq1 = sum(freq * prop), # D.5
@@ -141,11 +149,11 @@ weight_comps_base <- function(dat) {
 
     # re-standardize:
     mutate(weighted_freq1_scaled =
-        weighted_freq1 * sum(sum_freq)/sum(weighted_freq1)) %>%  # D.6
+        weighted_freq1 * sum(sum_freq) / sum(weighted_freq1)) %>%  # D.6
     group_by(year) %>% # pre D.7
 
     # second level (within years by catch or within survey-years by area):
-    mutate(annual_prop = weighting2/sum(weighting2_total)) %>% # D.7
+    mutate(annual_prop = weighting2 / sum(weighting2_total)) %>% # D.7
     group_by(year, value) %>% # pre D.8
 
     # re-weight:

@@ -18,12 +18,12 @@
 #'
 #' @export
 theme_pbs <- function(base_size = 11, base_family = "") {
-  half_line <- base_size/2
+  half_line <- base_size / 2
   theme_light(base_size = 11, base_family = "") +
     theme(
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      axis.ticks.length = unit(half_line/2.2, "pt"),
+      axis.ticks.length = unit(half_line / 2.2, "pt"),
       strip.background = element_rect(fill = NA, colour = NA),
       strip.text.x = element_text(colour = "grey30"),
       strip.text.y = element_text(colour = "grey30"),
@@ -36,6 +36,5 @@ theme_pbs <- function(base_size = 11, base_family = "") {
       legend.key = element_rect(colour = NA, fill = NA),
       legend.background = element_rect(colour = NA, fill = NA),
       plot.title = element_text(colour = "grey10", size = rel(1))
-      # panel.spacing = unit(0, "lines")
     )
 }

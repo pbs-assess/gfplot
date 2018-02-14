@@ -79,8 +79,8 @@ plot_catch <- function(dat,
   ylab = "Landings", units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
   unreliable = c(1996, 2006), unreliable_alpha = 0.2) {
 
-  pal <-  c(RColorBrewer::brewer.pal(n = length(unique(dat$gear))-2,
-    "Paired"),"grey60", "grey30")[c(2, 1, 4, 3, 5, 6)]
+  pal <-  c(RColorBrewer::brewer.pal(n = length(unique(dat$gear)) - 2,
+    "Paired"), "grey60", "grey30")[c(2, 1, 4, 3, 5, 6)]
   names(pal) <- levels(dat$gear)
 
   scale_val <- units[[1]]
