@@ -7,7 +7,7 @@
 fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
   downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
-  est_method = median, min_samples = 100L, ...)
+  est_method = median, min_samples = 50L, ...)
 }
 \arguments{
 \item{dat}{TODO}
@@ -36,6 +36,7 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 For use with data for a single species.
 }
 \seealso{
-Other growth functions: \code{\link{plot_vb}}
+Other growth functions: \code{\link{fit_length_weight}},
+  \code{\link{plot_growth}}
 }
 \concept{growth functions}

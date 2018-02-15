@@ -38,7 +38,8 @@ Imports:
     speedglm,
     TMB,
     FSA,
-    Rcpp
+    Rcpp,
+    MASS
 RoxygenNote: 6.0.1.9000
 Remotes: github::pbs-software/pbs-data/PBSdata
 Suggests: knitr,
