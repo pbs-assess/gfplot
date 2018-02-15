@@ -23,6 +23,16 @@ fit_length_weight(dat, sex = c("female", "male"), downsample = Inf,
 \description{
 For use with data for a single species.
 }
+\examples{
+model_f <- fit_length_weight(pop_samples)
+model_f$model
+model_f$predictions
+model_f$pars
+model_f$data
+
+model_m <- fit_length_weight(pop_samples, sex = "male")
+plot_length_weight(model_f, model_m)
+}
 \seealso{
 Other growth functions: \code{\link{fit_vb}},
   \code{\link{plot_growth}}

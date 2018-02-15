@@ -49,6 +49,17 @@ plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
 \description{
 Plot VB or length-weight fits TODO
 }
+\examples{
+\dontrun{
+model_f <- fit_vb(pop_samples, sex = "female")
+model_m <- fit_vb(pop_samples, sex = "male")
+plot_vb(model_f, model_m)
+}
+
+model_f <- fit_length_weight(pop_samples, sex = "female")
+model_m <- fit_length_weight(pop_samples, sex = "male")
+plot_length_weight(model_f, model_m)
+}
 \seealso{
 Other growth functions: \code{\link{fit_length_weight}},
   \code{\link{fit_vb}}

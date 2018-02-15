@@ -35,6 +35,31 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 \description{
 For use with data for a single species.
 }
+\examples{
+\dontrun{
+#' ## with `rstan::optimizing()` for the mode of the posterior density:
+x <- fit_vb(pop_samples, method = "mpd")
+x$model
+
+## with MCMC via Stan:
+x <- fit_vb(pop_samples, method = "mcmc")
+x$pars
+x$predictions
+x$data
+x$model
+posterior <- rstan::extract(x$model)
+hist(posterior$linf)
+
+model_f <- fit_vb(pop_samples, sex = "female")
+model_m <- fit_vb(pop_samples, sex = "male")
+plot_vb(model_f, model_m)
+
+## If less than `min_samples`, fit_vb() returns an empty object that
+## plot_vb() will correctly parse and produce an empty plot:
+obj <- fit_vb(pop_samples[1:2,])
+plot_vb(obj, obj)
+}
+}
 \seealso{
 Other growth functions: \code{\link{fit_length_weight}},
   \code{\link{plot_growth}}

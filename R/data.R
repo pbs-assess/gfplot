@@ -20,3 +20,10 @@
 #'   \item{species_common_name}{species common name}
 #' }
 "pbs_species"
+
+#' Example Pacific ocean perch biological samples
+#'
+#' 1000 random samples of ages, lengths, weights, and maturities
+#'
+#' @format A data frame
+"pop_samples"

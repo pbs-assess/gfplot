@@ -17,27 +17,30 @@
 #' @importFrom stats median quantile rlnorm runif median
 #'
 #' @export
-# TODO:
-# @examples
-# d <- readRDS("data-cache/pbs-survey-specimens.rds")
-# d <- dplyr::filter(d, species_common_name == "pacific ocean perch")
-# obj <- fit_vb(d, method = "mpd")
-# obj$model
-# obj <- fit_vb(d, method = "mcmc", downsample = 1000, chains = 3)
-# obj$model
-# obj$pars
-# obj$predictions
-# obj$data
-#
-# obj_f <- fit_vb(d, sex = "female")
-# obj_m <- fit_vb(d, sex = "male")
-# plot_vb(obj_f, obj_m)
-#
-## If less than `min_samples`, fit_vb() returns
-## an empty object that plot_vb() will correctly parse
-## and produce an empty plot:
-# obj <- fit_vb(d[1:2,], method = "mpd")
-# plot_vb(obj, obj)
+#' @examples
+#' \dontrun{
+#' #' ## with `rstan::optimizing()` for the mode of the posterior density:
+#' x <- fit_vb(pop_samples, method = "mpd")
+#' x$model
+#'
+#' ## with MCMC via Stan:
+#' x <- fit_vb(pop_samples, method = "mcmc")
+#' x$pars
+#' x$predictions
+#' x$data
+#' x$model
+#' posterior <- rstan::extract(x$model)
+#' hist(posterior$linf)
+#'
+#' model_f <- fit_vb(pop_samples, sex = "female")
+#' model_m <- fit_vb(pop_samples, sex = "male")
+#' plot_vb(model_f, model_m)
+#'
+#' ## If less than `min_samples`, fit_vb() returns an empty object that
+#' ## plot_vb() will correctly parse and produce an empty plot:
+#' obj <- fit_vb(pop_samples[1:2,])
+#' plot_vb(obj, obj)
+#' }
 
 fit_vb <- function(dat,
   sex = c("female", "male"),
@@ -137,18 +140,15 @@ fit_vb <- function(dat,
 #'
 #' @family growth functions
 #' @export
-# TODO:
-# @examples
-# d <- readRDS("data-cache/pbs-survey-specimens.rds")
-# d <- dplyr::filter(d, species_common_name == "pacific ocean perch")
-# obj_f <- fit_length_weight(d)
-# obj_f$model
-# obj_f$predictions
-# obj_f$pars
-# obj_f$data
-#
-# obj_m <- fit_length_weight(d, sex = "male")
-# plot_length_weight(obj_f, obj_m)
+#' @examples
+#' model_f <- fit_length_weight(pop_samples)
+#' model_f$model
+#' model_f$predictions
+#' model_f$pars
+#' model_f$data
+#'
+#' model_m <- fit_length_weight(pop_samples, sex = "male")
+#' plot_length_weight(model_f, model_m)
 
 fit_length_weight <- function(dat,
   sex = c("female", "male"),
@@ -215,7 +215,16 @@ fit_length_weight <- function(dat,
 #' @family growth functions
 #' @rdname plot_growth
 #'
-# @examples
+#' @examples
+#' \dontrun{
+#' model_f <- fit_vb(pop_samples, sex = "female")
+#' model_m <- fit_vb(pop_samples, sex = "male")
+#' plot_vb(model_f, model_m)
+#' }
+#'
+#' model_f <- fit_length_weight(pop_samples, sex = "female")
+#' model_m <- fit_length_weight(pop_samples, sex = "male")
+#' plot_length_weight(model_f, model_m)
 
 plot_growth <- function(object_female, object_male,
   type = c("vb", "length-weight"),
@@ -238,7 +247,8 @@ plot_growth <- function(object_female, object_male,
       stringsAsFactors = FALSE),
     data.frame(object_male$predictions, sex = "Male",
       stringsAsFactors = FALSE))
-  no_lines <- if (all(is.na(line_dat[[xvar]]))) TRUE else FALSE
+
+  no_lines <- if (all(is.na(line_dat[[1]]))) TRUE else FALSE
 
   pt_dat <- bind_rows(object_female$data, object_male$data)
   pt_dat$sex <- dplyr::case_when(
