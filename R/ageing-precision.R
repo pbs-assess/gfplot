@@ -62,7 +62,7 @@ tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' @export
 #'
 #' @template ageing-precision-examples
-plot_ageing_precision <- function(dat, n = 250, jitter = 0.25, seed = NULL) {
+plot_ageing_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
   if (!is.null(seed)) set.seed(seed)
   if (n < nrow(dat))
     dat <- dplyr::sample_n(dat, size = n)

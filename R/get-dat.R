@@ -28,7 +28,7 @@ get_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
   names(x) <- tolower(names(x))
-  x
+  as_tibble(x)
 }
 
 #' @export
@@ -42,7 +42,7 @@ get_strata <- function() {
     INNER JOIN GROUPING G ON
     SG.GROUPING_CODE = G.GROUPING_CODE")
   names(x) <- tolower(names(x))
-  x
+  as_tibble(x)
 }
 
 #' @export
@@ -50,7 +50,7 @@ get_strata <- function() {
 get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
-  q <- paste(
+  sql <- paste(
     "SELECT S.SURVEY_ID,
       SS.SURVEY_SERIES_ID,
       SS.SURVEY_SERIES_DESC
@@ -62,7 +62,7 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
   species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT * FROM SPECIES")
 
-  survey_ids <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
+  survey_ids <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
   d_survs <- list()
   k <- 0
   for (i in seq_along(species_codes)) {
@@ -73,65 +73,65 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
           species_codes[i], "'"))
     }
   }
-  d_survs_df <- dplyr::bind_rows(d_survs)
-  d_survs_df <- dplyr::inner_join(d_survs_df,
+  x <- dplyr::bind_rows(d_survs)
+  x <- dplyr::inner_join(x,
     unique(dplyr::select(survey_ids,
       SURVEY_SERIES_ID,
       SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
-  d_survs_df <- dplyr::inner_join(d_survs_df,
+  x <- dplyr::inner_join(x,
     unique(select(species,
       SPECIES_CODE,
       SPECIES_COMMON_NAME,
       SPECIES_SCIENCE_NAME,
       SPECIES_DESC)), by = "SPECIES_CODE")
-  names(d_survs_df) <- tolower(names(d_survs_df))
-  stopifnot(all(species_codes %in% d_survs_df$species_code))
-  d_survs_df <- dplyr::mutate(d_survs_df,
+  names(x) <- tolower(names(x))
+  stopifnot(all(species_codes %in% x$species_code))
+  x <- mutate(x,
     species_science_name = tolower(species_science_name),
     species_desc = tolower(species_desc),
     species_common_name = tolower(species_common_name))
-  d_survs_df
+  as_tibble(x)
 }
 
 #' @export
 #' @rdname get
 #' @param remove_bad_data Remove known bad data?
 get_survsamples <- function(species, remove_bad_data = TRUE) {
-  q <- read_sql("get-survey-biology.sql")
-  q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = q)
-  dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
+  sql <- read_sql("get-survey-biology.sql")
+  sql <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = sql)
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT * FROM SURVEY_SERIES")
   ss <- dplyr::select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(ss) <- tolower(names(ss))
 
-  names(dbio) <- tolower(names(dbio))
-  dbio$species_common_name <- tolower(dbio$species_common_name)
-  dbio$species_science_name <- tolower(dbio$species_science_name)
-  dbio <- dplyr::mutate(dbio, year = lubridate::year(trip_start_date))
-  dbio <- dplyr::inner_join(dbio, ss, by = "survey_series_id")
+  names(x) <- tolower(names(x))
+  x$species_common_name <- tolower(x$species_common_name)
+  x$species_science_name <- tolower(x$species_science_name)
+  x <- dplyr::mutate(x, year = lubridate::year(trip_start_date))
+  x <- dplyr::inner_join(x, ss, by = "survey_series_id")
 
-  warning(paste("Duplicate specimen IDs may still be present.",
-      "Filter them yourself after selecting specific surveys.",
-      "E.g. dat <- dat[!duplicated(dat$specimen_id), ]"))
+  warning("Duplicate specimen IDs may still be present. ",
+      "Filter them yourself after selecting specific surveys. ",
+      "For example, `d <- d[!duplicated(d$specimen_id), ]`")
 
   if (remove_bad_data) {
-    dbio <- dbio[!(dbio$length > 600 &
-      dbio$species_common_name == "north pacific spiny dogfish"), drop = FALSE]
-    dbio <- dbio[!(dbio$length > 600 &
-      dbio$species_common_name == "big skate"), drop = FALSE]
-    dbio <- dbio[!(dbio$length > 600 &
-      dbio$species_common_name == "longnose skate"), drop = FALSE]
-    dbio <- dbio[!(dbio$length > 60 &
-      dbio$species_common_name == "pacific tomcod"), drop = FALSE]
-    dbio <- dbio[!(dbio$length > 50 &
-      dbio$species_common_name == "quillback-rockfish"), drop = FALSE]
-    dat <- dat[!(dat$length < 10 & dat$weight/1000 > 1.0 &
-        dat$species_common_name == "pacific flatnose"), drop = FALSE]
+    x <- x[!(x$length > 600 &
+      x$species_common_name == "north pacific spiny dogfish"), drop = FALSE]
+    x <- x[!(x$length > 600 &
+      x$species_common_name == "big skate"), drop = FALSE]
+    x <- x[!(x$length > 600 &
+      x$species_common_name == "longnose skate"), drop = FALSE]
+    x <- x[!(x$length > 60 &
+      x$species_common_name == "pacific tomcod"), drop = FALSE]
+    x <- x[!(x$length > 50 &
+      x$species_common_name == "quillback-rockfish"), drop = FALSE]
+    x <- x[!(x$length < 10 & x$weight/1000 > 1.0 &
+      x$species_common_name == "pacific flatnose"), drop = FALSE]
   }
 
-  dbio
+  as_tibble(x)
 }
 
 #' @export
@@ -139,13 +139,13 @@ get_survsamples <- function(species, remove_bad_data = TRUE) {
 get_commsamples <- function(species) {
   q <- read_sql("get-commercial-biology.sql")
   q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = q)
-  dbio_c <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
-  names(dbio_c) <- tolower(names(dbio_c))
-  dbio_c$species_common_name <- tolower(dbio_c$species_common_name)
-  dbio_c$species_science_name <- tolower(dbio_c$species_science_name)
-  dbio_c <- mutate(dbio_c, year = lubridate::year(trip_start_date))
-  assertthat::assert_that(sum(duplicated(dbio_c$specimen_id)) == 0)
-  dbio_c
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
+  names(x) <- tolower(names(x))
+  x$species_common_name <- tolower(x$species_common_name)
+  x$species_science_name <- tolower(x$species_science_name)
+  x <- mutate(x, year = lubridate::year(trip_start_date))
+  assertthat::assert_that(sum(duplicated(x$specimen_id)) == 0)
+  as_tibble(x)
 }
 
 #' @export
@@ -155,7 +155,7 @@ get_catch <- function(species) {
   q <- read_sql("get-landings.sql")
   i <- grep("ORDER BY BEST", q) - 1
   q <- c(q[seq(1, i)],
-    paste("WHERE SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
+    paste("WHERE SP.SPECIES_CODE IN (", collapse_filters(species), ")"),
     q[seq(i + 1, length(q))])
   landings_sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), landings_sql)
@@ -172,7 +172,7 @@ get_catch <- function(species) {
       discarded_pcs = sum(discarded_pcs, na.rm = TRUE)) %>%
     ungroup() %>%
     arrange(species_common_name, year)
-  d
+  as_tibble(d)
 }
 
 #' @export
@@ -182,7 +182,7 @@ get_cpue <- function(species) {
   q <- read_sql("get-cpue.sql")
   i <- grep("ORDER BY YEAR", q) - 1
   q <- c(q[seq(1, i)],
-    paste("AND SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
+    paste("AND SP.SPECIES_CODE IN (", collapse_filters(species), ")"),
     q[seq(i + 1, length(q))])
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
@@ -191,23 +191,23 @@ get_cpue <- function(species) {
   names(d) <- tolower(names(d))
   d$species_common_name <- tolower(d$species_common_name)
   d$species_scientific_name <- tolower(d$species_scientific_name)
-  d
+  as_tibble(d)
 }
 
-#' @param gear A single gear type to include
-#' @param min_year Minimum year to return
+#' @param gear The gear type(s) to include. Will be converted to uppercase.
+#' @param min_year Minimum year to return.
 #' @export
 #' @rdname get
 get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   q <- read_sql("get-all-merged-catch.sql")
   i <- grep("-- insert filters here", q)
   # TODO allow for multiple gear types?
-  q[i] <- paste0("GEAR IN('", toupper(gear),
-    "') AND YEAR(BEST_DATE) >= ", min_year, " AND")
+  q[i] <- paste0("GEAR IN(", collapse_filters(toupper(gear)),
+    ") AND YEAR(BEST_DATE) >= ", min_year, " AND")
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
   names(d) <- tolower(names(d))
-  d
+  as_tibble(d)
 }
 
 #' @export
@@ -215,9 +215,9 @@ get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 get_ageing_precision <- function(species) {
   q <- read_sql("ageing-precision.sql")
   q <- inject_species_filter("AND C.SPECIES_CODE IN", species, q)
-  dbio <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
-  names(dbio) <- tolower(names(dbio))
-  dbio
+  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
+  names(x) <- tolower(names(x))
+  as_tibble(x)
 }
 
 #' @export
@@ -227,14 +227,14 @@ get_bioindex <- function(species) {
   q <- read_sql("get-survey-boot.sql")
   i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
   q <- c(q[seq(1, i)],
-    paste("WHERE SP.SPECIES_CODE IN (", collapse_species_names(species), ")"),
+    paste("WHERE SP.SPECIES_CODE IN (", collapse_filters(species), ")"),
     q[seq(i + 1, length(q))])
   sql <- paste(q, collapse = "\n")
   d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
   names(d) <- tolower(names(d))
   d$species_common_name <- tolower(d$species_common_name)
   d$species_science_name <- tolower(d$species_science_name)
-  d
+  as_tibble(d)
 }
 
 #' @export
@@ -248,11 +248,11 @@ get_sara_dat <- function() {
     .[- (1:2), ] %>%
     dplyr::as_tibble() %>%
     dplyr::filter(.data$Taxon %in% "Fishes") %>%
-    dplyr::filter(!grepl("Salmon",  .data$`Common name *`))
+    dplyr::filter(!grepl("Salmon", .data$`Common name *`))
   names(d) <- tolower(names(d))
   names(d) <- gsub(" ", "_", names(d))
   names(d) <- gsub("_\\*", "", names(d))
-  d
+  as_tibble(d)
 }
 
 #' @param path The folder where the cached data will be saved

@@ -8,22 +8,22 @@ common2codes <- function(common) {
     "SELECT * FROM SPECIES")
   common_df <- data.frame(SPECIES_COMMON_NAME = toupper(common),
     order_by = seq_along(common), stringsAsFactors = FALSE)
-  dd <- filter(species, SPECIES_COMMON_NAME %in% toupper(common))
+  .d <- filter(species, SPECIES_COMMON_NAME %in% toupper(common))
   # Remove erroneous species codes for basking shark and lingcod:
-  dd <- filter(dd, !SPECIES_CODE %in% c("033", "465")) %>%
+  .d <- filter(.d, !SPECIES_CODE %in% c("033", "465")) %>%
     left_join(common_df, by = "SPECIES_COMMON_NAME") %>%
     arrange(.data$order_by)
-  dd$SPECIES_CODE
+  .d$SPECIES_CODE
 }
 
-collapse_species_names <- function(x) {
+collapse_filters <- function(x) {
   paste0("'", paste(x, collapse = "','"), "'")
 }
 
 inject_species_filter <- function(x, species, sql_code) {
   i <- grep("-- insert species here", sql_code)
   sql_code[i] <- paste0(x, " (",
-    collapse_species_names(common2codes(species)), ")")
+    collapse_filters(common2codes(species)), ")")
   paste(sql_code, collapse = "\n")
 }
 
