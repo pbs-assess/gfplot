@@ -47,9 +47,9 @@ cache_pbs_data(species, path = "data-cache")
 
 \item{remove_bad_data}{Remove known bad data?}
 
-\item{gear}{A single gear type to include}
+\item{gear}{The gear type(s) to include. Will be converted to uppercase.}
 
-\item{min_year}{Minimum year to return}
+\item{min_year}{Minimum year to return.}
 
 \item{path}{The folder where the cached data will be saved}
 }

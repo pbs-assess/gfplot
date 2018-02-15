@@ -4,7 +4,7 @@
 \alias{plot_ageing_precision}
 \title{Plot ageing precision data}
 \usage{
-plot_ageing_precision(dat, n = 250, jitter = 0.25, seed = NULL)
+plot_ageing_precision(dat, n = 250, jitter = 0.25, seed = 42)
 }
 \arguments{
 \item{dat}{A properly formatted data frame, for example, from
