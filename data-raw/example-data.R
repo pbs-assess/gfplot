@@ -1,3 +1,4 @@
+library(dplyr)
 # d <- get_survsamples("pacific ocean perch")
 d <- readRDS("data-cache/pbs-survey-specimens.rds")
 d <- dplyr::filter(d, species_common_name == "pacific ocean perch")
@@ -14,3 +15,4 @@ names(d)
 nrow(d)
 pop_samples <- d
 usethis::use_data(pop_samples, overwrite = TRUE)
+

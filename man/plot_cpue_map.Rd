@@ -9,7 +9,7 @@ plot_cpue_map(dat, bin_width = 7, n_minimum_vessels = 3,
   ylim_ll = c(48.4, 54.25), utm_zone = 9, bath = c(100, 200, 500),
   fill_scale = viridis::scale_fill_viridis(trans = "log10", option = "C"),
   add_survey_boxes = FALSE, surv_cols = c(WCHG = "#6BAED6", HS = "#74C476",
-  QCS = "#FB6A4A", WCVI = "#9E9AC8"))
+  QCS = "#FB6A4A", WCVI = "#9E9AC8"), fill_lab = "CPUE (kg/hr)")
 }
 \arguments{
 \item{dat}{TODO}
@@ -33,7 +33,20 @@ plot_cpue_map(dat, bin_width = 7, n_minimum_vessels = 3,
 \item{add_survey_boxes}{TODO}
 
 \item{surv_cols}{TODO}
+
+\item{fill_lab}{TODO}
 }
 \description{
 Title TODO
+}
+\examples{
+## fake data demo:
+xlim <- c(-134.1, -123.0)
+ylim <- c(48.4, 54.25)
+d <- tibble::tibble(lat = runif(1000, min(ylim), max(ylim)),
+  lon = runif(length(lat), min(xlim), max(xlim)),
+  species_common_name = "fake species",
+  cpue = rlnorm(length(lat), log(1000), 0.6),
+  vessel_registration_number = rep(seq_len(100), each = 10))
+plot_cpue_map(d, bin_width = 15, n_minimum_vessels = 1)
 }

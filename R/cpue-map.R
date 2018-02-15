@@ -39,14 +39,21 @@ load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
 #' @param fill_scale TODO
 #' @param add_survey_boxes TODO
 #' @param surv_cols TODO
+#' @param fill_lab TODO
 #'
 #' @export
 #' @importFrom utils data
 #'
-# d <- readRDS("data-cache/pbs-cpue.rds") %>%
-#   filter(species_common_name == "pacific ocean perch") %>%
-#   as_tibble()
-# plot_cpue_map(d)
+#' @examples
+#' ## fake data demo:
+#' xlim <- c(-134.1, -123.0)
+#' ylim <- c(48.4, 54.25)
+#' d <- tibble::tibble(lat = runif(1000, min(ylim), max(ylim)),
+#'   lon = runif(length(lat), min(xlim), max(xlim)),
+#'   species_common_name = "fake species",
+#'   cpue = rlnorm(length(lat), log(1000), 0.6),
+#'   vessel_registration_number = rep(seq_len(100), each = 10))
+#' plot_cpue_map(d, bin_width = 15, n_minimum_vessels = 1)
 
 plot_cpue_map <- function(dat, bin_width = 7, n_minimum_vessels = 3,
   pal_function = viridisLite::viridis, xlim_ll = c(-134.1, -123.0),
@@ -57,7 +64,8 @@ plot_cpue_map <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     "WCHG" = "#6BAED6",
     "HS" = "#74C476",
     "QCS" = "#FB6A4A",
-    "WCVI" = "#9E9AC8")) {
+    "WCVI" = "#9E9AC8"),
+  fill_lab = "CPUE (kg/hr)") {
 
   dat <- rename(dat, X = .data$lon, Y = .data$lat) %>%
     filter(!is.na(.data$cpue))
@@ -112,21 +120,19 @@ plot_cpue_map <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     }
   }
 
-  g <- ggplot() +
-    geom_path(data = isobath_utm, aes_string(x = "X", y = "Y",
-      group = "paste(PID, SID)"),
-      inherit.aes = FALSE, lwd = 0.3, col = "grey40", alpha = 0.3) +
-    geom_polygon(data = coastline_utm,
+  g <- ggplot() + geom_path(data = isobath_utm, aes_string(x = "X", y = "Y",
+    group = "paste(PID, SID)"),
+    inherit.aes = FALSE, lwd = 0.3, col = "grey40", alpha = 0.3)
+
+  if (plot_hexagons)
+    g <- g + geom_polygon(data = public_dat, aes_string(x = "x", y = "y",
+      fill = "cpue", group = "hex_id"), inherit.aes = FALSE) + fill_scale
+
+  g <- g + geom_polygon(data = coastline_utm,
       aes_string(x = "X", y = "Y", group = "PID"),
       inherit.aes = FALSE, lwd = 0.3, fill = "grey90", col = "grey70") +
     coord_equal(xlim = xlim, ylim = ylim) +
-    theme_pbs() + labs(fill = "CPUE (kg/hr)", y = "Northing", x = "Easting")
-
-  if (!plot_hexagons)
-    return(g)
-
-  g <- g + geom_polygon(data = public_dat, aes_string(x = "x", y = "y",
-    fill = "cpue", group = "hex_id"), inherit.aes = FALSE) + fill_scale
+    theme_pbs() + labs(fill = fill_lab, y = "Northing", x = "Easting")
 
   # `boxes` is from R/sysdata.rda
   if (add_survey_boxes) {
