@@ -11,9 +11,9 @@ parameters {
   real t0;
 }
 model {
-  k ~ normal(0, 1);
+  k ~ normal(0, 2);
   linf ~ normal(0, linf_upper_sd);
-  sigma ~ normal(0, 1);
+  sigma ~ student_t(3, 0, 2);
   t0 ~ normal(0, 20);
   length ~ lognormal(log(linf * (1 - exp(-k * (age - t0)))), sigma);
 }
