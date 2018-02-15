@@ -20,6 +20,7 @@
 #'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
 #'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
 #'   guide_legend geom_ribbon element_text scale_shape_manual element_line
+#'   geom_path geom_polygon coord_equal stat_summary_hex
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #'   update.formula formula as.formula
 #' @import Rcpp
@@ -96,5 +97,8 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c(
   "trips_over_treshold_this_year", "vessel_name",
   "est", "est_log", "lwr", "se_log", "upr",  "est_link", "model", "se_link",
   "n_date", "pars", "par_name", "par_group", "par_name_short", "se",
-  "vessel", "pred", "term"
+  "vessel", "pred", "term",
+
+  "PID", "SID", "nepacLLhigh", "isobath"
+
   ))
