@@ -9,7 +9,7 @@
 #' @name PBSsynopsis
 #' @importFrom dplyr filter mutate summarise select group_by n arrange ungroup
 #' @importFrom dplyr inner_join left_join right_join anti_join full_join
-#' @importFrom dplyr bind_rows case_when pull contains tibble rename
+#' @importFrom dplyr bind_rows case_when pull contains tibble rename as_tibble
 #' @importFrom rlang enquo quo_name ":=" "!!" .data
 #' @importFrom forcats fct_reorder
 #' @importFrom assertthat assert_that are_equal
@@ -22,6 +22,7 @@
 #'   guide_legend geom_ribbon element_text scale_shape_manual element_line
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #'   update.formula formula as.formula
+#' @import Rcpp
 NULL
 
 #' PBSsynopsis exported functions

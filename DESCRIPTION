@@ -1,12 +1,12 @@
 Package: PBSsynopsis
 Title: Data Synopsis Reports for DFO PBS Groundfish Stocks
 Version: 0.0.0.9000
-Date: 2017-12-07
+Date: 2018-02-14
 Authors@R: person("Sean", "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre"))
 Description: Facilitates the creation of reproducible data synopsis report for
     DFO PBS groundfish stocks in British Columbia, Canada.
-Depends: R (>= 3.3.0)
+Depends: R (>= 3.2.3)
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
@@ -36,7 +36,9 @@ Imports:
     xml2,
     glmmTMB,
     speedglm,
-    TMB
+    TMB,
+    FSA,
+    Rcpp
 RoxygenNote: 6.0.1.9000
 Remotes: github::pbs-software/pbs-data/PBSdata
 Suggests: knitr,
