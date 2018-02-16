@@ -42,3 +42,14 @@
 #'
 #' @format A data frame
 "survey_grids"
+
+#' Strata areas (TEMPORARY TODO)
+#'
+#' @format A data frame
+"strata_areas"
+
+#' Sample-Trip IDs for surveys (TEMPORARY TODO)
+#'
+#' @format A data frame
+"sample_trip_ids"
+

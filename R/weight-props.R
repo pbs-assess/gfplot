@@ -9,7 +9,7 @@
 #' @param specimen_dat Specimen data. E.g. from [get_commsamples()] for
 #' commercial data or [get_survsamples()] for survey data.
 #' @param catch_dat Catch data. E.g. from [get_catch()].
-#' @param survey_tows Survey tow data. E.g. from [get_sample_trips()].
+#' @param survey_tows Survey tow data. E.g. from [get_survey()].
 #' @param value The **unquoted** column name with the values to re-weight
 #' (e.g. `age` or `length`).
 #' @param bin_size The binning size (likely only used for lengths).
@@ -47,10 +47,10 @@
 #' ## Surveys:
 #' survey_samples <- get_survsamples(species) %>%
 #'   dplyr::filter(survey_series_desc == survey)
-#' survey_trips <- get_sample_trips() %>%
+#' survey_tows <- get_survey(species) %>%
 #'   dplyr::filter(survey_series_desc == survey)
 #'
-#' surv_lengths <- tidy_comps_survey(survey_samples, survey_trips,
+#' surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
 #'   value = length, bin_size = 2)
 #' surv_lengths
 #' weight_comps(surv_lengths)
@@ -76,7 +76,7 @@
 #' weight_comps(comm_ages)
 #'
 #' ## These functions are pipe (%>%) friendly. E.g.:
-#' tidy_comps_survey(survey_samples, survey_trips, value = age) %>%
+#' tidy_comps_survey(survey_samples, survey_tows, value = age) %>%
 #'   weight_comps()
 #' }
 #' @name weight_comps
@@ -157,8 +157,10 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
   if (!is.null(bin_size))
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
 
-  sample_trip_ids <- readRDS("data-cache/sample-trip-id-lookup.rds")
-  areas <- readRDS("data-cache/stratum-areas.rds")
+  # TODO: Elise: can you add trip IDs and stratum areas to SQL call please?
+  # This is a temporary hack:
+  sample_trip_ids <- PBSsynopsis::sample_trip_ids
+  areas <- PBSsynopsis::strata_areas
 
   strat_dat <- survey_tows %>%
     left_join(sample_trip_ids, by = "fishing_event_id") %>%

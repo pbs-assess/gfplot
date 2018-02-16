@@ -118,17 +118,17 @@ get_survsamples <- function(species, remove_bad_data = TRUE) {
 
   if (remove_bad_data) {
     x <- x[!(x$length > 600 &
-      x$species_common_name == "north pacific spiny dogfish"), drop = FALSE]
+      x$species_common_name == "north pacific spiny dogfish"), , drop = FALSE]
     x <- x[!(x$length > 600 &
-      x$species_common_name == "big skate"), drop = FALSE]
+      x$species_common_name == "big skate"), , drop = FALSE]
     x <- x[!(x$length > 600 &
-      x$species_common_name == "longnose skate"), drop = FALSE]
+      x$species_common_name == "longnose skate"), , drop = FALSE]
     x <- x[!(x$length > 60 &
-      x$species_common_name == "pacific tomcod"), drop = FALSE]
+      x$species_common_name == "pacific tomcod"), , drop = FALSE]
     x <- x[!(x$length > 50 &
-      x$species_common_name == "quillback-rockfish"), drop = FALSE]
+      x$species_common_name == "quillback-rockfish"), , drop = FALSE]
     x <- x[!(x$length < 10 & x$weight/1000 > 1.0 &
-      x$species_common_name == "pacific flatnose"), drop = FALSE]
+      x$species_common_name == "pacific flatnose"), , drop = FALSE]
   }
 
   as_tibble(x)

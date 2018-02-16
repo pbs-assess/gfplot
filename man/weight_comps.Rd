@@ -23,7 +23,7 @@ commercial data or \code{\link[=get_survsamples]{get_survsamples()}} for survey 
 
 \item{bin_size}{The binning size (likely only used for lengths).}
 
-\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_sample_trips]{get_sample_trips()}}.}
+\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_survey]{get_survey()}}.}
 
 \item{dat}{A properly formatted data frame such the output from
 \code{tidy_comps_survey()} or \code{tidy_comps_commercial()}. See details.}
@@ -61,10 +61,10 @@ survey <- "Queen Charlotte Sound Synoptic Survey"
 ## Surveys:
 survey_samples <- get_survsamples(species) \%>\%
   dplyr::filter(survey_series_desc == survey)
-survey_trips <- get_sample_trips() \%>\%
+survey_tows <- get_survey(species) \%>\%
   dplyr::filter(survey_series_desc == survey)
 
-surv_lengths <- tidy_comps_survey(survey_samples, survey_trips,
+surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
   value = length, bin_size = 2)
 surv_lengths
 weight_comps(surv_lengths)
@@ -90,7 +90,7 @@ comm_ages
 weight_comps(comm_ages)
 
 ## These functions are pipe (\%>\%) friendly. E.g.:
-tidy_comps_survey(survey_samples, survey_trips, value = age) \%>\%
+tidy_comps_survey(survey_samples, survey_tows, value = age) \%>\%
   weight_comps()
 }
 }
