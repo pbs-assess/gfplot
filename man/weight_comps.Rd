@@ -76,20 +76,18 @@ surv_ages
 weight_comps(surv_ages)
 
 ## Commercial:
-comm_samples <- get_commsamples(species) \%>\%
-  dplyr::filter(survey_series_desc == survey)
-comm_catch <- get_catch(species) \%>\%
-  dplyr::filter(survey_series_desc == survey)
+com_samples <- get_commsamples(species)
+com_catch <- get_catch(species)
 
-comm_lengths <- tidy_comps_commercial(comm_samples, comm_catch,
+com_lengths <- tidy_comps_commercial(com_samples, com_catch,
   value = length, bin_size = 2)
-comm_lengths
-weight_comps(comm_lengths)
+com_lengths
+weight_comps(com_lengths)
 
-comm_ages <- tidy_comps_commercial(comm_samples, comm_catch,
+com_ages <- tidy_comps_commercial(com_samples, com_catch,
   value = age)
-comm_ages
-weight_comps(comm_ages)
+com_ages
+weight_comps(com_ages)
 
 ## These functions are pipe (\%>\%) friendly. E.g.:
 tidy_comps_survey(survey_samples, survey_tows, value = age) \%>\%
