@@ -163,15 +163,6 @@ get_catch <- function(species) {
   d$species_common_name <- tolower(d$species_common_name)
   d$species_scientific_name <- tolower(d$species_scientific_name)
   d$year <- lubridate::year(d$best_date)
-  d <- filter(d, !is.na(species_common_name), !is.na(year)) %>%
-    group_by(year, species_common_name, gear) %>%
-    summarise(
-      landed_kg = sum(landed_kg, na.rm = TRUE),
-      discarded_kg = sum(discarded_kg, na.rm = TRUE),
-      landed_pcs = sum(landed_pcs, na.rm = TRUE),
-      discarded_pcs = sum(discarded_pcs, na.rm = TRUE)) %>%
-    ungroup() %>%
-    arrange(species_common_name, year)
   as_tibble(d)
 }
 

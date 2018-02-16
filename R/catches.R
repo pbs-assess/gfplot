@@ -14,6 +14,16 @@
 
 tidy_catch <- function(dat) {
 
+  dat <- filter(dat, !is.na(species_common_name), !is.na(year)) %>%
+    group_by(year, species_common_name, gear) %>%
+    summarise(
+      landed_kg = sum(landed_kg, na.rm = TRUE),
+      discarded_kg = sum(discarded_kg, na.rm = TRUE),
+      landed_pcs = sum(landed_pcs, na.rm = TRUE),
+      discarded_pcs = sum(discarded_pcs, na.rm = TRUE)) %>%
+    ungroup() %>%
+    arrange(species_common_name, year)
+
   catches <- dplyr::mutate(dat,
     gear = dplyr::recode(gear,
       UNKNOWN = "Unknown/trawl",

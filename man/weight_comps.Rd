@@ -69,7 +69,7 @@ surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
 surv_lengths
 weight_comps(surv_lengths)
 
-surv_ages <- tidy_comps_survey(survey_samples, survey_trips, value = age)
+surv_ages <- tidy_comps_survey(survey_samples, survey_tows, value = age)
 surv_ages
 weight_comps(surv_ages)
 
