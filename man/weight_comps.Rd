@@ -2,41 +2,38 @@
 % Please edit documentation in R/weight-props.R
 \name{weight_comps}
 \alias{weight_comps}
-\alias{bin_lengths}
-\alias{join_comps_commercial}
-\alias{join_comps_survey}
+\alias{tidy_comps_commercial}
+\alias{tidy_comps_survey}
 \title{Age and length frequency weighting}
 \usage{
-bin_lengths(dat, value, bin_size)
+tidy_comps_commercial(specimen_dat, catch_dat, value, bin_size = NULL)
 
-join_comps_commercial(specimen_dat, catch_dat, value, bin_size = NULL)
-
-join_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
+tidy_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
 
 weight_comps(dat)
 }
 \arguments{
-\item{dat}{A properly formatted data frame such the output from
-\code{join_comps_survey()} or \code{join_comps_commercial()}. See details.}
+\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commsamples]{get_commsamples()}} for
+commercial data or \code{\link[=get_survsamples]{get_survsamples()}} for survey data.}
+
+\item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
 
 \item{value}{The \strong{unquoted} column name with the values to re-weight
 (e.g. \code{age} or \code{length}).}
 
 \item{bin_size}{The binning size (likely only used for lengths).}
 
-\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commsamples]{get_commsamples()}} for
-commercial data or \code{\link[=get_survsamples]{get_survsamples()}} for survey data.}
-
-\item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
-
 \item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_sample_trips]{get_sample_trips()}}.}
+
+\item{dat}{A properly formatted data frame such the output from
+\code{tidy_comps_survey()} or \code{tidy_comps_commercial()}. See details.}
 }
 \description{
 These functions weight age or length frequencies.
-\code{join_comps_commercial()} and \code{join_comps_survey()} join the necessary data
+\code{tidy_comps_commercial()} and \code{tidy_comps_survey()} join the necessary data
 for commercial or survey samples, respectively, and format it for
 weighting. \code{weight_comps()} does the actual weighting based on the output
-from the \code{join_*} functions.
+from the \code{tidy_*} functions.
 }
 \details{
 The input data frame to \code{weight_comps()} must have columns in the
@@ -67,12 +64,12 @@ survey_samples <- get_survsamples(species) \%>\%
 survey_trips <- get_sample_trips() \%>\%
   dplyr::filter(survey_series_desc == survey)
 
-surv_lengths <- join_comps_survey(survey_samples, survey_trips,
+surv_lengths <- tidy_comps_survey(survey_samples, survey_trips,
   value = length, bin_size = 2)
 surv_lengths
 weight_comps(surv_lengths)
 
-surv_ages <- join_comps_survey(survey_samples, survey_trips, value = age)
+surv_ages <- tidy_comps_survey(survey_samples, survey_trips, value = age)
 surv_ages
 weight_comps(surv_ages)
 
@@ -82,18 +79,18 @@ comm_samples <- get_commsamples(species) \%>\%
 comm_catch <- get_catch(species) \%>\%
   dplyr::filter(survey_series_desc == survey)
 
-comm_lengths <- join_comps_commercial(comm_samples, comm_catch,
+comm_lengths <- tidy_comps_commercial(comm_samples, comm_catch,
   value = length, bin_size = 2)
 comm_lengths
 weight_comps(comm_lengths)
 
-comm_ages <- join_comps_commercial(comm_samples, comm_catch,
+comm_ages <- tidy_comps_commercial(comm_samples, comm_catch,
   value = age)
 comm_ages
 weight_comps(comm_ages)
 
 ## These functions are pipe (\%>\%) friendly. E.g.:
-join_comps_survey(survey_samples, survey_trips, value = age) \%>\%
+tidy_comps_survey(survey_samples, survey_trips, value = age) \%>\%
   weight_comps()
 }
 }

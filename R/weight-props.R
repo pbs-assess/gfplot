@@ -1,10 +1,10 @@
 #' Age and length frequency weighting
 #'
 #' These functions weight age or length frequencies.
-#' `join_comps_commercial()` and `join_comps_survey()` join the necessary data
+#' `tidy_comps_commercial()` and `tidy_comps_survey()` join the necessary data
 #' for commercial or survey samples, respectively, and format it for
 #' weighting. `weight_comps()` does the actual weighting based on the output
-#' from the `join_*` functions.
+#' from the `tidy_*` functions.
 #'
 #' @param specimen_dat Specimen data. E.g. from [get_commsamples()] for
 #' commercial data or [get_survsamples()] for survey data.
@@ -14,7 +14,7 @@
 #' (e.g. `age` or `length`).
 #' @param bin_size The binning size (likely only used for lengths).
 #' @param dat A properly formatted data frame such the output from
-#' `join_comps_survey()` or `join_comps_commercial()`. See details.
+#' `tidy_comps_survey()` or `tidy_comps_commercial()`. See details.
 #'
 #' @details The input data frame to `weight_comps()` must have columns in the
 #' following order:
@@ -50,12 +50,12 @@
 #' survey_trips <- get_sample_trips() %>%
 #'   dplyr::filter(survey_series_desc == survey)
 #'
-#' surv_lengths <- join_comps_survey(survey_samples, survey_trips,
+#' surv_lengths <- tidy_comps_survey(survey_samples, survey_trips,
 #'   value = length, bin_size = 2)
 #' surv_lengths
 #' weight_comps(surv_lengths)
 #'
-#' surv_ages <- join_comps_survey(survey_samples, survey_trips, value = age)
+#' surv_ages <- tidy_comps_survey(survey_samples, survey_trips, value = age)
 #' surv_ages
 #' weight_comps(surv_ages)
 #'
@@ -65,21 +65,22 @@
 #' comm_catch <- get_catch(species) %>%
 #'   dplyr::filter(survey_series_desc == survey)
 #'
-#' comm_lengths <- join_comps_commercial(comm_samples, comm_catch,
+#' comm_lengths <- tidy_comps_commercial(comm_samples, comm_catch,
 #'   value = length, bin_size = 2)
 #' comm_lengths
 #' weight_comps(comm_lengths)
 #'
-#' comm_ages <- join_comps_commercial(comm_samples, comm_catch,
+#' comm_ages <- tidy_comps_commercial(comm_samples, comm_catch,
 #'   value = age)
 #' comm_ages
 #' weight_comps(comm_ages)
 #'
 #' ## These functions are pipe (%>%) friendly. E.g.:
-#' join_comps_survey(survey_samples, survey_trips, value = age) %>%
+#' tidy_comps_survey(survey_samples, survey_trips, value = age) %>%
 #'   weight_comps()
 #' }
 #' @name weight_comps
+NULL
 
 bin_lengths <- function(dat, value, bin_size) {
   value <- enquo(value)
@@ -91,7 +92,7 @@ bin_lengths <- function(dat, value, bin_size) {
 
 #' @export
 #' @rdname weight_comps
-join_comps_commercial <- function(specimen_dat, catch_dat, value,
+tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
   bin_size = NULL) {
 
   value <- enquo(value)
@@ -147,7 +148,7 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value,
 
 #' @export
 #' @rdname weight_comps
-join_comps_survey <- function(specimen_dat, survey_tows, value,
+tidy_comps_survey <- function(specimen_dat, survey_tows, value,
   bin_size = NULL) {
 
   value <- enquo(value)

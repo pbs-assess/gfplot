@@ -122,14 +122,14 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
 #survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
 #  filter(species_common_name %in% "pacific ocean perch")
 #
-# weighted_lengths <- join_comps_survey(survey_specimens, survey_tows,
+# weighted_lengths <- tidy_comps_survey(survey_specimens, survey_tows,
 #   value = age, bin_size = 2)
 #
 #
 # out <- purrr::map_df(survs, function(x) {
 #   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
 #   surv_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
-#   o <- surv_spec %>% join_comps_survey(surv_tows, length, bin_size = 2) %>%
+#   o <- surv_spec %>% tidy_comps_survey(surv_tows, length, bin_size = 2) %>%
 #     weight_comps()
 #   o$survey_series_desc <- x
 #   o
