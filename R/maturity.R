@@ -11,7 +11,7 @@ plot_maturity <- function(dat, type = "age") {
 
   dbio <- dat[!duplicated(dat$specimen_id), ] # critical!
   dbio <- dbio %>%
-    select(species_common_name, species_science_name,
+    select(species_common_name,
       year, age, length, weight,
       maturity_code, sex, survey_series_desc,
       maturity_convention_desc, maturity_convention_maxvalue,
@@ -30,7 +30,9 @@ plot_maturity <- function(dat, type = "age") {
       maturity_convention_maxvalue = readr::col_integer(),
       mature_at = readr::col_integer()))
 
-    dbio <- left_join(dbio, mat_df, by = c("sex", "maturity_convention_desc"))
+  mat_df$maturity_convention_maxvalue <- NULL
+
+  dbio <- left_join(dbio, mat_df, by = c("sex", "maturity_convention_desc"))
   dbio <- filter(dbio, maturity_code <= maturity_convention_maxvalue) %>%
     select(-maturity_convention_maxvalue)
   dbio <- mutate(dbio, mature = maturity_code >= mature_at)
@@ -56,7 +58,7 @@ plot_maturity <- function(dat, type = "age") {
   }
 
   age_or_length <- seq(min(xx$age_or_length), max(xx$age_or_length),
-    length.out = 100L)
+    length.out = 400L)
   nd <- expand.grid(age_or_length = age_or_length, sample_id = s_ids,
     female = c(0, 1), stringsAsFactors = FALSE)
   nd$glmm <- predict(m_re, newdata = nd, se.fit = FALSE)
@@ -82,12 +84,12 @@ plot_maturity <- function(dat, type = "age") {
 
   labs <- tibble(p = c("05", "50", "95"),
     value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
-    x = 0.7 * max(age_or_length),
+    x = 0.75 * max(age_or_length),
     y = seq(0.4, 0.1, length.out = 3), sex = "M")
 
   labs_f <- tibble(p = c("05", "50", "95"),
     value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
-    x = 0.7 * max(age_or_length),
+    x = 0.75 * max(age_or_length),
     y = seq(0.9, 0.6, length.out = 3L), sex = "F")
 
   labs <- bind_rows(labs, labs_f)
@@ -95,21 +97,26 @@ plot_maturity <- function(dat, type = "age") {
   nd_fe <- mutate(nd_fe, sex = ifelse(female == 1, "F", "M"))
   nd <- mutate(nd, sex = ifelse(female == 1, "F", "M"))
 
+  labs <- mutate(labs, label =
+      paste0(sex, ' ', p, ' = ', sprintf('%.1f', round(value, 1)), 'y'))
+  max_x <- min(c(max(labs$value) * 2, max(nd_fe$age_or_length)))
+  labs <- mutate(labs, x = max_x * 0.75)
+
   ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex")) +
     geom_line(data = nd,
       aes_string("age_or_length", "glmm", group = "paste(sample_id, sex)",
-        colour = sex), inherit.aes = FALSE, alpha = 0.05) +
+        colour = "sex"), inherit.aes = FALSE, alpha = 0.05) +
     geom_vline(data = labs, aes_string(xintercept = "value", colour = "sex"),
       lty = 2, show.legend = FALSE) +
     geom_line(size = 1.25) +
     scale_colour_manual(values = c("M" = "grey20", "F" = "red")) +
     xlab("Age (years)") + ylab("Probability mature") +
     geom_text(data = labs, aes_string(x = "x", y = "y",
-      label =
-        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1)), "y")),
+      label = "label"),
       hjust = 0, show.legend = FALSE) +
     theme_pbs() +
     coord_cartesian(expand = FALSE, ylim = c(-0.005, 1.005),
-      xlim = c(0, max(nd_fe$age_or_length))) +
-    labs(colour = "Sex")
+      xlim = c(0, max_x)) +
+    labs(colour = "Sex") +
+    ggplot2::ggtitle("Age at maturity")
 }
