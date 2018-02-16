@@ -58,7 +58,6 @@
 #' surv_ages <- join_comps_survey(survey_samples, survey_trips, value = age)
 #' surv_ages
 #' weight_comps(surv_ages)
-#' }
 #'
 #' ## Commercial:
 #' comm_samples <- get_commsamples(species) %>%

@@ -56,6 +56,47 @@ following order:
 The names of the columns do not matter, only their contents. The data frame
 should contain these columns and only these columns.
 }
+\examples{
+\dontrun{
+species <- "pacific ocean perch"
+survey <- "Queen Charlotte Sound Synoptic Survey"
+
+## Surveys:
+survey_samples <- get_survsamples(species) \%>\%
+  dplyr::filter(survey_series_desc == survey)
+survey_trips <- get_sample_trips() \%>\%
+  dplyr::filter(survey_series_desc == survey)
+
+surv_lengths <- join_comps_survey(survey_samples, survey_trips,
+  value = length, bin_size = 2)
+surv_lengths
+weight_comps(surv_lengths)
+
+surv_ages <- join_comps_survey(survey_samples, survey_trips, value = age)
+surv_ages
+weight_comps(surv_ages)
+
+## Commercial:
+comm_samples <- get_commsamples(species) \%>\%
+  dplyr::filter(survey_series_desc == survey)
+comm_catch <- get_catch(species) \%>\%
+  dplyr::filter(survey_series_desc == survey)
+
+comm_lengths <- join_comps_commercial(comm_samples, comm_catch,
+  value = length, bin_size = 2)
+comm_lengths
+weight_comps(comm_lengths)
+
+comm_ages <- join_comps_commercial(comm_samples, comm_catch,
+  value = age)
+comm_ages
+weight_comps(comm_ages)
+
+## These functions are pipe (\%>\%) friendly. E.g.:
+join_comps_survey(survey_samples, survey_trips, value = age) \%>\%
+  weight_comps()
+}
+}
 \references{
 Page 161 of Kendra R. Holt, Paul J. Starr, Rowan Haigh, and Brian Krishka.
 2016. Stock Assessment and Harvest Advice for Rock Sole (Lepidopsetta spp.)

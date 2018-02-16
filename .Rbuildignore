@@ -33,3 +33,5 @@
 ^man-roxygen$
 ^vignettes/commercial-cpue-index_cache$
 ^prediction-grids$
+^inst/R-draft/
+^inst/stan/*.rds
