@@ -1,17 +1,39 @@
-#' Tidy PBS catch data for \code{\link{plot_catch}}
+#' Plot catch data over time
 #'
-#' @param dat TODO
+#' Functions for plotting catch data over time as a stacked bar plot.
 #'
-#' @return A data frame formatted for \code{\link{plot_catch}}
-#' @export
-#' @family tidy data functions
+#' @details
+#'
+#' * `tidy_catch()` Prepares PBS data for `plot_catch()`. Works across one
+#' or multiple species.
+#' * `plot_catch()` Plots catch. The input data frame must come from
+#' `tidy_catch()` or have the columns (in any order): `year`, `gear`, `value`
+#' (containing catches or landings).
+#'
+#' @param dat Input data frame. For `tidy_catch()` should be from
+#' [get_catch()]. For `plot_catch()` should be from `tidy_ages()` or be
+#' formatted similarly. See details.
+#' @param ylab Y axis label.
+#' @param units A named character vector with names referring to text that will
+#'   be pasted into the y-axis label and a value defining the quantity to divide
+#'   the `value` column by for that unit label.
+#' @param unreliable An optional numeric vector defining years before which the
+#'   data are less reliable. Leave as `NA` to omit.
+#' @param unreliable_alpha The alpha (transparency) level for the optional
+#'   "unreliable" ranges of years shaded grey. Rectangles get overlaid from
+#'   older years to newer years making earlier ranges darker.
 #'
 #' @examples
 #' \dontrun{
 #' d <- get_catch("lingcod")
-#' tidy_catch(d)
+#' tidy_catch(d) %>%
+#'   plot_catch()
 #' }
+#' @name plot_catch
+NULL
 
+#' @rdname plot_catch
+#' @export
 tidy_catch <- function(dat) {
 
   dat <- filter(dat, !is.na(species_common_name), !is.na(year)) %>%
@@ -61,30 +83,8 @@ tidy_catch <- function(dat) {
   all_catch
 }
 
-#' Plot catches
-#'
-#' @param dat A properly formatted data frame. For example, from
-#'   \code{\link{tidy_catch}}. The input data frame must have the columns
-#'   (in any order): \code{year}, \code{gear}, \code{value} (containing catches
-#'   or landings).
-#' @param ylab Text to label y axis
-#' @param units A named character vector with names referring to text that will
-#'   be pasted into the y-axis label and a value defining the quantity to divide
-#'   the \code{value} column by for that unit label.
-#' @param unreliable An optional numeric vector defining years before which the
-#'   data are less reliable. Leave as \code{NA} to omit.
-#' @param unreliable_alpha The alpha level for the optional unreliable
-#'   rectangles.
-#'
+#' @rdname plot_catch
 #' @export
-#' @family plotting functions
-#'
-#' @examples
-#' \dontrun{
-#' d <- get_catch("lingcod")
-#' d <- tidy_catch(d)
-#' plot_catch(d)
-#' }
 plot_catch <- function(dat,
   ylab = "Landings", units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
   unreliable = c(1996, 2006), unreliable_alpha = 0.2) {

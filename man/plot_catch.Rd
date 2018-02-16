@@ -2,18 +2,20 @@
 % Please edit documentation in R/catches.R
 \name{plot_catch}
 \alias{plot_catch}
-\title{Plot catches}
+\alias{tidy_catch}
+\title{Plot catch data over time}
 \usage{
+tidy_catch(dat)
+
 plot_catch(dat, ylab = "Landings", units = c(`1000 tons` = 1e+06, tons =
   1000, kg = 1), unreliable = c(1996, 2006), unreliable_alpha = 0.2)
 }
 \arguments{
-\item{dat}{A properly formatted data frame. For example, from
-\code{\link{tidy_catch}}. The input data frame must have the columns
-(in any order): \code{year}, \code{gear}, \code{value} (containing catches
-or landings).}
+\item{dat}{Input data frame. For \code{tidy_catch()} should be from
+\code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_ages()} or be
+formatted similarly. See details.}
 
-\item{ylab}{Text to label y axis}
+\item{ylab}{Y axis label.}
 
 \item{units}{A named character vector with names referring to text that will
 be pasted into the y-axis label and a value defining the quantity to divide
@@ -22,24 +24,26 @@ the \code{value} column by for that unit label.}
 \item{unreliable}{An optional numeric vector defining years before which the
 data are less reliable. Leave as \code{NA} to omit.}
 
-\item{unreliable_alpha}{The alpha level for the optional unreliable
-rectangles.}
+\item{unreliable_alpha}{The alpha (transparency) level for the optional
+"unreliable" ranges of years shaded grey. Rectangles get overlaid from
+older years to newer years making earlier ranges darker.}
 }
 \description{
-Plot catches
+Functions for plotting catch data over time as a stacked bar plot.
+}
+\details{
+\itemize{
+\item \code{tidy_catch()} Prepares PBS data for \code{plot_catch()}. Works across one
+or multiple species.
+\item \code{plot_catch()} Plots catch. The input data frame must come from
+\code{tidy_catch()} or have the columns (in any order): \code{year}, \code{gear}, \code{value}
+(containing catches or landings).
+}
 }
 \examples{
 \dontrun{
 d <- get_catch("lingcod")
-d <- tidy_catch(d)
-plot_catch(d)
+tidy_catch(d) \%>\%
+  plot_catch()
 }
 }
-\seealso{
-Other plotting functions: \code{\link{jackknife_cpue_index}},
-  \code{\link{plot_bioindex}},
-  \code{\link{plot_cpue_index_coefs}},
-  \code{\link{plot_cpue_index}},
-  \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
-}
-\concept{plotting functions}

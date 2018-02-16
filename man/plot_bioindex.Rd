@@ -35,10 +35,9 @@ plot_bioindex(d_tidy)
 }
 \seealso{
 Other plotting functions: \code{\link{jackknife_cpue_index}},
-  \code{\link{plot_catch}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
-  \code{\link{plot_lengths}}, \code{\link{plot_maturity}}
+  \code{\link{plot_maturity}}
 
 Other survey biomass index functions: \code{\link{tidy_bioindex}}
 }

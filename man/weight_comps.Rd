@@ -103,6 +103,6 @@ in British Columbia. CSAS Res. Doc. 2016/009.
 }
 \seealso{
 Other age- and length-frequency functions: \code{\link{plot_ages}},
-  \code{\link{plot_lengths}}, \code{\link{tidy_ages}}
+  \code{\link{plot_lengths}}
 }
 \concept{age- and length-frequency functions}

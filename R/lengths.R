@@ -1,44 +1,68 @@
-# TODO
-#
-# @param dat
-# tidy_lengths <- function(dat) {
-
-# }
-
-#' TODO
+#' Plot length frequency data
 #'
-#' @param dat TODO
-#' @param n_bins TODO
-#' @param bin_size TODO
-#' @param min_specimens TODO
-#' @family plotting functions
+#' Functions for plotting length frequency data. (Weighting not implimented
+#' yet. TODO)
+#'
+#' @details
+#'
+#' * `tidy_lengths()` Prepares PBS data for `plot_lengths()`. Works across one
+#' or multiple species.
+#' * `plot_lengths()` Plots length frequencies for each year for selected
+#' surveys for a single species.
+#'
+#' @param dat Input data frame. For `tidy_lengths()` should be from
+#' [get_survsamples()] and or [get_commsamples()]. For `plot_lengths()` should
+#' be from `tidy_length()` or formatted similarly. See details TODO.
+#' @param n_bins Number of length bins (only used if `bin_size = NULL`).
+#' @param bin_size Bin size. Used preferentially over `n_bins`.
+#' @param min_specimens Minimum number of specimens for histogram data to be
+#' computed/shown.
+#' @param survey_series_desc A character vector of survey series to include.
+#' @param surveys A character vector of shorter/cleaner survey names to use in
+#' the same order as `survey_series_desc`. These are used in the plot.
+#'
+#' @param xlab X axis label.
+#' @param ylab Y axis label.
+#' @param fill_col Fill colours for histograms. A named vector with names
+#' `"F"` and `"M"` for female and male.
+#' @param line_col Line colours for histograms. A named vector with names
+#' `"F"` and `"M"` for female and male.
+#'
 #' @family age- and length-frequency functions
-#' @export
-plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
-  min_specimens = 20L) {
+#' @name plot_lengths
+NULL
 
-  survs <- c(
+#' @rdname plot_lengths
+#' @export
+tidy_lengths <- function(dat, n_bins = 25, bin_size = NULL,
+  min_specimens = 20L,
+  survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
     "Queen Charlotte Sound Synoptic Survey",
     "West Coast Vancouver Island Synoptic Survey",
-    "IPHC Longline Survey",
     "PHMA Rockfish Longline Survey - Outside North",
-    "PHMA Rockfish Longline Survey - Outside South")
+    "PHMA Rockfish Longline Survey - Outside South",
+    "IPHC Longline Survey"),
+  surveys = c("WCHG",
+    "HS",
+    "QCS",
+    "WCVI",
+    "PHMA LL (N)",
+    "PHMA LL (S)",
+    "IPHC")) {
 
-  dat <- filter(dat, survey_series_desc %in% survs)
+  dat <- filter(dat, survey_series_desc %in% survey_series_desc)
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
   dat <- dat %>%
-    select(species_common_name, .data$species_science_name,
-      .data$sample_id,
-      .data$year, .data$age, .data$length, .data$weight,
-      .data$maturity_code, .data$sex, .data$survey_series_desc)
+    select(species_common_name, .data$species_science_name, .data$sample_id,
+      .data$year, .data$age, .data$length, .data$weight, .data$maturity_code,
+      .data$sex, .data$survey_series_desc)
 
   dat <- filter(dat, !is.na(length), !is.na(sex))
 
-  surveys <- c("WCHG", "HS", "QCS", "WCVI", "IPHC", "PHMA LL (N)", "PHMA LL (S)")
   su <- dplyr::tibble(survey = surveys,
-    survey_series_desc = survs)
+    survey_series_desc = survey_series_desc)
   all <- expand.grid(survey = surveys, year = seq(min(dat$year), max(dat$year)),
     stringsAsFactors = FALSE)
 
@@ -61,7 +85,7 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
     lengths <- seq(0, max_length + 0.1, bin_size)
   }
 
-  dd <- dat %>%
+  dat %>%
     left_join(su, by = "survey_series_desc") %>%
     mutate(length_bin = lengths[findInterval(.data$length, lengths)]) %>%
     group_by(.data$year, .data$survey, .data$length_bin, .data$sex) %>%
@@ -74,72 +98,46 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
     mutate(sex = ifelse(.data$sex == 1, "M", "F")) %>%
     full_join(all, by = c("year", "survey")) %>%
     left_join(counts, by = c("year", "survey")) %>%
-    mutate(proportion = ifelse(.data$total >= min_specimens, .data$proportion, NA))
+    mutate(proportion = ifelse(total >= min_specimens, proportion, NA)) %>%
+    mutate(survey = forcats::fct_relevel(survey, su$survey))
+}
 
-  dd$sex[is.na(dd$sex)] <- "M"
+#' @rdname plot_lengths
+#' @export
 
-  x_breaks <- pretty(dd$length_bin, 4)
+plot_lengths <- function(dat, xlab = "Length (cm)",
+  ylab = "Relative length frequency",
+  fill_col = c("M" = "grey80", "F" = "#FF000010"),
+  line_col = c("M" = "grey40", "F" = "red")) {
+
+  dat$sex[is.na(dat$sex)] <- "F" # for legend only; avoid "NAs"
+
+  x_breaks <- pretty(dat$length_bin, 4L)
   N <- length(x_breaks)
   x_breaks <- x_breaks[seq(1, N - 1)]
-  range_lengths <- diff(range(dd$length_bin, na.rm = TRUE))
+  range_lengths <- diff(range(dat$length_bin, na.rm = TRUE))
 
-  # plot_lengths <- function()
-  ggplot(dd, aes_string("length_bin", "proportion")) +
-    ggplot2::geom_col(width = bin_size, aes_string(colour = "sex",
-      fill = "sex"), size = 0.3,
-      position = ggplot2::position_identity()) +
-    ggplot2::facet_grid(forcats::fct_rev(as.character(year))~
-        forcats::fct_relevel(survey,
-          su$survey)) +
+  ggplot(dat, aes_string("length_bin", "proportion")) +
+    geom_col(width = bin_size,
+      aes_string(colour = "sex", fill = "sex"), size = 0.3,
+      position = position_identity()) +
+    facet_grid(
+      forcats::fct_rev(as.character(year)) ~ survey) +
     theme_pbs() +
-    scale_fill_manual(values = c("M" = "grey80", "F" = "#FF000010")) +
-    scale_colour_manual(values = c("M" = "grey40", "F" = "red")) +
+    scale_fill_manual(values = fill_col) +
+    scale_colour_manual(values = line_col) +
     coord_cartesian(expand = FALSE) +
-    ggplot2::scale_x_continuous(breaks = x_breaks) +
-    xlab("Length (cm)") +
-    ylab("Relative length frequency") +
+    scale_x_continuous(breaks = x_breaks) +
+    xlab(xlab) + ylab(ylab) +
     ylim(-0.06, 1.1) +
     theme(
-      axis.text.y = ggplot2::element_text(colour = "white"),
-      axis.ticks.y = ggplot2::element_line(colour = "white")) +
+      axis.text.y = element_text(colour = "white"),
+      axis.ticks.y = element_line(colour = "white")) +
     labs(colour = "Sex", fill = "Sex") +
     geom_text(data = counts,
-      x = min(dd$length_bin, na.rm = TRUE) + 0.02 * range_lengths, y = 0.8,
-      aes_string(label = "total"),
+      x = min(dat$length_bin, na.rm = TRUE) + 0.02 * range_lengths,
+      y = 0.8, aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0) +
     labs(title = "Length frequencies") +
     theme(panel.grid.major.x = ggplot2::element_line(colour = "grey92"))
 }
-
-
-# weighting:
-# # bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>%
-# #   filter(species_common_name %in% "pacific ocean perch")
-# # catch <- readRDS("data-cache/all-catches.rds") %>%
-# #   filter(species_common_name %in% "pacific ocean perch")
-#survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
-#  filter(species_common_name %in% "pacific ocean perch")
-#survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
-#  filter(species_common_name %in% "pacific ocean perch")
-#
-# weighted_lengths <- tidy_comps_survey(survey_specimens, survey_tows,
-#   value = age, bin_size = 2)
-#
-#
-# out <- purrr::map_df(survs, function(x) {
-#   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
-#   surv_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
-#   o <- surv_spec %>% tidy_comps_survey(surv_tows, length, bin_size = 2) %>%
-#     weight_comps()
-#   o$survey_series_desc <- x
-#   o
-# })
-#
-# ggplot(out, aes_string("value", "weighted_prop")) +
-#   ggplot2::geom_col(width = 2) +
-#   facet_grid(forcats::fct_rev(as.character(year))~forcats::fct_relevel(survey_series_desc,
-#     survs)) +
-#   theme_pbs() +
-#   theme(panel.spacing = unit(-0.5, "lines")) +
-#   ylim(0, NA) +
-#   coord_cartesian(expand = FALSE)

@@ -2,40 +2,75 @@
 % Please edit documentation in R/ages.R
 \name{plot_ages}
 \alias{plot_ages}
-\title{Plot age frequencies with bubble plots}
+\alias{tidy_ages}
+\title{Plot age frequency data}
 \usage{
+tidy_ages(dat,
+  survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
+  "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
+  "West Coast Vancouver Island Synoptic Survey",
+  "PHMA Rockfish Longline Survey - Outside North",
+  "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
+  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
+  "IPHC"), spp_cat_code = 1)
+
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL)
 }
 \arguments{
-\item{dat}{A properly formatted data frame. For example, from
-\code{\link{tidy_ages}}. The input data frame must have the columns (in
-any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
-\code{age}, \code{survey}, \code{n_scaled}.}
+\item{dat}{Input data frame. For \code{tidy_ages()} should be from
+\code{\link[=get_survsamples]{get_survsamples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
+be from \code{tidy_ages()} or be formatted similarly. See details.}
 
-\item{max_size}{Maximum dot size (passed to
-\code{\link[ggplot2]{scale_size_area}})}
+\item{survey_series_desc}{A character vector of survey series to include.}
 
-\item{sex_gap}{Horizontal gap between male and female bubbles}
+\item{survey}{A character vector of shorter/cleaner survey names to use in
+the same order as \code{survey_series_desc}. These are used in the plot.}
 
-\item{year_increment}{Increment between year labels on x-axis}
+\item{spp_cat_code}{A numeric vector of species categorical codes to include
+for the commercial samples. Defaults to \code{1}, which refers to unsorted
+samples.}
 
-\item{ylab}{Y-axis label}
+\item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
 
-\item{year_range}{TODO}
+\item{sex_gap}{Horizontal gap between male and female bubbles.}
+
+\item{year_increment}{Increment between year labels on x axis.}
+
+\item{ylab}{Y axis label.}
+
+\item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
+all years included in original data.}
 }
 \description{
-Plot age frequencies with bubble plots
+Functions for plotting age frequency data. (Weighting not implimented
+yet. TODO)
+}
+\details{
+\itemize{
+\item \code{tidy_ages()} Prepares PBS data for \code{plot_ages()}. Works across one
+or multiple species.
+\item \code{plot_ages()} Plots age frequencies for each year for selected
+surveys for a single species. Input data frame should come from
+\code{tidy_ages()} or follow the following format: The input data frame must
+have the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"} and
+\code{"F"}), \code{age}, \code{survey}, \code{n_scaled}.
+}
 }
 \examples{
 \dontrun{
-d <- get_survsamples("canary rockfish")
-d <- tidy_ages(d)
+d <- get_survsamples("lingcod")
+tidy_ages(d)
 plot_ages(d)
+
+d <- get_survsamples("canary rockfish")
+tidy_ages(d) \%>\%
+  plot_ages()
 }
+
 }
 \seealso{
 Other age- and length-frequency functions: \code{\link{plot_lengths}},
-  \code{\link{tidy_ages}}, \code{\link{weight_comps}}
+  \code{\link{weight_comps}}
 }
 \concept{age- and length-frequency functions}

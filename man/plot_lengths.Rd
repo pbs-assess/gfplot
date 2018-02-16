@@ -2,31 +2,63 @@
 % Please edit documentation in R/lengths.R
 \name{plot_lengths}
 \alias{plot_lengths}
-\title{TODO}
+\alias{tidy_lengths}
+\title{Plot length frequency data}
 \usage{
-plot_lengths(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L)
+tidy_lengths(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L,
+  survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
+  "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
+  "West Coast Vancouver Island Synoptic Survey",
+  "PHMA Rockfish Longline Survey - Outside North",
+  "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
+  surveys = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
+  "IPHC"))
+
+plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
+  fill_col = c(M = "grey80", F = "#FF000010"), line_col = c(M = "grey40", F
+  = "red"))
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{Input data frame. For \code{tidy_lengths()} should be from
+\code{\link[=get_survsamples]{get_survsamples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_lengths()} should
+be from \code{tidy_length()} or formatted similarly. See details TODO.}
 
-\item{n_bins}{TODO}
+\item{n_bins}{Number of length bins (only used if \code{bin_size = NULL}).}
 
-\item{bin_size}{TODO}
+\item{bin_size}{Bin size. Used preferentially over \code{n_bins}.}
 
-\item{min_specimens}{TODO}
+\item{min_specimens}{Minimum number of specimens for histogram data to be
+computed/shown.}
+
+\item{survey_series_desc}{A character vector of survey series to include.}
+
+\item{surveys}{A character vector of shorter/cleaner survey names to use in
+the same order as \code{survey_series_desc}. These are used in the plot.}
+
+\item{xlab}{X axis label.}
+
+\item{ylab}{Y axis label.}
+
+\item{fill_col}{Fill colours for histograms. A named vector with names
+\code{"F"} and \code{"M"} for female and male.}
+
+\item{line_col}{Line colours for histograms. A named vector with names
+\code{"F"} and \code{"M"} for female and male.}
 }
 \description{
-TODO
+Functions for plotting length frequency data. (Weighting not implimented
+yet. TODO)
+}
+\details{
+\itemize{
+\item \code{tidy_lengths()} Prepares PBS data for \code{plot_lengths()}. Works across one
+or multiple species.
+\item \code{plot_lengths()} Plots length frequencies for each year for selected
+surveys for a single species.
+}
 }
 \seealso{
-Other plotting functions: \code{\link{jackknife_cpue_index}},
-  \code{\link{plot_bioindex}}, \code{\link{plot_catch}},
-  \code{\link{plot_cpue_index_coefs}},
-  \code{\link{plot_cpue_index}},
-  \code{\link{plot_maturity}}
-
 Other age- and length-frequency functions: \code{\link{plot_ages}},
-  \code{\link{tidy_ages}}, \code{\link{weight_comps}}
+  \code{\link{weight_comps}}
 }
 \concept{age- and length-frequency functions}
-\concept{plotting functions}

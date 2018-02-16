@@ -59,3 +59,35 @@ for (i in seq_along(sn$species_common_name)) {
 
 
 }
+
+# weighting:
+# # bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>%
+# #   filter(species_common_name %in% "pacific ocean perch")
+# # catch <- readRDS("data-cache/all-catches.rds") %>%
+# #   filter(species_common_name %in% "pacific ocean perch")
+#survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
+#  filter(species_common_name %in% "pacific ocean perch")
+#survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
+#  filter(species_common_name %in% "pacific ocean perch")
+#
+# weighted_lengths <- tidy_comps_survey(survey_specimens, survey_tows,
+#   value = age, bin_size = 2)
+#
+#
+# out <- purrr::map_df(survs, function(x) {
+#   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
+#   surv_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
+#   o <- surv_spec %>% tidy_comps_survey(surv_tows, length, bin_size = 2) %>%
+#     weight_comps()
+#   o$survey_series_desc <- x
+#   o
+# })
+#
+# ggplot(out, aes_string("value", "weighted_prop")) +
+#   ggplot2::geom_col(width = 2) +
+#   facet_grid(forcats::fct_rev(as.character(year))~forcats::fct_relevel(survey_series_desc,
+#     survs)) +
+#   theme_pbs() +
+#   theme(panel.spacing = unit(-0.5, "lines")) +
+#   ylim(0, NA) +
+#   coord_cartesian(expand = FALSE)

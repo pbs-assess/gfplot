@@ -1,24 +1,53 @@
-#' Tidy PBS age data for \code{\link{plot_ages}}
+#' Plot age frequency data
 #'
-#' @param dat TODO
-#' @param survey_series_desc A character vector of survey series to include
+#' Functions for plotting age frequency data. (Weighting not implimented
+#' yet. TODO)
+#'
+#' @details
+#'
+#' * `tidy_ages()` Prepares PBS data for `plot_ages()`. Works across one
+#'   or multiple species.
+#' * `plot_ages()` Plots age frequencies for each year for selected
+#'   surveys for a single species. Input data frame should come from
+#'   `tidy_ages()` or follow the following format: The input data frame must
+#'   have the columns (in any order): `year`, `sex` (coded as `"M"` and
+#'   `"F"`), `age`, `survey`, `n_scaled`.
+#'
+#' @param dat Input data frame. For `tidy_ages()` should be from
+#' [get_survsamples()] and or [get_commsamples()]. For `plot_ages()` should
+#' be from `tidy_ages()` or be formatted similarly. See details.
+#' @param survey_series_desc A character vector of survey series to include.
 #' @param survey A character vector of shorter/cleaner survey names to use in
-#'   the same order as \code{survey_series_desc}
+#' the same order as `survey_series_desc`. These are used in the plot.
 #' @param spp_cat_code A numeric vector of species categorical codes to include
-#'   for the commercial samples. Defaults to \code{1}, which refers to unsorted
+#'   for the commercial samples. Defaults to `1`, which refers to unsorted
 #'   samples.
+#' @param max_size Maximum dot size (passed to [ggplot2::scale_size_area()]).
+#' @param sex_gap Horizontal gap between male and female bubbles.
+#' @param year_increment Increment between year labels on x axis.
+#' @param ylab Y axis label.
+#' @param year_range If not `NULL`, a the range of years to plot. Defaults to
+#'   all years included in original data.
 #'
-#' @return A data frame formatted for \code{\link{plot_ages}}
-#' @export
-#' @family tidy data functions
 #' @family age- and length-frequency functions
 #'
 #' @examples
 #' \dontrun{
 #' d <- get_survsamples("lingcod")
 #' tidy_ages(d)
+#' plot_ages(d)
+#'
+#' d <- get_survsamples("canary rockfish")
+#' tidy_ages(d) %>%
+#'   plot_ages()
 #' }
+#'
+#' @name plot_ages
+NULL
 
+
+#' @rdname plot_ages
+#' @export
 tidy_ages <- function(dat,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
@@ -80,30 +109,8 @@ tidy_ages <- function(dat,
   ds
 }
 
-
-#' Plot age frequencies with bubble plots
-#'
-#' @param dat A properly formatted data frame. For example, from
-#'   \code{\link{tidy_ages}}. The input data frame must have the columns (in
-#'   any order): \code{year}, \code{sex} (coded as \code{"M"} and \code{"F"}),
-#'   \code{age}, \code{survey}, \code{n_scaled}.
-#' @param max_size Maximum dot size (passed to
-#'   \code{\link[ggplot2]{scale_size_area}})
-#' @param sex_gap Horizontal gap between male and female bubbles
-#' @param year_increment Increment between year labels on x-axis
-#' @param ylab Y-axis label
-#' @param year_range TODO
-#'
+#' @rdname plot_ages
 #' @export
-#' @family age- and length-frequency functions
-#'
-#' @examples
-#' \dontrun{
-#' d <- get_survsamples("canary rockfish")
-#' d <- tidy_ages(d)
-#' plot_ages(d)
-#' }
-
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL) {
 

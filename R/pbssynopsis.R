@@ -20,7 +20,8 @@
 #'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
 #'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
 #'   guide_legend geom_ribbon element_text scale_shape_manual element_line
-#'   geom_path geom_polygon coord_equal stat_summary_hex
+#'   geom_path geom_polygon coord_equal stat_summary_hex facet_grid
+#'   position_identity
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
@@ -75,7 +76,10 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c(
   "variable",
   "survey_series_desc",
 
-  #
+  # lengths:
+  "bin_size", "counts", "proportion", "total",
+
+  # aging precision:
   "age_reading_id", "age_reading_type_code", "ageing_method_desc",
   "ageing_param", "employee_id", "female", "glmm", "has_precision", "mature",
   "mature_at", "maturity_convention_desc", "maturity_convention_description",

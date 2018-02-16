@@ -28,8 +28,7 @@ get_ageing_precision("pacific ocean perch") \%>\%
 }
 }
 \seealso{
-Other tidy data functions: \code{\link{tidy_ages}},
-  \code{\link{tidy_bioindex}}, \code{\link{tidy_catch}},
+Other tidy data functions: \code{\link{tidy_bioindex}},
   \code{\link{tidy_cpue_index}}
 
 Other ageing precision functions: \code{\link{plot_ageing_precision}}

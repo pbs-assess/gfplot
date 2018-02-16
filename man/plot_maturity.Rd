@@ -16,8 +16,8 @@ TODO
 }
 \seealso{
 Other plotting functions: \code{\link{jackknife_cpue_index}},
-  \code{\link{plot_bioindex}}, \code{\link{plot_catch}},
+  \code{\link{plot_bioindex}},
   \code{\link{plot_cpue_index_coefs}},
-  \code{\link{plot_cpue_index}}, \code{\link{plot_lengths}}
+  \code{\link{plot_cpue_index}}
 }
 \concept{plotting functions}
