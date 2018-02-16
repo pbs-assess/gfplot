@@ -1,3 +1,87 @@
+#' Age and length frequency weighting
+#'
+#' These functions weight age or length frequencies.
+#' `join_comps_commercial()` and `join_comps_survey()` join the necessary data
+#' for commercial or survey samples, respectively, and format it for
+#' weighting. `weight_comps()` does the actual weighting based on the output
+#' from the `join_*` functions.
+#'
+#' @param specimen_dat Specimen data. E.g. from [get_commsamples()] for
+#' commercial data or [get_survsamples()] for survey data.
+#' @param catch_dat Catch data. E.g. from [get_catch()].
+#' @param survey_tows Survey tow data. E.g. from [get_sample_trips()].
+#' @param value The **unquoted** column name with the values to re-weight
+#' (e.g. `age` or `length`).
+#' @param bin_size The binning size (likely only used for lengths).
+#' @param dat A properly formatted data frame such the output from
+#' `join_comps_survey()` or `join_comps_commercial()`. See details.
+#'
+#' @details The input data frame to `weight_comps()` must have columns in the
+#' following order:
+#' 1. year
+#' 1. weighting unit ID (e.g. trip ID or sample ID)
+#' 1. grouping variable for first weighting (e.g. quarter or stratum)
+#' 1. value of weighting variable (e.g. age or length bin)
+#' 1. frequency of that weighting variable (e.g. frequency of that age or length bin)
+#' 1. numerator in first weighting (e.g. sample catch weight or density)
+#' 2. denominator in first weighting (e.g. quarter catch weight or total stratum density)
+#' 1. numerator in second weighting (e.g. catch that quarter or stratum area)
+#' 1. denominator in second weighting (e.g. catch that year or total survey area)
+#'
+#' The names of the columns do not matter, only their contents. The data frame
+#' should contain these columns and only these columns.
+#'
+#' @references
+#' Page 161 of Kendra R. Holt, Paul J. Starr, Rowan Haigh, and Brian Krishka.
+#' 2016. Stock Assessment and Harvest Advice for Rock Sole (Lepidopsetta spp.)
+#' in British Columbia. CSAS Res. Doc. 2016/009.
+#' [Link](http://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2016/2016_009-eng.html)
+#' [PDF](http://waves-vagues.dfo-mpo.gc.ca/Library/363948.pdf)
+#'
+#' @family age- and length-frequency functions
+#' @examples
+#' \dontrun{
+#' species <- "pacific ocean perch"
+#' survey <- "Queen Charlotte Sound Synoptic Survey"
+#'
+#' ## Surveys:
+#' survey_samples <- get_survsamples(species) %>%
+#'   dplyr::filter(survey_series_desc == survey)
+#' survey_trips <- get_sample_trips() %>%
+#'   dplyr::filter(survey_series_desc == survey)
+#'
+#' surv_lengths <- join_comps_survey(survey_samples, survey_trips,
+#'   value = length, bin_size = 2)
+#' surv_lengths
+#' weight_comps(surv_lengths)
+#'
+#' surv_ages <- join_comps_survey(survey_samples, survey_trips, value = age)
+#' surv_ages
+#' weight_comps(surv_ages)
+#' }
+#'
+#' ## Commercial:
+#' comm_samples <- get_commsamples(species) %>%
+#'   dplyr::filter(survey_series_desc == survey)
+#' comm_catch <- get_catch(species) %>%
+#'   dplyr::filter(survey_series_desc == survey)
+#'
+#' comm_lengths <- join_comps_commercial(comm_samples, comm_catch,
+#'   value = length, bin_size = 2)
+#' comm_lengths
+#' weight_comps(comm_lengths)
+#'
+#' comm_ages <- join_comps_commercial(comm_samples, comm_catch,
+#'   value = age)
+#' comm_ages
+#' weight_comps(comm_ages)
+#'
+#' ## These functions are pipe (%>%) friendly. E.g.:
+#' join_comps_survey(survey_samples, survey_trips, value = age) %>%
+#'   weight_comps()
+#' }
+#' @name weight_comps
+
 bin_lengths <- function(dat, value, bin_size) {
   value <- enquo(value)
   bin_range <- dat %>% select(!!value) %>% pull() %>% range()
@@ -6,15 +90,8 @@ bin_lengths <- function(dat, value, bin_size) {
     bins[findInterval(!!value, bins)] + bin_size / 2)
 }
 
-#' Join commercial catch and composition data for weighting
-#'
-#' @param specimen_dat Specimen data
-#' @param catch_dat Catch data
-#' @param value The unquoted column name with the values to re-weight (age or
-#'   length)
-#' @param bin_size The binning size (if length data)
-#'
 #' @export
+#' @rdname weight_comps
 join_comps_commercial <- function(specimen_dat, catch_dat, value,
   bin_size = NULL) {
 
@@ -69,15 +146,8 @@ join_comps_commercial <- function(specimen_dat, catch_dat, value,
     ungroup()
 }
 
-#' Join survey and composition data for weighting
-#'
-#' @param specimen_dat Specimen data
-#' @param survey_tows Survey tow data
-#' @param value The unquoted column name with the values to re-weight (age or
-#'   length)
-#' @param bin_size The binning size (if length data)
-#'
 #' @export
+#' @rdname weight_comps
 join_comps_survey <- function(specimen_dat, survey_tows, value,
   bin_size = NULL) {
 
@@ -126,19 +196,25 @@ join_comps_survey <- function(specimen_dat, survey_tows, value,
     arrange(year, sample_id, !!value)
 }
 
-# Internal function that actually does the weighting
 weight_comps_base <- function(dat) {
-   # value (age or length)
-
+  # Internal function that actually does the weighting
+  #
+  # value (age or length)
+  #
   # grouping1 (quarter or grouping_code)
-
+  #
   # weighting1 (samp_trip_catch_weight or density)
   # weighting1_total (samp_catch_weight_quarter or total_density)
-
+  #
   # weighting2 (landed_kg_quarter or area_km2)
   # weighting2_total (landed_kg_year or total_area_km2)
+  #
+  # Equation numbers refer to p161 of: Stock Assessment and Harvest Advice for
+  # Rock Sole (Lepidopsetta spp.) in British Columbia Kendra R. Holt, Paul J.
+  # Starr, Rowan Haigh, and Brian Krishka using dplyr and pipes. PDF:
+  # http://waves-vagues.dfo-mpo.gc.ca/Library/363948.pdf
 
-  group_by(dat, year, grouping1) %>% # pre D.4 / # quarter
+  group_by(dat, year, grouping1) %>% # pre D.4
 
     # first level (within quarters by catch or within strata by survey catch):
     mutate(prop = weighting1 / weighting1_total) %>% # D.4
@@ -173,11 +249,8 @@ weight_comps_base <- function(dat) {
     select(-contains("freq"))
 }
 
-#' Weight age or length composition data
-#'
-#' @param dat A properly formatted data frame. See Details. TODO
-#'
 #' @export
+#' @rdname weight_comps
 weight_comps <- function(dat) {
   names(dat) <- c("year", "id", "grouping1", "value", "freq",
     "weighting1", "weighting1_total",

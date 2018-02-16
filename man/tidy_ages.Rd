@@ -41,5 +41,9 @@ tidy_ages(d)
 Other tidy data functions: \code{\link{tidy_ageing_precision}},
   \code{\link{tidy_bioindex}}, \code{\link{tidy_catch}},
   \code{\link{tidy_cpue_index}}
+
+Other age- and length-frequency functions: \code{\link{plot_ages}},
+  \code{\link{plot_lengths}}, \code{\link{weight_comps}}
 }
+\concept{age- and length-frequency functions}
 \concept{tidy data functions}

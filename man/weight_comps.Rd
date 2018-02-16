@@ -2,13 +2,69 @@
 % Please edit documentation in R/weight-props.R
 \name{weight_comps}
 \alias{weight_comps}
-\title{Weight age or length composition data}
+\alias{bin_lengths}
+\alias{join_comps_commercial}
+\alias{join_comps_survey}
+\title{Age and length frequency weighting}
 \usage{
+bin_lengths(dat, value, bin_size)
+
+join_comps_commercial(specimen_dat, catch_dat, value, bin_size = NULL)
+
+join_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
+
 weight_comps(dat)
 }
 \arguments{
-\item{dat}{A properly formatted data frame. See Details. TODO}
+\item{dat}{A properly formatted data frame such the output from
+\code{join_comps_survey()} or \code{join_comps_commercial()}. See details.}
+
+\item{value}{The \strong{unquoted} column name with the values to re-weight
+(e.g. \code{age} or \code{length}).}
+
+\item{bin_size}{The binning size (likely only used for lengths).}
+
+\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commsamples]{get_commsamples()}} for
+commercial data or \code{\link[=get_survsamples]{get_survsamples()}} for survey data.}
+
+\item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
+
+\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_sample_trips]{get_sample_trips()}}.}
 }
 \description{
-Weight age or length composition data
+These functions weight age or length frequencies.
+\code{join_comps_commercial()} and \code{join_comps_survey()} join the necessary data
+for commercial or survey samples, respectively, and format it for
+weighting. \code{weight_comps()} does the actual weighting based on the output
+from the \code{join_*} functions.
 }
+\details{
+The input data frame to \code{weight_comps()} must have columns in the
+following order:
+\enumerate{
+\item year
+\item weighting unit ID (e.g. trip ID or sample ID)
+\item grouping variable for first weighting (e.g. quarter or stratum)
+\item value of weighting variable (e.g. age or length bin)
+\item frequency of that weighting variable (e.g. frequency of that age or length bin)
+\item numerator in first weighting (e.g. sample catch weight or density)
+\item denominator in first weighting (e.g. quarter catch weight or total stratum density)
+\item numerator in second weighting (e.g. catch that quarter or stratum area)
+\item denominator in second weighting (e.g. catch that year or total survey area)
+}
+
+The names of the columns do not matter, only their contents. The data frame
+should contain these columns and only these columns.
+}
+\references{
+Page 161 of Kendra R. Holt, Paul J. Starr, Rowan Haigh, and Brian Krishka.
+2016. Stock Assessment and Harvest Advice for Rock Sole (Lepidopsetta spp.)
+in British Columbia. CSAS Res. Doc. 2016/009.
+\href{http://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2016/2016_009-eng.html}{Link}
+\href{http://waves-vagues.dfo-mpo.gc.ca/Library/363948.pdf}{PDF}
+}
+\seealso{
+Other age- and length-frequency functions: \code{\link{plot_ages}},
+  \code{\link{plot_lengths}}, \code{\link{tidy_ages}}
+}
+\concept{age- and length-frequency functions}

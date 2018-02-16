@@ -34,3 +34,8 @@ d <- tidy_ages(d)
 plot_ages(d)
 }
 }
+\seealso{
+Other age- and length-frequency functions: \code{\link{plot_lengths}},
+  \code{\link{tidy_ages}}, \code{\link{weight_comps}}
+}
+\concept{age- and length-frequency functions}

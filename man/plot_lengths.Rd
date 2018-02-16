@@ -24,5 +24,9 @@ Other plotting functions: \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_maturity}}
+
+Other age- and length-frequency functions: \code{\link{plot_ages}},
+  \code{\link{tidy_ages}}, \code{\link{weight_comps}}
 }
+\concept{age- and length-frequency functions}
 \concept{plotting functions}

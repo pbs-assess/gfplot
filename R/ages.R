@@ -11,6 +11,7 @@
 #' @return A data frame formatted for \code{\link{plot_ages}}
 #' @export
 #' @family tidy data functions
+#' @family age- and length-frequency functions
 #'
 #' @examples
 #' \dontrun{
@@ -94,6 +95,7 @@ tidy_ages <- function(dat,
 #' @param year_range TODO
 #'
 #' @export
+#' @family age- and length-frequency functions
 #'
 #' @examples
 #' \dontrun{

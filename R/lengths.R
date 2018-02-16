@@ -12,6 +12,7 @@
 #' @param bin_size TODO
 #' @param min_specimens TODO
 #' @family plotting functions
+#' @family age- and length-frequency functions
 #' @export
 plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
   min_specimens = 20L) {
@@ -116,10 +117,14 @@ plot_lengths <- function(dat, n_bins = 25, bin_size = NULL,
 # #   filter(species_common_name %in% "pacific ocean perch")
 # # catch <- readRDS("data-cache/all-catches.rds") %>%
 # #   filter(species_common_name %in% "pacific ocean perch")
-# survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
-#   filter(species_common_name %in% "pacific ocean perch")
-# survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
-#   filter(species_common_name %in% "pacific ocean perch")
+#survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
+#  filter(species_common_name %in% "pacific ocean perch")
+#survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
+#  filter(species_common_name %in% "pacific ocean perch")
+#
+# weighted_lengths <- join_comps_survey(survey_specimens, survey_tows,
+#   value = age, bin_size = 2)
+#
 #
 # out <- purrr::map_df(survs, function(x) {
 #   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
