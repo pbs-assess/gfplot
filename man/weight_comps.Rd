@@ -50,6 +50,8 @@ following order:
 \item denominator in second weighting (e.g. catch that year or total survey area)
 }
 
+\code{tidy_comps_commercial()} and \code{tidy_comps_survey()} both output data frames in
+this format and so you ordinarily would not have to worry about this.
 The names of the columns do not matter, only their contents. The data frame
 should contain these columns and only these columns.
 }
