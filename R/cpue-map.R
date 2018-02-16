@@ -1,31 +1,3 @@
-hex_coords <- function (x, y, unitcell_x = 1, unitcell_y = 1) {
-  data.frame(x = hexbin::hexcoords(unitcell_x)$x + x,
-    y = hexbin::hexcoords(unitcell_y)$y + y)
-}
-
-ll2utm <- function(x, utm_zone = 9) {
-  attr(x, "projection") <- "LL"
-  attr(x, "zone") <- utm_zone
-  suppressMessages(PBSmapping::convUL(x))
-}
-
-load_coastline <- function(xlim_ll, ylim_ll, utm_zone) {
-  data("nepacLLhigh", package = "PBSmapping", envir = environment())
-  np <- PBSmapping::clipPolys(nepacLLhigh,
-    xlim = xlim_ll + c(-2, 2),
-    ylim = ylim_ll + c(-2, 2))
-  ll2utm(np, utm_zone = utm_zone)
-}
-
-load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
-  data("isobath", package = "PBSdata", envir = environment())
-  isobath <- filter(isobath, .data$PID %in% bath)
-  isobath <- PBSmapping::clipPolys(isobath,
-    xlim = xlim_ll + c(-3, 3),
-    ylim = ylim_ll + c(-3, 3))
-  ll2utm(isobath, utm_zone = utm_zone)
-}
-
 #' Title TODO
 #'
 #' @param dat TODO
@@ -124,9 +96,10 @@ plot_cpue_map <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     group = "paste(PID, SID)"),
     inherit.aes = FALSE, lwd = 0.3, col = "grey40", alpha = 0.3)
 
-  if (plot_hexagons)
+  if (plot_hexagons) {
     g <- g + geom_polygon(data = public_dat, aes_string(x = "x", y = "y",
       fill = "cpue", group = "hex_id"), inherit.aes = FALSE) + fill_scale
+  }
 
   g <- g + geom_polygon(data = coastline_utm,
       aes_string(x = "X", y = "Y", group = "PID"),
@@ -143,4 +116,32 @@ plot_cpue_map <- function(dat, bin_width = 7, n_minimum_vessels = 3,
   }
 
   g
+}
+
+hex_coords <- function (x, y, unitcell_x = 1, unitcell_y = 1) {
+  data.frame(x = hexbin::hexcoords(unitcell_x)$x + x,
+    y = hexbin::hexcoords(unitcell_y)$y + y)
+}
+
+ll2utm <- function(x, utm_zone = 9) {
+  attr(x, "projection") <- "LL"
+  attr(x, "zone") <- utm_zone
+  suppressMessages(PBSmapping::convUL(x))
+}
+
+load_coastline <- function(xlim_ll, ylim_ll, utm_zone) {
+  data("nepacLLhigh", package = "PBSmapping", envir = environment())
+  np <- PBSmapping::clipPolys(nepacLLhigh,
+    xlim = xlim_ll + c(-2, 2),
+    ylim = ylim_ll + c(-2, 2))
+  ll2utm(np, utm_zone = utm_zone)
+}
+
+load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
+  data("isobath", package = "PBSdata", envir = environment())
+  isobath <- filter(isobath, .data$PID %in% bath)
+  isobath <- PBSmapping::clipPolys(isobath,
+    xlim = xlim_ll + c(-3, 3),
+    ylim = ylim_ll + c(-3, 3))
+  ll2utm(isobath, utm_zone = utm_zone)
 }
