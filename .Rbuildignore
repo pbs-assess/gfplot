@@ -32,3 +32,4 @@
 ^pbssynopsis.sublime-workspace$
 ^man-roxygen$
 ^vignettes/commercial-cpue-index_cache$
+^prediction-grids$

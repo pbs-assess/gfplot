@@ -39,9 +39,13 @@ Imports:
     TMB,
     FSA,
     Rcpp,
-    MASS
+    MASS,
+    methods,
+    glmmfields,
+    akima
 RoxygenNote: 6.0.1.9000
-Remotes: github::pbs-software/pbs-data/PBSdata
+Remotes: github::pbs-software/pbs-data/PBSdata,
+    github::seananderson/glmmfields
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

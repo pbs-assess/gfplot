@@ -16,3 +16,8 @@ nrow(d)
 pop_samples <- d
 usethis::use_data(pop_samples, overwrite = TRUE)
 
+d <- readRDS("data-cache/pbs-survey-tows.rds")
+d <- dplyr::filter(d, species_common_name == "pacific ocean perch")
+d <- filter(d, year == 2015)
+pop_surv <- d
+usethis::use_data(pop_surv, overwrite = TRUE)

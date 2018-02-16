@@ -43,7 +43,7 @@ Title TODO
 ## fake data demo:
 xlim <- c(-134.1, -123.0)
 ylim <- c(48.4, 54.25)
-d <- tibble::tibble(lat = runif(1000, min(ylim), max(ylim)),
+d <- dplyr::tibble(lat = runif(1000, min(ylim), max(ylim)),
   lon = runif(length(lat), min(xlim), max(xlim)),
   species_common_name = "fake species",
   cpue = rlnorm(length(lat), log(1000), 0.6),

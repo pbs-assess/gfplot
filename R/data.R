@@ -27,3 +27,18 @@
 #'
 #' @format A data frame
 "pop_samples"
+
+#' Example Pacific ocean perch survey data from QCS in 2015
+#'
+#' TODO
+#'
+#' @format A data frame
+"pop_surv"
+
+
+#' A prediction grid for all surveys currently at 150 resolution
+#'
+#' TODO
+#'
+#' @format A data frame
+"survey_grids"
