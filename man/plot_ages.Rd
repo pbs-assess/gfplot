@@ -2,10 +2,10 @@
 % Please edit documentation in R/ages.R
 \name{plot_ages}
 \alias{plot_ages}
-\alias{tidy_ages}
+\alias{tidy_ages_raw}
 \title{Plot age frequency data}
 \usage{
-tidy_ages(surv_dat = NULL, comm_dat = NULL,
+tidy_ages_raw(surv_dat = NULL, comm_dat = NULL,
   survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
   "West Coast Vancouver Island Synoptic Survey",
@@ -27,9 +27,9 @@ the same order as \code{survey_series_desc}. These are used in the plot.}
 for the commercial samples. Defaults to \code{1}, which refers to unsorted
 samples.}
 
-\item{dat}{Input data frame. For \code{tidy_ages()} should be from
-\code{\link[=get_survsamples]{get_survsamples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
-be from \code{tidy_ages()} or be formatted similarly. See details.}
+\item{dat}{Input data frame. For \code{tidy_ages_raw()} should be from
+\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
+be from \code{tidy_ages_raw()} or be formatted similarly. See details.}
 
 \item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
 
@@ -48,23 +48,23 @@ yet. TODO)
 }
 \details{
 \itemize{
-\item \code{tidy_ages()} Prepares PBS data for \code{plot_ages()}. Works across one
+\item \code{tidy_ages_raw()} Prepares PBS data for \code{plot_ages()}. Works across one
 or multiple species.
 \item \code{plot_ages()} Plots age frequencies for each year for selected
 surveys for a single species. Input data frame should come from
-\code{tidy_ages()} or follow the following format: The input data frame must
+\code{tidy_ages_raw()} or follow the following format: The input data frame must
 have the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"} and
 \code{"F"}), \code{age}, \code{survey}, \code{n_scaled}.
 }
 }
 \examples{
 \dontrun{
-d <- get_survsamples("lingcod")
-tidy_ages(d)
+d <- get_surv_samples("lingcod")
+tidy_ages_raw(d)
 plot_ages(d)
 
-d <- get_survsamples("canary rockfish")
-tidy_ages(d) \%>\%
+d <- get_surv_samples("canary rockfish")
+tidy_ages_raw(d) \%>\%
   plot_ages()
 }
 

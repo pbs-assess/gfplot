@@ -25,9 +25,9 @@
 #'   species_common_name = "fake species",
 #'   cpue = rlnorm(length(lat), log(1000), 0.6),
 #'   vessel_registration_number = rep(seq_len(100), each = 10))
-#' plot_cpue_map(d, bin_width = 15, n_minimum_vessels = 1)
+#' plot_spat_cpue(d, bin_width = 15, n_minimum_vessels = 1)
 
-plot_cpue_map <- function(dat, bin_width = 7, n_minimum_vessels = 3,
+plot_spat_cpue <- function(dat, bin_width = 7, n_minimum_vessels = 3,
   pal_function = viridisLite::viridis, xlim_ll = c(-134.1, -123.0),
   ylim_ll = c(48.4, 54.25), utm_zone = 9, bath = c(100, 200, 500),
   fill_scale = viridis::scale_fill_viridis(trans = "log10", option = "C"),

@@ -259,3 +259,15 @@ weight_comps <- function(dat) {
     "weighting2", "weighting2_total")
   weight_comps_base(dat)
 }
+
+#' @export
+#' @rdname weight_comps
+tidy_ages_weighted <- function() {
+  stop("Not implemented yet.") # TODO
+}
+
+#' @export
+#' @rdname weight_comps
+tidy_lengths_weighted <- function() {
+  stop("Not implemented yet.") # TODO
+}

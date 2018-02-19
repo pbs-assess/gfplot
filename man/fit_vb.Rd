@@ -61,7 +61,7 @@ plot_vb(obj, obj)
 }
 }
 \seealso{
-Other growth functions: \code{\link{fit_length_weight}},
+Other growth functions: \code{\link{fit_length_wt}},
   \code{\link{plot_growth}}
 }
 \concept{growth functions}

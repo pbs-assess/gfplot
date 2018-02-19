@@ -3,7 +3,7 @@
 \name{plot_growth}
 \alias{plot_growth}
 \alias{plot_vb}
-\alias{plot_length_weight}
+\alias{plot_length_wt}
 \title{Plot VB or length-weight fits TODO}
 \usage{
 plot_growth(object_female, object_male, type = c("vb", "length-weight"),
@@ -14,7 +14,7 @@ plot_growth(object_female, object_male, type = c("vb", "length-weight"),
 
 plot_vb(..., type = "vb")
 
-plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
+plot_length_wt(..., type = "length-weight", xlab = "Length (cm)",
   ylab = "Weight (kg)", lab_x = 0.1, lab_y = 0.9, lab_x_gap = 0.35)
 }
 \arguments{
@@ -56,12 +56,12 @@ model_m <- fit_vb(pop_samples, sex = "male")
 plot_vb(model_f, model_m)
 }
 
-model_f <- fit_length_weight(pop_samples, sex = "female")
-model_m <- fit_length_weight(pop_samples, sex = "male")
-plot_length_weight(model_f, model_m)
+model_f <- fit_length_wt(pop_samples, sex = "female")
+model_m <- fit_length_wt(pop_samples, sex = "male")
+plot_length_wt(model_f, model_m)
 }
 \seealso{
-Other growth functions: \code{\link{fit_length_weight}},
+Other growth functions: \code{\link{fit_length_wt}},
   \code{\link{fit_vb}}
 }
 \concept{growth functions}

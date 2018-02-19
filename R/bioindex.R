@@ -1,15 +1,31 @@
-#' Title
+#' Plot survey relative biomass mass index
 #'
+#' @examples
+#' \dontrun{
+#' get_surv_index("lingcod") %>%
+#'   tidy_surv_index() %>%
+#'   plot_surv_index()
+#'
+#' # Or without pipes:
+#' d <- get_surv_index("lingcod")
+#' head(d)
+#'
+#' d_tidy <- tidy_surv_index(d)
+#' head(d_tidy)
+#'
+#' plot_surv_index(d_tidy)
+#' }
+
+#' @name plot_surv_index
 #' @param dat TODO
 #' @param surveys TODO
 #' @param survey_names TODO
 #' @param min_years TODO
 #' @param year_range TODO
-#' @export
 #' @family tidy data functions
-#' @template bioindex-examples
-
-tidy_bioindex <- function(dat,
+#' @rdname plot_surv_index
+#' @export
+tidy_surv_index <- function(dat,
   surveys = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -75,18 +91,15 @@ tidy_bioindex <- function(dat,
     .data$num_sets, .data$num_pos_sets)
 }
 
-#' Title TODO
-#'
-#' @param dat TODO
 #' @param col TODO
 #' @param title TODO
 #'
 #' @export
 #' @family plotting functions
 #'
-#' @template bioindex-examples
+#' @rdname plot_surv_index
 
-plot_bioindex <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
+plot_surv_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices") {
 
   d <- dat %>%

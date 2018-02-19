@@ -34,10 +34,10 @@ jackknife_cpue_index(m)
 }
 }
 \seealso{
-Other plotting functions: \code{\link{plot_bioindex}},
+Other plotting functions: \code{\link{fit_mat_ogive}},
   \code{\link{plot_cpue_index_coefs}},
   \code{\link{plot_cpue_index}},
-  \code{\link{plot_maturity}}
+  \code{\link{plot_surv_index}}
 
 Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},

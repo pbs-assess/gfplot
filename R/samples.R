@@ -1,4 +1,4 @@
-#' Tidy PBS samples data for \code{\link{plot_samples}}
+#' Tidy PBS samples data for \code{\link{plot_samp_avail}}
 #'
 #' @param dat Input data frame from \code{\link{get_surv_samples}}.
 #' @param year_range Either \code{NULL}, in which case all years are returned,
@@ -10,13 +10,13 @@
 #' @examples
 #' \dontrun{
 #' d <- get_surv_samples("lingcod")
-#' tidy_samples(d)
+#' tidy_samp_avail(d)
 #'
 #' d <- get_commsamples("lingcod")
-#' tidy_samples(d)
+#' tidy_samp_avail(d)
 #' }
 
-tidy_samples <- function(dat, year_range = NULL) {
+tidy_samp_avail <- function(dat, year_range = NULL) {
 
   if (!is.null(year_range))
     dat <- dat[dat$year >= year_range[[1]] & dat$year <= year_range[[2]], ]
@@ -53,7 +53,7 @@ tidy_samples <- function(dat, year_range = NULL) {
 #' Plot sample availability
 #'
 #' @param dat An input data frame from, for example,
-#' \code{\link{tidy_samples}}. The input data frame must have the columns:
+#' \code{\link{tidy_samp_avail}}. The input data frame must have the columns:
 #' \describe{
 #'   \item{\code{year}}{The year.}
 #'   \item{\code{type}}{The types of samples to plot, e.g. "maturity",
@@ -70,22 +70,22 @@ tidy_samples <- function(dat, year_range = NULL) {
 #'   type = c("maturity", "weight", "length", "age"), stringsAsFactors = FALSE)
 #' d$n <- round(runif(nrow(d), 0, 800))
 #' d$n[10] <- 0 # example zero
-#' plot_samples(d)
+#' plot_samp_avail(d)
 #'
 #' \dontrun{
 #' d <- get_surv_samples("lingcod")
-#' d <- tidy_samples(d, year_range = c(1996, 2016))
-#' plot_samples(d, year_range = c(1996, 2016),
+#' d <- tidy_samp_avail(d, year_range = c(1996, 2016))
+#' plot_samp_avail(d, year_range = c(1996, 2016),
 #'   title = "Survey samples")
 #'
 #' d <- get_commsamples("lingcod")
-#' d <- tidy_samples(d, year_range = c(1996, 2016))
-#' plot_samples(d, year_range = c(1996, 2016),
+#' d <- tidy_samp_avail(d, year_range = c(1996, 2016))
+#' plot_samp_avail(d, year_range = c(1996, 2016),
 #'   title = "Commercial samples")
 #' }
 #' @export
 
-plot_samples <- function(dat, year_range = NULL, title = "Biological samples",
+plot_samp_avail <- function(dat, year_range = NULL, title = "Biological samples",
   palette = "Greys") {
 
   dat$n_plot <- log(dat$n + 1)
