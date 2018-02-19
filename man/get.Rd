@@ -22,7 +22,7 @@ get_strata()
 
 get_survey(species, survey_codes = c(1, 3, 4, 16))
 
-get_surv_samples(species, remove_bad_data = TRUE)
+get_surv_samples(species, ssid, remove_bad_data = TRUE)
 
 get_commsamples(species)
 
@@ -44,6 +44,8 @@ cache_pbs_data(species, path = "data-cache")
 \item{species}{A character vector of species common names}
 
 \item{survey_codes}{A numeric vector of survey series IDs}
+
+\item{ssid}{TODO}
 
 \item{remove_bad_data}{Remove known bad data?}
 
