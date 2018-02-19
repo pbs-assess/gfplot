@@ -3,16 +3,13 @@
 #' Long description here
 #'
 #' @details
-#'
-#' * `get_sample_trips()` does...
-#' * `get_strata()` does...
 #' * `get_survey()` does...
-#' * `get_survsamples()` does...
+#' * `get_surv_samples()` does...
 #' * `get_commsamples()` does...
 #' * `get_catch()` does...
 #' * `get_cpue()` does...
 #' * `get_cpue_index()` does...
-#' * `get_ageing_precision()` does...
+#' * `get_age_precision()` does...
 #' * `get_sara_dat()` does...
 #' * `get_bioindex()` does...
 #' * `cache_pbs_data()` does...
@@ -95,43 +92,41 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
 
 #' @export
 #' @rdname get
+#' @param ssid TODO
 #' @param remove_bad_data Remove known bad data?
-get_survsamples <- function(species, remove_bad_data = TRUE) {
-  sql <- read_sql("get-survey-biology.sql")
-  sql <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = sql)
-  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
+get_surv_samples <- function(species, ssid, remove_bad_data = TRUE) {
+  .q <- read_sql("get-survey-biology.sql")
+  .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q,
+    collapse = FALSE)
+  .q <- inject_survey_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q)
+  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), .q)
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_science_name <- tolower(.d$species_science_name)
 
   surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT * FROM SURVEY_SERIES")
-  ss <- dplyr::select(surveys, -SURVEY_SERIES_TYPE_CODE)
-  names(ss) <- tolower(names(ss))
+  surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
+  names(surveys) <- tolower(names(surveys))
 
-  names(x) <- tolower(names(x))
-  x$species_common_name <- tolower(x$species_common_name)
-  x$species_science_name <- tolower(x$species_science_name)
-  x <- dplyr::mutate(x, year = lubridate::year(trip_start_date))
-  x <- dplyr::inner_join(x, ss, by = "survey_series_id")
+  .d <- inner_join(.d, surveys, by = "survey_series_id")
+  .d <- as_tibble(.d)
 
   warning("Duplicate specimen IDs may still be present. ",
       "Filter them yourself after selecting specific surveys. ",
-      "For example, `d <- d[!duplicated(d$specimen_id), ]`")
+      "For example, `dat <- dat[!duplicated(dat$specimen_id), ]`")
 
   if (remove_bad_data) {
-    x <- x[!(x$length > 600 &
-      x$species_common_name == "north pacific spiny dogfish"), , drop = FALSE]
-    x <- x[!(x$length > 600 &
-      x$species_common_name == "big skate"), , drop = FALSE]
-    x <- x[!(x$length > 600 &
-      x$species_common_name == "longnose skate"), , drop = FALSE]
-    x <- x[!(x$length > 60 &
-      x$species_common_name == "pacific tomcod"), , drop = FALSE]
-    x <- x[!(x$length > 50 &
-      x$species_common_name == "quillback-rockfish"), , drop = FALSE]
-    x <- x[!(x$length < 10 & x$weight/1000 > 1.0 &
-      x$species_common_name == "pacific flatnose"), , drop = FALSE]
+    .d <- .d[!(.d$length > 600 &
+      .d$species_common_name == "north pacific spiny dogfish"), ]
+    .d <- .d[!(.d$length > 600 & .d$species_common_name == "big skate"), ]
+    .d <- .d[!(.d$length > 600 & .d$species_common_name == "longnose skate"), ]
+    .d <- .d[!(.d$length > 60 & .d$species_common_name == "pacific tomcod"), ]
+    .d <- .d[!(.d$length > 50 & .d$species_common_name == "quillback-rockfish"), ]
+    .d <- .d[!(.d$length < 10 & .d$weight/1000 > 1.0 &
+      .d$species_common_name == "pacific flatnose"), ]
   }
 
-  as_tibble(x)
 }
 
 #' @export
@@ -203,7 +198,7 @@ get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 
 #' @export
 #' @rdname get
-get_ageing_precision <- function(species) {
+get_age_precision <- function(species) {
   q <- read_sql("ageing-precision.sql")
   q <- inject_species_filter("AND C.SPECIES_CODE IN", species, q)
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
@@ -255,7 +250,7 @@ cache_pbs_data <- function(species, path = "data-cache") {
   d_survs_df <- get_survey(species)
   saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
 
-  d <- get_survsamples(species)
+  d <- get_surv_samples(species)
   saveRDS(d, file = file.path(path, "pbs-survey-specimens.rds"))
 
   d <- get_commsamples(species)
@@ -276,6 +271,6 @@ cache_pbs_data <- function(species, path = "data-cache") {
   d <- get_strata()
   saveRDS(d, file = file.path(path, "pbs-strata.rds"))
 
-  d <- get_ageing_precision(species)
+  d <- get_age_precision(species)
   saveRDS(d, file = file.path(path, "pbs-ageing-precision.rds"))
 }

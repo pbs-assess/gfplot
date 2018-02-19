@@ -1,6 +1,6 @@
 #' Tidy PBS ageing precision data
 #'
-#' @param dat A data frame from \code{\link{get_ageing_precision}}
+#' @param dat A data frame from \code{\link{get_age_precision}}
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to codes `3` and `17`, which represent otolith
 #'   'break and burn' and 'break and bake' methods.
@@ -9,7 +9,7 @@
 #'
 #' @family tidy data functions
 #' @template ageing-precision-examples
-tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
+tidy_age_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 
   dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   # remove specimen id's for which there is no precision reading
@@ -50,7 +50,7 @@ tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' Plot ageing precision data
 #'
 #' @param dat A properly formatted data frame, for example, from
-#'   \code{\link{tidy_ageing_precision}}. Should have columns named
+#'   \code{\link{tidy_age_precision}}. Should have columns named
 #'   TODO.
 #' @param n Number of fish to sample if there are more fish than \code{n}.
 #' @param jitter Amount to randomly jitter ages. Same jitter values are used for
@@ -62,7 +62,7 @@ tidy_ageing_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' @export
 #'
 #' @template ageing-precision-examples
-plot_ageing_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
+plot_age_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
   if (!is.null(seed)) set.seed(seed)
   if (n < nrow(dat))
     dat <- dplyr::sample_n(dat, size = n)

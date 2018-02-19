@@ -49,7 +49,7 @@ plot_bioindex(d_tidy)
 }
 }
 \seealso{
-Other tidy data functions: \code{\link{tidy_ageing_precision}},
+Other tidy data functions: \code{\link{tidy_age_precision}},
   \code{\link{tidy_cpue_index}}
 
 Other survey biomass index functions: \code{\link{plot_bioindex}}

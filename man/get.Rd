@@ -5,12 +5,12 @@
 \alias{get_sample_trips}
 \alias{get_strata}
 \alias{get_survey}
-\alias{get_survsamples}
+\alias{get_surv_samples}
 \alias{get_commsamples}
 \alias{get_catch}
 \alias{get_cpue}
 \alias{get_cpue_index}
-\alias{get_ageing_precision}
+\alias{get_age_precision}
 \alias{get_bioindex}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
@@ -22,7 +22,7 @@ get_strata()
 
 get_survey(species, survey_codes = c(1, 3, 4, 16))
 
-get_survsamples(species, remove_bad_data = TRUE)
+get_surv_samples(species, remove_bad_data = TRUE)
 
 get_commsamples(species)
 
@@ -32,7 +32,7 @@ get_cpue(species)
 
 get_cpue_index(gear = "bottom trawl", min_year = 1996)
 
-get_ageing_precision(species)
+get_age_precision(species)
 
 get_bioindex(species)
 
@@ -58,15 +58,13 @@ Long description here
 }
 \details{
 \itemize{
-\item \code{get_sample_trips()} does...
-\item \code{get_strata()} does...
 \item \code{get_survey()} does...
-\item \code{get_survsamples()} does...
+\item \code{get_surv_samples()} does...
 \item \code{get_commsamples()} does...
 \item \code{get_catch()} does...
 \item \code{get_cpue()} does...
 \item \code{get_cpue_index()} does...
-\item \code{get_ageing_precision()} does...
+\item \code{get_age_precision()} does...
 \item \code{get_sara_dat()} does...
 \item \code{get_bioindex()} does...
 \item \code{cache_pbs_data()} does...

@@ -11,7 +11,7 @@
 #' surveys for a single species.
 #'
 #' @param dat Input data frame. For `tidy_lengths()` should be from
-#' [get_survsamples()] and or [get_commsamples()]. For `plot_lengths()` should
+#' [get_surv_samples()] and or [get_commsamples()]. For `plot_lengths()` should
 #' be from `tidy_length()` or formatted similarly. See details TODO.
 #' @param n_bins Number of length bins (only used if `bin_size = NULL`).
 #' @param bin_size Bin size. Used preferentially over `n_bins`.

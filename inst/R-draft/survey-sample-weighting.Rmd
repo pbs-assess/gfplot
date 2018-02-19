@@ -36,13 +36,13 @@ For surveys, the proportions are first weighted by the density of the tow associ
 Which we execute on our data with:
 
 ```{r}
-comp <- survey_specimens %>% filter(!is.na(age)) %>% 
-  join_comps_survey(survey_tows) %>% 
+comp <- survey_specimens %>% filter(!is.na(age)) %>%
+  join_comps_survey(survey_tows) %>%
   weight_comps()
 head(comp)
 ```
 
-Make sure the proportions add up to 1 each year: 
+Make sure the proportions add up to 1 each year:
 
 ```{r}
 a1 <- group_by(comp, year) %>%
@@ -73,13 +73,13 @@ tidyr::gather(raw, proportion_type, age_prop, -age, -year) %>%
 tidyr::gather(raw, proportion_type, age_prop, -age, -year) %>%
   ggplot(aes(year, age, size = age_prop)) +
   geom_point(alpha = 0.8, pch = 21, aes(colour = proportion_type),
-    position = position_dodge(width = 0.5)) + 
+    position = position_dodge(width = 0.5)) +
   scale_size(range = c(0.1, 10)) +
   scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
 
 tidyr::gather(raw, proportion_type, age_prop, -age, -year) %>%
   ggplot(aes(year, age, size = age_prop)) +
-  geom_point(alpha = 0.8, pch = 21, aes(colour = proportion_type)) + 
+  geom_point(alpha = 0.8, pch = 21, aes(colour = proportion_type)) +
   scale_size(range = c(0.1, 10)) +
   scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
 ```
@@ -111,16 +111,16 @@ Now the lengths (the functions will be cleaned up to make this easier):
 ```{r}
 survey_specimens_length <- survey_specimens %>% filter(!is.na(length))
 bin_size <- 2
-length_bins <- seq(min(survey_specimens_length$length), 
+length_bins <- seq(min(survey_specimens_length$length),
   max(survey_specimens_length$length), bin_size)
 
 comp_length_raw <- survey_specimens_length %>%
   mutate(bin = length_bins[findInterval(length, length_bins)] + bin_size / 2)
 
 comp_length <- comp_length_raw %>%
-  select(-age) %>% rename(age = bin) %>% 
-  join_comps_survey(strata_dat) %>% 
-  weight_comps() %>% 
+  select(-age) %>% rename(age = bin) %>%
+  join_comps_survey(strata_dat) %>%
+  weight_comps() %>%
   rename(weighted_length_prop = weighted_age_prop, bin = age)
 ```
 
@@ -139,7 +139,7 @@ comp_length_raw <- comp_length_raw %>%
 
 tidyr::gather(comp_length_raw, proportion_type, length_prop, -bin, -year) %>%
   ggplot(aes(year, bin, size = length_prop)) +
-  geom_point(alpha = 0.8, pch = 21, aes(colour = proportion_type)) + 
+  geom_point(alpha = 0.8, pch = 21, aes(colour = proportion_type)) +
   scale_size(range = c(0.1, 10)) +
   scale_x_continuous(breaks = seq(min(raw$year), max(raw$year), 2))
 ```
@@ -155,9 +155,9 @@ tidyr::gather(comp_length_raw, proportion_type, length_prop, -bin, -year) %>%
 
 
 ```{r}
-bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>% 
+bio_specs <- readRDS("data-cache/all-commercial-bio.rds") %>%
   filter(species_common_name %in% "pacific ocean perch")
-catch <- readRDS("data-cache/all-catches.rds") %>% 
+catch <- readRDS("data-cache/all-catches.rds") %>%
   filter(species_common_name %in% "pacific ocean perch")
 survey_specimens <- readRDS("data-cache/all-survey-bio.rds") %>%
   filter(species_common_name %in% "pacific ocean perch") %>%
@@ -168,14 +168,14 @@ survey_tows <- readRDS("data-cache/all-survey-spatial-tows.rds") %>%
 
 # ------------
 
-bio_specs %>% join_comps_commercial(catch, age) %>% 
+bio_specs %>% join_comps_commercial(catch, age) %>%
   weight_comps()
-bio_specs %>% join_comps_commercial(catch, length, bin_size = 2) %>% 
+bio_specs %>% join_comps_commercial(catch, length, bin_size = 2) %>%
   weight_comps()
 
-survey_specimens %>% join_comps_survey(survey_tows, age) %>% 
+survey_specimens %>% join_comps_survey(survey_tows, age) %>%
   weight_comps()
-survey_specimens %>% join_comps_survey(survey_tows, length, bin_size = 2) %>% 
+survey_specimens %>% join_comps_survey(survey_tows, length, bin_size = 2) %>%
   weight_comps()
 
 ```

@@ -348,6 +348,8 @@ fit_spatial_survey_model <- function(dat, survey, years,
 #' @param pt_size_range TODO
 #' @param show_legend TODO
 #' @param extrapolate_depth TODO
+#' @param extrapolation_buffer TODO
+#' @param show_model_predictions TODO
 #' @param utm_zone TODO
 #'
 #' @export
@@ -365,18 +367,46 @@ plot_bc_survey <- function(pred_dat, raw_dat, fill_column,
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
   pt_size_range = c(2, 7), show_legend = TRUE,
-  extrapolate_depth = FALSE, utm_zone = 9) {
+  extrapolate_depth = FALSE, extrapolation_buffer = 5,
+  show_model_predictions = TRUE,
+  utm_zone = 9) {
 
   if (!extrapolate_depth)
     pred_dat <- filter(pred_dat,
+      akima_depth >= min(raw_dat$depth, na.rm = TRUE) - extrapolation_buffer,
+      akima_depth <= max(raw_dat$depth, na.rm = TRUE) + extrapolation_buffer,
+      akima_depth > 0,
       akima_depth >= min(raw_dat$depth),
       akima_depth <= max(raw_dat$depth))
+
+  # if (region == "") {
+  #   xlim <- range(raw_dat$X) + c(-10, 10)
+  #   ylim <- range(raw_dat$Y) + c(-10, 10)
+  # } else {
+  #   # b <- readRDS("data/boxes.rds")
+  #   xlim <- b[[region]]$xlim * 10
+  #   ylim <- b[[region]]$ylim * 10
+  # }
+  #
+  # xrange <- diff(xlim)
+  # yrange <- diff(ylim)
+  # if (yrange / xrange > aspect_ratio) { # too tall
+  #   needed_xrange <- yrange / aspect_ratio
+  #   mid_pt <- xlim[1] + xrange/2
+  #   xlim <- c(mid_pt - needed_xrange/2, mid_pt + needed_xrange/2)
+  # }
+  # if (yrange / xrange < aspect_ratio) { # too wide
+  #   needed_yrange <- xrange * aspect_ratio
+  #   mid_pt <- ylim[1] + yrange/2
+  #   ylim <- c(mid_pt - needed_yrange/2, mid_pt + needed_yrange/2)
+  # }
 
   coast <- load_coastline(range(raw_dat$lon), range(raw_dat$lat),
     utm_zone = utm_zone)
 
-  g <- ggplot(pred_dat, aes_string("X", "Y")) +
-    ggplot2::geom_tile(aes_string(fill = fill_column), colour = NA) +
+  g <- ggplot() +
+    ggplot2::geom_tile(pred_dat, aes_string("X", "Y", fill = fill_column),
+      colour = NA) +
     fill_scale +
     geom_point(data = raw_dat, fill = pt_fill, col = pt_col,
       aes_string(shape = "as.factor(present)", size = "density")) +

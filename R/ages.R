@@ -14,7 +14,7 @@
 #'   `"F"`), `age`, `survey`, `n_scaled`.
 #'
 #' @param dat Input data frame. For `tidy_ages()` should be from
-#' [get_survsamples()] and or [get_commsamples()]. For `plot_ages()` should
+#' [get_surv_samples()] and or [get_commsamples()]. For `plot_ages()` should
 #' be from `tidy_ages()` or be formatted similarly. See details.
 #' @param survey_series_desc A character vector of survey series to include.
 #' @param survey A character vector of shorter/cleaner survey names to use in
@@ -33,11 +33,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_survsamples("lingcod")
+#' d <- get_surv_samples("lingcod")
 #' tidy_ages(d)
 #' plot_ages(d)
 #'
-#' d <- get_survsamples("canary rockfish")
+#' d <- get_surv_samples("canary rockfish")
 #' tidy_ages(d) %>%
 #'   plot_ages()
 #' }
@@ -48,7 +48,7 @@ NULL
 
 #' @rdname plot_ages
 #' @export
-tidy_ages <- function(dat,
+  tidy_ages <- function(surv_dat = NULL, comm_dat = NULL,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",

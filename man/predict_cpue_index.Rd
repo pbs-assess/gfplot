@@ -2,7 +2,7 @@
 % Please edit documentation in R/cpue.R
 \name{predict_cpue_index}
 \alias{predict_cpue_index}
-\title{Predit from a delta-lognormal commercial CPUE standardization model}
+\title{Predict from a delta-lognormal commercial CPUE standardization model}
 \usage{
 predict_cpue_index(object, center = FALSE)
 }
@@ -12,7 +12,7 @@ predict_cpue_index(object, center = FALSE)
 \item{center}{Should the index be centered by subtracting the mean in link space?}
 }
 \description{
-Predit from a delta-lognormal commercial CPUE standardization model
+Predict from a delta-lognormal commercial CPUE standardization model
 }
 \examples{
 \dontrun{

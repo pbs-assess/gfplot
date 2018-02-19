@@ -7,7 +7,8 @@
 plot_bc_survey(pred_dat, raw_dat, fill_column,
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60", pt_size_range = c(2, 7),
-  show_legend = TRUE, extrapolate_depth = FALSE, utm_zone = 9)
+  show_legend = TRUE, extrapolate_depth = FALSE, extrapolation_buffer = 5,
+  show_model_predictions = TRUE, utm_zone = 9)
 }
 \arguments{
 \item{pred_dat}{TODO}
@@ -27,6 +28,10 @@ plot_bc_survey(pred_dat, raw_dat, fill_column,
 \item{show_legend}{TODO}
 
 \item{extrapolate_depth}{TODO}
+
+\item{extrapolation_buffer}{TODO}
+
+\item{show_model_predictions}{TODO}
 
 \item{utm_zone}{TODO}
 }

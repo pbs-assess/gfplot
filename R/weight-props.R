@@ -7,7 +7,7 @@
 #' from the `tidy_*` functions.
 #'
 #' @param specimen_dat Specimen data. E.g. from [get_commsamples()] for
-#' commercial data or [get_survsamples()] for survey data.
+#' commercial data or [get_surv_samples()] for survey data.
 #' @param catch_dat Catch data. E.g. from [get_catch()].
 #' @param survey_tows Survey tow data. E.g. from [get_survey()].
 #' @param value The **unquoted** column name with the values to re-weight
@@ -47,7 +47,7 @@
 #' survey <- "Queen Charlotte Sound Synoptic Survey"
 #'
 #' ## Surveys:
-#' survey_samples <- get_survsamples(species) %>%
+#' survey_samples <- get_surv_samples(species) %>%
 #'   dplyr::filter(survey_series_desc == survey)
 #' survey_tows <- get_survey(species) %>%
 #'   dplyr::filter(survey_series_desc == survey)

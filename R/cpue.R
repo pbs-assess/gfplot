@@ -224,7 +224,7 @@ fit_cpue_index <- function(dat,
     data = dat)
 }
 
-#' Predit from a delta-lognormal commercial CPUE standardization model
+#' Predict from a delta-lognormal commercial CPUE standardization model
 #'
 #' @param object A model object from \code{\link{fit_cpue_index}}
 #' @param center Should the index be centered by subtracting the mean in link space?

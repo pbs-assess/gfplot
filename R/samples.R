@@ -1,6 +1,6 @@
 #' Tidy PBS samples data for \code{\link{plot_samples}}
 #'
-#' @param dat Input data frame from \code{\link{get_survsamples}}.
+#' @param dat Input data frame from \code{\link{get_surv_samples}}.
 #' @param year_range Either \code{NULL}, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_survsamples("lingcod")
+#' d <- get_surv_samples("lingcod")
 #' tidy_samples(d)
 #'
 #' d <- get_commsamples("lingcod")
@@ -73,7 +73,7 @@ tidy_samples <- function(dat, year_range = NULL) {
 #' plot_samples(d)
 #'
 #' \dontrun{
-#' d <- get_survsamples("lingcod")
+#' d <- get_surv_samples("lingcod")
 #' d <- tidy_samples(d, year_range = c(1996, 2016))
 #' plot_samples(d, year_range = c(1996, 2016),
 #'   title = "Survey samples")

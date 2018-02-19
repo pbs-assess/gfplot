@@ -54,7 +54,7 @@ jackknife_cpue_index(m)
 }
 }
 \seealso{
-Other tidy data functions: \code{\link{tidy_ageing_precision}},
+Other tidy data functions: \code{\link{tidy_age_precision}},
   \code{\link{tidy_bioindex}}
 
 Other CPUE index functions: \code{\link{fit_cpue_index}},
