@@ -27,6 +27,7 @@
 #' @name get
 NULL
 
+#' @export
 #' @rdname get
 get_ssids <- function() {
   .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -37,6 +38,8 @@ get_ssids <- function() {
   as_tibble(.d)
 }
 
+#' @export
+#' @rdname get
 get_age_methods <- function() {
   .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT AGEING_METHOD_CODE, AGEING_METHOD_DESC, ROW_VERSION
@@ -199,6 +202,22 @@ get_cpue_spatial <- function(species) {
     toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_scientific_name <- tolower(.d$species_scientific_name)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get
+get_cpue_spatial_ll <- function(species) {
+  .q <- read_sql("get-cpue-spatial-ll.sql")
+  .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFFOS", .q)
+  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+    toupper("north pacific spiny dogfish") # to match GFBioSQL
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$gear <- tolower(.d$gear)
+  .d$fishery_sector <- tolower(.d$fishery_sector)
   .d$species_scientific_name <- tolower(.d$species_scientific_name)
   as_tibble(.d)
 }
