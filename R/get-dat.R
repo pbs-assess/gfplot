@@ -18,7 +18,7 @@
 #'   perch"`) or one or more species codes (e.g. `396`). Species codes can be
 #'   specified as numeric vectors `c(396, 442`) or characters `c("396", "442")`.
 #'   Numeric values shorter than 3 digits will be expanded to 3 digits and
-#'   converted to character objects (`1` turns into `"001`). Species common
+#'   converted to character objects (`1` turns into `"001"`). Species common
 #'   names and species codes should not be mixed. If any element is missing a
 #'   species code, then all elements will be assumed to be species, common
 #'   names.
