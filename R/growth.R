@@ -313,7 +313,7 @@ plot_vb <- function(..., type = "vb") {
 #' @export
 #' @rdname plot_growth
 plot_length_wt <- function(..., type = "length-weight", xlab = "Length (cm)",
-    ylab = "Weight (kg)", lab_x = 0.1, lab_y = 0.9, lab_x_gap = 0.35) {
+    ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.25) {
   plot_growth(..., type = type, xlab = xlab,
     ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap)
 }

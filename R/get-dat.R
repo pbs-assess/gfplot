@@ -30,7 +30,7 @@ NULL
 #' @export
 #' @rdname get
 get_ssids <- function() {
-  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+  .d <- run_sql("GFBioSQL",
     "SELECT SURVEY_SERIES_ID, SURVEY_SERIES_DESC
       FROM SURVEY_SERIES")
   names(.d) <- tolower(names(.d))
@@ -298,6 +298,9 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   d <- get_cpue_spatial(species)
   saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"))
+
+  d <- get_cpue_spatial_ll(species)
+  saveRDS(d, file = file.path(path, "pbs-cpue-spatial-ll.rds"))
 
   d <- get_surv_index(species)
   saveRDS(d, file = file.path(path, "pbs-surv-index.rds"))

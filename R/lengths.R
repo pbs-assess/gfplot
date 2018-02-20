@@ -13,8 +13,7 @@
 #' @param dat Input data frame. For `tidy_lengths_raw()` should be from
 #' [get_surv_samples()] and or [get_commsamples()]. For `plot_lengths()` should
 #' be from `tidy_length()` or formatted similarly. See details TODO.
-#' @param n_bins Number of length bins (only used if `bin_size = NULL`).
-#' @param bin_size Bin size. Used preferentially over `n_bins`.
+#' @param bin_size Bin size.
 #' @param min_specimens Minimum number of specimens for histogram data to be
 #' computed/shown.
 #' @param survey_series_desc A character vector of survey series to include.
@@ -34,7 +33,7 @@ NULL
 
 #' @rdname plot_lengths
 #' @export
-tidy_lengths_raw <- function(dat, n_bins = 25, bin_size = NULL,
+tidy_lengths_raw <- function(dat, bin_size = 2,
   min_specimens = 20L,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
@@ -50,9 +49,12 @@ tidy_lengths_raw <- function(dat, n_bins = 25, bin_size = NULL,
     "WCVI",
     "PHMA LL (N)",
     "PHMA LL (S)",
-    "IPHC")) {
+    "IPHC"),
+  year_lim = c(1996, Inf)) {
 
+  dat <- filter(dat, !is.na(survey_series_desc))
   dat <- filter(dat, survey_series_desc %in% survey_series_desc)
+  dat <- filter(dat, year >= year_lim[[1]] & year <= year_lim[[2]])
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
   dat <- dat %>%
     select(species_common_name, .data$species_science_name, .data$sample_id,
@@ -67,7 +69,7 @@ tidy_lengths_raw <- function(dat, n_bins = 25, bin_size = NULL,
     stringsAsFactors = FALSE)
 
   surv_year_counts <- dat %>%
-    left_join(su, by = "survey_series_desc") %>%
+    inner_join(su, by = "survey_series_desc") %>%
     group_by(.data$year, .data$survey) %>%
     summarise(total = n(), max_length = max(.data$length)) %>%
     ungroup() %>%
@@ -79,14 +81,10 @@ tidy_lengths_raw <- function(dat, n_bins = 25, bin_size = NULL,
   max_length <- filter(counts, .data$total >= min_specimens) %>%
     dplyr::pull(.data$max_length) %>% max()
 
-  if (is.null(bin_size)) {
-    lengths <- seq(0, max_length + 0.1, length.out = n_bins)
-  } else {
-    lengths <- seq(0, max_length + 0.1, bin_size)
-  }
+  lengths <- seq(0, max_length + 0.1, bin_size)
 
-  dat %>%
-    left_join(su, by = "survey_series_desc") %>%
+  out <- dat %>%
+    inner_join(su, by = "survey_series_desc") %>%
     mutate(length_bin = lengths[findInterval(.data$length, lengths)]) %>%
     group_by(.data$year, .data$survey, .data$length_bin, .data$sex) %>%
     summarise(n = n()) %>%
@@ -99,7 +97,10 @@ tidy_lengths_raw <- function(dat, n_bins = 25, bin_size = NULL,
     full_join(all, by = c("year", "survey")) %>%
     left_join(counts, by = c("year", "survey")) %>%
     mutate(proportion = ifelse(total >= min_specimens, proportion, NA)) %>%
-    mutate(survey = forcats::fct_relevel(survey, su$survey))
+    mutate(bin_size = bin_size)
+  out <- out[!is.na(out$survey), ]
+
+  list(data = out, counts = counts, surveys = su)
 }
 
 #' @rdname plot_lengths
@@ -110,19 +111,19 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   fill_col = c("M" = "grey80", "F" = "#FF000010"),
   line_col = c("M" = "grey40", "F" = "red")) {
 
-  dat$sex[is.na(dat$sex)] <- "F" # for legend only; avoid "NAs"
+  dat$data$sex[is.na(dat$data$sex)] <- "F" # for legend only; avoid "NAs"
 
-  x_breaks <- pretty(dat$length_bin, 4L)
+  x_breaks <- pretty(dat$data$length_bin, 4L)
   N <- length(x_breaks)
   x_breaks <- x_breaks[seq(1, N - 1)]
-  range_lengths <- diff(range(dat$length_bin, na.rm = TRUE))
+  range_lengths <- diff(range(dat$data$length_bin, na.rm = TRUE))
 
-  ggplot(dat, aes_string("length_bin", "proportion")) +
-    geom_col(width = bin_size,
+  ggplot(dat$data, aes_string("length_bin", "proportion")) +
+    geom_col(width = unique(dat$bin_size),
       aes_string(colour = "sex", fill = "sex"), size = 0.3,
       position = position_identity()) +
     facet_grid(
-      forcats::fct_rev(as.character(year)) ~ survey) +
+      forcats::fct_rev(as.character(year)) ~ forcats::fct_relevel(survey, dat$survey$survey)) +
     theme_pbs() +
     scale_fill_manual(values = fill_col) +
     scale_colour_manual(values = line_col) +
@@ -134,8 +135,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       axis.text.y = element_text(colour = "white"),
       axis.ticks.y = element_line(colour = "white")) +
     labs(colour = "Sex", fill = "Sex") +
-    geom_text(data = counts,
-      x = min(dat$length_bin, na.rm = TRUE) + 0.02 * range_lengths,
+    geom_text(data = dat$counts,
+      x = min(dat$data$length_bin, na.rm = TRUE) + 0.02 * range_lengths,
       y = 0.8, aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0) +
     labs(title = "Length frequencies") +

@@ -52,7 +52,7 @@ tidy_surv_index <- function(dat,
   if (is.null(year_range))
     year_range <- range(dat$year, na.rm = TRUE)
 
-  d <- filter(d,
+  d <- filter(dat,
     .data$survey_series_desc %in% surveys,
     year >= year_range[[1]], year <= year_range[[2]])
 

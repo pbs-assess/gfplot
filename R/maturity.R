@@ -151,8 +151,13 @@ plot_mat_ogive <- function(object,
   nd_re <- mutate(nd_re, sex = ifelse(female == 1L, "F", "M"))
   object$data <- mutate(object$data, sex = ifelse(female == 1L, "F", "M"))
 
-  labs <- mutate(labs, label =
-      paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "y"))
+  if (object$type[[1]] == "age") {
+    labs <- mutate(labs, label =
+        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "y"))
+  } else {
+    labs <- mutate(labs, label =
+        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "cm"))
+  }
   max_x <- min(c(max(labs$value) * x_max, max(nd_fe$age_or_length)))
   labs <- mutate(labs, x = max_x * 0.75)
 
