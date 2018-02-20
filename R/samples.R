@@ -24,30 +24,30 @@ tidy_samp_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) {
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
 
   dat <- dat %>%
-    dplyr::select(.data$species_common_name, .data$year,
+    select(.data$species_common_name, .data$year,
       .data$age, .data$length, .data$weight, .data$maturity_code,
       .data$ageing_method)
 
-  out <- dplyr::group_by(dat,
+  out <- group_by(dat,
     .data$species_common_name, .data$year) %>%
-    dplyr::summarise(
+    summarise(
       age = sum(!is.na(age) & age > 0 &
           .data$ageing_method %in% ageing_method),
       length = sum(!is.na(length) & length > 0),
       weight = sum(!is.na(weight) & weight > 0),
       maturity = sum(!is.na(maturity_code) & maturity_code > 0)
-    ) %>% dplyr::ungroup()
+    ) %>% ungroup()
 
   all_years <- expand.grid(year = seq(min(dat$year), max(dat$year), 1),
     species_common_name = unique(dat$species_common_name),
     stringsAsFactors = FALSE)
 
-  out <- dplyr::left_join(all_years, out, by = c("year", "species_common_name"))
+  out <- left_join(all_years, out, by = c("year", "species_common_name"))
 
   out <- reshape2::melt(out,
     id.vars = c("species_common_name", "year"),
     variable.name = "type", value.name = "n") %>%
-    dplyr::as_tibble()
+    as_tibble()
   out$n[is.na(out$n)] <- 0
   out
 }
