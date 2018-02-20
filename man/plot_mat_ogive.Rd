@@ -3,19 +3,53 @@
 \name{fit_mat_ogive}
 \alias{fit_mat_ogive}
 \alias{plot_mat_ogive}
-\title{TODO}
+\title{Fit and plot maturity ogives}
 \usage{
-fit_mat_ogive()
+fit_mat_ogive(dat, type = c("age", "length"), sample_id_re = FALSE,
+  months = seq(1, 12), ageing_method = c(3, 17))
 
-plot_mat_ogive(dat, type = "age")
+plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
+  else "Length (cm)", title = if (object$type[[1]] == "age") "Age at maturity"
+  else "Length at maturity", rug = TRUE, run_n = 1500, x_max = 1.5)
 }
 \arguments{
 \item{dat}{TODO}
 
 \item{type}{TODO}
+
+\item{sample_id_re}{TODO}
+
+\item{months}{TODO}
+
+\item{ageing_method}{TODO}
+
+\item{xlab}{TODO}
+
+\item{title}{TODO}
+
+\item{rug}{TODO}
+
+\item{x_max}{TODO as -fold of L or A95.}
+
+\item{rug_n}{TODO}
 }
 \description{
-TODO
+Fit and plot maturity ogives
+}
+\examples{
+\dontrun{
+d <- get_surv_samples("pacific ocean perch", ssid = 1)
+
+m <- fit_mat_ogive(d, sample_id_re = FALSE, months = 1:6)
+plot_mat_ogive(m)
+
+m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE, months = 1:6)
+plot_mat_ogive(m)
+
+## with random intercepts for sample ID:
+m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE, months = 1:6)
+plot_mat_ogive(m)
+}
 }
 \seealso{
 Other plotting functions: \code{\link{jackknife_cpue_index}},

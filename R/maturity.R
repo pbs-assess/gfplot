@@ -1,30 +1,41 @@
+#' Fit and plot maturity ogives
+#'
+#' @param sample_id_re TODO
+#' @param months TODO
+#' @param ageing_method TODO
 #' @rdname plot_mat_ogive
 #' @export
-fit_mat_ogive <- function() {
-  stop("Not implemented yet.") # TODO
-}
-
-#' TODO
+#' @examples
+#' \dontrun{
+#' d <- get_surv_samples("pacific ocean perch", ssid = 1)
 #'
-#' @param dat TODO
-#' @param type TODO
+#' m <- fit_mat_ogive(d, sample_id_re = FALSE, months = 1:6)
+#' plot_mat_ogive(m)
 #'
-#' @importFrom stats binomial plogis predict
-#' @export
-#' @family plotting functions
-#' @rdname plot_mat_ogive
+#' m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE, months = 1:6)
+#' plot_mat_ogive(m)
+#'
+#' ## with random intercepts for sample ID:
+#' m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE, months = 1:6)
+#' plot_mat_ogive(m)
+#' }
 
-plot_mat_ogive <- function(dat, type = "age") {
+fit_mat_ogive <- function(dat,
+  type = c("age", "length"),
+  sample_id_re = FALSE,
+  months = seq(1, 12),
+  ageing_method = c(3, 17)) {
 
-  dbio <- dat[!duplicated(dat$specimen_id), ] # critical!
-  dbio <- dbio %>%
+  dat <- mutate(dat, month = lubridate::month(trip_start_date))
+  dat <- dplyr::filter(dat, month %in% months,
+    ageing_method %in% ageing_method)
+  dat <- dat[!duplicated(dat$specimen_id), ] # critical!
+  dat <- dat %>%
     select(species_common_name,
       year, age, length, weight,
       maturity_code, sex, survey_series_desc,
       maturity_convention_desc, maturity_convention_maxvalue,
       specimen_id, sample_id, trip_start_date)
-
-  dbio <- mutate(dbio, month = lubridate::month(trip_start_date))
 
   file <- system.file("extdata", "maturity_assignment.csv",
     package = "PBSsynopsis")
@@ -36,43 +47,78 @@ plot_mat_ogive <- function(dat, type = "age") {
       sex = readr::col_integer(),
       maturity_convention_maxvalue = readr::col_integer(),
       mature_at = readr::col_integer()))
-
   mat_df$maturity_convention_maxvalue <- NULL
 
-  dbio <- left_join(dbio, mat_df, by = c("sex", "maturity_convention_desc"))
-  dbio <- filter(dbio, maturity_code <= maturity_convention_maxvalue) %>%
+  dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_desc"))
+  dat <- filter(dat, maturity_code <= maturity_convention_maxvalue) %>%
     select(-maturity_convention_maxvalue)
-  dbio <- mutate(dbio, mature = maturity_code >= mature_at)
+  dat <- mutate(dat, mature = maturity_code >= mature_at)
 
-  if (type == "age") {
-    dbio <- filter(dbio, !is.na(mature), !is.na(age), !is.na(sex))
-    xx <- dbio %>% dplyr::rename(age_or_length = age)
+  type <- match.arg(type)
+  .d <- switch(type,
+    age = filter(dat, !is.na(mature), !is.na(age), !is.na(sex)) %>%
+      rename(age_or_length = age),
+    length = filter(dat, !is.na(mature), !is.na(length), !is.na(sex)) %>%
+      rename(age_or_length = length))
+  .d <- mutate(.d, female = ifelse(sex == 2L, 1L, 0L))
+
+  if (sample_id_re) {
+    m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
+      data = .d, family = binomial)
+    b <- glmmTMB::fixef(m)[[1L]]
   } else {
-    dbio <- filter(dbio, !is.na(mature), !is.na(length), !is.na(sex))
-    xx <- dbio %>% dplyr::rename(age_or_length = length)
+    m <- glm(mature ~ age_or_length * female,
+      data = .d, family = binomial)
+    b <- stats::coef(m)
   }
 
-  xx <- mutate(xx, female = ifelse(sex == 2, 1, 0))
-
-  m_re <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
-    data = xx, family = binomial)
-  b <-  glmmTMB::fixef(m_re)[[1]]
-
-  if (length(unique(xx$sample_id)) > 100L) {
-    s_ids <- sample(unique(xx$sample_id), 100L)
+  if (length(unique(.d$sample_id)) > 100L) {
+    s_ids <- sample(unique(.d$sample_id), 100L)
   } else {
-    s_ids <- unique(xx$sample_id)
+    s_ids <- unique(.d$sample_id)
   }
 
-  age_or_length <- seq(min(xx$age_or_length), max(xx$age_or_length),
-    length.out = 400L)
+  age_or_length <- seq(min(.d$age_or_length), max(.d$age_or_length),
+    length.out = 300L)
   nd <- expand.grid(age_or_length = age_or_length, sample_id = s_ids,
-    female = c(0, 1), stringsAsFactors = FALSE)
-  nd$glmm <- predict(m_re, newdata = nd, se.fit = FALSE)
-  nd$glmm_fe <- plogis(b[[1]] + b[[3]] * nd$female +
-      b[[2]] * nd$age_or_length + b[[4]] * nd$age_or_length * nd$female)
-  nd_fe <- filter(nd, sample_id == s_ids[[1]]) %>% # fake
-    select(-glmm)
+    female = c(0L, 1L), stringsAsFactors = FALSE)
+  if (sample_id_re)
+    nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
+  nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
+      b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+
+  list(data = .d, pred_data = nd, model = m, sample_id_re = sample_id_re,
+    type = type)
+}
+
+#' @param dat TODO
+#' @param type TODO
+#' @param xlab TODO
+#' @param title TODO
+#' @param rug TODO
+#' @param rug_n TODO
+#' @param x_max TODO as -fold of L or A95.
+#'
+#' @importFrom stats binomial plogis predict
+#' @export
+#' @family plotting functions
+#' @rdname plot_mat_ogive
+
+plot_mat_ogive <- function(object,
+  xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
+  title =
+    if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
+  rug = TRUE, run_n = 1500, x_max = 1.5) {
+
+  nd_re <- object$pred_data
+
+  if (object$sample_id_re)
+    b <- glmmTMB::fixef(object$model)[[1L]]
+  else
+    b <- stats::coef(object$model)
+
+  nd_fe <- filter(nd_re, sample_id == nd_re$sample_id[[1L]]) # fake; all same
+  nd_fe$glmm_re <- NULL # also may not exist if no random effects
 
   logit_perc <- function(a, b, perc = 0.5) {
     - (log ( (1 / perc) - 1) + a) / b
@@ -89,35 +135,39 @@ plot_mat_ogive <- function(dat, type = "age") {
   f_perc$p0.05 <- logit_perc(
     a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.05)
 
-  labs <- tibble(p = c("05", "50", "95"),
+  labs_m <- tibble(p = c("05", "50", "95"),
     value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
-    x = 0.75 * max(age_or_length),
+    x = 0.75 * max(nd_re$age_or_length),
     y = seq(0.4, 0.1, length.out = 3), sex = "M")
 
   labs_f <- tibble(p = c("05", "50", "95"),
     value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
-    x = 0.75 * max(age_or_length),
+    x = 0.75 * max(nd_re$age_or_length),
     y = seq(0.9, 0.6, length.out = 3L), sex = "F")
 
-  labs <- bind_rows(labs, labs_f)
+  labs <- bind_rows(labs_m, labs_f)
 
-  nd_fe <- mutate(nd_fe, sex = ifelse(female == 1, "F", "M"))
-  nd <- mutate(nd, sex = ifelse(female == 1, "F", "M"))
+  nd_fe <- mutate(nd_fe, sex = ifelse(female == 1L, "F", "M"))
+  nd_re <- mutate(nd_re, sex = ifelse(female == 1L, "F", "M"))
+  object$data <- mutate(object$data, sex = ifelse(female == 1L, "F", "M"))
 
   labs <- mutate(labs, label =
-      paste0(sex, ' ', p, ' = ', sprintf('%.1f', round(value, 1)), 'y'))
-  max_x <- min(c(max(labs$value) * 2, max(nd_fe$age_or_length)))
+      paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "y"))
+  max_x <- min(c(max(labs$value) * x_max, max(nd_fe$age_or_length)))
   labs <- mutate(labs, x = max_x * 0.75)
 
-  ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex")) +
-    geom_line(data = nd,
-      aes_string("age_or_length", "glmm", group = "paste(sample_id, sex)",
-        colour = "sex"), inherit.aes = FALSE, alpha = 0.05) +
-    geom_vline(data = labs, aes_string(xintercept = "value", colour = "sex"),
-      lty = 2, show.legend = FALSE) +
+  g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex"))
+  if ("glmm_re" %in% names(nd_re)) {
+    g <- g + geom_line(data = nd_re,
+      aes_string("age_or_length", "glmm_re", group = "paste(sample_id, sex)",
+        colour = "sex"), inherit.aes = FALSE, alpha = 0.05)
+  }
+  g <- g + geom_vline(data = labs,
+    aes_string(xintercept = "value", colour = "sex"),
+    lty = 2, show.legend = FALSE) +
     geom_line(size = 1.25) +
     scale_colour_manual(values = c("M" = "grey20", "F" = "red")) +
-    xlab("Age (years)") + ylab("Probability mature") +
+    xlab(xlab) + ylab("Probability mature") +
     geom_text(data = labs, aes_string(x = "x", y = "y",
       label = "label"),
       hjust = 0, show.legend = FALSE) +
@@ -125,5 +175,19 @@ plot_mat_ogive <- function(dat, type = "age") {
     coord_cartesian(expand = FALSE, ylim = c(-0.005, 1.005),
       xlim = c(0, max_x)) +
     labs(colour = "Sex") +
-    ggplot2::ggtitle("Age at maturity")
+    ggplot2::ggtitle(title)
+
+  if (rug) {
+    temp <- object$data[sample(seq_len(nrow(object$data)), run_n),
+      , drop = FALSE]
+    position <- if (object$type == "age") "jitter" else "identity"
+    g <- g + ggplot2::geom_rug(data = filter(temp, mature == 0L),
+      sides = "b", position = position,
+      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex"))
+    g <- g + ggplot2::geom_rug(data = filter(temp, mature == 1L),
+      sides = "t", position = position,
+      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex"))
+  }
+
+  g
 }
