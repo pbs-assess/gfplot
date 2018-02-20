@@ -38,25 +38,21 @@ get_ssids <- function() {
 }
 
 get_sample_trips <- function() {
-  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+  run_sql("GFBioSQL",
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
-  names(x) <- tolower(names(x))
-  as_tibble(x)
 }
 
 get_strata_areas <- function() {
-  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+  run_sql("GFBioSQL",
     "SELECT SG.SURVEY_ID,
     SG.GROUPING_CODE,
     G.AREA_KM2
     FROM SURVEY_GROUPING SG
     INNER JOIN GROUPING G ON
     SG.GROUPING_CODE = G.GROUPING_CODE")
-  names(x) <- tolower(names(x))
-  as_tibble(x)
 }
 
-get_spp_lookup <- function() {
+get_survey_ids <- function(ssid) {
   .q <- paste(
     "SELECT S.SURVEY_ID,
     SS.SURVEY_SERIES_ID,
@@ -65,8 +61,7 @@ get_spp_lookup <- function() {
     INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
     SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
     WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
-  species <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
-  as_tibble(species)
+  run_sql("GFBioSQL", .q)
 }
 
 #' @export
@@ -74,19 +69,10 @@ get_spp_lookup <- function() {
 get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
-  species <- get_spp_lookup()
+  species_df <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
   sample_trip_ids <- get_sample_trips()
   areas <- get_strata_areas()
-
-  .q <- paste(
-    "SELECT S.SURVEY_ID,
-    SS.SURVEY_SERIES_ID,
-    SS.SURVEY_SERIES_DESC
-    FROM SURVEY S
-    INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
-    SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
-    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
-  survey_ids <- run_sql("GFBioSQL", .q)
+  survey_ids <- get_survey_ids(ssid)
 
   d_survs <- list()
   k <- 0
@@ -106,7 +92,7 @@ get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
       SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
 
   .d <- inner_join(.d,
-    unique(select(species,
+    unique(select(species_df,
       SPECIES_CODE,
       SPECIES_COMMON_NAME,
       SPECIES_SCIENCE_NAME,
@@ -147,19 +133,19 @@ get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d <- as_tibble(.d)
 
   warning("Duplicate specimen IDs may still be present. ",
-      "Filter them yourself after selecting specific surveys. ",
-      "For example, `dat <- dat[!duplicated(dat$specimen_id), ]`")
+    "Filter them yourself after selecting specific surveys. ",
+    "For example, `dat <- dat[!duplicated(dat$specimen_id), ]`")
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
-    .d$species_common_name == "north pacific spiny dogfish"), ]
+        .d$species_common_name == "north pacific spiny dogfish"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "big skate"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "longnose skate"), ]
     .d <- .d[!(.d$length > 60 & .d$species_common_name == "pacific tomcod"), ]
     .d <- .d[!(.d$length > 50 &
         .d$species_common_name == "quillback-rockfish"), ]
     .d <- .d[!(.d$length < 10 & .d$weight / 1000 > 1.0 &
-      .d$species_common_name == "pacific flatnose"), ]
+        .d$species_common_name == "pacific flatnose"), ]
   }
 
 }
