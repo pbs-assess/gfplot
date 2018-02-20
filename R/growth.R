@@ -52,6 +52,7 @@ fit_vb <- function(dat,
   allow_slow_mcmc = FALSE,
   est_method = median,
   min_samples = 50L,
+  ageing_method = c(3, 17),
   ...) {
 
   if ("species_common_name" %in% names(dat))
@@ -60,6 +61,7 @@ fit_vb <- function(dat,
         "fit_vb() is for use with a single species. Filter the data yourself ",
         "first.", call. = FALSE)
 
+  dat <- filter(dat, .data$ageing_method %in% ageing_method)
   dat <- dat[!duplicated(dat), , drop = FALSE]
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
 
@@ -305,7 +307,8 @@ plot_growth <- function(object_female, object_male,
 #' @export
 #' @rdname plot_growth
 plot_vb <- function(..., type = "vb") {
-  plot_growth(..., type = type)
+  plot_growth(..., type = type) +
+    ggplot2::ggtitle("Growth")
 }
 
 #' @inheritParams plot_vb
@@ -315,7 +318,8 @@ plot_vb <- function(..., type = "vb") {
 plot_length_wt <- function(..., type = "length-weight", xlab = "Length (cm)",
     ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.25) {
   plot_growth(..., type = type, xlab = xlab,
-    ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap)
+    ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap) +
+    ggplot2::ggtitle("Length-weight")
 }
 
 # annotation helpers:

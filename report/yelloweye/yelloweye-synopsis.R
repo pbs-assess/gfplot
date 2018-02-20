@@ -11,10 +11,12 @@ d_surv_samples <- readRDS(file.path(cache, "pbs-surv-samples.rds"))
 d_comm_samples <- readRDS(file.path(cache, "pbs-comm-samples.rds"))
 d_catch <- readRDS(file.path(cache, "pbs-catch.rds"))
 d_cpue_spatial <- readRDS(file.path(cache, "pbs-cpue-spatial.rds"))
+d_cpue_spatial_ll <- readRDS(file.path(cache, "pbs-cpue-spatial-ll.rds"))
 d_surv_index <- readRDS(file.path(cache, "pbs-surv-index.rds"))
 d_age_precision <- readRDS(file.path(cache, "pbs-age-precision.rds"))
 
 library(ggplot2)
+library(dplyr)
 
 g <- tidy_ages_raw(d_surv_samples) %>%
   plot_ages()
@@ -37,7 +39,6 @@ g <- tidy_surv_index(d_surv_index) %>%
   plot_surv_index()
 ggsave(file.path(figs, "surv-index.pdf"), width = 5, height = 5)
 
-# None:
 g <- tidy_samp_avail(d_comm_samples) %>%
   plot_samp_avail(title = "Commercial samples", year_range = c(1994, 2017))
 ggsave(file.path(figs, "comm-samp-avail.pdf"), width = 6, height = 2)
@@ -56,27 +57,34 @@ lw_f <- fit_length_wt(d_surv_samples, sex = "female", method = "rlm")
 g <- plot_length_wt(object_female = lw_m, object_male = lw_f)
 ggsave(file.path(figs, "length-wt.pdf"), width = 6, height = 4)
 
-mat_age <- fit_mat_ogive(d_surv_samples,
-  months = seq(1, 12),
-  ageing_method = c(3, 17),
-  type = "age")
+mat_age <- d_surv_samples %>%
+  fit_mat_ogive(
+    type = "age",
+    months = seq(4, 6),
+    ageing_method = c(3, 17))
 g <- plot_mat_ogive(mat_age)
 ggsave(file.path(figs, "age-mat-ogive.pdf"), width = 6, height = 4)
 
-mat_length <- fit_mat_ogive(d_surv_samples,
-  months = seq(1, 12),
-  ageing_method = c(3, 17),
-  type = "length")
+mat_length <- d_surv_samples %>%
+  fit_mat_ogive(
+    type = "length",
+    months = seq(4, 6),
+    ageing_method = c(3, 17))
 g <- plot_mat_ogive(mat_length)
 ggsave(file.path(figs, "length-mat-ogive.pdf"), width = 6, height = 4)
 
 g <- dplyr::filter(d_cpue_spatial, year >= 2012) %>%
-  plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3)
-ggsave(file.path(figs, "cpue-spatial.pdf"), width = 8, height = 8)
+  plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3) +
+  ggtitle("Trawl CPUE") +
+  labs(subtitle = "Since 2012; including discards")
+ggsave(file.path(figs, "cpue-spatial.pdf"), width = 6, height = 4.75)
 
-g <- dplyr::filter(d_cpue_spatial, year >= 2008) %>%
-  plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3)
-ggsave(file.path(figs, "cpue-spatial.pdf"), width = 8, height = 8)
+g <- filter(d_cpue_spatial_ll, year >= 2008) %>%
+  plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3,
+    fill_lab = "CPUE (kg/FE)") +
+  ggtitle("Hook and line CPUE") +
+  labs(subtitle = "Since 2008; excluding discards")
+ggsave(file.path(figs, "cpue-spatial-ll.pdf"), width = 6, height = 4.75)
 
 # ## Will come back to:
 # m_wcvi <- fit_surv_tows(d_surv_tows,

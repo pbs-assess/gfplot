@@ -103,7 +103,7 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
 
   g <- g + geom_polygon(data = coastline_utm,
       aes_string(x = "X", y = "Y", group = "PID"),
-      inherit.aes = FALSE, lwd = 0.3, fill = "grey90", col = "grey70") +
+      inherit.aes = FALSE, lwd = 0.2, fill = "grey90", col = "grey70") +
     coord_equal(xlim = xlim, ylim = ylim) +
     theme_pbs() + labs(fill = fill_lab, y = "Northing", x = "Easting")
 

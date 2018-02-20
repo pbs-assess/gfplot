@@ -183,8 +183,11 @@ plot_mat_ogive <- function(object,
     ggplot2::ggtitle(title)
 
   if (rug) {
-    temp <- object$data[sample(seq_len(nrow(object$data)), run_n),
-      , drop = FALSE]
+    if (nrow(object$data) > run_n)
+      temp <- object$data[sample(seq_len(nrow(object$data)), run_n),
+        , drop = FALSE]
+    else
+      temp <- object$data
     position <- if (object$type == "age") "jitter" else "identity"
     g <- g + ggplot2::geom_rug(data = filter(temp, mature == 0L),
       sides = "b", position = position,
