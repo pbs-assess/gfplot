@@ -64,13 +64,11 @@ should contain these columns and only these columns.
 \examples{
 \dontrun{
 species <- "pacific ocean perch"
-survey <- "Queen Charlotte Sound Synoptic Survey"
 
 ## Surveys:
-survey_samples <- get_surv_samples(species) \%>\%
-  dplyr::filter(survey_series_desc == survey)
-survey_tows <- get_survey(species) \%>\%
-  dplyr::filter(survey_series_desc == survey)
+## ssid = 1 is Queen Charlotte Sound Synoptic Survey:
+survey_samples <- get_surv_samples(species, ssid = 1)
+survey_tows <- get_surv_tows(species, ssid = 1)
 
 surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
   value = length, bin_size = 2)
@@ -82,7 +80,7 @@ surv_ages
 weight_comps(surv_ages)
 
 ## Commercial:
-com_samples <- get_commsamples(species)
+com_samples <- get_comm_samples(species)
 com_catch <- get_catch(species)
 
 com_lengths <- tidy_comps_commercial(com_samples, com_catch,

@@ -2,8 +2,7 @@
 % Please edit documentation in R/get-dat.R
 \name{get}
 \alias{get}
-\alias{get_sample_trips}
-\alias{get_strata}
+\alias{get_ssids}
 \alias{get_surv_tows}
 \alias{get_surv_samples}
 \alias{get_comm_samples}
@@ -16,9 +15,7 @@
 \alias{cache_pbs_data}
 \title{Get PBS data}
 \usage{
-get_sample_trips()
-
-get_strata()
+get_ssids()
 
 get_surv_tows(species, ssid = c(1, 3, 4, 16))
 
@@ -41,9 +38,16 @@ get_sara_dat()
 cache_pbs_data(species, path = "data-cache")
 }
 \arguments{
-\item{species}{A character vector of species common names}
+\item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
+specified as numeric vectors \code{c(396, 442}) or characters \code{c("396", "442")}.
+Numeric values shorter than 3 digits will be expanded to 3 digits and
+converted to character objects (\code{1} turns into \code{"001}). Species common
+names and species codes should not be mixed. If any element is missing a
+species code, then all elements will be assumed to be species, common
+names.}
 
-\item{ssid}{TODO}
+\item{ssid}{A numeric vector of survey series IDs. Run \code{get_ssids()} if you
+want to look up a survey series ID via a surveys series description.}
 
 \item{remove_bad_data}{Remove known bad data?}
 
@@ -53,7 +57,7 @@ cache_pbs_data(species, path = "data-cache")
 
 \item{path}{The folder where the cached data will be saved}
 
-\item{survey_codes}{A numeric vector of survey series IDs}
+\item{ssid}{TODO}
 }
 \description{
 Long description here
