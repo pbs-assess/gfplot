@@ -84,7 +84,7 @@ is_windows <- function() {
 }
 
 is_dfo <- function() {
-  grepl("dfo-mpo", Sys.info()[["nodename"]])
+  grepl("PBS", Sys.info()[["nodename"]])
 }
 
 #' Is this a DFO Windows computer?

@@ -170,7 +170,6 @@ get_comm_samples <- function(species) {
 #' @export
 #' @rdname get
 get_catch <- function(species) {
-  species <- common2codes(species)
   .q <- read_sql("get-catch.sql")
   .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
@@ -184,7 +183,6 @@ get_catch <- function(species) {
 #' @export
 #' @rdname get
 get_cpue_spatial <- function(species) {
-  species <- common2codes(species)
   .q <- read_sql("get-cpue-spatial.sql")
   .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
@@ -223,7 +221,6 @@ get_age_precision <- function(species) {
 #' @export
 #' @rdname get
 get_surv_index <- function(species, ssid = NULL) {
-  species <- common2codes(species)
   .q <- read_sql("get-surv-index.sql")
   .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, .q)
   if (!is.null(ssid))
