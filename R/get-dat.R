@@ -37,7 +37,6 @@ get_ssids <- function() {
   as_tibble(.d)
 }
 
-#' @rdname get
 get_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
@@ -45,8 +44,7 @@ get_sample_trips <- function() {
   as_tibble(x)
 }
 
-#' @rdname get
-get_strata <- function() {
+get_strata_areas <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT SG.SURVEY_ID,
     SG.GROUPING_CODE,
@@ -58,21 +56,28 @@ get_strata <- function() {
   as_tibble(x)
 }
 
+get_spp_lookup <- function() {
+  .q <- paste(
+    "SELECT S.SURVEY_ID,
+    SS.SURVEY_SERIES_ID,
+    SS.SURVEY_SERIES_DESC
+    FROM SURVEY S
+    INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
+    SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
+    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
+  species <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
+  as_tibble(species)
+}
+
 #' @export
 #' @rdname get
 get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
-  .q <- paste(
-    "SELECT S.SURVEY_ID,
-      SS.SURVEY_SERIES_ID,
-      SS.SURVEY_SERIES_DESC
-    FROM SURVEY S
-    INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
-      SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
-    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
 
-  species <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
+  species <- get_spp_lookup()
+  sample_trip_ids <- get_sample_trips()
+  areas <- get_strata_areas()
 
   survey_ids <- run_sql("GFBioSQL", .q)
   d_survs <- list()
@@ -85,23 +90,30 @@ get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
           species_codes[i], "'"))
     }
   }
-  .d <- dplyr::bind_rows(d_survs)
-  .d <- dplyr::inner_join(.d,
-    unique(dplyr::select(survey_ids,
+  .d <- bind_rows(d_survs)
+
+  .d <- inner_join(.d,
+    unique(select(survey_ids,
       SURVEY_SERIES_ID,
       SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
-  .d <- dplyr::inner_join(.d,
+
+  .d <- inner_join(.d,
     unique(select(species,
       SPECIES_CODE,
       SPECIES_COMMON_NAME,
       SPECIES_SCIENCE_NAME,
       SPECIES_DESC)), by = "SPECIES_CODE")
+
+  .d <- left_join(.d, sample_trip_ids, by = "FISHING_EVENT_ID") %>%
+    left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
+
   names(.d) <- tolower(names(.d))
-  stopifnot(all(species_codes %in% .d$species_code))
   .d <- mutate(.d,
     species_science_name = tolower(species_science_name),
     species_desc = tolower(species_desc),
     species_common_name = tolower(species_common_name))
+
+  stopifnot(all(species_codes %in% .d$species_code))
   as_tibble(.d)
 }
 

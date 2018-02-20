@@ -157,16 +157,9 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
   if (!is.null(bin_size))
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
 
-  # TODO: Elise: can you add trip IDs and stratum areas to SQL call please?
-  # This is a temporary hack:
-  sample_trip_ids <- PBSsynopsis::sample_trip_ids
-  areas <- PBSsynopsis::strata_areas
-
   strat_dat <- survey_tows %>%
-    left_join(sample_trip_ids, by = "fishing_event_id") %>%
     select(year, survey_id, fishing_event_id, sample_id, grouping_code,
-      density_kgpm2)
-  strat_dat <- left_join(strat_dat, areas, by = c("survey_id", "grouping_code"))
+      density_kgpm2, area_km2)
 
   raw_comp <- specimen_dat %>%
     select(year, sample_id, !!value, weight, grouping_code) %>%
