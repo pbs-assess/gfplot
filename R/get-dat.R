@@ -132,9 +132,12 @@ get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d <- inner_join(.d, surveys, by = "survey_series_id")
   .d <- as_tibble(.d)
 
-  warning("Duplicate specimen IDs may still be present. ",
-    "Filter them yourself after selecting specific surveys. ",
-    "For example, `dat <- dat[!duplicated(dat$specimen_id), ]`")
+  if (length(.d$specimen_id) > length(unique(.d$specimen_id)))
+    warning("Duplicate specimen IDs are present because of overlapping survey ",
+      "stratifications. If working with the data yourelf, filter them after ",
+      "selecting specific surveys. For example, ",
+      "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
+      "Tidying and plotting functions with PBSsynopsis will do this for you.")
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
