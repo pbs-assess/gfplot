@@ -35,7 +35,7 @@ d$n[10] <- 0 # example zero
 plot_samples(d)
 
 \dontrun{
-d <- get_survsamples("lingcod")
+d <- get_surv_samples("lingcod")
 d <- tidy_samples(d, year_range = c(1996, 2016))
 plot_samples(d, year_range = c(1996, 2016),
   title = "Survey samples")

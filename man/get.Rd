@@ -4,14 +4,14 @@
 \alias{get}
 \alias{get_sample_trips}
 \alias{get_strata}
-\alias{get_survey}
+\alias{get_surv_tows}
 \alias{get_surv_samples}
-\alias{get_commsamples}
+\alias{get_comm_samples}
 \alias{get_catch}
-\alias{get_cpue}
+\alias{get_cpue_spatial}
 \alias{get_cpue_index}
 \alias{get_age_precision}
-\alias{get_bioindex}
+\alias{get_surv_index}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
 \title{Get PBS data}
@@ -20,21 +20,21 @@ get_sample_trips()
 
 get_strata()
 
-get_survey(species, survey_codes = c(1, 3, 4, 16))
+get_surv_tows(species, ssid = c(1, 3, 4, 16))
 
-get_surv_samples(species, remove_bad_data = TRUE)
+get_surv_samples(species, ssid = NULL, remove_bad_data = TRUE)
 
-get_commsamples(species)
+get_comm_samples(species)
 
 get_catch(species)
 
-get_cpue(species)
+get_cpue_spatial(species)
 
 get_cpue_index(gear = "bottom trawl", min_year = 1996)
 
 get_age_precision(species)
 
-get_bioindex(species)
+get_surv_index(species, ssid = NULL)
 
 get_sara_dat()
 
@@ -43,7 +43,7 @@ cache_pbs_data(species, path = "data-cache")
 \arguments{
 \item{species}{A character vector of species common names}
 
-\item{survey_codes}{A numeric vector of survey series IDs}
+\item{ssid}{TODO}
 
 \item{remove_bad_data}{Remove known bad data?}
 
@@ -52,21 +52,23 @@ cache_pbs_data(species, path = "data-cache")
 \item{min_year}{Minimum year to return.}
 
 \item{path}{The folder where the cached data will be saved}
+
+\item{survey_codes}{A numeric vector of survey series IDs}
 }
 \description{
 Long description here
 }
 \details{
 \itemize{
-\item \code{get_survey()} does...
+\item \code{get_surv_tows()} does...
 \item \code{get_surv_samples()} does...
-\item \code{get_commsamples()} does...
+\item \code{get_comm_samples()} does...
 \item \code{get_catch()} does...
-\item \code{get_cpue()} does...
+\item \code{get_cpue_spatial()} does...
 \item \code{get_cpue_index()} does...
 \item \code{get_age_precision()} does...
 \item \code{get_sara_dat()} does...
-\item \code{get_bioindex()} does...
+\item \code{get_surv_index()} does...
 \item \code{cache_pbs_data()} does...
 }
 }

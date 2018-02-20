@@ -7,7 +7,7 @@
 tidy_samples(dat, year_range = NULL)
 }
 \arguments{
-\item{dat}{Input data frame from \code{\link{get_survsamples}}.}
+\item{dat}{Input data frame from \code{\link{get_surv_samples}}.}
 
 \item{year_range}{Either \code{NULL}, in which case all years are returned,
 or a numeric vector of length two giving the lower and upper years to
@@ -18,7 +18,7 @@ Tidy PBS samples data for \code{\link{plot_samples}}
 }
 \examples{
 \dontrun{
-d <- get_survsamples("lingcod")
+d <- get_surv_samples("lingcod")
 tidy_samples(d)
 
 d <- get_commsamples("lingcod")

@@ -20,7 +20,7 @@ plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_lengths()} should be from
-\code{\link[=get_survsamples]{get_survsamples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_lengths()} should
+\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_lengths()} should
 be from \code{tidy_length()} or formatted similarly. See details TODO.}
 
 \item{n_bins}{Number of length bins (only used if \code{bin_size = NULL}).}

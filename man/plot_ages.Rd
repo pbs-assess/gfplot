@@ -28,7 +28,7 @@ for the commercial samples. Defaults to \code{1}, which refers to unsorted
 samples.}
 
 \item{dat}{Input data frame. For \code{tidy_ages()} should be from
-\code{\link[=get_survsamples]{get_survsamples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
+\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
 be from \code{tidy_ages()} or be formatted similarly. See details.}
 
 \item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
@@ -59,11 +59,11 @@ have the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"} an
 }
 \examples{
 \dontrun{
-d <- get_survsamples("lingcod")
+d <- get_surv_samples("lingcod")
 tidy_ages(d)
 plot_ages(d)
 
-d <- get_survsamples("canary rockfish")
+d <- get_surv_samples("canary rockfish")
 tidy_ages(d) \%>\%
   plot_ages()
 }

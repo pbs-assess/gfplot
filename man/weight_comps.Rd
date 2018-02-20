@@ -14,7 +14,7 @@ weight_comps(dat)
 }
 \arguments{
 \item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commsamples]{get_commsamples()}} for
-commercial data or \code{\link[=get_survsamples]{get_survsamples()}} for survey data.}
+commercial data or \code{\link[=get_surv_samples]{get_surv_samples()}} for survey data.}
 
 \item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
 
@@ -61,7 +61,7 @@ species <- "pacific ocean perch"
 survey <- "Queen Charlotte Sound Synoptic Survey"
 
 ## Surveys:
-survey_samples <- get_survsamples(species) \%>\%
+survey_samples <- get_surv_samples(species) \%>\%
   dplyr::filter(survey_series_desc == survey)
 survey_tows <- get_survey(species) \%>\%
   dplyr::filter(survey_series_desc == survey)

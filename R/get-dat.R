@@ -3,15 +3,15 @@
 #' Long description here
 #'
 #' @details
-#' * `get_survey()` does...
+#' * `get_surv_tows()` does...
 #' * `get_surv_samples()` does...
-#' * `get_commsamples()` does...
+#' * `get_comm_samples()` does...
 #' * `get_catch()` does...
-#' * `get_cpue()` does...
+#' * `get_cpue_spatial()` does...
 #' * `get_cpue_index()` does...
 #' * `get_age_precision()` does...
 #' * `get_sara_dat()` does...
-#' * `get_bioindex()` does...
+#' * `get_surv_index()` does...
 #' * `cache_pbs_data()` does...
 #'
 #' @param species A character vector of species common names
@@ -19,7 +19,6 @@
 #' @name get
 NULL
 
-#' @export
 #' @rdname get
 get_sample_trips <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -28,7 +27,6 @@ get_sample_trips <- function() {
   as_tibble(x)
 }
 
-#' @export
 #' @rdname get
 get_strata <- function() {
   x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
@@ -44,22 +42,21 @@ get_strata <- function() {
 
 #' @export
 #' @rdname get
-get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
+get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
-  sql <- paste(
+  .q <- paste(
     "SELECT S.SURVEY_ID,
       SS.SURVEY_SERIES_ID,
       SS.SURVEY_SERIES_DESC
     FROM SURVEY S
     INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
       SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
-    WHERE S.SURVEY_SERIES_ID IN (", paste(survey_codes, collapse = ", "), ")")
+    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
 
-  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT * FROM SPECIES")
+  species <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
 
-  survey_ids <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
+  survey_ids <- run_sql("GFBioSQL", .q)
   d_survs <- list()
   k <- 0
   for (i in seq_along(species_codes)) {
@@ -70,42 +67,41 @@ get_survey <- function(species, survey_codes = c(1, 3, 4, 16)) {
           species_codes[i], "'"))
     }
   }
-  x <- dplyr::bind_rows(d_survs)
-  x <- dplyr::inner_join(x,
+  .d <- dplyr::bind_rows(d_survs)
+  .d <- dplyr::inner_join(.d,
     unique(dplyr::select(survey_ids,
       SURVEY_SERIES_ID,
       SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
-  x <- dplyr::inner_join(x,
+  .d <- dplyr::inner_join(.d,
     unique(select(species,
       SPECIES_CODE,
       SPECIES_COMMON_NAME,
       SPECIES_SCIENCE_NAME,
       SPECIES_DESC)), by = "SPECIES_CODE")
-  names(x) <- tolower(names(x))
-  stopifnot(all(species_codes %in% x$species_code))
-  x <- mutate(x,
+  names(.d) <- tolower(names(.d))
+  stopifnot(all(species_codes %in% .d$species_code))
+  .d <- mutate(.d,
     species_science_name = tolower(species_science_name),
     species_desc = tolower(species_desc),
     species_common_name = tolower(species_common_name))
-  as_tibble(x)
+  as_tibble(.d)
 }
 
 #' @export
 #' @rdname get
 #' @param ssid TODO
 #' @param remove_bad_data Remove known bad data?
-get_surv_samples <- function(species, ssid, remove_bad_data = TRUE) {
-  .q <- read_sql("get-survey-biology.sql")
-  .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q,
-    collapse = FALSE)
-  .q <- inject_survey_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q)
-  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), .q)
+get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
+  .q <- read_sql("get-surv-samples.sql")
+  .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
+  if (!is.null(ssid))
+    .q <- inject_survey_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q)
+  .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-  surveys <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT * FROM SURVEY_SERIES")
+  surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
   surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(surveys) <- tolower(names(surveys))
 
@@ -118,12 +114,13 @@ get_surv_samples <- function(species, ssid, remove_bad_data = TRUE) {
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
-      .d$species_common_name == "north pacific spiny dogfish"), ]
+    .d$species_common_name == "north pacific spiny dogfish"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "big skate"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "longnose skate"), ]
     .d <- .d[!(.d$length > 60 & .d$species_common_name == "pacific tomcod"), ]
-    .d <- .d[!(.d$length > 50 & .d$species_common_name == "quillback-rockfish"), ]
-    .d <- .d[!(.d$length < 10 & .d$weight/1000 > 1.0 &
+    .d <- .d[!(.d$length > 50 &
+        .d$species_common_name == "quillback-rockfish"), ]
+    .d <- .d[!(.d$length < 10 & .d$weight / 1000 > 1.0 &
       .d$species_common_name == "pacific flatnose"), ]
   }
 
@@ -131,53 +128,45 @@ get_surv_samples <- function(species, ssid, remove_bad_data = TRUE) {
 
 #' @export
 #' @rdname get
-get_commsamples <- function(species) {
-  q <- read_sql("get-commercial-biology.sql")
-  q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = q)
-  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
-  names(x) <- tolower(names(x))
-  x$species_common_name <- tolower(x$species_common_name)
-  x$species_science_name <- tolower(x$species_science_name)
-  x <- mutate(x, year = lubridate::year(trip_start_date))
-  assertthat::assert_that(sum(duplicated(x$specimen_id)) == 0)
-  as_tibble(x)
+get_comm_samples <- function(species) {
+  .q <- read_sql("get-comm-samples.sql")
+  .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_science_name <- tolower(.d$species_science_name)
+  .d <- mutate(.d, year = lubridate::year(trip_start_date))
+  assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
+  as_tibble(.d)
 }
 
 #' @export
 #' @rdname get
 get_catch <- function(species) {
   species <- common2codes(species)
-  q <- read_sql("get-landings.sql")
-  i <- grep("ORDER BY BEST", q) - 1
-  q <- c(q[seq(1, i)],
-    paste("WHERE SP.SPECIES_CODE IN (", collapse_filters(species), ")"),
-    q[seq(i + 1, length(q))])
-  landings_sql <- paste(q, collapse = "\n")
-  d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), landings_sql)
-  names(d) <- tolower(names(d))
-  d$species_common_name <- tolower(d$species_common_name)
-  d$species_scientific_name <- tolower(d$species_scientific_name)
-  d$year <- lubridate::year(d$best_date)
-  as_tibble(d)
+  .q <- read_sql("get-catch.sql")
+  .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFFOS", .q)
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_scientific_name <- tolower(.d$species_scientific_name)
+  .d$year <- lubridate::year(.d$best_date)
+  as_tibble(.d)
 }
 
 #' @export
 #' @rdname get
-get_cpue <- function(species) {
+get_cpue_spatial <- function(species) {
   species <- common2codes(species)
-  q <- read_sql("get-cpue.sql")
-  i <- grep("ORDER BY YEAR", q) - 1
-  q <- c(q[seq(1, i)],
-    paste("AND SP.SPECIES_CODE IN (", collapse_filters(species), ")"),
-    q[seq(i + 1, length(q))])
-  sql <- paste(q, collapse = "\n")
-  d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
-  d$SPECIES_COMMON_NAME[d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+  .q <- read_sql("get-cpue-spatial.sql")
+  .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFFOS", .q)
+  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
-  names(d) <- tolower(names(d))
-  d$species_common_name <- tolower(d$species_common_name)
-  d$species_scientific_name <- tolower(d$species_scientific_name)
-  as_tibble(d)
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_scientific_name <- tolower(.d$species_scientific_name)
+  as_tibble(.d)
 }
 
 #' @param gear The gear type(s) to include. Will be converted to uppercase.
@@ -185,42 +174,38 @@ get_cpue <- function(species) {
 #' @export
 #' @rdname get
 get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
-  q <- read_sql("get-all-merged-catch.sql")
-  i <- grep("-- insert filters here", q)
-  # TODO allow for multiple gear types?
-  q[i] <- paste0("GEAR IN(", collapse_filters(toupper(gear)),
+  .q <- read_sql("get-cpue-index.sql")
+  i <- grep("-- insert filters here", .q)
+  .q[i] <- paste0("GEAR IN(", collapse_filters(toupper(gear)),
     ") AND YEAR(BEST_DATE) >= ", min_year, " AND")
-  sql <- paste(q, collapse = "\n")
-  d <- DBI::dbGetQuery(db_connection(database = "GFFOS"), sql)
-  names(d) <- tolower(names(d))
-  as_tibble(d)
+  .d <- run_sql("GFFOS", .q)
+  names(.d) <- tolower(names(.d))
+  as_tibble(.d)
 }
 
 #' @export
 #' @rdname get
 get_age_precision <- function(species) {
-  q <- read_sql("ageing-precision.sql")
-  q <- inject_species_filter("AND C.SPECIES_CODE IN", species, q)
-  x <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), q)
-  names(x) <- tolower(names(x))
-  as_tibble(x)
+  .q <- read_sql("get-age-precision.sql")
+  .q <- inject_species_filter("AND C.SPECIES_CODE IN", species, .q)
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  as_tibble(.d)
 }
 
 #' @export
 #' @rdname get
-get_bioindex <- function(species) {
+get_surv_index <- function(species, ssid = NULL) {
   species <- common2codes(species)
-  q <- read_sql("get-survey-boot.sql")
-  i <- grep("ORDER BY BH.SURVEY_YEAR", q) - 1
-  q <- c(q[seq(1, i)],
-    paste("WHERE SP.SPECIES_CODE IN (", collapse_filters(species), ")"),
-    q[seq(i + 1, length(q))])
-  sql <- paste(q, collapse = "\n")
-  d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"), sql)
-  names(d) <- tolower(names(d))
-  d$species_common_name <- tolower(d$species_common_name)
-  d$species_science_name <- tolower(d$species_science_name)
-  as_tibble(d)
+  .q <- read_sql("get-surv-index.sql")
+  .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, .q)
+  if (!is.null(ssid))
+    .q <- inject_survey_filter("WHERE BD.SURVEY_SERIES_ID IN", ssid, .q)
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_science_name <- tolower(.d$species_science_name)
+  as_tibble(.d)
 }
 
 #' @export
@@ -247,30 +232,24 @@ get_sara_dat <- function() {
 cache_pbs_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_survey(species)
-  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
+  d_survs_df <- get_surv_tows(species)
+  saveRDS(d_survs_df, file = file.path(path, "pbs-surv-tows.rds"))
 
   d <- get_surv_samples(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-specimens.rds"))
+  saveRDS(d, file = file.path(path, "pbs-surv-samples.rds"))
 
-  d <- get_commsamples(species)
-  saveRDS(d, file = file.path(path, "pbs-commercial-specimens.rds"))
+  d <- get_comm_samples(species)
+  saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"))
 
   d <- get_catch(species)
   saveRDS(d, file = file.path(path, "pbs-catch.rds"))
 
-  d <- get_cpue(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue.rds"))
+  d <- get_cpue_spatial(species)
+  saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"))
 
-  d <- get_bioindex(species)
-  saveRDS(d, file = file.path(path, "pbs-bioindex.rds"))
-
-  d <- get_sample_trips()
-  saveRDS(d, file = file.path(path, "pbs-sample-trips.rds"))
-
-  d <- get_strata()
-  saveRDS(d, file = file.path(path, "pbs-strata.rds"))
+  d <- get_surv_index(species)
+  saveRDS(d, file = file.path(path, "pbs-survindex.rds"))
 
   d <- get_age_precision(species)
-  saveRDS(d, file = file.path(path, "pbs-ageing-precision.rds"))
+  saveRDS(d, file = file.path(path, "pbs-age-precision.rds"))
 }
