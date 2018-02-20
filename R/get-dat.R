@@ -74,12 +74,20 @@ get_spp_lookup <- function() {
 get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
-
   species <- get_spp_lookup()
   sample_trip_ids <- get_sample_trips()
   areas <- get_strata_areas()
 
+  .q <- paste(
+    "SELECT S.SURVEY_ID,
+    SS.SURVEY_SERIES_ID,
+    SS.SURVEY_SERIES_DESC
+    FROM SURVEY S
+    INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
+    SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
+    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
   survey_ids <- run_sql("GFBioSQL", .q)
+
   d_survs <- list()
   k <- 0
   for (i in seq_along(species_codes)) {
