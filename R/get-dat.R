@@ -37,6 +37,15 @@ get_ssids <- function() {
   as_tibble(.d)
 }
 
+get_age_methods <- function() {
+  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT AGEING_METHOD_CODE, AGEING_METHOD_DESC, ROW_VERSION
+    FROM AGEING_METHOD")
+  names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
 get_sample_trips <- function() {
   run_sql("GFBioSQL",
     "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
