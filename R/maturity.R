@@ -1,3 +1,9 @@
+#' @rdname plot_mat_ogive
+#' @export
+fit_mat_ogive <- function() {
+  stop("Not implemented yet.") # TODO
+}
+
 #' TODO
 #'
 #' @param dat TODO
@@ -6,8 +12,9 @@
 #' @importFrom stats binomial plogis predict
 #' @export
 #' @family plotting functions
+#' @rdname plot_mat_ogive
 
-plot_maturity <- function(dat, type = "age") {
+plot_mat_ogive <- function(dat, type = "age") {
 
   dbio <- dat[!duplicated(dat$specimen_id), ] # critical!
   dbio <- dbio %>%

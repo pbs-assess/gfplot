@@ -63,3 +63,19 @@ mround <- function(x, base){
 round_down_even <- function(x, base = 2){
   base * floor(x / base)
 }
+
+is_windows <- function() {
+  identical(.Platform$OS.type, "windows")
+}
+
+is_dfo <- function() {
+  grepl("dfo-mpo", Sys.info()[["nodename"]])
+}
+
+#' Is this a DFO Windows computer?
+#'
+#' @export
+is_dfo_windows <- function() {
+  if (is_windows() & is_dfo()) TRUE else FALSE
+}
+

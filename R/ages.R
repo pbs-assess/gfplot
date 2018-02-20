@@ -5,17 +5,17 @@
 #'
 #' @details
 #'
-#' * `tidy_ages()` Prepares PBS data for `plot_ages()`. Works across one
+#' * `tidy_ages_raw()` Prepares PBS data for `plot_ages()`. Works across one
 #'   or multiple species.
 #' * `plot_ages()` Plots age frequencies for each year for selected
 #'   surveys for a single species. Input data frame should come from
-#'   `tidy_ages()` or follow the following format: The input data frame must
+#'   `tidy_ages_raw()` or follow the following format: The input data frame must
 #'   have the columns (in any order): `year`, `sex` (coded as `"M"` and
 #'   `"F"`), `age`, `survey`, `n_scaled`.
 #'
-#' @param dat Input data frame. For `tidy_ages()` should be from
+#' @param dat Input data frame. For `tidy_ages_raw()` should be from
 #' [get_surv_samples()] and or [get_commsamples()]. For `plot_ages()` should
-#' be from `tidy_ages()` or be formatted similarly. See details.
+#' be from `tidy_ages_raw()` or be formatted similarly. See details.
 #' @param survey_series_desc A character vector of survey series to include.
 #' @param survey A character vector of shorter/cleaner survey names to use in
 #' the same order as `survey_series_desc`. These are used in the plot.
@@ -34,11 +34,11 @@
 #' @examples
 #' \dontrun{
 #' d <- get_surv_samples("lingcod")
-#' tidy_ages(d)
+#' tidy_ages_raw(d)
 #' plot_ages(d)
 #'
 #' d <- get_surv_samples("canary rockfish")
-#' tidy_ages(d) %>%
+#' tidy_ages_raw(d) %>%
 #'   plot_ages()
 #' }
 #'
@@ -48,7 +48,7 @@ NULL
 
 #' @rdname plot_ages
 #' @export
-  tidy_ages <- function(surv_dat = NULL, comm_dat = NULL,
+  tidy_ages_raw <- function(surv_dat = NULL, comm_dat = NULL,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",

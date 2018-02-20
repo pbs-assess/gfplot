@@ -12,7 +12,7 @@ plot_catch(dat, ylab = "Landings", units = c(`1000 tons` = 1e+06, tons =
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_catch()} should be from
-\code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_ages()} or be
+\code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_ages_raw()} or be
 formatted similarly. See details.}
 
 \item{ylab}{Y axis label.}

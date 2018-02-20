@@ -19,7 +19,7 @@ sn <- get_spp_names() %>%
   filter(species_common_name %in% c("pacific ocean perch", "yelloweye rockfish", "pacific cod"))
 
 filter(d_comm_samp, species_common_name == spp) %>%
-  tidy_samples()
+  tidy_samp_avail()
 
 for (i in seq_along(sn$species_common_name)) {
 
@@ -28,12 +28,12 @@ for (i in seq_along(sn$species_common_name)) {
   message(spp)
 
   g <- filter(d_index, species_common_name == spp) %>%
-    tidy_bioindex() %>%
-    plot_bioindex()
-  ggsave(paste0("report/figs/", spp_f, "-bioindex.pdf"), width = 5, height = 5)
+    tidy_surv_index() %>%
+    plot_surv_index()
+  ggsave(paste0("report/figs/", spp_f, "-surv_index.pdf"), width = 5, height = 5)
 
   g <- filter(d_surv_samp, species_common_name == spp) %>%
-    tidy_ages() %>%
+    tidy_ages_raw() %>%
     plot_ages(max_size = 3.7, sex_gap = 0.25, year_range = c(2003, 2016))
   ggsave(paste0("report/figs/", spp_f, "-ages.pdf"), width = 13, height = 5)
 
@@ -48,13 +48,13 @@ for (i in seq_along(sn$species_common_name)) {
   ggsave(paste0("report/figs/", spp_f, "-catch.pdf"), width = 6, height = 2)
 
   g <- filter(d_surv_samp, species_common_name == spp) %>%
-    tidy_samples(year_range = c(1996, 2016)) %>%
-    plot_samples(year_range = c(1996, 2016), title = "Survey samples")
+    tidy_samp_avail(year_range = c(1996, 2016)) %>%
+    plot_samp_avail(year_range = c(1996, 2016), title = "Survey samples")
   ggsave(paste0("report/figs/", spp_f, "-surv-samples.pdf"), width = 6, height = 1.5)
 
   g <- filter(d_comm_samp, species_common_name == spp) %>%
-    tidy_samples(year_range = c(1996, 2016)) %>%
-    plot_samples(year_range = c(1996, 2016), title = "Commercial samples")
+    tidy_samp_avail(year_range = c(1996, 2016)) %>%
+    plot_samp_avail(year_range = c(1996, 2016), title = "Commercial samples")
   ggsave(paste0("report/figs/", spp_f, "-comm-samples.pdf"), width = 6, height = 1.5)
 
 

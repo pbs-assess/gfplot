@@ -5,12 +5,12 @@
 #'
 #' @details
 #'
-#' * `tidy_lengths()` Prepares PBS data for `plot_lengths()`. Works across one
+#' * `tidy_lengths_raw()` Prepares PBS data for `plot_lengths()`. Works across one
 #' or multiple species.
 #' * `plot_lengths()` Plots length frequencies for each year for selected
 #' surveys for a single species.
 #'
-#' @param dat Input data frame. For `tidy_lengths()` should be from
+#' @param dat Input data frame. For `tidy_lengths_raw()` should be from
 #' [get_surv_samples()] and or [get_commsamples()]. For `plot_lengths()` should
 #' be from `tidy_length()` or formatted similarly. See details TODO.
 #' @param n_bins Number of length bins (only used if `bin_size = NULL`).
@@ -34,7 +34,7 @@ NULL
 
 #' @rdname plot_lengths
 #' @export
-tidy_lengths <- function(dat, n_bins = 25, bin_size = NULL,
+tidy_lengths_raw <- function(dat, n_bins = 25, bin_size = NULL,
   min_specimens = 20L,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",

@@ -11,7 +11,7 @@
 #' (containing catches or landings).
 #'
 #' @param dat Input data frame. For `tidy_catch()` should be from
-#' [get_catch()]. For `plot_catch()` should be from `tidy_ages()` or be
+#' [get_catch()]. For `plot_catch()` should be from `tidy_ages_raw()` or be
 #' formatted similarly. See details.
 #' @param ylab Y axis label.
 #' @param units A named character vector with names referring to text that will

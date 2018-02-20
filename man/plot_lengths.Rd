@@ -2,10 +2,10 @@
 % Please edit documentation in R/lengths.R
 \name{plot_lengths}
 \alias{plot_lengths}
-\alias{tidy_lengths}
+\alias{tidy_lengths_raw}
 \title{Plot length frequency data}
 \usage{
-tidy_lengths(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L,
+tidy_lengths_raw(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L,
   survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
   "West Coast Vancouver Island Synoptic Survey",
@@ -19,7 +19,7 @@ plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
   = "red"))
 }
 \arguments{
-\item{dat}{Input data frame. For \code{tidy_lengths()} should be from
+\item{dat}{Input data frame. For \code{tidy_lengths_raw()} should be from
 \code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_lengths()} should
 be from \code{tidy_length()} or formatted similarly. See details TODO.}
 
@@ -51,7 +51,7 @@ yet. TODO)
 }
 \details{
 \itemize{
-\item \code{tidy_lengths()} Prepares PBS data for \code{plot_lengths()}. Works across one
+\item \code{tidy_lengths_raw()} Prepares PBS data for \code{plot_lengths()}. Works across one
 or multiple species.
 \item \code{plot_lengths()} Plots length frequencies for each year for selected
 surveys for a single species.
