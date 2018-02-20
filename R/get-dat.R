@@ -30,7 +30,7 @@ NULL
 #' @export
 #' @rdname get
 get_ssids <- function() {
-  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+  .d <- run_sql("GFBioSQL",
     "SELECT SURVEY_SERIES_ID, SURVEY_SERIES_DESC
       FROM SURVEY_SERIES")
   names(.d) <- tolower(names(.d))

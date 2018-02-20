@@ -106,7 +106,7 @@ plot_catch <- function(dat,
   g <- ggplot()
 
   if (!is.na(unreliable[[1]])) {
-    for (i in seq_along(unreliable))d
+    for (i in seq_along(unreliable))
       g <- g + ggplot2::annotate("rect",
         xmin = min(dat$year) - 1, xmax = unreliable[[i]], ymin = 0,
         ymax = max(dat$value / scale_val) * 1.5, alpha = unreliable_alpha,

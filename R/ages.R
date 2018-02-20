@@ -48,7 +48,7 @@ NULL
 
 #' @rdname plot_ages
 #' @export
-  tidy_ages_raw <- function(surv_dat = NULL, comm_dat = NULL,
+tidy_ages_raw <- function(dat,
   survey_series_desc = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
