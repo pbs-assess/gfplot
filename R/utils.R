@@ -3,7 +3,22 @@ db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
     server = server, database = database)
 }
 
+force_three_letter_species_code <- function(x) {
+  if (is.numeric(x))
+    sprintf(paste0("%0", 3L, "d"), x)
+  else
+    as.character(x)
+}
+
+all_species_codes <- function(x) {
+  all(grepl("[0-9]+", x))
+}
+
 common2codes <- function(common) {
+
+  if (all_species_codes(common))
+    return(force_three_letter_species_code(common))
+
   species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT * FROM SPECIES")
   common_df <- data.frame(SPECIES_COMMON_NAME = toupper(common),

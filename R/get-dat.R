@@ -14,10 +14,28 @@
 #' * `get_surv_index()` does...
 #' * `cache_pbs_data()` does...
 #'
-#' @param species A character vector of species common names
-#' @param survey_codes A numeric vector of survey series IDs
+#' @param species One or more species common names (e.g. `"pacific ocean
+#'   perch"`) or one or more species codes (e.g. `396`). Species codes can be
+#'   specified as numeric vectors `c(396, 442`) or characters `c("396", "442")`.
+#'   Numeric values shorter than 3 digits will be expanded to 3 digits and
+#'   converted to character objects (`1` turns into `"001`). Species common
+#'   names and species codes should not be mixed. If any element is missing a
+#'   species code, then all elements will be assumed to be species, common
+#'   names.
+#' @param ssid A numeric vector of survey series IDs. Run `get_ssids()` if you
+#'   want to look up a survey series ID via a surveys series description.
 #' @name get
 NULL
+
+#' @rdname get
+get_ssids <- function() {
+  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+    "SELECT SURVEY_SERIES_ID, SURVEY_SERIES_DESC
+      FROM SURVEY_SERIES")
+  names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
+  as_tibble(.d)
+}
 
 #' @rdname get
 get_sample_trips <- function() {
@@ -211,19 +229,19 @@ get_surv_index <- function(species, ssid = NULL) {
 #' @export
 #' @rdname get
 get_sara_dat <- function() {
-  h <- xml2::read_html(
+  .h <- xml2::read_html(
     "http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm")
-  d <- h %>% rvest::html_nodes("table") %>%
+  .d <- .h %>% rvest::html_nodes("table") %>%
     .[[1]] %>%
     rvest::html_table() %>%
     .[- (1:2), ] %>%
     dplyr::as_tibble() %>%
     dplyr::filter(.data$Taxon %in% "Fishes") %>%
     dplyr::filter(!grepl("Salmon", .data$`Common name *`))
-  names(d) <- tolower(names(d))
-  names(d) <- gsub(" ", "_", names(d))
-  names(d) <- gsub("_\\*", "", names(d))
-  as_tibble(d)
+  names(.d) <- tolower(names(.d))
+  names(.d) <- gsub(" ", "_", names(.d))
+  names(.d) <- gsub("_\\*", "", names(.d))
+  as_tibble(.d)
 }
 
 #' @param path The folder where the cached data will be saved
@@ -248,7 +266,7 @@ cache_pbs_data <- function(species, path = "data-cache") {
   saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"))
 
   d <- get_surv_index(species)
-  saveRDS(d, file = file.path(path, "pbs-survindex.rds"))
+  saveRDS(d, file = file.path(path, "pbs-surv-index.rds"))
 
   d <- get_age_precision(species)
   saveRDS(d, file = file.path(path, "pbs-age-precision.rds"))
