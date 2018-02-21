@@ -123,7 +123,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       aes_string(colour = "sex", fill = "sex"), size = 0.3,
       position = position_identity()) +
     facet_grid(
-      forcats::fct_rev(as.character(year)) ~ forcats::fct_relevel(survey, dat$survey$survey)) +
+      forcats::fct_rev(as.character(year)) ~
+        forcats::fct_relevel(survey, dat$survey$survey)) +
     theme_pbs() +
     scale_fill_manual(values = fill_col) +
     scale_colour_manual(values = line_col) +
@@ -134,6 +135,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     theme(
       axis.text.y = element_text(colour = "white"),
       axis.ticks.y = element_line(colour = "white")) +
+    theme(panel.spacing = unit(-0.1, "lines")) +
     labs(colour = "Sex", fill = "Sex") +
     geom_text(data = dat$counts,
       x = min(dat$data$length_bin, na.rm = TRUE) + 0.02 * range_lengths,

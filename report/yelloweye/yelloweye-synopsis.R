@@ -1,6 +1,6 @@
 library(PBSsynopsis)
 
-figs <- file.path("report", "yelloweye", "figs")
+figs <- file.path("report", "yelloweye", "yelloweye-figs")
 dir.create(figs, showWarnings = FALSE)
 
 cache_pbs_data("yelloweye rockfish", path = "data-cache")
@@ -18,12 +18,10 @@ d_age_precision <- readRDS(file.path(cache, "pbs-age-precision.rds"))
 
 library(ggplot2)
 library(dplyr)
-library(rstan)
-library(glmmTMB)
 
 g <- tidy_ages_raw(d_surv_samples) %>%
   plot_ages()
-ggsave(file.path(figs, "ages-raw.pdf"), width = 12, height = 6)
+ggsave(file.path(figs, "ages-raw.pdf"), width = 13, height = 6)
 
 g <- tidy_lengths_raw(d_surv_samples, bin_size = 2,
   year_lim = c(2002, Inf)) %>%
@@ -40,20 +38,21 @@ ggsave(file.path(figs, "catch.pdf"), width = 6, height = 3)
 
 g <- tidy_surv_index(d_surv_index) %>%
   plot_surv_index()
-ggsave(file.path(figs, "surv-index.pdf"), width = 5, height = 5)
+ggsave(file.path(figs, "surv-index.pdf"), width = 6, height = 5)
 
 g <- tidy_samp_avail(d_comm_samples) %>%
   plot_samp_avail(title = "Commercial samples", year_range = c(1994, 2017))
 ggsave(file.path(figs, "comm-samp-avail.pdf"), width = 6, height = 1.75)
 
 g <- tidy_samp_avail(d_surv_samples) %>%
-  plot_samp_avail(title = "Survey samples", year_range = c(1994, 2017))
+  plot_samp_avail(title = "Survey samples", year_range = c(1994, 2017),
+    palette = "Blues")
 ggsave(file.path(figs, "surv-samp-avail.pdf"), width = 6, height = 1.75)
 
 vb_m <- fit_vb(d_surv_samples, sex = "male", method = "mpd")
 vb_f <- fit_vb(d_surv_samples, sex = "female", method = "mpd")
 g <- plot_vb(object_female = vb_m, object_male = vb_f)
-ggsave(file.path(figs, "vb.pdf"), width = 6, height = 3.5)
+ggsave(file.path(figs, "vb.pdf"), width = 5, height = 4)
 
 lw_m <- fit_length_wt(d_surv_samples, sex = "male", method = "rlm")
 lw_f <- fit_length_wt(d_surv_samples, sex = "female", method = "rlm")
@@ -79,14 +78,14 @@ ggsave(file.path(figs, "length-mat-ogive.pdf"), width = 6, height = 3.5)
 g <- dplyr::filter(d_cpue_spatial, year >= 2012) %>%
   plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3) +
   ggtitle("Trawl CPUE") +
-  labs(subtitle = "Since 2012; including discards")
+  labs(subtitle = "Since 2012; including discards; 3-vessel minimum")
 ggsave(file.path(figs, "cpue-spatial.pdf"), width = 6, height = 4.75)
 
 g <- filter(d_cpue_spatial_ll, year >= 2008) %>%
   plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3,
     fill_lab = "CPUE (kg/fe)") +
   ggtitle("Hook and line CPUE") +
-  labs(subtitle = "Since 2008; excluding discards")
+  labs(subtitle = "Since 2008; excluding discards; 3-vessel minimum")
 ggsave(file.path(figs, "cpue-spatial-ll.pdf"), width = 6, height = 4.75)
 
 # ## Will come back to:

@@ -151,7 +151,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     ylab(ylab) +
     scale_size_area(max_size = max_size) +
     coord_cartesian(
-      xlim = year_range + c(-0.5 - sex_gap / 2, 0.5 + sex_gap / 2),
+      xlim = year_range + c(-0.8 - sex_gap / 2, 0.8 + sex_gap / 2),
       ylim = c(0, age_max + 0.02 * age_range), expand = FALSE) +
     guides(size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
       fill = guide_legend(override.aes = list(size = 3.5))) +
@@ -161,5 +161,6 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       aes_string(x = "year", label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 1,
       angle = 90) +
+    theme(panel.spacing = unit(-0.1, "lines")) +
     labs(title = "Age frequencies", colour = "Sex", fill = "Sex")
 }

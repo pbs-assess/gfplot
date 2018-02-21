@@ -17,8 +17,6 @@ library(PBSsynopsis)
 ```{r}
 library(ggplot2)
 library(dplyr)
-library(rstan)
-library(Rcpp)
 ```
 
 ```{r}

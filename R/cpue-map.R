@@ -28,9 +28,9 @@
 #' plot_cpue_spatial(d, bin_width = 15, n_minimum_vessels = 1)
 
 plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
-  pal_function = viridisLite::viridis, xlim_ll = c(-134.1, -123.0),
+  xlim_ll = c(-134.1, -123.0),
   ylim_ll = c(48.4, 54.25), utm_zone = 9, bath = c(100, 200, 500),
-  fill_scale = viridis::scale_fill_viridis(trans = "log10", option = "C"),
+  fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
   add_survey_boxes = FALSE,
   surv_cols = c(
     "WCHG" = "#6BAED6",
@@ -115,6 +115,7 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
       scale_colour_manual(values = surv_cols)
   }
 
+  g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
   g
 }
 

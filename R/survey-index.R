@@ -123,7 +123,7 @@ plot_surv_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     facet_wrap(~survey_name, ncol = 2) +
     theme_pbs() +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    ylim(-0.03, NA) +
+    ylim(-0.01, NA) +
     coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5)) +
     xlab("") +
     ylab("Relative biomass") +
