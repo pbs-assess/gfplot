@@ -15,7 +15,7 @@ plot_growth(object_female, object_male, type = c("vb", "length-weight"),
 plot_vb(..., type = "vb")
 
 plot_length_wt(..., type = "length-weight", xlab = "Length (cm)",
-  ylab = "Weight (kg)", lab_x = 0.1, lab_y = 0.9, lab_x_gap = 0.35)
+  ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.25)
 }
 \arguments{
 \item{object_female}{TODO}

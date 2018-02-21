@@ -5,7 +5,7 @@
 \alias{tidy_ages_raw}
 \title{Plot age frequency data}
 \usage{
-tidy_ages_raw(surv_dat = NULL, comm_dat = NULL,
+tidy_ages_raw(dat,
   survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
   "West Coast Vancouver Island Synoptic Survey",
@@ -18,6 +18,10 @@ plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL)
 }
 \arguments{
+\item{dat}{Input data frame. For \code{tidy_ages_raw()} should be from
+\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
+be from \code{tidy_ages_raw()} or be formatted similarly. See details.}
+
 \item{survey_series_desc}{A character vector of survey series to include.}
 
 \item{survey}{A character vector of shorter/cleaner survey names to use in
@@ -26,10 +30,6 @@ the same order as \code{survey_series_desc}. These are used in the plot.}
 \item{spp_cat_code}{A numeric vector of species categorical codes to include
 for the commercial samples. Defaults to \code{1}, which refers to unsorted
 samples.}
-
-\item{dat}{Input data frame. For \code{tidy_ages_raw()} should be from
-\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_ages()} should
-be from \code{tidy_ages_raw()} or be formatted similarly. See details.}
 
 \item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
 

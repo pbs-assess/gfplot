@@ -3,11 +3,13 @@
 \name{get}
 \alias{get}
 \alias{get_ssids}
+\alias{get_age_methods}
 \alias{get_surv_tows}
 \alias{get_surv_samples}
 \alias{get_comm_samples}
 \alias{get_catch}
 \alias{get_cpue_spatial}
+\alias{get_cpue_spatial_ll}
 \alias{get_cpue_index}
 \alias{get_age_precision}
 \alias{get_surv_index}
@@ -16,6 +18,8 @@
 \title{Get PBS data}
 \usage{
 get_ssids()
+
+get_age_methods()
 
 get_surv_tows(species, ssid = c(1, 3, 4, 16))
 
@@ -26,6 +30,8 @@ get_comm_samples(species)
 get_catch(species)
 
 get_cpue_spatial(species)
+
+get_cpue_spatial_ll(species)
 
 get_cpue_index(gear = "bottom trawl", min_year = 1996)
 

@@ -4,6 +4,7 @@
 #' @param year_range Either \code{NULL}, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
+#' @param ageing_method TODO
 #'
 #' @export
 #'
@@ -19,23 +20,18 @@
 tidy_samp_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) {
 
   if (!is.null(year_range))
-    dat <- dat[dat$year >= year_range[[1]] & dat$year <= year_range[[2]], ]
+    dat <- dat[dat$year >= min(year_range) & dat$year <= max(year_range), ]
 
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
 
-  dat <- dat %>%
-    select(.data$species_common_name, .data$year,
-      .data$age, .data$length, .data$weight, .data$maturity_code,
-      .data$ageing_method)
-
-  out <- group_by(dat,
-    .data$species_common_name, .data$year) %>%
+  out <- group_by(dat, species_common_name, year) %>%
     summarise(
       age = sum(!is.na(age) & age > 0 &
           .data$ageing_method %in% ageing_method),
       length = sum(!is.na(length) & length > 0),
       weight = sum(!is.na(weight) & weight > 0),
-      maturity = sum(!is.na(maturity_code) & maturity_code > 0)
+      maturity = sum(!is.na(maturity_code) & maturity_code > 0 &
+          maturity_convention_code <= maturity_convention_maxvalue)
     ) %>% ungroup()
 
   all_years <- expand.grid(year = seq(min(dat$year), max(dat$year), 1),

@@ -5,14 +5,14 @@
 \alias{tidy_lengths_raw}
 \title{Plot length frequency data}
 \usage{
-tidy_lengths_raw(dat, n_bins = 25, bin_size = NULL, min_specimens = 20L,
+tidy_lengths_raw(dat, bin_size = 2, min_specimens = 20L,
   survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
   "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
   "West Coast Vancouver Island Synoptic Survey",
   "PHMA Rockfish Longline Survey - Outside North",
   "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
   surveys = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"))
+  "IPHC"), year_lim = c(1996, Inf))
 
 plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
   fill_col = c(M = "grey80", F = "#FF000010"), line_col = c(M = "grey40", F
@@ -23,9 +23,7 @@ plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
 \code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_lengths()} should
 be from \code{tidy_length()} or formatted similarly. See details TODO.}
 
-\item{n_bins}{Number of length bins (only used if \code{bin_size = NULL}).}
-
-\item{bin_size}{Bin size. Used preferentially over \code{n_bins}.}
+\item{bin_size}{Bin size.}
 
 \item{min_specimens}{Minimum number of specimens for histogram data to be
 computed/shown.}
