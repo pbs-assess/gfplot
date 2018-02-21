@@ -70,12 +70,14 @@ plot_age_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
   dat$prec_age <- dat$prec_age + jit
   dat$prim_age <- dat$prim_age + jit
   ggplot(dat, aes_string("prim_age", "prec_age")) +
-    geom_point(pch = 19, colour = "grey10", size = 1.2) +
+    geom_point(pch = 21, colour = "grey20", alpha = 0.7) +
     ggplot2::geom_abline(intercept = 0, slope = 1, col = "grey50", lty = 2) +
     ggplot2::geom_segment(aes_string(x = "prim_min_age", xend = "prim_max_age",
-      y = "prec_age", yend = "prec_age"), alpha = 0.6) +
+      y = "prec_age", yend = "prec_age"), alpha = 0.5,
+      colour = "grey30") +
     ggplot2::geom_segment(aes_string(x = "prim_age", xend = "prim_age",
-      y = "prec_min_age", yend = "prec_max_age"), alpha = 0.6) +
-    labs(title = "Ageing Precision", x = "Primary Age", y = "Precision Age") +
+      y = "prec_min_age", yend = "prec_max_age"), alpha = 0.5,
+      colour = "grey30") +
+    labs(title = "Ageing precision", x = "Primary age", y = "Precision age") +
     theme_pbs()
 }

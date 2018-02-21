@@ -130,14 +130,14 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     coord_cartesian(expand = FALSE) +
     scale_x_continuous(breaks = x_breaks) +
     xlab(xlab) + ylab(ylab) +
-    ylim(-0.06, 1.1) +
+    ylim(-0.04, 1.07) +
     theme(
       axis.text.y = element_text(colour = "white"),
       axis.ticks.y = element_line(colour = "white")) +
     labs(colour = "Sex", fill = "Sex") +
     geom_text(data = dat$counts,
       x = min(dat$data$length_bin, na.rm = TRUE) + 0.02 * range_lengths,
-      y = 0.8, aes_string(label = "total"),
+      y = 0.85, aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0) +
     labs(title = "Length frequencies") +
     theme(panel.grid.major.x = ggplot2::element_line(colour = "grey92"))

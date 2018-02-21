@@ -138,12 +138,12 @@ plot_mat_ogive <- function(object,
   labs_m <- tibble(p = c("05", "50", "95"),
     value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
     x = 0.75 * max(nd_re$age_or_length),
-    y = seq(0.4, 0.1, length.out = 3), sex = "M")
+    y = seq(0.4, 0.2, length.out = 3), sex = "M")
 
   labs_f <- tibble(p = c("05", "50", "95"),
     value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
     x = 0.75 * max(nd_re$age_or_length),
-    y = seq(0.9, 0.6, length.out = 3L), sex = "F")
+    y = seq(0.8, 0.6, length.out = 3L), sex = "F")
 
   labs <- bind_rows(labs_m, labs_f)
 
@@ -171,7 +171,7 @@ plot_mat_ogive <- function(object,
     aes_string(xintercept = "value", colour = "sex"),
     lty = 2, show.legend = FALSE) +
     geom_line(size = 1.25) +
-    scale_colour_manual(values = c("M" = "grey20", "F" = "red")) +
+    scale_colour_manual(values = c("M" = "grey40", "F" = "red")) +
     xlab(xlab) + ylab("Probability mature") +
     geom_text(data = labs, aes_string(x = "x", y = "y",
       label = "label"),
@@ -190,10 +190,10 @@ plot_mat_ogive <- function(object,
       temp <- object$data
     position <- if (object$type == "age") "jitter" else "identity"
     g <- g + ggplot2::geom_rug(data = filter(temp, mature == 0L),
-      sides = "b", position = position,
+      sides = "b", position = position, alpha = 0.6,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex"))
     g <- g + ggplot2::geom_rug(data = filter(temp, mature == 1L),
-      sides = "t", position = position,
+      sides = "t", position = position, alpha = 0.6,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex"))
   }
 

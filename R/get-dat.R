@@ -282,6 +282,10 @@ get_sara_dat <- function() {
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache") {
+
+  if (!is_dfo_windows())
+    stop("Not on a PBS windows machine. Cannot access data.")
+
   dir.create(path, showWarnings = FALSE)
 
   d_survs_df <- get_surv_tows(species)

@@ -157,7 +157,7 @@ fit_length_wt <- function(dat,
   downsample = Inf,
   min_samples = 50L,
   method = c("rlm", "lm"),
-  scale_weight = 1/1000) {
+  scale_weight = 1 / 1000) {
 
   if ("species_common_name" %in% names(dat))
     if (length(unique(dat$species_common_name)) != 1L)
@@ -239,7 +239,7 @@ plot_growth <- function(object_female, object_male,
   lab_y = 0.3,
   lab_x_gap = 0.3,
   lab_y_gap = 0.08,
-  col = c("Female" = "red", "Male" = "black")) {
+  col = c("Female" = "red", "Male" = "grey20")) {
 
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
