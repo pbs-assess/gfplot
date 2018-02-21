@@ -9,7 +9,7 @@
 #' @param specimen_dat Specimen data. E.g. from [get_commsamples()] for
 #' commercial data or [get_surv_samples()] for survey data.
 #' @param catch_dat Catch data. E.g. from [get_catch()].
-#' @param survey_tows Survey tow data. E.g. from [get_survey()].
+#' @param survey_tows Survey tow data. E.g. from [get_surv_samples()].
 #' @param value The **unquoted** column name with the values to re-weight
 #' (e.g. `age` or `length`).
 #' @param bin_size The binning size (likely only used for lengths).

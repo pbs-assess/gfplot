@@ -67,7 +67,7 @@ fit_mat_ogive <- function(dat,
       data = .d, family = binomial)
     b <- glmmTMB::fixef(m)[[1L]]
   } else {
-    m <- glm(mature ~ age_or_length * female,
+    m <- stats::glm(mature ~ age_or_length * female,
       data = .d, family = binomial)
     b <- stats::coef(m)
   }

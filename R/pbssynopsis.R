@@ -102,6 +102,8 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c(
   # surveys:
   "Var1", "Var2", "X", "Y", "akima_depth","depth", "depth_m",
   "depth_mean", "depth_scaled", "depth_sd", "present", "species", "start_lat",
-  "start_lon", "x", "y", "z", "bctopo"
+  "start_lon", "x", "y", "z", "bctopo",
+
+  "maturity_convention_code"
 
   ))

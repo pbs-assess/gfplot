@@ -37,7 +37,7 @@ For use with data for a single species.
 }
 \examples{
 \dontrun{
-#' ## with `rstan::optimizing()` for the mode of the posterior density:
+## with `rstan::optimizing()` for the mode of the posterior density:
 x <- fit_vb(pop_samples, method = "mpd")
 x$model
 

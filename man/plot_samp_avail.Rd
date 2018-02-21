@@ -40,7 +40,7 @@ d <- tidy_samp_avail(d, year_range = c(1996, 2016))
 plot_samp_avail(d, year_range = c(1996, 2016),
   title = "Survey samples")
 
-d <- get_commsamples("lingcod")
+d <- get_comm_samples("lingcod")
 d <- tidy_samp_avail(d, year_range = c(1996, 2016))
 plot_samp_avail(d, year_range = c(1996, 2016),
   title = "Commercial samples")

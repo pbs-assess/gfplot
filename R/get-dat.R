@@ -125,7 +125,6 @@ get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
 
 #' @export
 #' @rdname get
-#' @param ssid TODO
 #' @param remove_bad_data Remove known bad data?
 get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .q <- read_sql("get-surv-samples.sql")

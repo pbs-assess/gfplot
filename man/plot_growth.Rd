@@ -10,7 +10,7 @@ plot_growth(object_female, object_male, type = c("vb", "length-weight"),
   downsample = 2000L, pt_alpha = 0.2, xlab = "Age (years)",
   ylab = "Length (cm)", seed = 42, lab_x = 0.4, lab_y = 0.3,
   lab_x_gap = 0.3, lab_y_gap = 0.08, col = c(Female = "red", Male =
-  "black"))
+  "grey20"))
 
 plot_vb(..., type = "vb")
 

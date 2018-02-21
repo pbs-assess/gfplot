@@ -62,8 +62,6 @@ want to look up a survey series ID via a surveys series description.}
 \item{min_year}{Minimum year to return.}
 
 \item{path}{The folder where the cached data will be saved}
-
-\item{ssid}{TODO}
 }
 \description{
 Long description here

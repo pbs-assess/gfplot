@@ -3,7 +3,6 @@
 #' @param dat TODO
 #' @param bin_width TODO
 #' @param n_minimum_vessels TODO
-#' @param pal_function TODO
 #' @param xlim_ll TODO
 #' @param ylim_ll TODO
 #' @param utm_zone TODO

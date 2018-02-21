@@ -14,7 +14,7 @@
 #'   `"F"`), `age`, `survey`, `n_scaled`.
 #'
 #' @param dat Input data frame. For `tidy_ages_raw()` should be from
-#' [get_surv_samples()] and or [get_commsamples()]. For `plot_ages()` should
+#' [get_surv_samples()] and or [get_comm_samples()]. For `plot_ages()` should
 #' be from `tidy_ages_raw()` or be formatted similarly. See details.
 #' @param survey_series_desc A character vector of survey series to include.
 #' @param survey A character vector of shorter/cleaner survey names to use in

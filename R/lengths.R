@@ -11,7 +11,7 @@
 #' surveys for a single species.
 #'
 #' @param dat Input data frame. For `tidy_lengths_raw()` should be from
-#' [get_surv_samples()] and or [get_commsamples()]. For `plot_lengths()` should
+#' [get_surv_samples()] and or [get_comm_samples()]. For `plot_lengths()` should
 #' be from `tidy_length()` or formatted similarly. See details TODO.
 #' @param bin_size Bin size.
 #' @param min_specimens Minimum number of specimens for histogram data to be
@@ -26,6 +26,7 @@
 #' `"F"` and `"M"` for female and male.
 #' @param line_col Line colours for histograms. A named vector with names
 #' `"F"` and `"M"` for female and male.
+#' @param year_lim TODO
 #'
 #' @family age- and length-frequency functions
 #' @name plot_lengths
@@ -55,7 +56,7 @@ tidy_lengths_raw <- function(dat, bin_size = 2,
   dat <- filter(dat, !is.na(survey_series_desc))
   dat <- filter(dat, survey_series_desc %in% survey_series_desc)
   dat <- filter(dat, year >= year_lim[[1]] & year <= year_lim[[2]])
-  dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
+  dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!!
   dat <- dat %>%
     select(species_common_name, .data$species_science_name, .data$sample_id,
       .data$year, .data$age, .data$length, .data$weight, .data$maturity_code,

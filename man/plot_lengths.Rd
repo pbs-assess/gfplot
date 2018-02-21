@@ -20,7 +20,7 @@ plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_lengths_raw()} should be from
-\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_commsamples]{get_commsamples()}}. For \code{plot_lengths()} should
+\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_lengths()} should
 be from \code{tidy_length()} or formatted similarly. See details TODO.}
 
 \item{bin_size}{Bin size.}
@@ -32,6 +32,8 @@ computed/shown.}
 
 \item{surveys}{A character vector of shorter/cleaner survey names to use in
 the same order as \code{survey_series_desc}. These are used in the plot.}
+
+\item{year_lim}{TODO}
 
 \item{xlab}{X axis label.}
 

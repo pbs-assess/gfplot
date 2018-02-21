@@ -29,7 +29,7 @@ commercial data or \code{\link[=get_surv_samples]{get_surv_samples()}} for surve
 
 \item{bin_size}{The binning size (likely only used for lengths).}
 
-\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_survey]{get_survey()}}.}
+\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_surv_samples]{get_surv_samples()}}.}
 
 \item{dat}{A properly formatted data frame such the output from
 \code{tidy_comps_survey()} or \code{tidy_comps_commercial()}. See details.}
