@@ -12,6 +12,7 @@
 #' @param allow_slow_mcmc TODO
 #' @param est_method TODO
 #' @param min_samples TODO
+#' @param ageing_method TODO
 #' @param ... TODO
 #' @family growth functions
 #' @importFrom stats median quantile rlnorm runif median

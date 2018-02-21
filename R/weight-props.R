@@ -6,7 +6,7 @@
 #' weighting. `weight_comps()` does the actual weighting based on the output
 #' from the `tidy_*` functions.
 #'
-#' @param specimen_dat Specimen data. E.g. from [get_commsamples()] for
+#' @param specimen_dat Specimen data. E.g. from [get_comm_samples()] for
 #' commercial data or [get_surv_samples()] for survey data.
 #' @param catch_dat Catch data. E.g. from [get_catch()].
 #' @param survey_tows Survey tow data. E.g. from [get_surv_samples()].

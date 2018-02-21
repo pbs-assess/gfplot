@@ -10,11 +10,9 @@ fit_mat_ogive(dat, type = c("age", "length"), sample_id_re = FALSE,
 
 plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
   else "Length (cm)", title = if (object$type[[1]] == "age") "Age at maturity"
-  else "Length at maturity", rug = TRUE, run_n = 1500, x_max = 1.5)
+  else "Length at maturity", rug = TRUE, rug_n = 1500, x_max = 1.5)
 }
 \arguments{
-\item{dat}{TODO}
-
 \item{type}{TODO}
 
 \item{sample_id_re}{TODO}
@@ -23,15 +21,17 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
 
 \item{ageing_method}{TODO}
 
+\item{object}{TODO}
+
 \item{xlab}{TODO}
 
 \item{title}{TODO}
 
 \item{rug}{TODO}
 
-\item{x_max}{TODO as -fold of L or A95.}
-
 \item{rug_n}{TODO}
+
+\item{x_max}{TODO as -fold of L or A95.}
 }
 \description{
 Fit and plot maturity ogives

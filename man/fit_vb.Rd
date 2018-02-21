@@ -30,6 +30,8 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 
 \item{min_samples}{TODO}
 
+\item{ageing_method}{TODO}
+
 \item{...}{TODO}
 }
 \description{

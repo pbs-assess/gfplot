@@ -91,7 +91,7 @@ fit_mat_ogive <- function(dat,
     type = type)
 }
 
-#' @param dat TODO
+#' @param object TODO
 #' @param type TODO
 #' @param xlab TODO
 #' @param title TODO
@@ -108,7 +108,7 @@ plot_mat_ogive <- function(object,
   xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
   title =
     if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
-  rug = TRUE, run_n = 1500, x_max = 1.5) {
+  rug = TRUE, rug_n = 1500, x_max = 1.5) {
 
   nd_re <- object$pred_data
 
@@ -183,8 +183,8 @@ plot_mat_ogive <- function(object,
     ggplot2::ggtitle(title)
 
   if (rug) {
-    if (nrow(object$data) > run_n)
-      temp <- object$data[sample(seq_len(nrow(object$data)), run_n),
+    if (nrow(object$data) > rug_n)
+      temp <- object$data[sample(seq_len(nrow(object$data)), rug_n),
         , drop = FALSE]
     else
       temp <- object$data

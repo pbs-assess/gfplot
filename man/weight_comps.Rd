@@ -19,7 +19,7 @@ tidy_ages_weighted()
 tidy_lengths_weighted()
 }
 \arguments{
-\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commsamples]{get_commsamples()}} for
+\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_comm_samples]{get_comm_samples()}} for
 commercial data or \code{\link[=get_surv_samples]{get_surv_samples()}} for survey data.}
 
 \item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
