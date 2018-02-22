@@ -135,6 +135,7 @@ get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
+  .d$usability <- ifelse(.d$usability == 1L, TRUE, FALSE) # TODO: test
 
   surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
   surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
