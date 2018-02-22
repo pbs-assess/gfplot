@@ -28,3 +28,4 @@ WHERE TRIP_SUB_TYPE_CODE NOT IN (2, 3)
   AND SM.SAMPLE_SOURCE_CODE = 1 
 -- insert species here
 ORDER BY SEX
+
