@@ -160,11 +160,11 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
       density_kgpm2, area_km2)
 
   raw_comp <- specimen_dat %>%
-    select(year, sample_id, !!value, weight, grouping_code) %>%
+    select(year, sample_id, !!value, weight, !is.null(grouping_code)) %>%
     group_by(year, sample_id, grouping_code, !!value) %>%
     summarise(freq = n())
 
-  strat_areas <- select(strat_dat, year, grouping_code, area_km2) %>%
+  strat_areas <- select(strat_dat, year, !is.null(grouping_code), area_km2) %>%
     unique() %>%
     group_by(year) %>%
     mutate(total_area_km2 = sum(area_km2))
