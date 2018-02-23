@@ -80,7 +80,7 @@ fit_vb <- function(dat,
   }
 
   rstan::rstan_options(auto_write = TRUE)
-  model_file <- system.file("stan", "vb.stan", package = "gfsynopsis")
+  model_file <- system.file("stan", "vb.stan", package = "gfplot")
   mod <- rstan::stan_model(model_file)
 
   if (nrow(dat) > downsample)

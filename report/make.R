@@ -1,4 +1,4 @@
-library("gfsynopsis")
+library("gfplot")
 library("tidyverse")
 
 d_index <- readRDS("data-cache/all-boot-biomass-indices.rds")

@@ -19,11 +19,11 @@ knitr::opts_chunk$set(
 
 ```{r, include=FALSE}
 d <- readRDS("../data-cache/gf_merged_catch_1996_onwards.rds") # TODO deal with
-library("gfsynopsis")
+library("gfplot")
 ```
 
 ```{r, eval=FALSE}
-library("gfsynopsis")
+library("gfplot")
 d <- get_cpue_index(gear = "bottom trawl")
 ```
 

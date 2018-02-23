@@ -39,7 +39,7 @@ fit_mat_ogive <- function(dat,
       specimen_id, sample_id, trip_start_date)
 
   file <- system.file("extdata", "maturity_assignment.csv",
-    package = "gfsynopsis")
+    package = "gfplot")
 
   mat_df <- readr::read_csv(file,
     col_types = readr::cols(

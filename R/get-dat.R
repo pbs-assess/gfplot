@@ -149,7 +149,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
       "stratifications. If working with the data yourelf, filter them after ",
       "selecting specific surveys. For example, ",
       "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-      "Tidying and plotting functions with gfsynopsis will do this for you.")
+      "Tidying and plotting functions with gfplot will do this for you.")
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &

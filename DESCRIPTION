@@ -1,5 +1,5 @@
-Package: gfsynopsis
-Title: Data Synopsis Reports for DFO PBS Groundfish Stocks
+Package: gfplot
+Title: Data extraction and plotting for DFO PBS Groundfish Stocks
 Version: 0.0.0.9000
 Date: 2018-02-16
 Authors@R: c(person("Sean", "Anderson",

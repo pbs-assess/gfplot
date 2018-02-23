@@ -7,10 +7,10 @@ The combination of fishery dependent data, such as catch and effort, and fishery
 
 # Installation
 
-The gfsynopsis package is *not* ready for use yet. In particular, the documentation is far from complete. However, it can be installed with:
+The gfplot package is *not* ready for use yet. In particular, the documentation is far from complete. However, it can be installed with:
 
 ```r
 # install.packages("devtools")
 devtools::install_github("seananderson.ca/pbs-synopsis")
-library("gfsynopsis")
+library("gfplot")
 ```

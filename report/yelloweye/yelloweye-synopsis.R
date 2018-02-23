@@ -1,4 +1,4 @@
-library(gfsynopsis)
+library(gfplot)
 
 figs <- file.path("report", "yelloweye", "yelloweye-figs")
 dir.create(figs, showWarnings = FALSE)

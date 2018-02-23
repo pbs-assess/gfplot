@@ -1,5 +1,5 @@
 get_spp_names <- function() {
-  file <- system.file("extdata", "spp-of-interest.csv", package = "gfsynopsis")
+  file <- system.file("extdata", "spp-of-interest.csv", package = "gfplot")
   spp <- readr::read_csv(file,
     col_types = list(species_common_name = readr::col_character(),
       type = readr::col_character()))
