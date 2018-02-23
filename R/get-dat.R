@@ -311,4 +311,9 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   d <- get_age_precision(species)
   saveRDS(d, file = file.path(path, "pbs-age-precision.rds"))
+
+  d <- get_cpue_index(gear = "bottom trawl", min_year = 1996)
+  saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"))
+
+  message("All data extracted and saved in the folder `", path, "`.")
 }
