@@ -20,7 +20,7 @@ tidy_lengths_weighted()
 }
 \arguments{
 \item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_comm_samples]{get_comm_samples()}} for
-commercial data or \code{\link[=get_surv_samples]{get_surv_samples()}} for survey data.}
+commercial data or \code{\link[=get_survey_samples]{get_survey_samples()}} for survey data.}
 
 \item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
 
@@ -29,7 +29,7 @@ commercial data or \code{\link[=get_surv_samples]{get_surv_samples()}} for surve
 
 \item{bin_size}{The binning size (likely only used for lengths).}
 
-\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_surv_samples]{get_surv_samples()}}.}
+\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
 \item{dat}{A properly formatted data frame such the output from
 \code{tidy_comps_survey()} or \code{tidy_comps_commercial()}. See details.}
@@ -67,8 +67,8 @@ species <- "pacific ocean perch"
 
 ## Surveys:
 ## ssid = 1 is Queen Charlotte Sound Synoptic Survey:
-survey_samples <- get_surv_samples(species, ssid = 1)
-survey_tows <- get_surv_tows(species, ssid = 1)
+survey_samples <- get_survey_samples(species, ssid = 1)
+survey_tows <- get_survey_tows(species, ssid = 1)
 
 surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
   value = length, bin_size = 2)

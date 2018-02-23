@@ -11,10 +11,10 @@ test_that("get_* data functions work at PBS", {
   # d <- get_catch("lingcod")
   # expect_gte(nrow(d), 1L)
   #
-  # d <- get_surv_tows("lingcod", 1)
+  # d <- get_survey_tows("lingcod", 1)
   # expect_gte(d$catch_weight[[1]], 0)
   #
-  # d <- get_surv_samples("lingcod", 16)
+  # d <- get_survey_samples("lingcod", 16)
   # expect_gte(d$survey_id[[1]], 1L)
 
   # d <- get_comm_samples("lingcod")

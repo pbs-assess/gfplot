@@ -2,30 +2,30 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_surv_index("lingcod") %>%
-#'   tidy_surv_index() %>%
-#'   plot_surv_index()
+#' get_survey_index("lingcod") %>%
+#'   tidy_survey_index() %>%
+#'   plot_survey_index()
 #'
 #' # Or without pipes:
-#' d <- get_surv_index("lingcod")
+#' d <- get_survey_index("lingcod")
 #' head(d)
 #'
-#' d_tidy <- tidy_surv_index(d)
+#' d_tidy <- tidy_survey_index(d)
 #' head(d_tidy)
 #'
-#' plot_surv_index(d_tidy)
+#' plot_survey_index(d_tidy)
 #' }
 
-#' @name plot_surv_index
+#' @name plot_survey_index
 #' @param dat TODO
 #' @param surveys TODO
 #' @param survey_names TODO
 #' @param min_years TODO
 #' @param year_range TODO
 #' @family tidy data functions
-#' @rdname plot_surv_index
+#' @rdname plot_survey_index
 #' @export
-tidy_surv_index <- function(dat,
+tidy_survey_index <- function(dat,
   surveys = c(
     "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey",
@@ -97,9 +97,9 @@ tidy_surv_index <- function(dat,
 #' @export
 #' @family plotting functions
 #'
-#' @rdname plot_surv_index
+#' @rdname plot_survey_index
 
-plot_surv_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
+plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices") {
 
   d <- dat %>%

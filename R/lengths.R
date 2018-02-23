@@ -11,7 +11,7 @@
 #' surveys for a single species.
 #'
 #' @param dat Input data frame. For `tidy_lengths_raw()` should be from
-#' [get_surv_samples()] and or [get_comm_samples()]. For `plot_lengths()` should
+#' [get_survey_samples()] and or [get_comm_samples()]. For `plot_lengths()` should
 #' be from `tidy_length()` or formatted similarly. See details TODO.
 #' @param bin_size Bin size.
 #' @param min_specimens Minimum number of specimens for histogram data to be

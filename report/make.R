@@ -1,4 +1,4 @@
-library("PBSsynopsis")
+library("gfsynopsis")
 library("tidyverse")
 
 d_index <- readRDS("data-cache/all-boot-biomass-indices.rds")
@@ -19,7 +19,7 @@ sn <- get_spp_names() %>%
   filter(species_common_name %in% c("pacific ocean perch", "yelloweye rockfish", "pacific cod"))
 
 filter(d_comm_samp, species_common_name == spp) %>%
-  tidy_samp_avail()
+  tidy_sample_avail()
 
 for (i in seq_along(sn$species_common_name)) {
 
@@ -28,9 +28,9 @@ for (i in seq_along(sn$species_common_name)) {
   message(spp)
 
   g <- filter(d_index, species_common_name == spp) %>%
-    tidy_surv_index() %>%
-    plot_surv_index()
-  ggsave(paste0("report/figs/", spp_f, "-surv_index.pdf"), width = 5, height = 5)
+    tidy_survey_index() %>%
+    plot_survey_index()
+  ggsave(paste0("report/figs/", spp_f, "-survey_index.pdf"), width = 5, height = 5)
 
   g <- filter(d_surv_samp, species_common_name == spp) %>%
     tidy_ages_raw() %>%
@@ -48,13 +48,13 @@ for (i in seq_along(sn$species_common_name)) {
   ggsave(paste0("report/figs/", spp_f, "-catch.pdf"), width = 6, height = 2)
 
   g <- filter(d_surv_samp, species_common_name == spp) %>%
-    tidy_samp_avail(year_range = c(1996, 2016)) %>%
-    plot_samp_avail(year_range = c(1996, 2016), title = "Survey samples")
+    tidy_sample_avail(year_range = c(1996, 2016)) %>%
+    plot_sample_avail(year_range = c(1996, 2016), title = "Survey samples")
   ggsave(paste0("report/figs/", spp_f, "-surv-samples.pdf"), width = 6, height = 1.5)
 
   g <- filter(d_comm_samp, species_common_name == spp) %>%
-    tidy_samp_avail(year_range = c(1996, 2016)) %>%
-    plot_samp_avail(year_range = c(1996, 2016), title = "Commercial samples")
+    tidy_sample_avail(year_range = c(1996, 2016)) %>%
+    plot_sample_avail(year_range = c(1996, 2016), title = "Commercial samples")
   ggsave(paste0("report/figs/", spp_f, "-comm-samples.pdf"), width = 6, height = 1.5)
 
 
@@ -76,8 +76,8 @@ for (i in seq_along(sn$species_common_name)) {
 #
 # out <- purrr::map_df(survs, function(x) {
 #   surv_spec <- dplyr::filter(survey_specimens, survey_series_desc == x)
-#   surv_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
-#   o <- surv_spec %>% tidy_comps_survey(surv_tows, length, bin_size = 2) %>%
+#   survey_tows <- dplyr::filter(survey_tows, survey_series_desc == x)
+#   o <- surv_spec %>% tidy_comps_survey(survey_tows, length, bin_size = 2) %>%
 #     weight_comps()
 #   o$survey_series_desc <- x
 #   o

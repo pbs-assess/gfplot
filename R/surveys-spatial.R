@@ -4,7 +4,7 @@
 #'
 #' @details
 #'
-#' * `tidy_surv_tows()` does...
+#' * `tidy_survey_tows()` does...
 #' * `interp_survey_bathymetry()` does...
 #' ... TODO
 #'
@@ -17,16 +17,16 @@
 #' @examples
 #' \dontrun{
 #' ## generally, use the main function:
-#' x <- fit_surv_tows(pop_surv,
+#' x <- fit_survey_tows(pop_surv,
 #'   years = 2015,
 #'   survey = "Queen Charlotte Sound Synoptic Survey",
 #'   iter = 600, chains = 1, mcmc_posterior_samples = 100)
 #' names(x)
 #' print(x$models)
-#' plot_surv_tows(x$predictions, x$data, fill_column = "combined")
+#' plot_survey_tows(x$predictions, x$data, fill_column = "combined")
 #'
-#' ## internally, fit_surv_tows() does something like this:
-#' dat <- tidy_surv_tows(pop_surv,
+#' ## internally, fit_survey_tows() does something like this:
+#' dat <- tidy_survey_tows(pop_surv,
 #'  survey = "Queen Charlotte Sound Synoptic Survey",
 #'  years = 2015)
 #' dat_interp <- interp_survey_bathymetry(dat)
@@ -39,7 +39,7 @@
 #'  type = "response", return_mcmc = TRUE, iter = 100)
 #' com <- bin * pos
 #' pg$combined <- apply(com, 1, median)
-#' plot_surv_tows(pg, dat, fill_column = "combined")
+#' plot_survey_tows(pg, dat, fill_column = "combined")
 #' }
 #' @name survey-spatial-modelling
 NULL
@@ -47,7 +47,7 @@ NULL
 #' @param years TODO
 #' @export
 #' @rdname survey-spatial-modelling
-tidy_surv_tows <- function(dat, survey, years, utm_zone = 9) {
+idy_survey_tows <- function(dat, survey, years, utm_zone = 9) {
 
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
     filter(survey_series_desc %in% survey) %>%
@@ -212,7 +212,7 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
       Y = seq(min(dat$Y), max(dat$Y), length.out = n),
       year = unique(dat$year))
   } else {
-    shape_utm <- ll2utm(PBSsynopsis::survey_grids[[region]],
+    shape_utm <- ll2utm(gfsynopsis::survey_grids[[region]],
       utm_zone = utm_zone)
     sp_poly <- sp::SpatialPolygons(
       list(sp::Polygons(list(sp::Polygon(shape_utm)), ID = 1)))
@@ -288,7 +288,7 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
 #'
 #' @rdname survey-spatial-modelling
 
-fit_surv_tows <- function(dat, survey, years,
+fit_survey_tows <- function(dat, survey, years,
   chains = 3, iter = 1200, max_knots = 15,
   adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
   mcmc_posterior_samples = 150, required_obs_percent = 0.1,
@@ -300,7 +300,7 @@ fit_surv_tows <- function(dat, survey, years,
   if (survey == "Queen Charlotte Sound Synoptic Survey") region <- "QCS"
   if (survey == "Hecate Strait Synoptic Survey") region <- "HS"
 
-  .d_tidy <- tidy_surv_tows(dat, survey, years = years)
+  .d_tidy <- tidy_survey_tows(dat, survey, years = years)
 
   if (nrow(.d_tidy) == 0)
     stop("No survey data for species-survey-year combination.")
@@ -356,14 +356,14 @@ fit_surv_tows <- function(dat, survey, years,
 #' @family spatial survey modelling functions
 #' @examples
 #' \dontrun{
-#' x <- fit_surv_tows(pop_surv,
+#' x <- fit_survey_tows(pop_surv,
 #'   years = 2015,
 #'   survey = "Queen Charlotte Sound Synoptic Survey",
 #'   iter = 600, chains = 1, mcmc_posterior_samples = 100)
-#' plot_surv_tows(x$predictions, x$data, fill_column = "combined")
+#' plot_survey_tows(x$predictions, x$data, fill_column = "combined")
 #' }
 
-plot_surv_tows <- function(pred_dat, raw_dat, fill_column,
+plot_survey_tows <- function(pred_dat, raw_dat, fill_column,
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
   pt_size_range = c(2, 7), show_legend = TRUE,

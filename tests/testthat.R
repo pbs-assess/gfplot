@@ -1,4 +1,4 @@
 library(testthat)
-library(PBSsynopsis)
+library(gfsynopsis)
 
-test_check("PBSsynopsis")
+test_check("gfsynopsis")

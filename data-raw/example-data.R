@@ -1,5 +1,5 @@
 library(dplyr)
-# d <- get_surv_samples("pacific ocean perch")
+# d <- get_survey_samples("pacific ocean perch")
 d <- readRDS("data-cache/pbs-survey-specimens.rds")
 d <- dplyr::filter(d, species_common_name == "pacific ocean perch")
 d <- filter(d, year > 2010, year < 2012)

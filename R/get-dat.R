@@ -3,15 +3,15 @@
 #' Long description here
 #'
 #' @details
-#' * `get_surv_tows()` does...
-#' * `get_surv_samples()` does...
+#' * `get_survey_tows()` does...
+#' * `get_survey_samples()` does...
 #' * `get_comm_samples()` does...
 #' * `get_catch()` does...
 #' * `get_cpue_spatial()` does...
 #' * `get_cpue_index()` does...
 #' * `get_age_precision()` does...
 #' * `get_sara_dat()` does...
-#' * `get_surv_index()` does...
+#' * `get_survey_index()` does...
 #' * `cache_pbs_data()` does...
 #'
 #' @param species One or more species common names (e.g. `"pacific ocean
@@ -78,7 +78,7 @@ get_survey_ids <- function(ssid) {
 
 #' @export
 #' @rdname get
-get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
+get_survey_tows <- function(species, ssid = c(1, 3, 4, 16)) {
   species_codes <- common2codes(species)
 
   species_df <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
@@ -126,7 +126,7 @@ get_surv_tows <- function(species, ssid = c(1, 3, 4, 16)) {
 #' @export
 #' @rdname get
 #' @param remove_bad_data Remove known bad data?
-get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
+get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .q <- read_sql("get-surv-samples.sql")
   .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid))
@@ -149,7 +149,7 @@ get_surv_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
       "stratifications. If working with the data yourelf, filter them after ",
       "selecting specific surveys. For example, ",
       "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-      "Tidying and plotting functions with PBSsynopsis will do this for you.")
+      "Tidying and plotting functions with gfsynopsis will do this for you.")
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
@@ -248,7 +248,7 @@ get_age_precision <- function(species) {
 
 #' @export
 #' @rdname get
-get_surv_index <- function(species, ssid = NULL) {
+get_survey_index <- function(species, ssid = NULL) {
   .q <- read_sql("get-surv-index.sql")
   .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, .q)
   if (!is.null(ssid))
@@ -288,11 +288,11 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_surv_tows(species)
-  saveRDS(d_survs_df, file = file.path(path, "pbs-surv-tows.rds"))
+  d_survs_df <- get_survey_tows(species)
+  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
 
-  d <- get_surv_samples(species)
-  saveRDS(d, file = file.path(path, "pbs-surv-samples.rds"))
+  d <- get_survey_samples(species)
+  saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"))
 
   d <- get_comm_samples(species)
   saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"))
@@ -306,8 +306,8 @@ cache_pbs_data <- function(species, path = "data-cache") {
   d <- get_cpue_spatial_ll(species)
   saveRDS(d, file = file.path(path, "pbs-cpue-spatial-ll.rds"))
 
-  d <- get_surv_index(species)
-  saveRDS(d, file = file.path(path, "pbs-surv-index.rds"))
+  d <- get_survey_index(species)
+  saveRDS(d, file = file.path(path, "pbs-survey-index.rds"))
 
   d <- get_age_precision(species)
   saveRDS(d, file = file.path(path, "pbs-age-precision.rds"))

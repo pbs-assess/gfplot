@@ -1,6 +1,6 @@
 #' Tidy PBS ageing precision data
 #'
-#' @param dat A data frame from \code{\link{get_age_precision}}
+#' @param dat A data frame from [get_age_precision()]
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to codes `3` and `17`, which represent otolith
 #'   'break and burn' and 'break and bake' methods.
@@ -50,9 +50,9 @@ tidy_age_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' Plot ageing precision data
 #'
 #' @param dat A properly formatted data frame, for example, from
-#'   \code{\link{tidy_age_precision}}. Should have columns named
+#'   [tidy_age_precision()]. Should have columns named
 #'   TODO.
-#' @param n Number of fish to sample if there are more fish than \code{n}.
+#' @param n Number of fish to sample if there are more fish than `n`.
 #' @param jitter Amount to randomly jitter ages. Same jitter values are used for
 #'   the precision and primary ages.
 #' @param seed If a numeric value, set the random seed so that the same rows

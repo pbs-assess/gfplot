@@ -7,7 +7,7 @@
 tidy_age_precision(dat, ageing_method_codes = c(3, 17))
 }
 \arguments{
-\item{dat}{A data frame from \code{\link{get_age_precision}}}
+\item{dat}{A data frame from \code{\link[=get_age_precision]{get_age_precision()}}}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to codes \code{3} and \code{17}, which represent otolith
@@ -28,7 +28,7 @@ get_ageing_precision("pacific ocean perch") \%>\%
 }
 }
 \seealso{
-Other tidy data functions: \code{\link{plot_surv_index}},
+Other tidy data functions: \code{\link{plot_survey_index}},
   \code{\link{tidy_cpue_index}}
 
 Other ageing precision functions: \code{\link{plot_age_precision}}

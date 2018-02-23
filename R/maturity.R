@@ -7,7 +7,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' d <- get_surv_samples("pacific ocean perch", ssid = 1)
+#' d <- get_survey_samples("pacific ocean perch", ssid = 1)
 #'
 #' m <- fit_mat_ogive(d, sample_id_re = FALSE, months = 1:6)
 #' plot_mat_ogive(m)
@@ -38,7 +38,7 @@ fit_mat_ogive <- function(dat,
       specimen_id, sample_id, trip_start_date)
 
   file <- system.file("extdata", "maturity_assignment.csv",
-    package = "PBSsynopsis")
+    package = "gfsynopsis")
 
   mat_df <- readr::read_csv(file,
     col_types = readr::cols(

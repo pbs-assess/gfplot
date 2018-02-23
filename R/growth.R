@@ -80,7 +80,7 @@ fit_vb <- function(dat,
   }
 
   rstan::rstan_options(auto_write = TRUE)
-  model_file <- system.file("stan", "vb.stan", package = "PBSsynopsis")
+  model_file <- system.file("stan", "vb.stan", package = "gfsynopsis")
   mod <- rstan::stan_model(model_file)
 
   if (nrow(dat) > downsample)
@@ -144,16 +144,16 @@ fit_vb <- function(dat,
 #' @family growth functions
 #' @export
 #' @examples
-#' model_f <- fit_length_wt(pop_samples)
+#' model_f <- fit_length_weight(pop_samples)
 #' model_f$model
 #' model_f$predictions
 #' model_f$pars
 #' model_f$data
 #'
-#' model_m <- fit_length_wt(pop_samples, sex = "male")
-#' plot_length_wt(model_f, model_m)
+#' model_m <- fit_length_weight(pop_samples, sex = "male")
+#' plot_length_weight(model_f, model_m)
 
-fit_length_wt <- function(dat,
+fit_length_weight <- function(dat,
   sex = c("female", "male"),
   downsample = Inf,
   min_samples = 50L,
@@ -225,9 +225,9 @@ fit_length_wt <- function(dat,
 #' plot_vb(model_f, model_m)
 #' }
 #'
-#' model_f <- fit_length_wt(pop_samples, sex = "female")
-#' model_m <- fit_length_wt(pop_samples, sex = "male")
-#' plot_length_wt(model_f, model_m)
+#' model_f <- fit_length_weight(pop_samples, sex = "female")
+#' model_m <- fit_length_weight(pop_samples, sex = "male")
+#' plot_length_weight(model_f, model_m)
 
 plot_growth <- function(object_female, object_male,
   type = c("vb", "length-weight"),
@@ -316,7 +316,7 @@ plot_vb <- function(..., type = "vb") {
 #' @inheritParams plot_growth
 #' @export
 #' @rdname plot_growth
-plot_length_wt <- function(..., type = "length-weight", xlab = "Length (cm)",
+plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)",
     ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.25) {
   plot_growth(..., type = type, xlab = xlab,
     ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap) +

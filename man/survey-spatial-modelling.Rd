@@ -2,15 +2,15 @@
 % Please edit documentation in R/surveys-spatial.R
 \name{survey-spatial-modelling}
 \alias{survey-spatial-modelling}
-\alias{tidy_surv_tows}
+\alias{idy_survey_tows}
 \alias{interp_survey_bathymetry}
 \alias{scale_survey_predictors}
 \alias{fit_glmmfields}
 \alias{make_prediction_grid}
-\alias{fit_surv_tows}
+\alias{fit_survey_tows}
 \title{Survey spatial modelling}
 \usage{
-tidy_surv_tows(dat, survey, years, utm_zone = 9)
+idy_survey_tows(dat, survey, years, utm_zone = 9)
 
 interp_survey_bathymetry(dat, utm_zone = 9)
 
@@ -24,8 +24,8 @@ fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
 make_prediction_grid(dat, bath, n = 150, region = NULL,
   cache_folder = "prediction-grids", utm_zone = 9)
 
-fit_surv_tows(dat, survey, years, chains = 3, iter = 1200, max_knots = 15,
-  adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
+fit_survey_tows(dat, survey, years, chains = 3, iter = 1200,
+  max_knots = 15, adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
   mcmc_posterior_samples = 150, required_obs_percent = 0.1, utm_zone = 9)
 }
 \arguments{
@@ -76,7 +76,7 @@ Long description here
 }
 \details{
 \itemize{
-\item \code{tidy_surv_tows()} does...
+\item \code{tidy_survey_tows()} does...
 \item \code{interp_survey_bathymetry()} does...
 ... TODO
 }
@@ -84,16 +84,16 @@ Long description here
 \examples{
 \dontrun{
 ## generally, use the main function:
-x <- fit_surv_tows(pop_surv,
+x <- fit_survey_tows(pop_surv,
   years = 2015,
   survey = "Queen Charlotte Sound Synoptic Survey",
   iter = 600, chains = 1, mcmc_posterior_samples = 100)
 names(x)
 print(x$models)
-plot_surv_tows(x$predictions, x$data, fill_column = "combined")
+plot_survey_tows(x$predictions, x$data, fill_column = "combined")
 
-## internally, fit_surv_tows() does something like this:
-dat <- tidy_surv_tows(pop_surv,
+## internally, fit_survey_tows() does something like this:
+dat <- tidy_survey_tows(pop_surv,
  survey = "Queen Charlotte Sound Synoptic Survey",
  years = 2015)
 dat_interp <- interp_survey_bathymetry(dat)
@@ -106,10 +106,10 @@ bin <- predict(m$bin, newdata = data.frame(pg, time = 1),
  type = "response", return_mcmc = TRUE, iter = 100)
 com <- bin * pos
 pg$combined <- apply(com, 1, median)
-plot_surv_tows(pg, dat, fill_column = "combined")
+plot_survey_tows(pg, dat, fill_column = "combined")
 }
 }
 \seealso{
-Other spatial survey modelling functions: \code{\link{plot_surv_tows}}
+Other spatial survey modelling functions: \code{\link{plot_survey_tows}}
 }
 \concept{spatial survey modelling functions}

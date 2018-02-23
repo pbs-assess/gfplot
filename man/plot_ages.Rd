@@ -19,7 +19,7 @@ plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_ages_raw()} should be from
-\code{\link[=get_surv_samples]{get_surv_samples()}} and or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_ages()} should
+\code{\link[=get_survey_samples]{get_survey_samples()}} and or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_ages()} should
 be from \code{tidy_ages_raw()} or be formatted similarly. See details.}
 
 \item{survey_series_desc}{A character vector of survey series to include.}
@@ -59,11 +59,11 @@ have the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"} an
 }
 \examples{
 \dontrun{
-d <- get_surv_samples("lingcod")
+d <- get_survey_samples("lingcod")
 tidy_ages_raw(d)
 plot_ages(d)
 
-d <- get_surv_samples("canary rockfish")
+d <- get_survey_samples("canary rockfish")
 tidy_ages_raw(d) \%>\%
   plot_ages()
 }

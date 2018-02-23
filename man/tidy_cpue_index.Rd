@@ -54,7 +54,7 @@ jackknife_cpue_index(m)
 }
 }
 \seealso{
-Other tidy data functions: \code{\link{plot_surv_index}},
+Other tidy data functions: \code{\link{plot_survey_index}},
   \code{\link{tidy_age_precision}}
 
 Other CPUE index functions: \code{\link{fit_cpue_index}},

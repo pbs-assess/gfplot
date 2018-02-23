@@ -61,7 +61,7 @@ firstup <- function(x) {
 }
 
 read_sql <- function(x) {
-  readLines(system.file("sql", x, package = "PBSsynopsis"))
+  readLines(system.file("sql", x, package = "gfsynopsis"))
 }
 
 round_nice <- function(x) {
