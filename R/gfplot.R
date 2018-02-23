@@ -1,9 +1,9 @@
 #' gfplot package
 #'
-#' PBS Synopsis Report package
+#' gfplot package
 #'
 #' See the README on
-#' \href{https://github.com/seananderson/pbs-synopsis#readme}{GitHub}
+#' \href{https://github.com/seananderson/gfplot#readme}{GitHub}
 #'
 #' @docType package
 #' @name gfplot

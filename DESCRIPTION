@@ -5,8 +5,8 @@ Date: 2018-02-16
 Authors@R: c(person("Sean", "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
     person("Elise", "Keppel", role = "aut"))
-Description: Facilitates the creation of reproducible data synopsis report for
-    DFO PBS groundfish stocks in British Columbia, Canada.
+Description: Facilitates data extraction (at PBS), data tidying, 
+    model fitting, and plotting of groundfish data.
 Depends: R (>= 3.2.0)
 License: GPL (>=2)
 Encoding: UTF-8
@@ -54,5 +54,5 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-URL: https://github.com/seananderson/pbs-synopsis
-BugReports: https://github.com/seananderson/pbs-synopsis/issues
+URL: https://github.com/seananderson/gfplot
+BugReports: https://github.com/seananderson/gfplot/issues
