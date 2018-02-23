@@ -20,11 +20,21 @@ test_that("get_* data functions work at PBS", {
   # d <- get_comm_samples("lingcod")
   # expect_gte(d$year[[1]], 1900L)
 
-  d <- get_cpue_spatial("lingcod")
-  expect_false(is.null(d$lat[[1]]))
-  expect_false(is.null(d$lon[[1]]))
+  # d <- get_cpue_spatial("lingcod")
+  # expect_false(is.null(d$lat[[1]]))
+  # expect_false(is.null(d$lon[[1]]))
 
-  # d <- get_comm_samples("lingcod")
-  # expect_gte(d$year[[1]], 1900L)
+  # d <- get_cpue_spatial_ll("lingcod")
+  # expect_type(d$fishing_event_id, "integer")
+
+  # d <- get_cpue_index("bottom trawl", min_year = 2015)
+  # expect_true(!is.null(d$fe_start_date))
+
+  # Why doesn't this work?
+  # d <- get_cpue_index("bottom trawl", min_year = 2015)
+  # expect_type(d$best_date, "datetime")
+
+  d <- get_surv_index("lingcod", ssid = 1)
+  expect_type(d$num_pos_sets, "integer")
 
 })

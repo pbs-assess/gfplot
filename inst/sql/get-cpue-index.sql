@@ -21,3 +21,4 @@ FROM GFFOS.dbo.GF_MERGED_CATCH C
 -- insert species here
 -- insert filters here
 	FE_END_DATE IS NOT NULL
+

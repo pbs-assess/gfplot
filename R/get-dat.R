@@ -252,7 +252,7 @@ get_survey_index <- function(species, ssid = NULL) {
   .q <- read_sql("get-surv-index.sql")
   .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, .q)
   if (!is.null(ssid))
-    .q <- inject_survey_filter("WHERE BD.SURVEY_SERIES_ID IN", ssid, .q)
+    .q <- inject_survey_filter("AND BD.SURVEY_SERIES_ID IN", ssid, .q)
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
