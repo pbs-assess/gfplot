@@ -61,8 +61,8 @@ Other tidy data functions: \code{\link{tidy_age_precision}},
   \code{\link{tidy_cpue_index}}
 
 Other plotting functions: \code{\link{fit_mat_ogive}},
-  \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
+  \code{\link{plot_cpue_index_jk}},
   \code{\link{plot_cpue_index}}
 }
 \concept{plotting functions}

@@ -47,7 +47,7 @@ NULL
 #' @param years TODO
 #' @export
 #' @rdname survey-spatial-modelling
-idy_survey_tows <- function(dat, survey, years, utm_zone = 9) {
+tidy_survey_tows <- function(dat, survey, years, utm_zone = 9) {
 
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
     filter(survey_series_desc %in% survey) %>%

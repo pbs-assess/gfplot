@@ -13,6 +13,8 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
   else "Length at maturity", rug = TRUE, rug_n = 1500, x_max = 1.5)
 }
 \arguments{
+\item{dat}{TODO}
+
 \item{type}{TODO}
 
 \item{sample_id_re}{TODO}
@@ -52,8 +54,8 @@ plot_mat_ogive(m)
 }
 }
 \seealso{
-Other plotting functions: \code{\link{jackknife_cpue_index}},
-  \code{\link{plot_cpue_index_coefs}},
+Other plotting functions: \code{\link{plot_cpue_index_coefs}},
+  \code{\link{plot_cpue_index_jk}},
   \code{\link{plot_cpue_index}},
   \code{\link{plot_survey_index}}
 }

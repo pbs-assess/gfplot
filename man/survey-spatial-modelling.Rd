@@ -2,7 +2,7 @@
 % Please edit documentation in R/surveys-spatial.R
 \name{survey-spatial-modelling}
 \alias{survey-spatial-modelling}
-\alias{idy_survey_tows}
+\alias{tidy_survey_tows}
 \alias{interp_survey_bathymetry}
 \alias{scale_survey_predictors}
 \alias{fit_glmmfields}
@@ -10,7 +10,7 @@
 \alias{fit_survey_tows}
 \title{Survey spatial modelling}
 \usage{
-idy_survey_tows(dat, survey, years, utm_zone = 9)
+tidy_survey_tows(dat, survey, years, utm_zone = 9)
 
 interp_survey_bathymetry(dat, utm_zone = 9)
 

@@ -34,13 +34,13 @@ jackknife_cpue_index(m)
 }
 \seealso{
 Other plotting functions: \code{\link{fit_mat_ogive}},
-  \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
+  \code{\link{plot_cpue_index_jk}},
   \code{\link{plot_survey_index}}
 
 Other CPUE index functions: \code{\link{fit_cpue_index}},
-  \code{\link{jackknife_cpue_index}},
   \code{\link{plot_cpue_index_coefs}},
+  \code{\link{plot_cpue_index_jk}},
   \code{\link{predict_cpue_index}},
   \code{\link{tidy_cpue_index}}
 }

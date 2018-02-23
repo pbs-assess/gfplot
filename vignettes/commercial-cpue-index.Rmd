@@ -58,5 +58,5 @@ predict_cpue_index(m, center = TRUE) %>%
 ```
 
 ```{r cpue-jk, warnings=FALSE, message=FALSE, fig.width=8, fig.height=4, cache=TRUE}
-jackknife_cpue_index(m)
+plot_cpue_index_jk(m)
 ```

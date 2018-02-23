@@ -1,5 +1,6 @@
 #' Fit and plot maturity ogives
 #'
+#' @param dat TODO
 #' @param sample_id_re TODO
 #' @param months TODO
 #' @param ageing_method TODO

@@ -363,7 +363,7 @@ plot_cpue_index_coefs <- function(object) {
 #'
 #' @template cpue-examples
 
-jackknife_cpue_index <- function(object,
+plot_cpue_index_jk <- function(object,
   terms = c("f(month)", "f(vessel)", "f(locality)",
     "f(depth)", "f(latitude)")){
   pos_dat <- object$data[object$data$pos_catch == 1, , drop = FALSE]
