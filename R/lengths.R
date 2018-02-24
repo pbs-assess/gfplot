@@ -112,6 +112,7 @@ tidy_lengths_raw <- function(dat, bin_size = 2,
 #' @param l Luminance in the range [0,100]
 #' @param c Chroma of the colour.
 #' @details See the [grDevices::hcl()] function for details.
+#' @export
 #' @examples
 #' gg_color_hue(10)
 #' plot(1:6, col = gg_color_hue(6), pch = 20, cex = 3)
