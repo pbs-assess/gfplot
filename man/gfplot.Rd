@@ -6,9 +6,9 @@
 \alias{gfplot-package}
 \title{gfplot package}
 \description{
-PBS Synopsis Report package
+gfplot package
 }
 \details{
 See the README on
-\href{https://github.com/seananderson/pbs-synopsis#readme}{GitHub}
+\href{https://github.com/seananderson/gfplot#readme}{GitHub}
 }

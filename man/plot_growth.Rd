@@ -9,13 +9,13 @@
 plot_growth(object_female, object_male, type = c("vb", "length-weight"),
   downsample = 2000L, pt_alpha = 0.2, xlab = "Age (years)",
   ylab = "Length (cm)", seed = 42, lab_x = 0.4, lab_y = 0.3,
-  lab_x_gap = 0.3, lab_y_gap = 0.08, col = c(Female = "red", Male =
-  "grey20"))
+  lab_x_gap = 0.3, lab_y_gap = 0.06, col = c(Female = "#d80d0d", Male =
+  "grey25"))
 
 plot_vb(..., type = "vb")
 
 plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
-  ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.25)
+  ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.35)
 }
 \arguments{
 \item{object_female}{TODO}
