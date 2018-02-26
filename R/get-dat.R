@@ -6,16 +6,28 @@
 #' visualization.
 #'
 #' @details
-#' * `get_survey_tows()` does...
-#' * `get_survey_samples()` does...
-#' * `get_comm_samples()` does...
-#' * `get_catch()` does...
-#' * `get_cpue_spatial()` does...
-#' * `get_cpue_index()` does...
-#' * `get_age_precision()` does...
-#' * `get_sara_dat()` does...
-#' * `get_survey_index()` does...
-#' * `cache_pbs_data()` does...
+#' * `get_survey_tows()` extracts survey catch data and spatial data for
+#'    plotting survey catchs on a map of British Columbia
+#' * `get_survey_samples()` extracts all biological sample specimen records
+#'    from research surveys for given species and survey series id's from GFBio
+#' * `get_comm_samples()` extracts all biological sample specimen records
+#'    from commercial data for given species from GFBio
+#' * `get_catch()` extracts all landing and discard records for a given species
+#'    from GFFOS.GF_MERGED_CATCH
+#' * `get_cpue_spatial()` extracts catch, effort and spatial data from
+#'    GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
+#' * `get_cpue_spatial_ll()` extracts catch, effort and spatial data from
+#'    GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
+#' * `get_cpue_index()` extracts catch and effort data from
+#'    GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery
+#' * `get_age_precision()` extracts age readings from biological samples for a
+#'    given species where there is a second ('precision') age reading
+#' * `get_sara_dat()` scrubs Species At Risk website for up-to-date species
+#'    status and listings
+#' * `get_survey_index()` extracts survey catch data for given species
+#'    and survey series id's
+#' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
+#'    and caches extracted data to a given folder
 #'
 #' @param species One or more species common names (e.g. `"pacific ocean
 #'   perch"`) or one or more species codes (e.g. `396`). Species codes can be

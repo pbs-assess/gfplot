@@ -64,19 +64,34 @@ want to look up a survey series ID via a surveys series description.}
 \item{path}{The folder where the cached data will be saved}
 }
 \description{
-Long description here
+Automates data extraction from fisheries databases. Extracts commercial
+and research survey catch and biological sampling data using SQL queries.
+These datasets feed into tidy, plot, and/or model functions for data
+visualization.
 }
 \details{
 \itemize{
-\item \code{get_survey_tows()} does...
-\item \code{get_survey_samples()} does...
-\item \code{get_comm_samples()} does...
-\item \code{get_catch()} does...
-\item \code{get_cpue_spatial()} does...
-\item \code{get_cpue_index()} does...
-\item \code{get_age_precision()} does...
-\item \code{get_sara_dat()} does...
-\item \code{get_survey_index()} does...
-\item \code{cache_pbs_data()} does...
+\item \code{get_survey_tows()} extracts survey catch data and spatial data for
+plotting survey catchs on a map of British Columbia
+\item \code{get_survey_samples()} extracts all biological sample specimen records
+from research surveys for given species and survey series id's from GFBio
+\item \code{get_comm_samples()} extracts all biological sample specimen records
+from commercial data for given species from GFBio
+\item \code{get_catch()} extracts all landing and discard records for a given species
+from GFFOS.GF_MERGED_CATCH
+\item \code{get_cpue_spatial()} extracts catch, effort and spatial data from
+GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
+\item \code{get_cpue_spatial_ll()} extracts catch, effort and spatial data from
+GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
+\item \code{get_cpue_index()} extracts catch and effort data from
+GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery
+\item \code{get_age_precision()} extracts age readings from biological samples for a
+given species where there is a second ('precision') age reading
+\item \code{get_sara_dat()} scrubs Species At Risk website for up-to-date species
+status and listings
+\item \code{get_survey_index()} extracts survey catch data for given species
+and survey series id's
+\item \code{cache_pbs_data()} runs all 'get' functions in the gfplot package
+and caches extracted data to a given folder
 }
 }
