@@ -80,7 +80,7 @@ fit_vb <- function(dat,
   }
 
   rstan::rstan_options(auto_write = TRUE)
-  model_file <- system.file("stan", "vb.stan", package = "gfsynopsis")
+  model_file <- system.file("stan", "vb.stan", package = "gfplot")
   mod <- rstan::stan_model(model_file)
 
   if (nrow(dat) > downsample)
@@ -239,8 +239,8 @@ plot_growth <- function(object_female, object_male,
   lab_x = 0.4,
   lab_y = 0.3,
   lab_x_gap = 0.3,
-  lab_y_gap = 0.08,
-  col = c("Female" = "red", "Male" = "grey20")) {
+  lab_y_gap = 0.06,
+  col = c("Female" = "#d80d0d", "Male" = "grey25")) {
 
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
@@ -317,16 +317,16 @@ plot_vb <- function(..., type = "vb") {
 #' @export
 #' @rdname plot_growth
 plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)",
-    ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.25) {
+    ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.35) {
   plot_growth(..., type = type, xlab = xlab,
     ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap) +
-    ggplot2::ggtitle("Length-weight")
+    ggplot2::ggtitle("Length-weight relationship")
 }
 
 # annotation helpers:
 ann_vb <- function(gg, pars, title, col, x, y, gap) {
   gg + ggplot2::annotate("text", label = title,
-    x = x, y = y, hjust = 0, col = col) +
+    x = x, y = y, hjust = 0, col = col, size = 3) +
     ann("k", pars[["k"]], dec = 2, x, y - gap) +
     ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2) +
     ann("t0", pars[["t0"]], dec = 2, x, y - gap * 3)
@@ -334,12 +334,12 @@ ann_vb <- function(gg, pars, title, col, x, y, gap) {
 
 ann_lw <- function(gg, pars, title, col, x, y, gap) {
   gg + ggplot2::annotate("text", label = title,
-    x = x, y = y, hjust = 0, col = col) +
-    ann("log(a)", pars[["log_a"]], dec = 2, x, y - gap) +
+    x = x, y = y, hjust = 0, col = col, size = 3) +
+    ann("ln(a)", pars[["log_a"]], dec = 2, x, y - gap) +
     ann("b", pars[["b"]], dec = 2, x, y - gap * 2)
 }
 
-ann <- function(par_name, par_val, dec, x, y, col = "grey10") {
+ann <- function(par_name, par_val, dec, x, y, col = "grey40") {
   ggplot2::annotate("text",
     label = paste0(
       par_name, " = ",
@@ -349,5 +349,5 @@ ann <- function(par_name, par_val, dec, x, y, col = "grey10") {
     x = x,
     y = y,
     hjust = 0,
-    col = col)
+    col = col, size = 3)
 }

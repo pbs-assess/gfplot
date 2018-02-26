@@ -212,7 +212,7 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
       Y = seq(min(dat$Y), max(dat$Y), length.out = n),
       year = unique(dat$year))
   } else {
-    shape_utm <- ll2utm(gfsynopsis::survey_grids[[region]],
+    shape_utm <- ll2utm(gfplot::survey_grids[[region]],
       utm_zone = utm_zone)
     sp_poly <- sp::SpatialPolygons(
       list(sp::Polygons(list(sp::Polygon(shape_utm)), ID = 1)))

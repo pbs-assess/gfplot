@@ -30,10 +30,10 @@ tidy_cpue_index <- function(dat, species_common,
   depth_bands = seq(50, 450, 25),
   gear = "BOTTOM TRAWL") {
 
-  pbs_areas <- gfsynopsis::pbs_areas[grep(area_grep_pattern,
-    gfsynopsis::pbs_areas$major_stat_area_description), ]
+  pbs_areas <- gfplot::pbs_areas[grep(area_grep_pattern,
+    gfplot::pbs_areas$major_stat_area_description), ]
   names(dat) <- tolower(names(dat))
-  dat <- inner_join(dat, gfsynopsis::pbs_species, by = "species_code")
+  dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
 
   # basic filtering:
   catch <- dat %>%
@@ -177,7 +177,7 @@ fit_cpue_index <- function(dat,
     f(month) + f(vessel) +
     f(locality) + f(depth) + f(latitude)) {
 
-  tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "gfsynopsis")
+  tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "gfplot")
   TMB::compile(tmb_cpp)
   dyn.load(TMB::dynlib(sub("\\.cpp", "", tmb_cpp)))
 

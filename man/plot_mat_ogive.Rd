@@ -10,7 +10,7 @@ fit_mat_ogive(dat, type = c("age", "length"), sample_id_re = FALSE,
 
 plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
   else "Length (cm)", title = if (object$type[[1]] == "age") "Age at maturity"
-  else "Length at maturity", rug = TRUE, rug_n = 1500, x_max = 1.5)
+  else "Length at maturity", rug = TRUE, rug_n = 1500, x_max = 1.75)
 }
 \arguments{
 \item{dat}{TODO}

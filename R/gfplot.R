@@ -1,12 +1,12 @@
-#' gfsynopsis package
+#' gfplot package
 #'
-#' PBS Synopsis Report package
+#' gfplot package
 #'
 #' See the README on
-#' \href{https://github.com/seananderson/pbs-synopsis#readme}{GitHub}
+#' \href{https://github.com/seananderson/gfplot#readme}{GitHub}
 #'
 #' @docType package
-#' @name gfsynopsis
+#' @name gfplot
 #' @importFrom dplyr filter mutate summarise select group_by n arrange ungroup
 #' @importFrom dplyr inner_join left_join right_join anti_join full_join
 #' @importFrom dplyr bind_rows case_when pull contains tibble rename as_tibble

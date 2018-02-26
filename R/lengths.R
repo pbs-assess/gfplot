@@ -104,15 +104,42 @@ tidy_lengths_raw <- function(dat, bin_size = 2,
   list(data = out, counts = counts, surveys = su)
 }
 
+#' ggplot2-like colour scale in HCL space
+#'
+#' @param n Number of colours to return.
+#' @param hue_min Minimum hue value in the range [0,360]
+#' @param hue_max Maximum hue value in the range [0,360]
+#' @param l Luminance in the range [0,100]
+#' @param c Chroma of the colour.
+#' @details See the [grDevices::hcl()] function for details.
+#' @export
+#' @examples
+#' gg_color_hue(10)
+#' plot(1:6, col = gg_color_hue(6), pch = 20, cex = 3)
+gg_color_hue <- function(n, hue_min = 8, hue_max = 290, l = 52, c = 100) {
+  hues <- seq(hue_min, hue_max, length = n + 1)
+  grDevices::hcl(h = hues, l = l, c = c)[seq_len(n)]
+}
+
 #' @rdname plot_lengths
 #' @export
-
 plot_lengths <- function(dat, xlab = "Length (cm)",
   ylab = "Relative length frequency",
   fill_col = c("M" = "grey80", "F" = "#FF000010"),
-  line_col = c("M" = "grey40", "F" = "red")) {
+  line_col = c("M" = "grey40", "F" = "red"),
+  survey_col_function = NULL, alpha = 0.24) {
 
   dat$data$sex[is.na(dat$data$sex)] <- "F" # for legend only; avoid "NAs"
+
+  if (!is.null(survey_col_function)) {
+    col <- survey_col_function(length(dat$surveys$survey))
+    col <- setNames(col, paste("F", dat$surveys$survey))
+    col <- c(col, setNames(rep("#888888", length(col)),
+      paste("M", dat$surveys$survey)))
+    fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    line_col <- col
+    dat$data$sex <- paste(dat$data$sex, dat$data$survey)
+  }
 
   x_breaks <- pretty(dat$data$length_bin, 4L)
   N <- length(x_breaks)
@@ -134,8 +161,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     xlab(xlab) + ylab(ylab) +
     ylim(-0.04, 1.07) +
     theme(
-      axis.text.y = element_text(colour = "white"),
-      axis.ticks.y = element_line(colour = "white")) +
+      axis.text.y = ggplot2::element_blank(),
+      axis.ticks.y =ggplot2::element_blank()) +
     theme(panel.spacing = unit(-0.1, "lines")) +
     labs(colour = "Sex", fill = "Sex") +
     geom_text(data = dat$counts,
@@ -143,5 +170,6 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       y = 0.85, aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0) +
     labs(title = "Length frequencies") +
-    theme(panel.grid.major.x = ggplot2::element_line(colour = "grey92"))
+    theme(panel.grid.major.x = ggplot2::element_line(colour = "grey93")) +
+    guides(colour = FALSE, fill = FALSE)
 }

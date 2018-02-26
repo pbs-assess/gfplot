@@ -152,7 +152,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
       "stratifications. If working with the data yourelf, filter them after ",
       "selecting specific surveys. For example, ",
       "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-      "Tidying and plotting functions with gfsynopsis will do this for you.")
+      "Tidying and plotting functions with gfplot will do this for you.")
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
@@ -314,4 +314,9 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   d <- get_age_precision(species)
   saveRDS(d, file = file.path(path, "pbs-age-precision.rds"))
+
+  d <- get_cpue_index(gear = "bottom trawl", min_year = 1996)
+  saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"))
+
+  message("All data extracted and saved in the folder `", path, "`.")
 }

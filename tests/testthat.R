@@ -1,4 +1,4 @@
 library(testthat)
-library(gfsynopsis)
+library(gfplot)
 
-test_check("gfsynopsis")
+test_check("gfplot")

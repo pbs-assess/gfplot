@@ -39,7 +39,7 @@ fit_mat_ogive <- function(dat,
       specimen_id, sample_id, trip_start_date)
 
   file <- system.file("extdata", "maturity_assignment.csv",
-    package = "gfsynopsis")
+    package = "gfplot")
 
   mat_df <- readr::read_csv(file,
     col_types = readr::cols(
@@ -109,7 +109,7 @@ plot_mat_ogive <- function(object,
   xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
   title =
     if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
-  rug = TRUE, rug_n = 1500, x_max = 1.5) {
+  rug = TRUE, rug_n = 1500, x_max = 1.75) {
 
   nd_re <- object$pred_data
 
@@ -136,15 +136,16 @@ plot_mat_ogive <- function(object,
   f_perc$p0.05 <- logit_perc(
     a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.05)
 
-  labs_m <- tibble(p = c("05", "50", "95"),
-    value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
-    x = 0.75 * max(nd_re$age_or_length),
-    y = seq(0.4, 0.2, length.out = 3), sex = "M")
-
   labs_f <- tibble(p = c("05", "50", "95"),
     value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
-    x = 0.75 * max(nd_re$age_or_length),
-    y = seq(0.8, 0.6, length.out = 3L), sex = "F")
+    x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+    y = seq(0.75, 0.6, length.out = 3L), sex = "F")
+
+  labs_m <- tibble(p = c("05", "50", "95"),
+    value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
+    x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+    y = seq(0.4, 0.25, length.out = 3), sex = "M")
+
 
   labs <- bind_rows(labs_m, labs_f)
 
@@ -160,7 +161,7 @@ plot_mat_ogive <- function(object,
         paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "cm"))
   }
   max_x <- min(c(max(labs$value) * x_max, max(nd_fe$age_or_length)))
-  labs <- mutate(labs, x = max_x * 0.75)
+  labs <- mutate(labs, x = max_x * 0.65) # actual x position calculation
 
   g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex"))
   if ("glmm_re" %in% names(nd_re)) {
@@ -172,11 +173,11 @@ plot_mat_ogive <- function(object,
     aes_string(xintercept = "value", colour = "sex"),
     lty = 2, show.legend = FALSE) +
     geom_line(size = 1.25) +
-    scale_colour_manual(values = c("M" = "grey40", "F" = "red")) +
+    scale_colour_manual(values = c("M" = "grey30", "F" = "#d80d0d")) +
     xlab(xlab) + ylab("Probability mature") +
     geom_text(data = labs, aes_string(x = "x", y = "y",
       label = "label"),
-      hjust = 0, show.legend = FALSE) +
+      hjust = 0, show.legend = FALSE, size = 3) +
     theme_pbs() +
     coord_cartesian(expand = FALSE, ylim = c(-0.005, 1.005),
       xlim = c(0, max_x)) +

@@ -137,8 +137,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 
   ggplot(dat, aes_string("year_jitter", "age")) +
     geom_vline(xintercept = seq(year_range[1], year_range[2], 1),
-      col = "grey92", lwd = 0.4) +
-    geom_hline(yintercept = seq(0, age_max, 10), col = "grey92",
+      col = "grey95", lwd = 0.4) +
+    geom_hline(yintercept = seq(0, age_max, 10), col = "grey95",
       lwd = 0.4) +
     geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
       pch = 21, alpha = 0.9) +
