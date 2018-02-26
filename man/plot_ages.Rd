@@ -15,7 +15,9 @@ tidy_ages_raw(dat,
   "IPHC"), spp_cat_code = 1)
 
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)", year_range = NULL)
+  ylab = "Age (years)", year_range = NULL, fill_col = c(M = "grey50", F =
+  "#f44256"), line_col = c(M = "grey50", F = "#f44256"), survey_cols = NULL,
+  alpha = 0.85)
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_ages_raw()} should be from

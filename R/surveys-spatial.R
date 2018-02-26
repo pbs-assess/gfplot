@@ -49,6 +49,7 @@ NULL
 #' @rdname survey-spatial-modelling
 tidy_survey_tows <- function(dat, survey, years, utm_zone = 9) {
 
+  browser()
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
     filter(survey_series_desc %in% survey) %>%
     filter(year %in% years) %>%
@@ -59,9 +60,12 @@ tidy_survey_tows <- function(dat, survey, years, utm_zone = 9) {
     rename(depth = depth_m)
   dat <- mutate(dat, present = ifelse(density > 0, 1, 0))
 
+  ## stop("TODO: Need make sure no duplicated data b/c of sample IDs per FE.")
+  ## dat <- dat[!duplicated(select(dat, ...)), ]
+
   dat$lat <- dat$Y
   dat$lon <- dat$X
-  if (nrow(dat) > 1)
+  if (nrow(dat) >= 1)
     dat <- as_tibble(ll2utm(dat, utm_zone = utm_zone))
 
   dat

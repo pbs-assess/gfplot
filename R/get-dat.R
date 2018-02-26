@@ -93,8 +93,19 @@ get_survey_ids <- function(ssid) {
 
 #' @export
 #' @rdname get
-get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36)) {
+get_survey_sets <- function(species, ssid = c(1, 3, 4, 16),
+  join_sample_ids = FALSE) {
   species_codes <- common2codes(species)
+
+stop("In progress!")
+# if (!ssid %in% c(XX, YY))
+#   stop("One or more of the survey series IDs is not supported.")
+# if (ssid %in% XX) {
+#   sql_proc <- "proc_catmat_2011"
+# }
+# if (ssid %in% YY) {
+#   sql_proc <- "proc_catmat_2011"
+# }
 
   species_df <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
   sample_trip_ids <- get_sample_trips()
@@ -107,16 +118,26 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36)) {
     for (j in seq_along(survey_ids$SURVEY_ID)) {
       k <- k + 1
       d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-        paste0("EXEC proc_catmat_2011 ", survey_ids$SURVEY_ID[j], ", '",
+        paste0("EXEC ", sql_proc, survey_ids$SURVEY_ID[j], ", '",
           species_codes[i], "'"))
     }
   }
   .d <- bind_rows(d_survs)
 
-  .d <- inner_join(.d,
-    unique(select(survey_ids,
-      SURVEY_SERIES_ID,
-      SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
+  if (join_sample_ids) {
+    .d <- inner_join(.d,
+      unique(select(survey_ids,
+          SURVEY_SERIES_ID,
+          SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
+
+  ## if (length(.d$specimen_id) > length(unique(.d$specimen_id)))
+  ##   warning("Duplicate specimen IDs are present because of overlapping survey ",
+  ##     "stratifications. If working with the data yourelf, filter them after ",
+  ##     "selecting specific surveys. For example, ",
+  ##     "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
+  ##     "Tidying and plotting functions with gfplot will do this for you.")
+
+  }
 
   .d <- inner_join(.d,
     unique(select(species_df,
@@ -241,11 +262,11 @@ get_cpue_spatial_ll <- function(species) {
 #' @param min_year Minimum year to return.
 #' @export
 #' @rdname get
-get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
+get_cpue_index <- function(gear = "bottom trawl", min_year = 1996, max_year = Inf) {
   .q <- read_sql("get-cpue-index.sql")
   i <- grep("-- insert filters here", .q)
   .q[i] <- paste0("GEAR IN(", collapse_filters(toupper(gear)),
-    ") AND YEAR(BEST_DATE) >= ", min_year, " AND")
+    ") AND YEAR(BEST_DATE) >= ", min_year, " AND YEAR(BEST_DATE) <= ", max_year)
   .d <- run_sql("GFFOS", .q)
   names(.d) <- tolower(names(.d))
   as_tibble(.d)
@@ -303,7 +324,8 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_survey_tows(species)
+  d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE)
+  ## TODO: filter out dups
   saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
 
   d <- get_survey_samples(species)

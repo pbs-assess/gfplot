@@ -112,7 +112,10 @@ tidy_ages_raw <- function(dat,
 #' @rdname plot_ages
 #' @export
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)", year_range = NULL) {
+  ylab = "Age (years)", year_range = NULL,
+  fill_col = c("M" = "grey50", "F" = "#f44256"),
+  line_col = c("M" = "grey50", "F" = "#f44256"),
+  survey_cols = NULL, alpha = 0.85) {
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
@@ -132,10 +135,20 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   dat$sex[is.na(dat$sex)] <- "F" # just for legend or we'll have "NAs"
   age_range <- diff(range(dat$age, na.rm = TRUE))
 
+  if (!is.null(survey_cols)) {
+    survey_col_names <- names(survey_cols)
+    col <- setNames(survey_cols, paste("F", survey_col_names))
+    col <- c(col, setNames(rep("#888888", length(col)),
+      paste("M", survey_col_names)))
+    fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    line_col <- col
+    dat$sex <- paste(dat$sex, dat$survey)
+  }
+
   if (is.null(year_range))
     year_range <- c(year_min, year_max)
 
-  ggplot(dat, aes_string("year_jitter", "age")) +
+  g <- ggplot(dat, aes_string("year_jitter", "age")) +
     geom_vline(xintercept = seq(year_range[1], year_range[2], 1),
       col = "grey95", lwd = 0.4) +
     geom_hline(yintercept = seq(0, age_max, 10), col = "grey95",
@@ -143,8 +156,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
       pch = 21, alpha = 0.9) +
     facet_wrap(~survey, nrow = 1) +
-    scale_fill_manual(values = c("M" = "grey50", "F" = "#f44256")) +
-    scale_colour_manual(values = c("M" = "grey50", "F" = "#f44256")) +
+    scale_fill_manual(values = fill_col) +
+    scale_colour_manual(values = line_col) +
     scale_x_continuous(breaks =
       seq(round_down_even(year_range[1]), year_range[2], year_increment)) +
     xlab("") +
@@ -163,4 +176,9 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       angle = 90) +
     theme(panel.spacing = unit(-0.1, "lines")) +
     labs(title = "Age frequencies", colour = "Sex", fill = "Sex")
+
+  if (!is.null(survey_cols))
+    g <- g + guides(fill = FALSE, colour = FALSE)
+
+  g
 }
