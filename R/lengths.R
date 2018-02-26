@@ -127,15 +127,15 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   ylab = "Relative length frequency",
   fill_col = c("M" = "grey80", "F" = "#FF000010"),
   line_col = c("M" = "grey40", "F" = "red"),
-  survey_col_function = NULL, alpha = 0.24) {
+  survey_cols = NULL, alpha = 0.24) {
 
   dat$data$sex[is.na(dat$data$sex)] <- "F" # for legend only; avoid "NAs"
 
-  if (!is.null(survey_col_function)) {
-    col <- survey_col_function(length(dat$surveys$survey))
-    col <- setNames(col, paste("F", dat$surveys$survey))
+  if (!is.null(survey_cols)) {
+    survey_col_names <- names(survey_cols)
+    col <- setNames(survey_cols, paste("F", survey_col_names))
     col <- c(col, setNames(rep("#888888", length(col)),
-      paste("M", dat$surveys$survey)))
+      paste("M", survey_col_names)))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
     line_col <- col
     dat$data$sex <- paste(dat$data$sex, dat$data$survey)
@@ -146,7 +146,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   x_breaks <- x_breaks[seq(1, N - 1)]
   range_lengths <- diff(range(dat$data$length_bin, na.rm = TRUE))
 
-  ggplot(dat$data, aes_string("length_bin", "proportion")) +
+  g <- ggplot(dat$data, aes_string("length_bin", "proportion")) +
     geom_col(width = unique(dat$bin_size),
       aes_string(colour = "sex", fill = "sex"), size = 0.3,
       position = position_identity()) +
@@ -170,6 +170,10 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       y = 0.85, aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0) +
     labs(title = "Length frequencies") +
-    theme(panel.grid.major.x = ggplot2::element_line(colour = "grey93")) +
-    guides(colour = FALSE, fill = FALSE)
+    theme(panel.grid.major.x = ggplot2::element_line(colour = "grey93"))
+
+  if (!is.null(survey_cols))
+    g <- g + guides(fill = FALSE, colour = FALSE)
+
+  g
 }
