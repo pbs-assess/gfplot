@@ -93,7 +93,7 @@ get_survey_ids <- function(ssid) {
 
 #' @export
 #' @rdname get
-get_survey_tows <- function(species, ssid = c(1, 3, 4, 16)) {
+get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36)) {
   species_codes <- common2codes(species)
 
   species_df <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
