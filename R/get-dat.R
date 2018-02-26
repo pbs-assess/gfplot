@@ -1,6 +1,9 @@
 #' Get PBS data
 #'
-#' Long description here
+#' Automates data extraction from fisheries databases. Extracts commercial
+#' and research survey catch and biological sampling data using SQL queries.
+#' These datasets feed into tidy, plot, and/or model functions for data
+#' visualization.
 #'
 #' @details
 #' * `get_survey_tows()` does...
