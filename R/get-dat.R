@@ -93,19 +93,23 @@ get_survey_ids <- function(ssid) {
 
 #' @export
 #' @rdname get
-get_survey_sets <- function(species, ssid = c(1, 3, 4, 16),
+get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2),
   join_sample_ids = FALSE) {
   species_codes <- common2codes(species)
+  trawl <- c(1, 3, 4, 16, 2)
+  ll <- c(14, 22, 36)
 
-stop("In progress!")
-# if (!ssid %in% c(XX, YY))
-#   stop("One or more of the survey series IDs is not supported.")
-# if (ssid %in% XX) {
-#   sql_proc <- "proc_catmat_2011"
-# }
-# if (ssid %in% YY) {
-#   sql_proc <- "proc_catmat_2011"
-# }
+##stop("In progress!")
+if (!ssid %in% c(trawl, ll))
+  stop("One or more of the survey series IDs is not supported.")
+if (ssid %in% trawl) {
+  sql_proc <- "proc_catmat_2011"
+}
+
+
+if (ssid %in% ll) {
+  sql_proc <- "proc_catmat_ll_2013"
+}
 
   species_df <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
   sample_trip_ids <- get_sample_trips()
@@ -118,7 +122,7 @@ stop("In progress!")
     for (j in seq_along(survey_ids$SURVEY_ID)) {
       k <- k + 1
       d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-        paste0("EXEC ", sql_proc, survey_ids$SURVEY_ID[j], ", '",
+        paste0("EXEC ", sql_proc," " ,survey_ids$SURVEY_ID[j], ", '",
           species_codes[i], "'"))
     }
   }
