@@ -46,7 +46,7 @@
 #' get_cpue_spatial(species)
 #' get_cpue_spatial_ll("yelloweye rockfish")
 #'
-#' get_cpue_index(gear = "bottom trawl", min_year = 2012)
+#' get_cpue_index(gear = "bottom trawl", min_year = 2012, max_year = 2017)
 #'
 #' get_age_precision("arrowtooth flounder")
 #' get_survey_index(species, ssid = 3)
