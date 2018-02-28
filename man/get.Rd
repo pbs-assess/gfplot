@@ -101,10 +101,30 @@ and caches extracted data to a given folder
 }
 \section{Note}{
 
-'Get' functions only extract data when performed on a computer connected
-to the DFO network.
+\code{get_*} functions only extract data when performed on a computer connected to
+the Pacific Biological Station DFO network. The \code{get_*} functions attempt to
+detect this and will not run unless "PBS" is in \code{Sys.info()["nodename"]} and
+the computer is a Windows computer.
 }
 
+\examples{
+\dontrun{
+get_survey_sets("lingcod", 1)
+get_survey_sets(442, ssid = c(1,3,4,16))
+
+get_survey_samples("lingcod", 3)
+
+species <- c("lingcod", "yelloweye rockfish")
+get_comm_samples(species)
+
+get_catch(c("yelloweye rockfish", "pacific ocean perch"))
+get_catch(c(442, 397))
+
+get_cpue_spatial("pacific cod")
+get_cpue_spatial_ll("arrowtooth flounder")
+}
+
+<<<<<<< HEAD
 \examples{
 \dontrun{
 get_survey_sets(species = "lingcod", ssid = 1)
@@ -132,3 +152,6 @@ cache_pbs_data(species, path = "data-cache")
 \code{\link{tidy_survey_index}}
 }
 \concept{get data functions}
+=======
+}
+>>>>>>> d16f857354974d828279e6d235eb983a7a1e9182
