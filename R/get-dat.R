@@ -28,8 +28,10 @@
 #'    and caches extracted data to a given folder
 #'
 #' @section Note:
-#' 'Get' functions only extract data when performed on a computer connected
-#' to the DFO network.
+#' `get_*` functions only extract data when performed on a computer connected to
+#' the Pacific Biological Station DFO network. The `get_*` functions attempt to
+#' detect this and will not run unless "PBS" is in `Sys.info()["nodename"]` and
+#' the computer is a Windows computer.
 #'
 #'@examples
 #' \dontrun{
@@ -46,11 +48,7 @@
 #'
 #' get_cpue_spatial("pacific cod")
 #' get_cpue_spatial_ll("arrowtooth flounder")
-#'
 #'}
-#'
-#' @seealso \code{\link{tidy_age_precision}}, \code{\link{tidy_catch}},
-#' \code{\link{tidy_survey_index}}
 #'
 #' @param species One or more species common names (e.g. `"pacific ocean
 #'   perch"`) or one or more species codes (e.g. `396`). Species codes can be
@@ -119,21 +117,24 @@ get_survey_ids <- function(ssid) {
 #' @rdname get
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE) {
-  species_codes <- common2codes(species)
+
   trawl <- c(1, 3, 4, 16, 2)
   ll <- c(14, 22, 36)
 
-##stop("In progress!")
-if (!ssid %in% c(trawl, ll))
-  stop("One or more of the survey series IDs is not supported.")
-if (ssid %in% trawl) {
-  sql_proc <- "proc_catmat_2011"
-}
+  missing <- setdiff(ssid, c(trawl, ll))
+  if (length(missing) > 0)
+    stop("ssid(s) ", missing, " is/are not supported. Must be one of ",
+      paste(sort(c(trawl, ll)), collapse = ", "), ". ",
+      "See the function `get_ssids()` for help identifying ",
+      "survey series IDs.", call. = FALSE)
+  if (ssid %in% trawl)
+    sql_proc <- "proc_catmat_2011"
+  if (ssid %in% ll) {
+    stop("Long line surveys are not yet supported. TODO")
+    sql_proc <- "proc_catmat_ll_2013"
+  }
 
-
-if (ssid %in% ll) {
-  sql_proc <- "proc_catmat_ll_2013"
-}
+  species_codes <- common2codes(species)
 
   species_df <- run_sql("GFBioSQL", "SELECT * FROM SPECIES")
   sample_trip_ids <- get_sample_trips()
@@ -146,7 +147,7 @@ if (ssid %in% ll) {
     for (j in seq_along(survey_ids$SURVEY_ID)) {
       k <- k + 1
       d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-        paste0("EXEC ", sql_proc," " ,survey_ids$SURVEY_ID[j], ", '",
+        paste0("EXEC ", sql_proc, " ", survey_ids$SURVEY_ID[j], ", '",
           species_codes[i], "'"))
     }
   }

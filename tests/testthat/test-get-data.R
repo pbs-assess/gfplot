@@ -53,4 +53,6 @@ test_that("get_* data functions work at PBS", {
   d <- get_survey_ids(16)
   expect_true(!is.null(d$SURVEY_ID[[1]]))
 
+  expect_error(get_survey_sets("lingcod", ssid = 99999))
+
 })
