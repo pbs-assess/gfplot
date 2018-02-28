@@ -34,7 +34,7 @@ get_cpue_spatial(species)
 
 get_cpue_spatial_ll(species)
 
-get_cpue_index(gear = "bottom trawl", min_year = 1996, max_year = Inf)
+get_cpue_index(gear = "bottom trawl", min_year = 1996)
 
 get_age_precision(species)
 
@@ -62,7 +62,7 @@ length or weight values.}
 
 \item{gear}{The gear type(s) to include. Will be converted to uppercase.}
 
-\item{min_year, }{max_year Minimum or maximum year to return.}
+\item{min_year}{Minimum year to return.}
 
 \item{path}{The folder where the cached data will be saved}
 }
@@ -109,24 +109,6 @@ the computer is a Windows computer.
 
 \examples{
 \dontrun{
-get_survey_sets("lingcod", 1)
-get_survey_sets(442, ssid = c(1,3,4,16))
-
-get_survey_samples("lingcod", 3)
-
-species <- c("lingcod", "yelloweye rockfish")
-get_comm_samples(species)
-
-get_catch(c("yelloweye rockfish", "pacific ocean perch"))
-get_catch(c(442, 397))
-
-get_cpue_spatial("pacific cod")
-get_cpue_spatial_ll("arrowtooth flounder")
-}
-
-<<<<<<< HEAD
-\examples{
-\dontrun{
 get_survey_sets(species = "lingcod", ssid = 1)
 
 get_survey_samples(species = 442, ssid = c(1,3,4,16))
@@ -140,18 +122,9 @@ get_cpue_spatial_ll("yelloweye rockfish")
 
 get_cpue_index(gear = "bottom trawl", min_year = 2012, max_year = 2017)
 
-get_age_precision("arrowtooth flounder")
-get_survey_index(species, ssid = 3)
-
-cache_pbs_data(species, path = "data-cache")
+get_cpue_spatial("pacific cod")
+get_cpue_spatial_ll("arrowtooth flounder")
 }
 
-}
-\seealso{
-\code{\link{tidy_age_precision}}, \code{\link{tidy_catch}},
-\code{\link{tidy_survey_index}}
 }
 \concept{get data functions}
-=======
-}
->>>>>>> d16f857354974d828279e6d235eb983a7a1e9182
