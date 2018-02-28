@@ -49,6 +49,11 @@ NULL
 #' @rdname survey-spatial-modelling
 tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
 
+  # Make sure here are no duplicated fishing events in surveyed tows
+  # Could be there because of the sample ID column being emerged in
+  dat <- dat[!duplicated(
+    select(dat, year, fishing_event_id)), , drop = FALSE]
+
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
     filter(survey_series_id %in% survey) %>%
     filter(year %in% years) %>%
@@ -58,9 +63,6 @@ tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
     rename(X = start_lon, Y = start_lat) %>%
     rename(depth = depth_m)
   dat <- mutate(dat, present = ifelse(density > 0, 1, 0))
-
-  ## stop("TODO: Need make sure no duplicated data b/c of sample IDs per FE.")
-  ## dat <- dat[!duplicated(select(dat, ...)), ]
 
   dat$lat <- dat$Y
   dat$lon <- dat$X
