@@ -40,11 +40,11 @@ Title TODO
 }
 \examples{
 \dontrun{
-x <- fit_survey_tows(pop_surv,
+x <- fit_survey_sets(pop_surv,
   years = 2015,
   survey = "Queen Charlotte Sound Synoptic Survey",
   iter = 600, chains = 1, mcmc_posterior_samples = 100)
-plot_survey_tows(x$predictions, x$data, fill_column = "combined")
+plot_survey_sets(x$predictions, x$data, fill_column = "combined")
 }
 }
 \seealso{

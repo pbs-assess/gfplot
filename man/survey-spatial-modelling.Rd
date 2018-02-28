@@ -76,7 +76,7 @@ Long description here
 }
 \details{
 \itemize{
-\item \code{tidy_survey_tows()} does...
+\item \code{tidy_survey_sets()} does...
 \item \code{interp_survey_bathymetry()} does...
 ... TODO
 }
@@ -84,16 +84,16 @@ Long description here
 \examples{
 \dontrun{
 ## generally, use the main function:
-x <- fit_survey_tows(pop_surv,
+x <- fit_survey_sets(pop_surv,
   years = 2015,
   survey = "Queen Charlotte Sound Synoptic Survey",
   iter = 600, chains = 1, mcmc_posterior_samples = 100)
 names(x)
 print(x$models)
-plot_survey_tows(x$predictions, x$data, fill_column = "combined")
+plot_survey_sets(x$predictions, x$data, fill_column = "combined")
 
-## internally, fit_survey_tows() does something like this:
-dat <- tidy_survey_tows(pop_surv,
+## internally, fit_survey_sets() does something like this:
+dat <- tidy_survey_sets(pop_surv,
  survey = "Queen Charlotte Sound Synoptic Survey",
  years = 2015)
 dat_interp <- interp_survey_bathymetry(dat)
@@ -106,7 +106,7 @@ bin <- predict(m$bin, newdata = data.frame(pg, time = 1),
  type = "response", return_mcmc = TRUE, iter = 100)
 com <- bin * pos
 pg$combined <- apply(com, 1, median)
-plot_survey_tows(pg, dat, fill_column = "combined")
+plot_survey_sets(pg, dat, fill_column = "combined")
 }
 }
 \seealso{

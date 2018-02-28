@@ -1,7 +1,10 @@
 #' Get PBS data
 #'
-#' Automates data extraction from DFO groundfish databases. These datasets feed
-#' into other functions (eg. tidy, plot, model) for data visualization.
+#' Automates fisheries and research survey data extraction from DFO Pacific
+#' groundfish databases. The output datasets feed into other functions (eg.
+#' tidy, plot, modelling) for data visualization, which can be used as
+#' prodcuts themselves or can be fed into automated DFO Pacific groundfish
+#' data synopsis report production.
 #'
 #' @details
 #' * `get_survey_sets()` extracts survey catch data and spatial data for
@@ -27,27 +30,33 @@
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    and caches extracted data to a given folder
 #'
+#'
+#' @family get data functions
+#'
+#' @examples
+#' \dontrun{
+#' get_survey_sets(species = "lingcod", ssid = 1)
+#'
+#' get_survey_samples(species = 442, ssid = c(1,3,4,16))
+#' get_comm_samples(c(442, 397))
+#'
+#' species <- c("lingcod", "pacific cod")
+#' get_catch(species)
+#'
+#' get_cpue_spatial(species)
+#' get_cpue_spatial_ll("yelloweye rockfish")
+#'
+#' get_cpue_index(gear = "bottom trawl", min_year = 2012, max_year = 2017)
+#'
+#' get_age_precision("arrowtooth flounder")
+#' get_survey_index(species, ssid = 3)
+#'
+#'cache_pbs_data(species, path = "data-cache")
+#'}
+#'
 #' @section Note:
 #' 'Get' functions only extract data when performed on a computer connected
 #' to the DFO network.
-#'
-#'@examples
-#' \dontrun{
-#' get_survey_sets("lingcod", 1)
-#' get_survey_sets(442, ssid = c(1,3,4,16))
-#'
-#' get_survey_samples("lingcod", 3)
-#'
-#' species <- c("lingcod", "yelloweye rockfish")
-#' get_comm_samples(species)
-#'
-#' get_catch(c("yelloweye rockfish", "pacific ocean perch"))
-#' get_catch(c(442, 397))
-#'
-#' get_cpue_spatial("pacific cod")
-#' get_cpue_spatial_ll("arrowtooth flounder")
-#'
-#'}
 #'
 #' @seealso \code{\link{tidy_age_precision}}, \code{\link{tidy_catch}},
 #' \code{\link{tidy_survey_index}}
@@ -291,11 +300,11 @@ get_cpue_spatial_ll <- function(species) {
 #' @param min_year Minimum year to return.
 #' @export
 #' @rdname get
-get_cpue_index <- function(gear = "bottom trawl", min_year = 1996, max_year = Inf) {
+get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   .q <- read_sql("get-cpue-index.sql")
   i <- grep("-- insert filters here", .q)
   .q[i] <- paste0("GEAR IN(", collapse_filters(toupper(gear)),
-    ") AND YEAR(BEST_DATE) >= ", min_year, " AND YEAR(BEST_DATE) <= ", max_year)
+    ") AND YEAR(BEST_DATE) >= ", min_year, " AND ")
   .d <- run_sql("GFFOS", .q)
   names(.d) <- tolower(names(.d))
   as_tibble(.d)

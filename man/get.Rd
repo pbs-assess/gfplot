@@ -62,13 +62,16 @@ length or weight values.}
 
 \item{gear}{The gear type(s) to include. Will be converted to uppercase.}
 
-\item{min_year}{Minimum year to return.}
+\item{min_year, }{max_year Minimum or maximum year to return.}
 
 \item{path}{The folder where the cached data will be saved}
 }
 \description{
-Automates data extraction from DFO groundfish databases. These datasets feed
-into other functions (eg. tidy, plot, model) for data visualization.
+Automates fisheries and research survey data extraction from DFO Pacific
+groundfish databases. The output datasets feed into other functions (eg.
+tidy, plot, modelling) for data visualization, which can be used as
+prodcuts themselves or can be fed into automated DFO Pacific groundfish
+data synopsis report production.
 }
 \details{
 \itemize{
@@ -102,8 +105,30 @@ and caches extracted data to a given folder
 to the DFO network.
 }
 
+\examples{
+\dontrun{
+get_survey_sets(species = "lingcod", ssid = 1)
+
+get_survey_samples(species = 442, ssid = c(1,3,4,16))
+get_comm_samples(c(442, 397))
+
+species <- c("lingcod", "pacific cod")
+get_catch(species)
+
+get_cpue_spatial(species)
+get_cpue_spatial_ll("yelloweye rockfish")
+
+get_cpue_index(gear = "bottom trawl", min_year = 2012, max_year = 2017)
+
+get_age_precision("arrowtooth flounder")
+get_survey_index(species, ssid = 3)
+
+cache_pbs_data(species, path = "data-cache")
+}
+
+}
 \seealso{
 \code{\link{tidy_age_precision}}, \code{\link{tidy_catch}},
 \code{\link{tidy_survey_index}}
 }
-\concept{aggregate functions}
+\concept{get data functions}

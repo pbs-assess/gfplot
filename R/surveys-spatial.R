@@ -4,7 +4,7 @@
 #'
 #' @details
 #'
-#' * `tidy_survey_tows()` does...
+#' * `tidy_survey_sets()` does...
 #' * `interp_survey_bathymetry()` does...
 #' ... TODO
 #'
@@ -17,16 +17,16 @@
 #' @examples
 #' \dontrun{
 #' ## generally, use the main function:
-#' x <- fit_survey_tows(pop_surv,
+#' x <- fit_survey_sets(pop_surv,
 #'   years = 2015,
 #'   survey = "Queen Charlotte Sound Synoptic Survey",
 #'   iter = 600, chains = 1, mcmc_posterior_samples = 100)
 #' names(x)
 #' print(x$models)
-#' plot_survey_tows(x$predictions, x$data, fill_column = "combined")
+#' plot_survey_sets(x$predictions, x$data, fill_column = "combined")
 #'
-#' ## internally, fit_survey_tows() does something like this:
-#' dat <- tidy_survey_tows(pop_surv,
+#' ## internally, fit_survey_sets() does something like this:
+#' dat <- tidy_survey_sets(pop_surv,
 #'  survey = "Queen Charlotte Sound Synoptic Survey",
 #'  years = 2015)
 #' dat_interp <- interp_survey_bathymetry(dat)
@@ -39,7 +39,7 @@
 #'  type = "response", return_mcmc = TRUE, iter = 100)
 #' com <- bin * pos
 #' pg$combined <- apply(com, 1, median)
-#' plot_survey_tows(pg, dat, fill_column = "combined")
+#' plot_survey_sets(pg, dat, fill_column = "combined")
 #' }
 #' @name survey-spatial-modelling
 NULL
@@ -303,7 +303,7 @@ fit_survey_sets <- function(dat, survey, years,
   if (survey == "Queen Charlotte Sound Synoptic Survey") region <- "QCS"
   if (survey == "Hecate Strait Synoptic Survey") region <- "HS"
 
-  .d_tidy <- tidy_survey_tows(dat, survey, years = years)
+  .d_tidy <- tidy_survey_sets(dat, survey, years = years)
 
   if (nrow(.d_tidy) == 0)
     stop("No survey data for species-survey-year combination.")
@@ -359,11 +359,11 @@ fit_survey_sets <- function(dat, survey, years,
 #' @family spatial survey modelling functions
 #' @examples
 #' \dontrun{
-#' x <- fit_survey_tows(pop_surv,
+#' x <- fit_survey_sets(pop_surv,
 #'   years = 2015,
 #'   survey = "Queen Charlotte Sound Synoptic Survey",
 #'   iter = 600, chains = 1, mcmc_posterior_samples = 100)
-#' plot_survey_tows(x$predictions, x$data, fill_column = "combined")
+#' plot_survey_sets(x$predictions, x$data, fill_column = "combined")
 #' }
 
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
