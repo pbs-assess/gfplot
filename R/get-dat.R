@@ -1,15 +1,13 @@
 #' Get PBS data
 #'
-#' Automates data extraction from fisheries databases. Extracts commercial
-#' and research survey catch and biological sampling data using SQL queries.
-#' These datasets feed into tidy, plot, and/or model functions for data
-#' visualization.
+#' Automates data extraction from DFO groundfish databases. These datasets feed
+#' into other functions (eg. tidy, plot, model) for data visualization.
 #'
 #' @details
-#' * `get_survey_tows()` extracts survey catch data and spatial data for
-#'    plotting survey catchs on a map of British Columbia
+#' * `get_survey_sets()` extracts survey catch data and spatial data for
+#'    plotting survey catchs on a map of British Columbia.
 #' * `get_survey_samples()` extracts all biological sample specimen records
-#'    from research surveys for given species and survey series id's from GFBio
+#'    from research surveys for given species and survey series IDs from GFBio
 #' * `get_comm_samples()` extracts all biological sample specimen records
 #'    from commercial data for given species from GFBio
 #' * `get_catch()` extracts all landing and discard records for a given species
@@ -29,16 +27,42 @@
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    and caches extracted data to a given folder
 #'
+#' @section Note:
+#' 'Get' functions only extract data when performed on a computer connected
+#' to the DFO network.
+#'
+#'@examples
+#' \dontrun{
+#' get_survey_sets("lingcod", 1)
+#' get_survey_sets(442, ssid = c(1,3,4,16))
+#'
+#' get_survey_samples("lingcod", 3)
+#'
+#' species <- c("lingcod", "yelloweye rockfish")
+#' get_comm_samples(species)
+#'
+#' get_catch(c("yelloweye rockfish", "pacific ocean perch"))
+#' get_catch(c(442, 397))
+#'
+#' get_cpue_spatial("pacific cod")
+#' get_cpue_spatial_ll("arrowtooth flounder")
+#'
+#'}
+#'
+#' @seealso \code{\link{tidy_age_precision}}, \code{\link{tidy_catch}},
+#' \code{\link{tidy_survey_index}}
+#'
 #' @param species One or more species common names (e.g. `"pacific ocean
 #'   perch"`) or one or more species codes (e.g. `396`). Species codes can be
 #'   specified as numeric vectors `c(396, 442`) or characters `c("396", "442")`.
 #'   Numeric values shorter than 3 digits will be expanded to 3 digits and
 #'   converted to character objects (`1` turns into `"001"`). Species common
 #'   names and species codes should not be mixed. If any element is missing a
-#'   species code, then all elements will be assumed to be species, common
+#'   species code, then all elements will be assumed to be species common
 #'   names.
-#' @param ssid A numeric vector of survey series IDs. Run `get_ssids()` if you
-#'   want to look up a survey series ID via a surveys series description.
+#' @param ssid A numeric vector of survey series IDs. Run
+#' \code{\link{get_ssids}} if you for a look-up table of available survey
+#' series IDs with surveys series descriptions.
 #' @name get
 NULL
 
@@ -93,7 +117,7 @@ get_survey_ids <- function(ssid) {
 
 #' @export
 #' @rdname get
-get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2),
+get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE) {
   species_codes <- common2codes(species)
   trawl <- c(1, 3, 4, 16, 2)
@@ -165,7 +189,8 @@ if (ssid %in% ll) {
 
 #' @export
 #' @rdname get
-#' @param remove_bad_data Remove known bad data?
+#' @param remove_bad_data Remove known bad data, such as unrealistic
+#'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .q <- read_sql("get-surv-samples.sql")
   .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)

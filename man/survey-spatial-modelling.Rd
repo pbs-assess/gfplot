@@ -2,15 +2,15 @@
 % Please edit documentation in R/surveys-spatial.R
 \name{survey-spatial-modelling}
 \alias{survey-spatial-modelling}
-\alias{tidy_survey_tows}
+\alias{tidy_survey_sets}
 \alias{interp_survey_bathymetry}
 \alias{scale_survey_predictors}
 \alias{fit_glmmfields}
 \alias{make_prediction_grid}
-\alias{fit_survey_tows}
+\alias{fit_survey_sets}
 \title{Survey spatial modelling}
 \usage{
-tidy_survey_tows(dat, survey, years, utm_zone = 9)
+tidy_survey_sets(dat, survey, years, utm_zone = 9)
 
 interp_survey_bathymetry(dat, utm_zone = 9)
 
@@ -24,7 +24,7 @@ fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
 make_prediction_grid(dat, bath, n = 150, region = NULL,
   cache_folder = "prediction-grids", utm_zone = 9)
 
-fit_survey_tows(dat, survey, years, chains = 3, iter = 1200,
+fit_survey_sets(dat, survey, years, chains = 3, iter = 1200,
   max_knots = 15, adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
   mcmc_posterior_samples = 150, required_obs_percent = 0.1, utm_zone = 9)
 }
@@ -110,6 +110,6 @@ plot_survey_tows(pg, dat, fill_column = "combined")
 }
 }
 \seealso{
-Other spatial survey modelling functions: \code{\link{plot_survey_tows}}
+Other spatial survey modelling functions: \code{\link{plot_survey_sets}}
 }
 \concept{spatial survey modelling functions}

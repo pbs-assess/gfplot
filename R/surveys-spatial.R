@@ -47,11 +47,10 @@ NULL
 #' @param years TODO
 #' @export
 #' @rdname survey-spatial-modelling
-tidy_survey_tows <- function(dat, survey, years, utm_zone = 9) {
+tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
 
-  browser()
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
-    filter(survey_series_desc %in% survey) %>%
+    filter(survey_series_id %in% survey) %>%
     filter(year %in% years) %>%
     rename(density = density_kgpm2)
 
@@ -292,7 +291,7 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
 #'
 #' @rdname survey-spatial-modelling
 
-fit_survey_tows <- function(dat, survey, years,
+fit_survey_sets <- function(dat, survey, years,
   chains = 3, iter = 1200, max_knots = 15,
   adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
   mcmc_posterior_samples = 150, required_obs_percent = 0.1,
@@ -367,7 +366,7 @@ fit_survey_tows <- function(dat, survey, years,
 #' plot_survey_tows(x$predictions, x$data, fill_column = "combined")
 #' }
 
-plot_survey_tows <- function(pred_dat, raw_dat, fill_column,
+plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
   pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
   pt_size_range = c(2, 7), show_legend = TRUE,

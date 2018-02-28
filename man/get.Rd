@@ -4,7 +4,7 @@
 \alias{get}
 \alias{get_ssids}
 \alias{get_age_methods}
-\alias{get_survey_tows}
+\alias{get_survey_sets}
 \alias{get_survey_samples}
 \alias{get_comm_samples}
 \alias{get_catch}
@@ -21,7 +21,8 @@ get_ssids()
 
 get_age_methods()
 
-get_survey_tows(species, ssid = c(1, 3, 4, 16))
+get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
+  join_sample_ids = FALSE)
 
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE)
 
@@ -33,7 +34,7 @@ get_cpue_spatial(species)
 
 get_cpue_spatial_ll(species)
 
-get_cpue_index(gear = "bottom trawl", min_year = 1996)
+get_cpue_index(gear = "bottom trawl", min_year = 1996, max_year = Inf)
 
 get_age_precision(species)
 
@@ -49,13 +50,15 @@ specified as numeric vectors \code{c(396, 442}) or characters \code{c("396", "44
 Numeric values shorter than 3 digits will be expanded to 3 digits and
 converted to character objects (\code{1} turns into \code{"001"}). Species common
 names and species codes should not be mixed. If any element is missing a
-species code, then all elements will be assumed to be species, common
+species code, then all elements will be assumed to be species common
 names.}
 
-\item{ssid}{A numeric vector of survey series IDs. Run \code{get_ssids()} if you
-want to look up a survey series ID via a surveys series description.}
+\item{ssid}{A numeric vector of survey series IDs. Run
+\code{\link{get_ssids}} if you for a look-up table of available survey
+series IDs with surveys series descriptions.}
 
-\item{remove_bad_data}{Remove known bad data?}
+\item{remove_bad_data}{Remove known bad data, such as unrealistic
+length or weight values.}
 
 \item{gear}{The gear type(s) to include. Will be converted to uppercase.}
 
@@ -64,17 +67,15 @@ want to look up a survey series ID via a surveys series description.}
 \item{path}{The folder where the cached data will be saved}
 }
 \description{
-Automates data extraction from fisheries databases. Extracts commercial
-and research survey catch and biological sampling data using SQL queries.
-These datasets feed into tidy, plot, and/or model functions for data
-visualization.
+Automates data extraction from DFO groundfish databases. These datasets feed
+into other functions (eg. tidy, plot, model) for data visualization.
 }
 \details{
 \itemize{
-\item \code{get_survey_tows()} extracts survey catch data and spatial data for
-plotting survey catchs on a map of British Columbia
+\item \code{get_survey_sets()} extracts survey catch data and spatial data for
+plotting survey catchs on a map of British Columbia.
 \item \code{get_survey_samples()} extracts all biological sample specimen records
-from research surveys for given species and survey series id's from GFBio
+from research surveys for given species and survey series IDs from GFBio
 \item \code{get_comm_samples()} extracts all biological sample specimen records
 from commercial data for given species from GFBio
 \item \code{get_catch()} extracts all landing and discard records for a given species
@@ -95,3 +96,14 @@ and survey series id's
 and caches extracted data to a given folder
 }
 }
+\section{Note}{
+
+'Get' functions only extract data when performed on a computer connected
+to the DFO network.
+}
+
+\seealso{
+\code{\link{tidy_age_precision}}, \code{\link{tidy_catch}},
+\code{\link{tidy_survey_index}}
+}
+\concept{aggregate functions}
