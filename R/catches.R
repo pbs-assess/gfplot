@@ -121,9 +121,11 @@ plot_catch <- function(dat,
     ylim(0, NA) +
     coord_cartesian(xlim = range(dat$year) + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
-    ggplot2::theme(legend.position = "right") +
+    ## ggplot2::theme(legend.position = "right") +
     ggplot2::labs(fill = "", colour = "") +
-    labs(title = "Commercial catch")
+    labs(title = "Commercial catch") +
+    ggplot2::theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+    ggplot2::theme(legend.background = element_rect(fill = "#FFFFFF99"))
 
   g
 }
