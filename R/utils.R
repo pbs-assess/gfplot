@@ -61,7 +61,9 @@ firstup <- function(x) {
 }
 
 read_sql <- function(x) {
-  readLines(system.file("sql", x, package = "gfplot"))
+  if(file.exists(system.file("sql", x, package = "gfplot")))
+    readLines(system.file("sql", x, package = "gfplot"))
+  else warning("The sql file does not exist.")
 }
 
 round_nice <- function(x) {

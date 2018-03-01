@@ -200,7 +200,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
-  .q <- read_sql("get-surv-samples.sql")
+  .q <- read_sql("get-survey-samples.sql")
   .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid))
     .q <- inject_survey_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q)
@@ -322,7 +322,7 @@ get_age_precision <- function(species) {
 #' @export
 #' @rdname get
 get_survey_index <- function(species, ssid = NULL) {
-  .q <- read_sql("get-surv-index.sql")
+  .q <- read_sql("get-survey-index.sql")
   .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, .q)
   if (!is.null(ssid))
     .q <- inject_survey_filter("AND BD.SURVEY_SERIES_ID IN", ssid, .q)
