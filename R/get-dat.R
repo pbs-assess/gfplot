@@ -134,12 +134,12 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       paste(sort(c(trawl, ll)), collapse = ", "), ". ",
       "See the function `get_ssids()` for help identifying ",
       "survey series IDs.", call. = FALSE)
-  if (ssid %in% trawl)
+  ## if (ssid %in% trawl)
     sql_proc <- "proc_catmat_2011"
-  if (ssid %in% ll) {
-    stop("Long line surveys are not yet supported. TODO")
-    sql_proc <- "proc_catmat_ll_2013"
-  }
+  ## if (ssid %in% ll) {
+    ## stop("Long line surveys are not yet supported. TODO")
+    ## sql_proc <- "proc_catmat_ll_2013"
+  ## }
 
   species_codes <- common2codes(species)
 
