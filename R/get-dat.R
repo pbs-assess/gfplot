@@ -363,7 +363,7 @@ cache_pbs_data <- function(species, path = "data-cache") {
 
   d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE)
   ## TODO: filter out dups
-  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-tows.rds"))
+  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"))
 
   d <- get_survey_samples(species)
   saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"))
