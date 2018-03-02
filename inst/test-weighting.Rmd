@@ -1,0 +1,175 @@
+---
+title: "Test weighting"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+survey_samples <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-samples.rds")
+survey_tows <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-tows.rds")
+
+survey_samples <- survey_samples %>%
+  filter(survey_series_desc == "Queen Charlotte Sound Synoptic Survey" )
+table(survey_samples$species_common_name)
+dd <- tidy_comps_survey(survey_samples, survey_tows, value = age)
+dd$age <- paste(ifelse(dd$sex == 1, "M", "F"), dd$age)
+dd$sex <- NULL
+
+
+surv_ages <- weight_comps(dd)
+surv_ages <- surv_ages %>%
+  mutate(sex = substr(value, 1, 1),
+    value = as.numeric(as.character(gsub("[A-Z ]+", "", value)))) %>%
+  mutate(value = ifelse(value >= 40, 40, value))
+
+surv_ages %>%
+  ggplot(aes(year, value, size = weighted_prop)) +
+  geom_point(pch = 21) +
+  theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39)
+
+rh <- read.csv("~/Downloads/awatea-wpa439(den)-ssid(1)-major(567).csv",
+  stringsAsFactors = FALSE, strip.white = TRUE)
+
+rh <- rh %>%
+  select(-nsid, -age1, -ageN) %>%
+  reshape2::melt(id.vars = c("series", "year"), value.name = "weighted_prop",
+    variable.name = "value") %>%
+  mutate(sex = toupper(substr(value, 1, 1)),
+    value = as.numeric(as.character(gsub("[a-z]+", "", value)))) %>%
+  mutate(weighted_prop = ifelse(weighted_prop == 0, NA, weighted_prop)) %>%
+  select(-series)
+
+ggplot(rh, aes(year, value, size = weighted_prop)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39)
+
+## together:
+
+all <- rbind(mutate(rh, type = "RH"),
+  mutate(surv_ages, type = "gfplot"))
+all <- as.data.frame(na.omit(all))
+
+ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39)
+
+## with raw:
+
+raw <- survey_samples %>%
+  select(year, sex, age) %>%
+  filter(!is.na(age), sex %in% c(1, 2)) %>%
+  group_by(year, age, sex) %>%
+  summarise(freq = n()) %>%
+  group_by(year) %>%
+  mutate(weighted_prop = freq / sum(freq)) %>%
+  select(-freq) %>%
+  mutate(sex = ifelse(sex == 1, "M", "F")) %>%
+  rename(value = age) %>%
+  mutate(type = "raw")
+
+
+all <- rbind(all, as.data.frame(raw))
+
+ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39) +
+  scale_colour_manual(
+    values = c("raw" = "grey40", "RH" = "orange", "gfplot" = "blue"))
+
+
+# Commercial:
+
+com_samples <- readRDS("~/Dropbox/PBS synopsis/pbs-comm-samples.rds")
+com_catch <- readRDS("~/Dropbox/PBS synopsis/pbs-catch.rds")
+
+dd <- tidy_comps_commercial(com_samples, com_catch, value = age)
+dd$age <- paste(ifelse(dd$sex == 1, "M", "F"), dd$age)
+dd$sex <- NULL
+
+com_ages <- weight_comps(dd)
+com_ages <- com_ages %>%
+  mutate(sex = substr(value, 1, 1),
+    value = as.numeric(as.character(gsub("[A-Z ]+", "", value)))) %>%
+  mutate(value = ifelse(value >= 40, 40, value))
+
+com_ages %>%
+  ggplot(aes(year, value, size = weighted_prop)) +
+  geom_point(pch = 21) +
+  theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39)
+
+rh <- read.csv("~/Downloads/awatea-wpa439(cat)-tt(145)-major(34567).csv",
+  stringsAsFactors = FALSE, strip.white = TRUE) %>%
+  filter(year >= 1998)
+
+rh <- rh %>%
+  select(-ntid, -age1, -ageN) %>%
+  reshape2::melt(id.vars = c("series", "year"), value.name = "weighted_prop",
+    variable.name = "value") %>%
+  mutate(sex = toupper(substr(value, 1, 1)),
+    value = as.numeric(as.character(gsub("[a-z]+", "", value)))) %>%
+  mutate(weighted_prop = ifelse(weighted_prop == 0, NA, weighted_prop)) %>%
+  select(-series)
+
+ggplot(rh, aes(year, value, size = weighted_prop)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39)
+
+## together:
+
+all <- rbind(mutate(rh, type = "RH"),
+  mutate(com_ages, type = "gfplot"))
+all <- as.data.frame(na.omit(all))
+
+ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39)
+
+## with raw:
+
+raw <- com_samples %>%
+  select(year, sex, age) %>%
+  filter(!is.na(age), sex %in% c(1, 2)) %>%
+  group_by(year, age, sex) %>%
+  summarise(freq = n()) %>%
+  group_by(year) %>%
+  mutate(weighted_prop = freq / sum(freq)) %>%
+  select(-freq) %>%
+  mutate(sex = ifelse(sex == 1, "M", "F")) %>%
+  rename(value = age) %>%
+  mutate(type = "raw")
+
+ggplot(raw, aes(year, value, size = weighted_prop, colour = type)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39) +
+  geom_vline(xintercept = c(2009, 2004))
+
+
+all <- rbind(all, as.data.frame(raw))
+
+ggplot(filter(all, type != "gfplot"), aes(year, value, size = weighted_prop, colour = type)) +
+  geom_point(pch = 21) + theme_pbs() +
+  facet_wrap(~sex) +
+  scale_size_continuous(range = c(0, 8)) +
+  ylim(0, 39) +
+  geom_vline(xintercept = c(2009, 2004))
+
+```
