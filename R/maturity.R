@@ -35,7 +35,7 @@ fit_mat_ogive <- function(dat,
     select(species_common_name,
       year, age, length, weight,
       maturity_code, sex, survey_series_desc,
-      maturity_convention_desc, maturity_convention_maxvalue,
+      maturity_convention_desc,
       specimen_id, sample_id, trip_start_date)
 
   file <- system.file("extdata", "maturity_assignment.csv",
@@ -46,13 +46,9 @@ fit_mat_ogive <- function(dat,
       maturity_convention_code = readr::col_integer(),
       maturity_convention_desc = readr::col_character(),
       sex = readr::col_integer(),
-      maturity_convention_maxvalue = readr::col_integer(),
       mature_at = readr::col_integer()))
-  mat_df$maturity_convention_maxvalue <- NULL
 
   dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_desc"))
-  dat <- filter(dat, maturity_code <= maturity_convention_maxvalue) %>%
-    select(-maturity_convention_maxvalue)
   dat <- mutate(dat, mature = maturity_code >= mature_at)
 
   type <- match.arg(type)

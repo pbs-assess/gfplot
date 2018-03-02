@@ -12,7 +12,7 @@ tidy_mat <- function(dat,
   dat <- dat %>%
     select(species_common_name, trip_start_date,
       survey_series_desc, year, month, sample_id, specimen_id,
-      maturity_convention_desc, maturity_convention_maxvalue,
+      maturity_convention_desc,
       maturity_code, maturity_name, sex, maturity_desc)
 
   # file <- system.file("extdata", "maturity_assignment.csv",
@@ -23,13 +23,9 @@ tidy_mat <- function(dat,
   #     maturity_convention_code = readr::col_integer(),
   #     maturity_convention_desc = readr::col_character(),
   #     sex = readr::col_integer(),
-  #     maturity_convention_maxvalue = readr::col_integer(),
   #     mature_at = readr::col_integer()))
-  # mat_df$maturity_convention_maxvalue <- NULL
 
   # dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_desc"))
-  dat <- filter(dat, maturity_code <= maturity_convention_maxvalue) %>%
-    select(-maturity_convention_maxvalue)
   # dat <- mutate(dat, mature = maturity_code >= mature_at)
 
   # .d <- switch(type,

@@ -203,14 +203,13 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .q <- read_sql("get-survey-samples.sql")
-  .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
+  .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid))
     .q <- inject_survey_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
-  .d$usability <- ifelse(.d$usability == 1L, TRUE, FALSE) # TODO: test
 
   surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
   surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
