@@ -94,7 +94,7 @@ tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
   bin_size = NULL) {
 
   value <- enquo(value)
-  specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
+  specimen_dat <- specimen_dat %>% filter(!is.na(!!value), sex %in% c(1, 2))
 
   if (!is.null(bin_size))
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
@@ -125,7 +125,7 @@ tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
     group_by(year, quarter) %>%
     summarise(samp_catch_weight_quarter = sum(samp_trip_catch_weight))
 
-  freq_and_catch_by_trip <- group_by(dat, year, trip_id, quarter, !!value) %>%
+  freq_and_catch_by_trip <- group_by(dat, year, sex, trip_id, quarter, !!value) %>%
     summarise(freq = n()) %>%
     inner_join(sampled_trip_id_catch, by = c("year", "trip_id", "quarter"))
 
@@ -137,10 +137,10 @@ tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
   inner_join(freq_and_catch_by_trip,
     species_catch_by_quarter, by = c("year", "quarter")) %>%
     inner_join(quarter_sampled_catch, by = c("year", "quarter")) %>%
-    select(year, trip_id, quarter, !!value, freq,
+    select(year, sex, trip_id, quarter, !!value, freq,
       samp_trip_catch_weight, samp_catch_weight_quarter,
       landed_kg_quarter, landed_kg_year) %>% # re-order columns
-    arrange(year, trip_id, !!value) %>%
+    arrange(year, sex, trip_id, !!value) %>%
     ungroup()
 }
 
@@ -150,7 +150,8 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
   bin_size = NULL) {
 
   value <- enquo(value)
-  specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
+  specimen_dat <- specimen_dat %>% filter(!is.na(!!value)) %>%
+    filter(sex %in% c(1, 2))
 
   if (!is.null(bin_size))
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
@@ -161,8 +162,8 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
 
   raw_comp <- specimen_dat %>%
     filter(!is.na(grouping_code)) %>%
-    select(year, sample_id, !!value, weight, grouping_code) %>%
-    group_by(year, sample_id, grouping_code, !!value) %>%
+    select(year, sample_id, !!value, weight, sex, grouping_code) %>%
+    group_by(year, sex, sample_id, grouping_code, !!value) %>%
     summarise(freq = n())
 
   strat_areas <- strat_dat %>%
@@ -189,7 +190,7 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
     inner_join(strat_dens, by = c("year", "grouping_code")) %>%
     inner_join(strat_areas, by = c("year", "grouping_code")) %>%
     ungroup() %>%
-    arrange(year, sample_id, !!value)
+    arrange(year, sex, sample_id, !!value)
 }
 
 weight_comps_base <- function(dat) {
@@ -242,7 +243,8 @@ weight_comps_base <- function(dat) {
     # calculate proportions:
     mutate(weighted_prop =
         weighted_freq2_scaled / sum(weighted_freq2_scaled)) %>% # D.10
-    select(-contains("freq"))
+    select(-contains("freq")) %>%
+    ungroup()
 }
 
 #' @export
