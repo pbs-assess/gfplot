@@ -104,7 +104,6 @@ ds
 
 # dat <- ds
 
-#' @rdname plot_ages
 #' @export
 plot_maturity_months <- function(dat, max_size = 5, sex_gap = 0.2, month_increment = 2,
   ylab = "Maturity desc", months = NULL,
