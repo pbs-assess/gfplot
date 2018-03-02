@@ -1,7 +1,7 @@
-# EAK Building maturity frequency by month based on age frequency code from SCA
+# EAK Building maturity frequency by month based on plot age frequency code
+# from SCA and fit mat code
 
 tidy_mat <- function(dat,
-  type = c("age", "length"),
   sample_id_re = FALSE,
   months = seq(1, 12),
   ageing_method = c(3, 17)) {
@@ -10,92 +10,125 @@ tidy_mat <- function(dat,
   dat <- dplyr::filter(dat, month %in% months)
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!
   dat <- dat %>%
-    select(species_common_name,
-      year, month,
-      maturity_code, sex, survey_series_desc,
+    select(species_common_name, trip_start_date,
+      survey_series_desc, year, month, sample_id, specimen_id,
       maturity_convention_desc, maturity_convention_maxvalue,
-      specimen_id, sample_id, trip_start_date)
+      maturity_code, maturity_name, sex, maturity_desc)
 
-  file <- system.file("extdata", "maturity_assignment.csv",
-    package = "gfplot")
+  # file <- system.file("extdata", "maturity_assignment.csv",
+  #   package = "gfplot")
+  #
+  # mat_df <- readr::read_csv(file,
+  #   col_types = readr::cols(
+  #     maturity_convention_code = readr::col_integer(),
+  #     maturity_convention_desc = readr::col_character(),
+  #     sex = readr::col_integer(),
+  #     maturity_convention_maxvalue = readr::col_integer(),
+  #     mature_at = readr::col_integer()))
+  # mat_df$maturity_convention_maxvalue <- NULL
 
-  mat_df <- readr::read_csv(file,
-    col_types = readr::cols(
-      maturity_convention_code = readr::col_integer(),
-      maturity_convention_desc = readr::col_character(),
-      sex = readr::col_integer(),
-      maturity_convention_maxvalue = readr::col_integer(),
-      mature_at = readr::col_integer()))
-  mat_df$maturity_convention_maxvalue <- NULL
-
-  dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_desc"))
+  # dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_desc"))
   dat <- filter(dat, maturity_code <= maturity_convention_maxvalue) %>%
     select(-maturity_convention_maxvalue)
-  dat <- mutate(dat, mature = maturity_code >= mature_at)
+  # dat <- mutate(dat, mature = maturity_code >= mature_at)
 
-  type <- match.arg(type)
-  .d <- switch(type,
-    age = filter(dat, !is.na(mature), !is.na(age), !is.na(sex)) %>%
-      rename(age_or_length = age),
-    length = filter(dat, !is.na(mature), !is.na(length), !is.na(sex)) %>%
-      rename(age_or_length = length))
-  .d <- mutate(.d, female = ifelse(sex == 2L, 1L, 0L))
+  # .d <- switch(type,
+  #   age = filter(dat, !is.na(mature), !is.na(age), !is.na(sex)) %>%
+  #     rename(age_or_length = age),
+  #   length = filter(dat, !is.na(mature), !is.na(length), !is.na(sex)) %>%
+  #     rename(age_or_length = length))
+  # .d <- mutate(.d, female = ifelse(sex == 2L, 1L, 0L))
 
-  if (sample_id_re) {
-    m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
-      data = .d, family = binomial)
-    b <- glmmTMB::fixef(m)[[1L]]
-  } else {
-    m <- stats::glm(mature ~ age_or_length * female,
-      data = .d, family = binomial)
-    b <- stats::coef(m)
-  }
+  # if (sample_id_re) {
+  #   m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
+  #     data = .d, family = binomial)
+  #   b <- glmmTMB::fixef(m)[[1L]]
+  # } else {
+  #   m <- stats::glm(mature ~ age_or_length * female,
+  #     data = .d, family = binomial)
+  #   b <- stats::coef(m)
+  # }
 
-  if (length(unique(.d$sample_id)) > 100L) {
-    s_ids <- sample(unique(.d$sample_id), 100L)
-  } else {
-    s_ids <- unique(.d$sample_id)
-  }
+  # if (length(unique(.d$sample_id)) > 100L) {
+  #   s_ids <- sample(unique(.d$sample_id), 100L)
+  # } else {
+  #   s_ids <- unique(.d$sample_id)
+  # }
 
-  age_or_length <- seq(min(.d$age_or_length), max(.d$age_or_length),
-    length.out = 300L)
-  nd <- expand.grid(age_or_length = age_or_length, sample_id = s_ids,
-    female = c(0L, 1L), stringsAsFactors = FALSE)
-  if (sample_id_re)
-    nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
-  nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
-      b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+  # age_or_length <- seq(min(.d$age_or_length), max(.d$age_or_length),
+  #   length.out = 300L)
+  # nd <- expand.grid(age_or_length = age_or_length, sample_id = s_ids,
+  #   female = c(0L, 1L), stringsAsFactors = FALSE)
+  # if (sample_id_re)
+  #   nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
+  # nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
+  #     b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+  #
+  # list(data = .d, pred_data = nd, model = m, sample_id_re = sample_id_re,
+  #   type = type)
 
-  list(data = .d, pred_data = nd, model = m, sample_id_re = sample_id_re,
-    type = type)
+  surv <- tibble(survey_series_desc = survey_series_desc, survey = survey)
+  dat$survey <- NULL # extra careful
+  dat <- inner_join(dat, surv, by = "survey_series_desc")
+
+tidy <- filter(dat, !is.na(maturity_name), !is.na(sex)) %>%
+  group_by(species_common_name, survey_series_desc) %>%
+  mutate(n_maturities = n()) %>%
+  ungroup()
+
+ds <- tidy %>% mutate(sex = ifelse(sex == 2, "F", "M"))
+
+all_surveys <- tibble(survey = survey)
+
+complete_df <- expand.grid(
+  survey = survey,
+  age = 1,
+  month = seq(min(tidy$month), max(tidy$month), 1),
+  sex = NA,
+  stringsAsFactors = FALSE
+)
+if (nrow(ds) == 0)
+  ds <- complete_df
+
+ds <- full_join(ds, all_surveys, by = "survey") %>%
+  select(-survey_series_desc)
+ds$survey <- factor(ds$survey, levels = survey)
+
+ds <- filter(ds, !is.na(maturity_name))
+ds
+
 }
 
 
+
+
+dat <- ds
+
 #' @rdname plot_ages
 #' @export
-plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)", year_range = NULL,
+plot_matuirty <- function(dat, max_size = 5, sex_gap = 0.2, month_increment = 2,
+  ylab = "Maturity desc", months = NULL,
   fill_col = c("M" = "grey50", "F" = "#f44256"),
   line_col = c("M" = "grey50", "F" = "#f44256"),
   survey_cols = NULL, alpha = 0.85) {
 
-  year_min <- min(dat$year, na.rm = TRUE)
-  year_max <- max(dat$year, na.rm = TRUE)
-  age_max <- max(dat$age, na.rm = TRUE)
+  month_min <- min(dat$month, na.rm = TRUE)
+  month_max <- max(dat$month, na.rm = TRUE)
+  mat_max <- max(dat$maturity_name, na.rm = TRUE)
 
-  dat <- dat %>% mutate(year_jitter = ifelse(sex == "M",
-    year + sex_gap / 2, year - sex_gap / 2)) %>%
-    group_by(year, .data$year_jitter, age, sex, survey) %>%
+  dat <- dat %>% mutate(month_jitter = ifelse(sex == "M",
+    month + sex_gap / 2, month - sex_gap / 2)) %>%
+    group_by(month, .data$month_jitter, maturity_name, sex, survey) %>%
     summarise(n = n()) %>%
-    group_by(year, survey) %>%
+    group_by(month, survey) %>%
     mutate(n_scaled = n / max(n), total = sum(n)) %>%
     ungroup()
 
-  counts <- select(dat, .data$total, .data$year,
+  counts <- select(dat, .data$total, .data$month,
     .data$survey) %>% unique()
 
   dat$sex[is.na(dat$sex)] <- "F" # just for legend or we'll have "NAs"
-  age_range <- diff(range(dat$age, na.rm = TRUE))
+  # maturity_range <- diff(range(dat$maturity_code, na.rm = TRUE))
 
   if (!is.null(survey_cols)) {
     survey_col_names <- names(survey_cols)
@@ -107,11 +140,11 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     dat$sex <- paste(dat$sex, dat$survey)
   }
 
-  if (is.null(year_range))
-    year_range <- c(year_min, year_max)
+  if (is.null(months))
+    months <- c(month_min, month_max)
 
-  g <- ggplot(dat, aes_string("year_jitter", "age")) +
-    geom_vline(xintercept = seq(year_range[1], year_range[2], 1),
+  g <- ggplot(dat, aes_string("month_jitter", "maturity_name")) +
+    geom_vline(xintercept = seq(months[1], months[2], 1),
       col = "grey95", lwd = 0.4) +
     geom_hline(yintercept = seq(0, age_max, 10), col = "grey95",
       lwd = 0.4) +
