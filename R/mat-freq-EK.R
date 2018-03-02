@@ -102,11 +102,10 @@ ds
 
 
 
-dat <- ds
+# dat <- ds
 
-#' @rdname plot_ages
 #' @export
-plot_matuirty <- function(dat, max_size = 5, sex_gap = 0.2, month_increment = 2,
+plot_maturity_months <- function(dat, max_size = 5, sex_gap = 0.2, month_increment = 2,
   ylab = "Maturity desc", months = NULL,
   fill_col = c("M" = "grey50", "F" = "#f44256"),
   line_col = c("M" = "grey50", "F" = "#f44256"),

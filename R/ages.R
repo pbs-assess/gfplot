@@ -47,6 +47,7 @@ NULL
 
 
 #' @rdname plot_ages
+#' @param ageing_method_codes TODO
 #' @export
 tidy_ages_raw <- function(dat,
   survey_series_desc = c(
@@ -58,13 +59,16 @@ tidy_ages_raw <- function(dat,
     "PHMA Rockfish Longline Survey - Outside South",
     "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)", "IPHC"),
-  spp_cat_code = 1) {
+  spp_cat_code = 1, ageing_method_codes = c(3, 17)) {
 
   if (!"survey_series_desc" %in% names(dat)) {
     dat <- filter(dat, species_category_code %in% spp_cat_code) # TODO not in data yet
     dat <- filter(dat, !is.na(year))
     dat$survey_series_desc <- "Commercial"
   }
+
+  dbio <- filter(dbio, .data$ageing_method %in% ageing_method_codes)
+  dbio <- filter(dbio, .data$sex %in% c(1, 2))
 
   dbio <- dat
   dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)

@@ -4,14 +4,12 @@
 \alias{fit_vb}
 \title{Fit growth TODO}
 \usage{
-fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
-  downsample = Inf, chains = 4L, iter = 1000L,
-  cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
+fit_vb(dat_survey = NULL, dat_commercial = NULL, sex = c("female",
+  "male"), method = c("mpd", "mcmc"), downsample = Inf, chains = 4L,
+  iter = 1000L, cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, ageing_method = c(3, 17), ...)
 }
 \arguments{
-\item{dat}{TODO}
-
 \item{sex}{TODO}
 
 \item{method}{TODO}
@@ -33,6 +31,8 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 \item{ageing_method}{TODO}
 
 \item{...}{TODO}
+
+\item{dat}{TODO}
 }
 \description{
 For use with data for a single species.

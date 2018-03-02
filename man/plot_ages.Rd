@@ -12,7 +12,7 @@ tidy_ages_raw(dat,
   "PHMA Rockfish Longline Survey - Outside North",
   "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"), spp_cat_code = 1)
+  "IPHC"), spp_cat_code = 1, ageing_method_codes = c(3, 17))
 
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL, fill_col = c(M = "grey50", F =
@@ -32,6 +32,8 @@ the same order as \code{survey_series_desc}. These are used in the plot.}
 \item{spp_cat_code}{A numeric vector of species categorical codes to include
 for the commercial samples. Defaults to \code{1}, which refers to unsorted
 samples.}
+
+\item{ageing_method_codes}{TODO}
 
 \item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
 
