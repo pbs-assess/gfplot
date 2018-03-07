@@ -67,10 +67,14 @@ tidy_ages_raw <- function(dat,
     dat$survey_series_desc <- "Commercial"
   }
 
-  dbio <- filter(dbio, .data$ageing_method %in% ageing_method_codes)
+  dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   dbio <- filter(dbio, .data$sex %in% c(1, 2))
+  dbio <- filter(dbio, !is.na(.data$year))
 
-  dbio <- dat
+  if (nrow(dbio) == 0)
+    stop("No data available after filtering for those ageing codes.",
+      call. = FALSE)
+
   dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)
   dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
   dup <- group_by(dbio, species_common_name) %>%
@@ -141,8 +145,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 
   if (!is.null(survey_cols)) {
     survey_col_names <- names(survey_cols)
-    col <- setNames(survey_cols, paste("F", survey_col_names))
-    col <- c(col, setNames(rep("#888888", length(col)),
+    col <- stats::setNames(survey_cols, paste("F", survey_col_names))
+    col <- c(col, stats::setNames(rep("#888888", length(col)),
       paste("M", survey_col_names)))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
     line_col <- col

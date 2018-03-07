@@ -133,8 +133,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
 
   if (!is.null(survey_cols)) {
     survey_col_names <- names(survey_cols)
-    col <- setNames(survey_cols, paste("F", survey_col_names))
-    col <- c(col, setNames(rep("#888888", length(col)),
+    col <- stats::setNames(survey_cols, paste("F", survey_col_names))
+    col <- c(col, stats::setNames(rep("#888888", length(col)),
       paste("M", survey_col_names)))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
     line_col <- col

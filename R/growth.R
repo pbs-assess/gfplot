@@ -43,8 +43,7 @@
 #' plot_vb(obj, obj)
 #' }
 
-fit_vb <- function(dat_survey = NULL,
-  dat_commercial = NULL,
+fit_vb <- function(dat,
   sex = c("female", "male"),
   method = c("mpd", "mcmc"),
   downsample = Inf,

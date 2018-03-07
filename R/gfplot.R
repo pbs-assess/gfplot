@@ -104,6 +104,10 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c(
   "depth_mean", "depth_scaled", "depth_sd", "present", "species", "start_lat",
   "start_lon", "x", "y", "z", "bctopo",
 
-  "maturity_convention_code"
+  "maturity_convention_code",
+
+  "total_month", "month_jitter", "maturity_name_short", "survey_series_id",
+  ".n", "maturity"
+
 
   ))
