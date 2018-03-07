@@ -44,3 +44,6 @@ text/spatial-appendix.tex
 *.sublime-project
 *.sublime-workspace
 inst/doc
+inst/pcod-cache
+inst/pcod-figs
+inst/pcod-knitr*
