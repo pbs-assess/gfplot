@@ -67,7 +67,7 @@ tidy_ages_raw <- function(dat,
     dat$survey_series_desc <- "Commercial"
   }
 
-  dbio <- filter(dbio, .data$ageing_method %in% ageing_method_codes)
+  dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   dbio <- filter(dbio, .data$sex %in% c(1, 2))
 
   dbio <- dat
