@@ -40,7 +40,7 @@ fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
 ```
 
-Here's how the various factions fit together:
+Here's how the various functions fit together:
 <https://github.com/seananderson/gfplot/blob/master/inst/function-web.pdf>
 
 The following helper function `cache_pbs_data()` will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
