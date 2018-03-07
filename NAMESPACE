@@ -2,6 +2,7 @@
 
 export("%>%")
 export(cache_pbs_data)
+export(f)
 export(fit_cpue_index)
 export(fit_glmmfields)
 export(fit_length_weight)

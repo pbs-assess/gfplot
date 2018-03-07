@@ -156,7 +156,11 @@ make_pred_mm <- function(x, years) {
   mm_pred
 }
 
-# Force factors to be sequential within the positive or binary data sets for TMB:
+#' Force factors to be sequential within the positive or binary data sets for TMB
+#'
+#' @param x A parameter name
+#'
+#' @export
 f <- function(x) as.factor(as.character(x))
 
 #' Fit a delta-lognormal commercial CPUE standardization model
