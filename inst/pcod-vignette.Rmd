@@ -131,7 +131,7 @@ g <- tidy_ages_raw(d_survey_samples, ageing_method_codes = 6) %>%
 g
 ```
 
-The plotting functions all return a ggplot object. That means we need to print them to see them on the screen. It also means we can save them into objects, like I did above and to the object `g`. That way we can also build on them to do things like adjust labels or change the color scales or add our own theme. It also means that if we want to save them that we can use the function `ggsave()`:
+The plotting functions all return a ggplot object. That means we need to print them to see them on the screen. It also means we can save them into objects, like I did above with the object `g`. That way we can also build on them to do things like adjust labels or change the color scales or add our own theme. It also means that if we want to save them that we can use the function `ggsave()`:
 
 ```{r}
 ggsave(file.path(figs, "ages-raw.pdf"), plot = g, width = 13, height = 6)
@@ -139,7 +139,7 @@ ggsave(file.path(figs, "ages-raw.pdf"), plot = g, width = 13, height = 6)
 
 Most plotting functions have arguments that let you control many aspects of how the plots look. Similarly, most of the tidying functions have some options for how the data are manipulated.
 
-In all cases, the `get_*()` and `tidy_*()` functions can operate on one or multiple species in the same data frame. All of the fitting and plotting functions, however, expected data from a single species.
+In all cases, the `get_*()` and `tidy_*()` functions can operate on one or multiple species in the same data frame. All of the fitting and plotting functions, however, expect data from a single species.
 
 Let's make our previous age frequency plot but just for the synoptic surveys:
 
@@ -411,4 +411,18 @@ plot_survey_sets(m_wcvi$predictions, m_wcvi$data, fill_column = "bin") +
     low = scales::muted("blue"), high = scales::muted("red"))
 plot_survey_sets(m_wcvi$predictions, m_wcvi$data, fill_column = "pos") +
   viridis::scale_fill_viridis(option = "C")
+```
+
+Finally, let's look at the raw data extracted. You can do whatever you want with it.
+
+```{r}
+glimpse(d_survey_sets)
+glimpse(d_survey_samples)
+glimpse(d_comm_samples)
+glimpse(d_catch)
+# glimpse(d_cpue_spatial) # commented out for privacy
+# glimpse(d_cpue_spatial_ll) # commented out for privacy
+glimpse(d_survey_index)
+glimpse(d_age_precision)
+# glimpse(d_cpue_index) # commented out for privacy
 ```
