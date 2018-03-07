@@ -55,9 +55,10 @@ tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
     select(dat, year, fishing_event_id)), , drop = FALSE]
 
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
-    filter(survey_series_id %in% survey) %>%
+    filter(survey_series_desc %in% survey) %>%
     filter(year %in% years) %>%
     rename(density = density_kgpm2)
+
 
   dat <- select(dat, year, start_lon, start_lat, depth_m, density) %>%
     rename(X = start_lon, Y = start_lat) %>%
@@ -410,11 +411,12 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
     utm_zone = utm_zone)
 
   g <- ggplot() +
-    ggplot2::geom_tile(pred_dat, aes_string("X", "Y", fill = fill_column),
+    ggplot2::geom_tile(data = pred_dat, aes_string("X", "Y", fill = fill_column),
       colour = NA) +
     fill_scale +
-    geom_point(data = raw_dat, fill = pt_fill, col = pt_col,
-      aes_string(shape = "as.factor(present)", size = "density")) +
+    geom_point(data = raw_dat,
+      aes_string(x = "X", y = "Y", shape = "as.factor(present)",
+        size = "density"), fill = pt_fill, col = pt_col) +
     ggplot2::scale_shape_manual(values = c(4, 21)) +
     ggplot2::scale_size_continuous(range = pt_size_range) +
     theme_pbs() +
@@ -425,7 +427,9 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
       shape = ggplot2::guide_legend(override.aes = list(colour = "grey30")),
       size = ggplot2::guide_legend(override.aes = list(colour = "grey30"))) +
     geom_polygon(data = coast, aes_string(x = "X", y = "Y", group = "PID"),
-      fill = "grey50")
+      fill = "grey50") +
+    guides(shape = FALSE) +
+    labs(size = "Tow density (kg/m)")
 
   if (!show_legend)
     g <- g + theme(legend.position = "none")

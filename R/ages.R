@@ -69,8 +69,12 @@ tidy_ages_raw <- function(dat,
 
   dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   dbio <- filter(dbio, .data$sex %in% c(1, 2))
+  dbio <- filter(dbio, !is.na(.data$year))
 
-  dbio <- dat
+  if (nrow(dbio) == 0)
+    stop("No data available after filtering for those ageing codes.",
+      call. = FALSE)
+
   dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)
   dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
   dup <- group_by(dbio, species_common_name) %>%

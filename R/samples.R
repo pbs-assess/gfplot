@@ -30,8 +30,7 @@ tidy_sample_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) 
           .data$ageing_method %in% ageing_method),
       length = sum(!is.na(length) & length > 0),
       weight = sum(!is.na(weight) & weight > 0),
-      maturity = sum(!is.na(maturity_code) & maturity_code > 0 &
-          maturity_convention_code <= maturity_convention_maxvalue)
+      maturity = sum(!is.na(maturity_code) & maturity_code > 0)
     ) %>% ungroup()
 
   all_years <- expand.grid(year = seq(min(dat$year), max(dat$year), 1),
