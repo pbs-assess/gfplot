@@ -43,10 +43,12 @@ sort(fns[grepl("get", fns)])
 Here's how the various factions fit together:
 <https://github.com/seananderson/gfplot/blob/master/inst/function-web.pdf>
 
-The following helper function will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument.
+The following helper function `cache_pbs_data()` will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
 
-```{r, eval=FALSE}
-cache_pbs_data("pacific cod", path = "pcod-cache")
+```{r}
+if (!file.exists(file.path("pcod-cache", "pbs-survey-sets.rds"))) { # quick check for speed
+  cache_pbs_data("pacific cod", path = "pcod-cache")
+}
 ```
 
 Let's read those data files and to work with here.
