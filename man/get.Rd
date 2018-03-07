@@ -75,6 +75,16 @@ data synopsis report production.
 }
 \details{
 \itemize{
+\item \code{get_ssids()} produces a lookup table for survey series IDs and
+descriptions
+\item \code{get_age_methods()} produces a lookup table for ageing method codes
+and descriptions
+\item \code{get_sample_trips()}produces a lookup table for sample ID and
+fishing event ID
+\item \code{get_strata_areas()} produces a lookup table for surveyed area for
+each stratum within surveys
+\item \code{get_survey_ids()} produces lookup table for survey IDs for a given
+survey series ID
 \item \code{get_survey_sets()} extracts survey catch data and spatial data for
 plotting survey catchs on a map of British Columbia.
 \item \code{get_survey_samples()} extracts all biological sample specimen records
