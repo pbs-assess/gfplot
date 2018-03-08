@@ -81,7 +81,7 @@ All of the plotting functions have associated `get_*()` functions to extract dat
 There are some options for a number of the `get` functions in terms of what gets extracted. Many of the columns that you might want to filter on are just retained so that you can filter yourself with, for example, `dplyr::filter(dat, x = "y")`.
 
 For the start of descriptions of the default filtering, see the end of the very-in-progress working paper:
-https://sean.updog.co/gf-synopsis-wp.pdf
+<https://sean.updog.co/gf-synopsis-wp.pdf>
 
 which references this SQL code:
 <https://github.com/seananderson/gfplot/tree/master/inst/sql>
@@ -429,4 +429,11 @@ glimpse(d_catch)
 glimpse(d_survey_index)
 glimpse(d_age_precision)
 # glimpse(d_cpue_index) # commented out for privacy
+```
+
+There's also a bonus function that we plan to use for the description at the top. Look up the SARA/COSEWIC status of your favorite species! This gets scraped dynamically from tables on a website.
+
+```{r}
+d <- get_sara_dat()
+glimpse(d)
 ```
