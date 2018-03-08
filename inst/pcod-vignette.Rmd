@@ -51,7 +51,7 @@ if (!file.exists(file.path("pcod-cache", "pbs-survey-sets.rds"))) { # quick chec
 }
 ```
 
-Let's read those data files and to work with here.
+Let's read those data files in to work with here.
 
 ```{r}
 cache <- file.path("pcod-cache")
@@ -75,7 +75,7 @@ dir.create(figs, showWarnings = FALSE)
 
 All of the plotting functions have associated `get_*()` functions to extract data, `tidy_*()` and / or `fit_*()` functions to tidy that data or fit a model to be plotted. First let's look at the raw age frequencies from the surveys.
 
-There are some options for a number of the `get` functions in terms of what gets extracted. Many of the columns that you might want to filter on our just retained so that you can filter yourself with, for example, `dplyr::filter(dat, x = "y")`.
+There are some options for a number of the `get` functions in terms of what gets extracted. Many of the columns that you might want to filter on are just retained so that you can filter yourself with, for example, `dplyr::filter(dat, x = "y")`.
 
 For the start of descriptions of the default filtering, see the end of the very-in-progress working paper:
 https://sean.updog.co/gf-synopsis-wp.pdf
@@ -91,7 +91,7 @@ As an example, we could extract the data with the following function call if we 
 get_survey_samples("pacific cod")
 ```
 
-If you'd rather you can also specify the species and number or the species name in a variety of ways. The following all do the same thing:
+If you'd rather you can also specify the species code or the species name in a variety of ways. The following all do the same thing:
 
 ```{r, eval=FALSE}
 get_survey_samples("Pacific cod")
@@ -107,7 +107,7 @@ get_survey_samples(c("pacific ocean perch", "pacific cod"))
 get_survey_samples(c(396, 442))
 ```
 
-Instead, we used to the caching function for convenience and saved the data frame into `d_survey_samples`.
+For this example, we used the caching function for convenience and saved the data frame into `d_survey_samples`.
 
 ```{r}
 glimpse(d_survey_samples)
@@ -371,7 +371,7 @@ predict_cpue_index(m_cpue, center = TRUE) %>%
   plot_cpue_index(all_models = FALSE)
 ```
 
-There is a built-in function to jackknif out each of the predictors to assess the sensitivity of the model to each predictor. In the following plot, the dashed grey line represents the standardized and centered index. Each of the colored indices represents removing that predictor.
+There is a built-in function to jackknife out each of the predictors to assess the sensitivity of the model to each predictor. In the following plot, the dashed grey line represents the standardized and centered index. Each of the colored indices represents removing that predictor.
 
 ```{r cpue-jk, warnings=FALSE, message=FALSE, fig.width=8, fig.height=4, cache=TRUE}
 plot_cpue_index_jk(m_cpue)
