@@ -38,6 +38,9 @@ The complete list is:
 ```{r list-get}
 fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
+sort(fns[grepl("tidy", fns)])
+sort(fns[grepl("fit", fns)])
+sort(fns[grepl("plot", fns)])
 ```
 
 Here's how the various functions fit together:
@@ -94,8 +97,9 @@ get_survey_samples("pacific cod")
 If you'd rather you can also specify the species code or the species name in a variety of ways. The following all do the same thing:
 
 ```{r, eval=FALSE}
-get_survey_samples("Pacific cod")
 get_survey_samples("pacific cod")
+get_survey_samples("Pacific cod")
+get_survey_samples("PaCiFiC cOD")
 get_survey_samples("442")
 get_survey_samples(442)
 ```
