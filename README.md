@@ -11,6 +11,6 @@ The gfplot package is *not* ready for use yet. In particular, the documentation 
 
 ```r
 # install.packages("devtools")
-devtools::install_github("seananderson.ca/gfplot")
+devtools::install_github("seananderson/gfplot")
 library("gfplot")
 ```
