@@ -271,7 +271,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE, kee
 
 #' @export
 #' @rdname get
-get_comm_samples <- function(species) {
+get_comm_samples <- function(species, keepers = FALSE) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -281,6 +281,15 @@ get_comm_samples <- function(species) {
   .d <- mutate(.d, year = lubridate::year(trip_start_date))
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
   as_tibble(.d)
+
+  if (keepers == FALSE){
+    .d <- .d %>% filter(!.d$species_category_code == 3)
+    .d <- .d %>% filter(!.d$sample_source_code == 2)
+  }
+  else{
+    .d <- .d %>% filter((.d$species_category_code == 1 & .d$sample_source_code ==2) |
+        (.d$species_category_code == 3 & !.d$sample_source_code == 1))
+  }
 }
 
 #' @export
