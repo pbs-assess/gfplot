@@ -94,6 +94,17 @@ get_ssids <- function() {
 
 #' @export
 #' @rdname get
+get_major_areas <- function() {
+  .d <- run_sql("GFFOS",
+    "SELECT MAJOR_STAT_AREA_CODE, MAJOR_STAT_AREA_DESCRIPTION
+    FROM MAJOR_STAT_AREA")
+  names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get
 get_age_methods <- function() {
   .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
     "SELECT AGEING_METHOD_CODE, AGEING_METHOD_DESC, ROW_VERSION
