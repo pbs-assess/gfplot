@@ -218,11 +218,18 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   as_tibble(.d)
 }
 
+.discard_keepers <- function(x) {
+    x %>% filter(!species_category_code %in% c(2, 3))
+}
+
 #' @export
 #' @rdname get
+#' @param discard_keepers Discard keepers?
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
-get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE, keepers = FALSE) {
+get_survey_samples <- function(species, ssid = NULL, 
+  discard_keepers = TRUE, remove_bad_data = TRUE) {
+
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid))
@@ -232,14 +239,16 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE, kee
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-  if (keepers == FALSE){
-    .d <- .d %>% filter(!.d$species_category_code == 3)
-    .d <- .d %>% filter(!.d$sample_source_code == 2)
+  if (discard_keepers) {
+    .d <- .discard_keepers(.d)
   }
-  else{
-    .d <- .d %>% filter((.d$species_category_code == 1 & .d$sample_source_code ==2) |
-        (.d$species_category_code == 3 & !.d$sample_source_code == 1))
-  }
+
+  ## TODO: is this just the keepers?
+  ## } else {
+  ##   .d <- .d %>% filter(
+  ##     (species_category_code == 1 & sample_source_code == 2) |
+  ##       (species_category_code == 3 & !sample_source_code == 1))
+  ## }
 
   surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
   surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
@@ -271,7 +280,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE, kee
 
 #' @export
 #' @rdname get
-get_comm_samples <- function(species, keepers = FALSE) {
+get_comm_samples <- function(species, discard_keepers = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -282,14 +291,16 @@ get_comm_samples <- function(species, keepers = FALSE) {
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
   as_tibble(.d)
 
-  if (keepers == FALSE){
-    .d <- .d %>% filter(!.d$species_category_code == 3)
-    .d <- .d %>% filter(!.d$sample_source_code == 2)
+  if (discard_keepers) {
+    .d <- .discard_keepers(.d)
   }
-  else{
-    .d <- .d %>% filter((.d$species_category_code == 1 & .d$sample_source_code ==2) |
-        (.d$species_category_code == 3 & !.d$sample_source_code == 1))
-  }
+
+  ## TODO: is this just the keepers?
+  ## } else {
+  ##   .d <- .d %>% filter(
+  ##     (species_category_code == 1 & sample_source_code == 2) |
+  ##       (species_category_code == 3 & !sample_source_code == 1))
+  ## }
 }
 
 #' @export

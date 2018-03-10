@@ -3,6 +3,7 @@
 \name{get}
 \alias{get}
 \alias{get_ssids}
+\alias{get_major_areas}
 \alias{get_age_methods}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
@@ -19,14 +20,17 @@
 \usage{
 get_ssids()
 
+get_major_areas()
+
 get_age_methods()
 
 get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE)
 
-get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE)
+get_survey_samples(species, ssid = NULL, discard_keepers = TRUE,
+  remove_bad_data = TRUE)
 
-get_comm_samples(species)
+get_comm_samples(species, discard_keepers = TRUE)
 
 get_catch(species)
 
@@ -56,6 +60,8 @@ names.}
 \item{ssid}{A numeric vector of survey series IDs. Run
 \code{\link{get_ssids}} if you for a look-up table of available survey
 series IDs with surveys series descriptions.}
+
+\item{discard_keepers}{Discard keepers?}
 
 \item{remove_bad_data}{Remove known bad data, such as unrealistic
 length or weight values.}
