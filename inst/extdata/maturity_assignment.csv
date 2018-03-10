@@ -16,7 +16,7 @@ maturity_convention_code,maturity_convention_desc,sex,maturity_convention_maxval
 8,LINGCOD (1985+),1,11,3
 8,LINGCOD (1985+),2,11,3
 10,DOGFISH,1,99,90
-10,DOGFISH,2,99,55
+10,DOGFISH,2,99,77
 11,PORT SAMPLES,1,7,3
 11,PORT SAMPLES,2,7,3
 12,THORNYHEAD SIMPLIFIED,1,3,2
