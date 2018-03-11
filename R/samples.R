@@ -19,8 +19,11 @@
 
 tidy_sample_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) {
 
+  dat <- filter(dat, !is.na(year))
+
   if (!is.null(year_range))
-    dat <- dat[dat$year >= min(year_range) & dat$year <= max(year_range), ]
+    dat <- dat[dat$year >= min(year_range) &
+        dat$year <= max(year_range), , drop = FALSE]
 
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
 
