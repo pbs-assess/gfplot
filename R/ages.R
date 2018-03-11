@@ -59,6 +59,7 @@ tidy_ages_raw <- function(dat,
     "PHMA Rockfish Longline Survey - Outside South",
     "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)", "IPHC"),
+  year_range = NULL,
   spp_cat_code = 1, ageing_method_codes = c(3, 17)) {
 
   if (!"survey_series_desc" %in% names(dat)) {
@@ -71,9 +72,10 @@ tidy_ages_raw <- function(dat,
   dbio <- filter(dbio, .data$sex %in% c(1, 2))
   dbio <- filter(dbio, !is.na(.data$year))
 
-  if (nrow(dbio) == 0)
-    stop("No data available after filtering for those ageing codes.",
+  if (nrow(dbio) == 0) {
+    warning("No data available after filtering for those ageing codes.",
       call. = FALSE)
+  }
 
   dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)
   dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
@@ -96,23 +98,29 @@ tidy_ages_raw <- function(dat,
     mutate(n_ages = n()) %>%
     ungroup()
 
-  d <- dplyr::filter(dbio_ages, !is.na(.data$age))
+  d <- filter(dbio_ages, !is.na(.data$age))
   ds <- d %>% mutate(sex = ifelse(sex == 2, "F", "M"))
 
   all_surveys <- tibble(survey = survey)
 
-  complete_df <- expand.grid(
-    survey = survey,
-    age = 1,
-    year = seq(min(dbio_ages$year), max(dbio_ages$year), 1),
-    sex = NA,
-    stringsAsFactors = FALSE
-  )
-  if (nrow(ds) == 0)
-    ds <- complete_df
+  if (is.null(year_range))
+    year_range <- c(min(dbio_ages$year), max(dbio_ages$year))
 
-  ds <- full_join(ds, all_surveys, by = "survey") %>%
-    select(-survey_series_desc)
+  dbio_ages <- filter(dbio_ages,
+    year >= year_range[[1]], year <= year_range[[2]])
+
+  # complete_df <- expand.grid(
+  #   survey = survey,
+  #   age = 1,
+  #   year = seq(year_range[[1]], year_range[[2]], 1),
+  #   sex = NA,
+  #   stringsAsFactors = FALSE
+  # )
+  # if (nrow(ds) == 0)
+  #   ds <- complete_df
+
+  # ds <- full_join(ds, all_surveys, by = "survey") %>%
+  #   select(-survey_series_desc)
   ds$survey <- factor(ds$survey, levels = survey)
   ds
 }
@@ -125,9 +133,12 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   line_col = c("M" = "grey50", "F" = "#f44256"),
   survey_cols = NULL, alpha = 0.85) {
 
-  year_min <- min(dat$year, na.rm = TRUE)
-  year_max <- max(dat$year, na.rm = TRUE)
-  age_max <- max(dat$age, na.rm = TRUE)
+  dat <- filter(dat, )
+  year_range <- as.numeric(year_range)
+  if (nrow(dat) > 0)
+    age_max <- max(dat$age, na.rm = TRUE)
+  else
+    age_max <- 1
 
   dat <- dat %>% mutate(year_jitter = ifelse(sex == "M",
     year + sex_gap / 2, year - sex_gap / 2)) %>%
@@ -154,36 +165,48 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   }
 
   if (is.null(year_range))
-    year_range <- c(year_min, year_max)
+    year_range <- c(min(dat$year, na.rm = TRUE), max(dat$year, na.rm = TRUE))
+
+  dat <- full_join(dat, tibble(survey = factor(levels(dat$survey),
+    levels = levels(dat$survey))), by = "survey")
+
+  if (sum(!is.na(dat$age)) == 0) {
+    dat$age <- 0
+    age_range <- 1
+  }
 
   g <- ggplot(dat, aes_string("year_jitter", "age")) +
+    facet_wrap(~survey, nrow = 1) +
+    scale_x_continuous(breaks =
+        seq(round_down_even(year_range[1]), year_range[2], year_increment)) +
+    xlab("") +
+    ylab(ylab) +
+    theme_pbs() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+    theme(panel.spacing = unit(-0.1, "lines")) +
+    labs(title = "Age frequencies", colour = "Sex", fill = "Sex") +
     geom_vline(xintercept = seq(year_range[1], year_range[2], 1),
       col = "grey95", lwd = 0.4) +
     geom_hline(yintercept = seq(0, age_max, 10), col = "grey95",
       lwd = 0.4) +
-    geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
-      pch = 21, alpha = 0.9) +
-    facet_wrap(~survey, nrow = 1) +
-    scale_fill_manual(values = fill_col) +
-    scale_colour_manual(values = line_col) +
-    scale_x_continuous(breaks =
-      seq(round_down_even(year_range[1]), year_range[2], year_increment)) +
-    xlab("") +
-    ylab(ylab) +
-    scale_size_area(max_size = max_size) +
     coord_cartesian(
       xlim = year_range + c(-0.8 - sex_gap / 2, 0.8 + sex_gap / 2),
-      ylim = c(0, age_max + 0.02 * age_range), expand = FALSE) +
-    guides(size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
-      fill = guide_legend(override.aes = list(size = 3.5))) +
-    theme_pbs() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-    geom_text(data = counts, y = age_max + 0.005 * age_range,
-      aes_string(x = "year", label = "total"),
-      inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 1,
-      angle = 90) +
-    theme(panel.spacing = unit(-0.1, "lines")) +
-    labs(title = "Age frequencies", colour = "Sex", fill = "Sex")
+      ylim = c(0, age_max + 0.02 * age_range), expand = FALSE)
+
+  if (sum(dat$age > 0, na.rm = TRUE) > 0) {
+    g <- g +
+      scale_fill_manual(values = fill_col) +
+      scale_colour_manual(values = line_col) +
+      scale_size_area(max_size = max_size) +
+      guides(size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
+        fill = guide_legend(override.aes = list(size = 3.5))) +
+      geom_text(data = counts, y = age_max + 0.005 * age_range,
+        aes_string(x = "year", label = "total"),
+        inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 1,
+        angle = 90) +
+      geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
+        pch = 21, alpha = 0.9)
+  }
 
   if (!is.null(survey_cols))
     g <- g + guides(fill = FALSE, colour = FALSE)
