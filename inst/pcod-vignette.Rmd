@@ -19,7 +19,7 @@ If you don't already have the package installed then run:
 
 ```{r, eval=FALSE}
 # install.packages("devtools")
-devtools::install_github("seananderson.ca/gfplot")
+devtools::install_github("seananderson/gfplot")
 ```
 
 First we will load the package along with ggplot2 and dplyr since we will use them a bit here.
