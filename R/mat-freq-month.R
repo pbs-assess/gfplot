@@ -29,32 +29,42 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
   mat_df <- readr::read_csv(file,
     col_types = readr::cols(
       maturity_convention_code = readr::col_integer(),
+      maturity_convention_desc = readr::col_character(),
+      `Maturity Convention Max Value` = readr::col_integer(),
       maturity_code = readr::col_integer(),
       sex = readr::col_integer(),
-      maturity_name_short = readr::col_character()))
+      maturity_name = readr::col_character(),
+      maturity_desc = readr::col_character(),
+      mature_at = readr::col_integer(),
+      maturity_name_short = readr::col_character()
+    ))
 
-  dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_code", "maturity_code"))
+  dat <- left_join(dat,
+    select(mat_df, sex, maturity_convention_code, maturity_code, maturity_name_short),
+    by = c("sex", "maturity_convention_code", "maturity_code"))
 
+  dat <- filter(dat, sex %in% c(1, 2))
   dat <- dat %>% mutate(sex = ifelse(sex == 2, "F", "M"))
 
-  # dat <- dat %>%
-  #   mutate(maturity_name_short = replace(maturity_name, maturity_name %in%
-  #       c("IMMATURE-1", "IMMATURE-2", "MATURING-SMALL", "MATURING - SMALL"),
-  #     "Immature")) %>%
-  #   mutate(maturity_name_short = replace(maturity_name_short,
-  #     maturity_name_short %in%
-  #       c("MATURING-LARGE", "PRE-RIPENING", "PRE-RIPENING-R1",
-  #         "PRE-RIPENING-R2", "RIPENING", "RIPENING-2R", "MATURING - LARGE"),
-  #     "Mature")) %>%
-  #   mutate(maturity_name_short = replace(maturity_name_short,
-  #     maturity_name_short %in% c("MATURE (SPENT)"), "Spent")) %>%
-  #   mutate(maturity_name_short = replace(maturity_name_short,
-  #     maturity_name_short %in% c("MATURE (RIPE)"), "Ripe")) %>%
-  #   mutate(maturity_name_short = replace(maturity_name_short,
-  #     maturity_name_short %in% c("MATURE (RESTING)"), "Resting"))
+  mat_levels <- rev(c(
+    "Immature",
+    "Maturing",
+    "Maturing-Small",
+    "Maturing-Large",
+    "Pre-Ripening (Mature)",
+    "Mature",
+    "Ripening (Mature)",
+    "Gravid",
+    "Fertilized",
+    "Ripe",
+    "Running Ripe",
+    "Embryos",
+    "Spent",
+    "Resorbing",
+    "Recovering",
+    "Resting"))
 
-  mat_levels <- rev(c("Immature", "Maturing", "Maturing-Small", "Maturing-Large", "Pre-Ripening (Mature)", "Mature", "Ripening (Mature)", "Gravid", "Fertilized", "Ripe", "Running Ripe", "Embryos", "Spent", "Resorbing", "Recovering", "Resting"))
-  # dat$maturity_name_short <- stringr::str_to_title(dat$maturity_name_short)
+  mat_levels <- mat_levels[mat_levels %in% unique(dat$maturity_name_short)]
   dat$maturity_name_short <- factor(dat$maturity_name_short,
     levels = mat_levels)
 
