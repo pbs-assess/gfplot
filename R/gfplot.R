@@ -21,7 +21,7 @@
 #'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
 #'   guide_legend geom_ribbon element_text scale_shape_manual element_line
 #'   geom_path geom_polygon coord_equal stat_summary_hex facet_grid
-#'   position_identity
+#'   position_identity coord_fixed
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
