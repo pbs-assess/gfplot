@@ -116,7 +116,7 @@ get_age_methods <- function() {
 
 get_sample_trips <- function() {
   run_sql("GFBioSQL",
-    "SELECT SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
+    "SELECT SPECIES_CODE, SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
 }
 
 get_strata_areas <- function() {
@@ -205,7 +205,8 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 
   if (join_sample_ids) {
     # give us each sample_id associated with each fishing_event_id
-    .d <- left_join(.d, sample_trip_ids, by = "FISHING_EVENT_ID") %>%
+    .d <- left_join(.d, sample_trip_ids,
+      by = c("SPECIES_CODE", "FISHING_EVENT_ID")) %>%
       left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
   }
 
