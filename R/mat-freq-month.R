@@ -12,6 +12,7 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
+  dat <- filter(dat, maturity_code <= maturity_convention_maxvalue)
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!
   dat <- dat %>%
     select(species_common_name,
