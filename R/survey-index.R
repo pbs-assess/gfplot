@@ -100,7 +100,7 @@ tidy_survey_index <- function(dat,
 #' @rdname plot_survey_index
 
 plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
-  title = "Biomass indices") {
+  title = "Biomass indices", survey_cols = NULL) {
 
   d <- dat %>%
     group_by(.data$survey_name) %>%
@@ -112,11 +112,18 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   labs <- unique(select(d, .data$survey_name))
   yrs <- range(d$year, na.rm = TRUE)
 
+  if (!is.null(survey_cols)) {
+    fill_col <- stats::setNames(survey_cols, levels(d$survey_name))
+    fill_col <- paste0(substr(fill_col, 1L, 7L), as.character(0.7 * 100))
+  } else {
+    fill_col <- rep(col[[1]], length(levels(d$survey_name)))
+  }
+
   ggplot(d, aes_string("year", "biomass_scaled")) +
-    geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey97") +
-    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93") +
-    geom_ribbon(aes_string(ymin = "lowerci_scaled", ymax = "upperci_scaled"),
-      colour = NA, fill = col[[1]]) +
+    geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey98") +
+    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey95") +
+    geom_ribbon(aes_string(ymin = "lowerci_scaled", ymax = "upperci_scaled",
+      fill = "survey_name"), colour = NA) +
     geom_line(col = "#00000050", size = 1) +
     geom_point(pch = 21, colour = col[[2]], fill = "grey60", size = 1.6,
       stroke = 1) +
@@ -125,6 +132,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     theme(panel.spacing = unit(-0.1, "lines")) +
     ylim(-0.01, NA) +
     coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5)) +
+    scale_fill_manual(values = fill_col) +
     xlab("") +
     ylab("Relative biomass") +
     theme(
@@ -133,6 +141,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       strip.background = element_blank(),
       strip.text.x = element_blank()) +
     labs(title = title) +
+    guides(fill = FALSE, colour = FALSE) +
     geom_text(data = labs, x = yrs[1] + 0.5, y = 0.88,
       aes_string(label = "survey_name"),
       inherit.aes = FALSE, colour = "grey30", size = 2.75, hjust = 0) +

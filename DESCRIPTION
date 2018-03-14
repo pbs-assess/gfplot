@@ -48,7 +48,7 @@ Imports:
     xml2
 Remotes: github::pbs-software/pbs-data/PBSdata,
     github::seananderson/glmmfields
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 Suggests: 
     knitr,

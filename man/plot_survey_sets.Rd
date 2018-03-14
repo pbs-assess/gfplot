@@ -50,4 +50,3 @@ plot_survey_sets(x$predictions, x$data, fill_column = "combined")
 \seealso{
 Other spatial survey modelling functions: \code{\link{survey-spatial-modelling}}
 }
-\concept{spatial survey modelling functions}

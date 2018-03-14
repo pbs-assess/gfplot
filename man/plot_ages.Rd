@@ -3,6 +3,7 @@
 \name{plot_ages}
 \alias{plot_ages}
 \alias{tidy_ages_raw}
+\alias{plot_ages}
 \title{Plot age frequency data}
 \usage{
 tidy_ages_raw(dat,
@@ -12,7 +13,8 @@ tidy_ages_raw(dat,
   "PHMA Rockfish Longline Survey - Outside North",
   "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"), spp_cat_code = 1, ageing_method_codes = c(3, 17))
+  "IPHC"), year_range = NULL, spp_cat_code = 1, ageing_method_codes = c(3,
+  17))
 
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL, fill_col = c(M = "grey50", F =
@@ -29,6 +31,9 @@ be from \code{tidy_ages_raw()} or be formatted similarly. See details.}
 \item{survey}{A character vector of shorter/cleaner survey names to use in
 the same order as \code{survey_series_desc}. These are used in the plot.}
 
+\item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
+all years included in original data.}
+
 \item{spp_cat_code}{A numeric vector of species categorical codes to include
 for the commercial samples. Defaults to \code{1}, which refers to unsorted
 samples.}
@@ -42,9 +47,6 @@ samples.}
 \item{year_increment}{Increment between year labels on x axis.}
 
 \item{ylab}{Y axis label.}
-
-\item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
-all years included in original data.}
 }
 \description{
 Functions for plotting age frequency data. (Weighting not implimented
@@ -77,4 +79,3 @@ tidy_ages_raw(d) \%>\%
 Other age- and length-frequency functions: \code{\link{plot_lengths}},
   \code{\link{weight_comps}}
 }
-\concept{age- and length-frequency functions}

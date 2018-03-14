@@ -183,11 +183,10 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   }
   .d <- bind_rows(d_survs)
 
-  if (join_sample_ids) {
-    .d <- inner_join(.d,
-      unique(select(survey_ids,
-          SURVEY_SERIES_ID,
-          SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
+  .d <- inner_join(.d,
+    unique(select(survey_ids,
+      SURVEY_SERIES_ID,
+      SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
 
   ## if (length(.d$specimen_id) > length(unique(.d$specimen_id)))
   ##   warning("Duplicate specimen IDs are present because of overlapping survey ",
@@ -196,7 +195,6 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   ##     "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
   ##     "Tidying and plotting functions with gfplot will do this for you.")
 
-  }
 
   .d <- inner_join(.d,
     unique(select(species_df,
@@ -205,8 +203,11 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       SPECIES_SCIENCE_NAME,
       SPECIES_DESC)), by = "SPECIES_CODE")
 
-  .d <- left_join(.d, sample_trip_ids, by = "FISHING_EVENT_ID") %>%
-    left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
+  if (join_sample_ids) {
+    # give us each sample_id associated with each fishing_event_id
+    .d <- left_join(.d, sample_trip_ids, by = "FISHING_EVENT_ID") %>%
+      left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
+  }
 
   names(.d) <- tolower(names(.d))
   .d <- mutate(.d,
@@ -219,7 +220,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 }
 
 .discard_keepers <- function(x) {
-    x %>% filter(!species_category_code %in% c(2, 3))
+  x %>% filter(!species_category_code %in% c(2, 3))
 }
 
 #' @export
@@ -227,7 +228,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @param discard_keepers Discard keepers?
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
-get_survey_samples <- function(species, ssid = NULL, 
+get_survey_samples <- function(species, ssid = NULL,
   discard_keepers = TRUE, remove_bad_data = TRUE) {
 
   .q <- read_sql("get-survey-samples.sql")

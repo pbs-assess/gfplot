@@ -3,6 +3,7 @@
 \name{plot_lengths}
 \alias{plot_lengths}
 \alias{tidy_lengths_raw}
+\alias{plot_lengths}
 \title{Plot length frequency data}
 \usage{
 tidy_lengths_raw(dat, bin_size = 2, min_specimens = 20L,
@@ -61,4 +62,3 @@ surveys for a single species.
 Other age- and length-frequency functions: \code{\link{plot_ages}},
   \code{\link{weight_comps}}
 }
-\concept{age- and length-frequency functions}

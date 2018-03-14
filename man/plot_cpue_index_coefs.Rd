@@ -49,5 +49,3 @@ Other CPUE index functions: \code{\link{fit_cpue_index}},
   \code{\link{predict_cpue_index}},
   \code{\link{tidy_cpue_index}}
 }
-\concept{CPUE index functions}
-\concept{plotting functions}

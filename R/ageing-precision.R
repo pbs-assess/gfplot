@@ -3,7 +3,7 @@
 #' @param dat A data frame from [get_age_precision()]
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to codes `3` and `17`, which represent otolith
-#'   'break and burn' and 'break and bake' methods.
+#'   'break and burn' and 'break and bake' methods. See [get_age_methods()].
 #'
 #' @export
 #'
@@ -52,12 +52,12 @@ tidy_age_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' @param dat A properly formatted data frame, for example, from
 #'   [tidy_age_precision()]. Should have columns named
 #'   TODO.
-#' @param n Number of fish to sample if there are more fish than `n`.
-#' @param jitter Amount to randomly jitter ages. Same jitter values are used for
-#'   the precision and primary ages.
+#' @param n Number of fish to randomly sample to plot.
+#' @param jitter Amount to randomly jitter ages for visualization. Same jitter
+#'   values are used for the precision and primary ages for the same fish.
 #' @param seed If a numeric value, set the random seed so that the same rows
 #'   are sampled each time and the same jitter values are generated. If
-#'   \code{NULL} different fish will be sampled each time function is run.
+#'   `NULL`, different fish will be sampled each time the function is run.
 #'
 #' @export
 #'

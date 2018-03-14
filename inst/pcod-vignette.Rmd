@@ -247,7 +247,7 @@ ggsave(file.path(figs, "vb.pdf"), width = 5, height = 4)
 lw_m <- fit_length_weight(d_survey_samples, sex = "male", method = "rlm")
 lw_f <- fit_length_weight(d_survey_samples, sex = "female", method = "rlm")
 plot_length_weight(object_female = lw_m, object_male = lw_f)
-ggsave(file.path(figs, "length-wt.pdf"), width = 6, height = 3.5)
+ggsave(file.path(figs, "length-wt.pdf"), width = 5, height = 4)
 ```
 
 Similarly, we can fit a logistic maturity ogive:
@@ -284,6 +284,7 @@ And look at maturity by month (for the surveys right now):
 ```{r, fig.width=5, fig.height=3}
 tidy_maturity_months(d_survey_samples) %>%
   plot_maturity_months()
+ggsave(file.path(figs, "maturity-months.pdf"), width = 6, height = 4)
 ```
 
 We can plot the trawl and hook and line CPUE on maps. Note that the hook and line "CPUE" is just kg per fishing event right now since it seems like quantifing effort across all stocks might be troublesome.

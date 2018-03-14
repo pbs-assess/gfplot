@@ -11,7 +11,7 @@ tidy_age_precision(dat, ageing_method_codes = c(3, 17))
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to codes \code{3} and \code{17}, which represent otolith
-'break and burn' and 'break and bake' methods.}
+'break and burn' and 'break and bake' methods. See \code{\link[=get_age_methods]{get_age_methods()}}.}
 }
 \description{
 Tidy PBS ageing precision data
@@ -33,5 +33,3 @@ Other tidy data functions: \code{\link{plot_survey_index}},
 
 Other ageing precision functions: \code{\link{plot_age_precision}}
 }
-\concept{ageing precision functions}
-\concept{tidy data functions}

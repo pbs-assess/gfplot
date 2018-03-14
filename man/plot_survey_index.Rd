@@ -3,6 +3,7 @@
 \name{plot_survey_index}
 \alias{plot_survey_index}
 \alias{tidy_survey_index}
+\alias{plot_survey_index}
 \title{Plot survey relative biomass mass index}
 \usage{
 tidy_survey_index(dat, surveys = c("West Coast Haida Gwaii Synoptic Survey",
@@ -20,7 +21,7 @@ tidy_survey_index(dat, surveys = c("West Coast Haida Gwaii Synoptic Survey",
   year_range = NULL)
 
 plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
-  title = "Biomass indices")
+  title = "Biomass indices", survey_cols = NULL)
 }
 \arguments{
 \item{dat}{TODO}
@@ -65,5 +66,3 @@ Other plotting functions: \code{\link{fit_mat_ogive}},
   \code{\link{plot_cpue_index_jk}},
   \code{\link{plot_cpue_index}}
 }
-\concept{plotting functions}
-\concept{tidy data functions}

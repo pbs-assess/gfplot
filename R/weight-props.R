@@ -179,7 +179,7 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
     group_by(year, grouping_code) %>%
     summarise(total_density = sum(density_kgpm2 * 1e6))
 
-  sample_dens <- select(specimen_dat, -area_km2) %>%
+  sample_dens <- specimen_dat %>%
     inner_join(strat_dat,
       by = c("year", "survey_id", "sample_id", "grouping_code")) %>%
     group_by(year, grouping_code, sample_id) %>%

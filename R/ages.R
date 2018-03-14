@@ -134,7 +134,6 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   survey_cols = NULL, alpha = 0.85) {
 
   dat <- filter(dat, )
-  year_range <- as.numeric(year_range)
   if (nrow(dat) > 0)
     age_max <- max(dat$age, na.rm = TRUE)
   else

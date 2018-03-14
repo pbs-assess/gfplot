@@ -4,6 +4,7 @@
 \alias{weight_comps}
 \alias{tidy_comps_commercial}
 \alias{tidy_comps_survey}
+\alias{weight_comps}
 \alias{tidy_ages_weighted}
 \alias{tidy_lengths_weighted}
 \title{Age and length frequency weighting}
@@ -109,4 +110,3 @@ in British Columbia. CSAS Res. Doc. 2016/009.
 Other age- and length-frequency functions: \code{\link{plot_ages}},
   \code{\link{plot_lengths}}
 }
-\concept{age- and length-frequency functions}

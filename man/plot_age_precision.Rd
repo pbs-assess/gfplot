@@ -11,14 +11,14 @@ plot_age_precision(dat, n = 250, jitter = 0.25, seed = 42)
 \code{\link[=tidy_age_precision]{tidy_age_precision()}}. Should have columns named
 TODO.}
 
-\item{n}{Number of fish to sample if there are more fish than \code{n}.}
+\item{n}{Number of fish to randomly sample to plot.}
 
-\item{jitter}{Amount to randomly jitter ages. Same jitter values are used for
-the precision and primary ages.}
+\item{jitter}{Amount to randomly jitter ages for visualization. Same jitter
+values are used for the precision and primary ages for the same fish.}
 
 \item{seed}{If a numeric value, set the random seed so that the same rows
 are sampled each time and the same jitter values are generated. If
-\code{NULL} different fish will be sampled each time function is run.}
+\code{NULL}, different fish will be sampled each time the function is run.}
 }
 \description{
 Plot ageing precision data
@@ -37,4 +37,3 @@ get_ageing_precision("pacific ocean perch") \%>\%
 \seealso{
 Other ageing precision functions: \code{\link{tidy_age_precision}}
 }
-\concept{ageing precision functions}

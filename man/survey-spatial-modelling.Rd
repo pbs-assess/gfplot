@@ -73,6 +73,8 @@ fit_survey_sets(dat, survey, years, chains = 3, iter = 1200,
 }
 \description{
 Long description here
+
+Title TODO
 }
 \details{
 \itemize{
@@ -112,4 +114,3 @@ plot_survey_sets(pg, dat, fill_column = "combined")
 \seealso{
 Other spatial survey modelling functions: \code{\link{plot_survey_sets}}
 }
-\concept{spatial survey modelling functions}

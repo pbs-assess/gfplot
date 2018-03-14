@@ -143,4 +143,3 @@ get_cpue_spatial_ll("arrowtooth flounder")
 }
 
 }
-\concept{get data functions}

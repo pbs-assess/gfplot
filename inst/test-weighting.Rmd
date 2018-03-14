@@ -6,8 +6,10 @@ output: html_document
 ```{r}
 library(dplyr)
 library(ggplot2)
-survey_samples <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-samples.rds")
-survey_tows <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-tows.rds")
+survey_samples <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-samples.rds") %>% 
+  filter(species_common_name == "redstripe rockfish")
+survey_tows <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-sets.rds") %>%
+  filter(species_common_name == "redstripe rockfish")
 
 survey_samples <- survey_samples %>%
   filter(survey_series_desc == "Queen Charlotte Sound Synoptic Survey" )
@@ -89,8 +91,18 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
 
 # Commercial:
 
-com_samples <- readRDS("~/Dropbox/PBS synopsis/pbs-comm-samples.rds")
-com_catch <- readRDS("~/Dropbox/PBS synopsis/pbs-catch.rds")
+com_samples <- read.csv(
+  "~/Dropbox/PBS synopsis/redstripe-data/Rowans_redstripe_comm_samp_data.csv",
+  stringsAsFactors = FALSE, strip.white = TRUE) %>% dplyr::as.tbl()
+names(com_samples) <- tolower(names(com_samples))
+com_samples <- mutate(com_samples,
+  species_science_name = tolower(species_science_name),
+  species_common_name = tolower(species_common_name))
+com_samples <- mutate(com_samples, year = lubridate::year(trip_start_date))
+assertthat::assert_that(sum(duplicated(com_samples$specimen_id)) == 0)
+
+com_catch <- readRDS("~/Dropbox/PBS synopsis/pbs-catch.rds") %>% 
+  filter(species_common_name == "redstripe rockfish")
 
 dd <- tidy_comps_commercial(com_samples, com_catch, value = age)
 dd$age <- paste(ifelse(dd$sex == 1, "M", "F"), dd$age)
