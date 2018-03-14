@@ -3,21 +3,32 @@ title: "Test weighting"
 output: html_document
 ---
 
+Here we will compare the age frequency weighting functions against the frequency weighting code previously implemented by Rowan.
+
 ```{r}
+library(gfplot)
 library(dplyr)
 library(ggplot2)
-survey_samples <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-samples.rds") %>% 
-  filter(species_common_name == "redstripe rockfish")
-survey_tows <- readRDS("~/Dropbox/PBS synopsis/pbs-survey-sets.rds") %>%
-  filter(species_common_name == "redstripe rockfish")
+```
+
+```{r, eval=FALSE}
+cache_pbs_data("redstrip rockfish", path = "data-cache")
+```
+
+# Survey samples
+
+gfplot data and weighting:
+
+```{r}
+survey_samples <- readRDS("data-cache/pbs-survey-samples.rds")
+survey_sets <- readRDS("data-cache/pbs-survey-sets.rds")
 
 survey_samples <- survey_samples %>%
   filter(survey_series_desc == "Queen Charlotte Sound Synoptic Survey" )
-table(survey_samples$species_common_name)
-dd <- tidy_comps_survey(survey_samples, survey_tows, value = age)
+
+dd <- tidy_comps_survey(survey_samples, survey_sets, value = age)
 dd$age <- paste(ifelse(dd$sex == 1, "M", "F"), dd$age)
 dd$sex <- NULL
-
 
 surv_ages <- weight_comps(dd)
 surv_ages <- surv_ages %>%
@@ -32,7 +43,11 @@ surv_ages %>%
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39)
+```
 
+Rowan's weighted data:
+
+```{r}
 rh <- read.csv("~/Downloads/awatea-wpa439(den)-ssid(1)-major(567).csv",
   stringsAsFactors = FALSE, strip.white = TRUE)
 
@@ -50,9 +65,11 @@ ggplot(rh, aes(year, value, size = weighted_prop)) +
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39)
+```
 
-## together:
+Together:
 
+```{r}
 all <- rbind(mutate(rh, type = "RH"),
   mutate(surv_ages, type = "gfplot"))
 all <- as.data.frame(na.omit(all))
@@ -62,9 +79,11 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39)
+```
 
-## with raw:
+With raw data:
 
+```{r}
 raw <- survey_samples %>%
   select(year, sex, age) %>%
   filter(!is.na(age), sex %in% c(1, 2)) %>%
@@ -77,7 +96,6 @@ raw <- survey_samples %>%
   rename(value = age) %>%
   mutate(type = "raw")
 
-
 all <- rbind(all, as.data.frame(raw))
 
 ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
@@ -86,13 +104,16 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39) +
   scale_colour_manual(
-    values = c("raw" = "grey40", "RH" = "orange", "gfplot" = "blue"))
+    values = c("raw" = "grey40", "RH" = "red", "gfplot" = "blue"))
+```
 
+# Commercial samples
 
-# Commercial:
+gplot data:
 
-com_samples <- readRDS(
-  "~/Dropbox/PBS synopsis/redstripe-data/Redstripe_comm_samples_Rowan.rds") %>% dplyr::as.tbl()
+```{r}
+com_samples <- readRDS("Redstripe_comm_samples_Rowan.rds") %>%
+  dplyr::as.tbl()
 names(com_samples) <- tolower(names(com_samples))
 com_samples <- mutate(com_samples,
   species_science_name = tolower(species_science_name),
@@ -100,9 +121,12 @@ com_samples <- mutate(com_samples,
 com_samples <- mutate(com_samples, year = lubridate::year(trip_start_date))
 assertthat::assert_that(sum(duplicated(com_samples$specimen_id)) == 0)
 
-com_catch <- readRDS("~/Dropbox/PBS synopsis/pbs-catch.rds") %>% 
-  filter(species_common_name == "redstripe rockfish")
+com_catch <- readRDS("data-cache/pbs-catch.rds")
+```
 
+gfplot weighting:
+
+```{r}
 dd <- tidy_comps_commercial(com_samples, com_catch, value = age)
 dd$age <- paste(ifelse(dd$sex == 1, "M", "F"), dd$age)
 dd$sex <- NULL
@@ -120,7 +144,11 @@ com_ages %>%
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39)
+```
 
+Rowan's weighted data:
+
+```{r}
 rh <- read.csv("~/Downloads/awatea-wpa439(cat)-tt(145)-major(34567).csv",
   stringsAsFactors = FALSE, strip.white = TRUE) %>%
   filter(year >= 1998)
@@ -139,9 +167,11 @@ ggplot(rh, aes(year, value, size = weighted_prop)) +
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39)
+```
 
-## together:
+Together:
 
+```{r}
 all <- rbind(mutate(rh, type = "RH"),
   mutate(com_ages, type = "gfplot"))
 all <- as.data.frame(na.omit(all))
@@ -151,9 +181,11 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39)
+```
 
-## with raw:
+With raw:
 
+```{r}
 raw <- com_samples %>%
   select(year, sex, age) %>%
   filter(!is.na(age), sex %in% c(1, 2)) %>%
@@ -166,21 +198,14 @@ raw <- com_samples %>%
   rename(value = age) %>%
   mutate(type = "raw")
 
-ggplot(raw, aes(year, value, size = weighted_prop, colour = type)) +
-  geom_point(pch = 21) + theme_pbs() +
-  facet_wrap(~sex) +
-  scale_size_continuous(range = c(0, 8)) +
-  ylim(0, 39) +
-  geom_vline(xintercept = c(2009, 2004))
-
-
 all <- rbind(all, as.data.frame(raw))
 
-ggplot(filter(all, type != "gfplot"), aes(year, value, size = weighted_prop, colour = type)) +
+ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   geom_point(pch = 21) + theme_pbs() +
   facet_wrap(~sex) +
   scale_size_continuous(range = c(0, 8)) +
   ylim(0, 39) +
-  geom_vline(xintercept = c(2009, 2004))
-
+  geom_vline(xintercept = c(2009, 2004)) +
+  scale_colour_manual(
+    values = c("raw" = "grey40", "RH" = "red", "gfplot" = "blue"))
 ```
