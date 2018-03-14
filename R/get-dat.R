@@ -195,7 +195,6 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   ##     "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
   ##     "Tidying and plotting functions with gfplot will do this for you.")
 
-
   .d <- inner_join(.d,
     unique(select(species_df,
       SPECIES_CODE,
@@ -204,7 +203,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       SPECIES_DESC)), by = "SPECIES_CODE")
 
   if (join_sample_ids) {
-    # give us each sample_id associated with each fishing_event_id
+    # give us each sample_id associated with each fishing_event_id and species:
     .d <- left_join(.d, sample_trip_ids,
       by = c("SPECIES_CODE", "FISHING_EVENT_ID")) %>%
       left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
