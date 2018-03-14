@@ -91,9 +91,8 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
 
 # Commercial:
 
-com_samples <- read.csv(
-  "~/Dropbox/PBS synopsis/redstripe-data/Rowans_redstripe_comm_samp_data.csv",
-  stringsAsFactors = FALSE, strip.white = TRUE) %>% dplyr::as.tbl()
+com_samples <- readRDS(
+  "~/Dropbox/PBS synopsis/redstripe-data/Redstripe_comm_samples_Rowan.rds") %>% dplyr::as.tbl()
 names(com_samples) <- tolower(names(com_samples))
 com_samples <- mutate(com_samples,
   species_science_name = tolower(species_science_name),
