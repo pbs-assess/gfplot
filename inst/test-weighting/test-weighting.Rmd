@@ -1,15 +1,27 @@
 ---
-title: "Test weighting"
-output: html_document
+title: "Testing the age/length frequency weighting"
+output: rmarkdown::html_vignette
 ---
 
 Here we will compare the age frequency weighting functions against the frequency weighting code previously implemented by Rowan.
 
-```{r}
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 8 / 1.618
+)
+```
+
+
+```{r, warning=FALSE, message=FALSE}
 library(gfplot)
 library(dplyr)
 library(ggplot2)
 ```
+
+Let's cache all the data for redstripe rockfish using gfplot:
 
 ```{r, eval=FALSE}
 cache_pbs_data("redstrip rockfish", path = "data-cache")
@@ -17,7 +29,9 @@ cache_pbs_data("redstrip rockfish", path = "data-cache")
 
 # Survey samples
 
-gfplot data and weighting:
+First let's compare the weighting with the survey data.
+
+Let's read in the gfplot data and apply the weighting:
 
 ```{r}
 survey_samples <- readRDS("data-cache/pbs-survey-samples.rds")
@@ -48,7 +62,7 @@ surv_ages %>%
 Rowan's weighted data:
 
 ```{r}
-rh <- read.csv("~/Downloads/awatea-wpa439(den)-ssid(1)-major(567).csv",
+rh <- read.csv("awatea-wpa439(den)-ssid(1)-major(567).csv",
   stringsAsFactors = FALSE, strip.white = TRUE)
 
 rh <- rh %>%
@@ -67,7 +81,7 @@ ggplot(rh, aes(year, value, size = weighted_prop)) +
   ylim(0, 39)
 ```
 
-Together:
+Plot the two together:
 
 ```{r}
 all <- rbind(mutate(rh, type = "RH"),
@@ -81,7 +95,7 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   ylim(0, 39)
 ```
 
-With raw data:
+And also add the raw data:
 
 ```{r}
 raw <- survey_samples %>%
@@ -107,18 +121,31 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
     values = c("raw" = "grey40", "RH" = "red", "gfplot" = "blue"))
 ```
 
+Note that we are starting with different source data here. My understanding is that Rowan's data includes samples from tows regardless of their usability code. The data from gfplot makes use of Norm's procedure used when documenting the relative biomass indices and so only includes fishing events with usable usability codes.
+
+As we will see below, the weighting is almost identical for the commercial samples and both use the same weighting function meaning that the differences here are almost certainly from the slightly different criteria used when filtering the source data.
+
 # Commercial samples
 
-gplot data:
+Next let's do the same thing for the commercial samples.
+
+gplot data first. Elise wrote some SQL to match the criteria used by Rowan when extracting the commercial sample data:
+
+```{r, eval=FALSE}
+sql_query <- readLines("get-comm-samples-rowan.sql")
+com_samples <- gfplot:::run_sql("GFBioSQL", query = sql_query)
+saveRDS(com_samples, "redstripe-comm-samples-rowan.rds")
+```
 
 ```{r}
-com_samples <- readRDS("Redstripe_comm_samples_Rowan.rds") %>%
+com_samples <- readRDS("redstripe-comm-samples-rowan.rds") %>%
   dplyr::as.tbl()
 names(com_samples) <- tolower(names(com_samples))
 com_samples <- mutate(com_samples,
   species_science_name = tolower(species_science_name),
   species_common_name = tolower(species_common_name))
 com_samples <- mutate(com_samples, year = lubridate::year(trip_start_date))
+com_samples <- filter(com_samples, year >= 1996)
 assertthat::assert_that(sum(duplicated(com_samples$specimen_id)) == 0)
 
 com_catch <- readRDS("data-cache/pbs-catch.rds")
@@ -149,9 +176,9 @@ com_ages %>%
 Rowan's weighted data:
 
 ```{r}
-rh <- read.csv("~/Downloads/awatea-wpa439(cat)-tt(145)-major(34567).csv",
+rh <- read.csv("awatea-wpa439(cat)-tt(145)-major(34567).csv",
   stringsAsFactors = FALSE, strip.white = TRUE) %>%
-  filter(year >= 1998)
+  filter(year >= 1996)
 
 rh <- rh %>%
   select(-ntid, -age1, -ageN) %>%
@@ -169,7 +196,7 @@ ggplot(rh, aes(year, value, size = weighted_prop)) +
   ylim(0, 39)
 ```
 
-Together:
+Compare the two visually:
 
 ```{r}
 all <- rbind(mutate(rh, type = "RH"),
@@ -183,7 +210,9 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   ylim(0, 39)
 ```
 
-With raw:
+This looks nearly perfect to me. There are a small number of 29, 30, and 31 year-old redstripe in 2013 in Rowan's data that aren't in ours (see the blue dots that stand out). When we go back to the databases themselves, we can't find any redstripe rockfish of those ages in those years regardless of filtering criteria (actually I believe we found one that gets filtered out). The most likely scenario is that some data have been corrected in the database since Rowan pulled his version of the data. 
+
+A plot with raw frequencies added in grey:
 
 ```{r}
 raw <- com_samples %>%
@@ -209,3 +238,7 @@ ggplot(all, aes(year, value, size = weighted_prop, colour = type)) +
   scale_colour_manual(
     values = c("raw" = "grey40", "RH" = "red", "gfplot" = "blue"))
 ```
+
+So we can see here that the weighting does make a difference (albeit usually relatively minor), but the two weighting implementations look effectively identical.
+
+When I go back further than 1996 that looks like there are some small differences in the weighted frequencies. This most likely comes down to the catch data that is used.
