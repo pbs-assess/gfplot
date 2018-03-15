@@ -107,7 +107,7 @@ if (getRversion() >= "2.15.1") utils::globalVariables(c(
   "maturity_convention_code",
 
   "total_month", "month_jitter", "maturity_name_short", "survey_series_id",
-  ".n", "maturity"
+  ".n", "maturity", "maturity_name"
 
 
   ))

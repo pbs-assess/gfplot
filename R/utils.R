@@ -35,17 +35,11 @@ collapse_filters <- function(x) {
   paste0("'", paste(x, collapse = "','"), "'")
 }
 
-inject_species_filter <- function(sql_precode, species, sql_code) {
-  i <- grep("-- insert species here", sql_code)
+inject_filter <- function(sql_precode, species, sql_code,
+  search_flag = "-- insert species here", conversion_func = common2codes) {
+  i <- grep(search_flag, sql_code)
   sql_code[i] <- paste0(sql_precode, " (",
-    collapse_filters(common2codes(species)), ")")
-    sql_code
-}
-
-inject_survey_filter <- function(sql_precode, ssid, sql_code) {
-  i <- grep("-- insert ssid here", sql_code)
-  sql_code[i] <- paste0(sql_precode, " (",
-    collapse_filters(ssid), ")")
+    collapse_filters(conversion_func(species)), ")")
     sql_code
 }
 
@@ -53,7 +47,6 @@ run_sql <- function(database, query) {
   query <- paste(query, collapse = "\n")
   DBI::dbGetQuery(db_connection(database = database), query)
 }
-
 
 firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))

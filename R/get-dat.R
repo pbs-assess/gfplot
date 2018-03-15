@@ -232,9 +232,11 @@ get_survey_samples <- function(species, ssid = NULL,
   discard_keepers = TRUE, remove_bad_data = TRUE) {
 
   .q <- read_sql("get-survey-samples.sql")
-  .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
-  if (!is.null(ssid))
-    .q <- inject_survey_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q)
+  .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
+  if (!is.null(ssid)) {
+    .q <- inject_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q,
+      search_flag = "-- insert ssid here", conversion_func = I)
+  }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
@@ -283,7 +285,7 @@ get_survey_samples <- function(species, ssid = NULL,
 #' @rdname get
 get_comm_samples <- function(species, discard_keepers = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
-  .q <- inject_species_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
+  .q <- inject_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
@@ -308,7 +310,7 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
 #' @rdname get
 get_catch <- function(species) {
   .q <- read_sql("get-catch.sql")
-  .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, sql_code = .q)
+  .q <- inject_filter("WHERE SP.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
@@ -321,7 +323,7 @@ get_catch <- function(species) {
 #' @rdname get
 get_cpue_spatial <- function(species) {
   .q <- read_sql("get-cpue-spatial.sql")
-  .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
+  .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
   .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
@@ -335,7 +337,7 @@ get_cpue_spatial <- function(species) {
 #' @rdname get
 get_cpue_spatial_ll <- function(species) {
   .q <- read_sql("get-cpue-spatial-ll.sql")
-  .q <- inject_species_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
+  .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
   .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
@@ -365,7 +367,7 @@ get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
 #' @rdname get
 get_age_precision <- function(species) {
   .q <- read_sql("get-age-precision.sql")
-  .q <- inject_species_filter("AND C.SPECIES_CODE IN", species, .q)
+  .q <- inject_filter("AND C.SPECIES_CODE IN", species, .q)
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   as_tibble(.d)
@@ -375,9 +377,11 @@ get_age_precision <- function(species) {
 #' @rdname get
 get_survey_index <- function(species, ssid = NULL) {
   .q <- read_sql("get-survey-index.sql")
-  .q <- inject_species_filter("WHERE SP.SPECIES_CODE IN", species, .q)
-  if (!is.null(ssid))
-    .q <- inject_survey_filter("AND BD.SURVEY_SERIES_ID IN", ssid, .q)
+  .q <- inject_filter("WHERE SP.SPECIES_CODE IN", species, .q)
+  if (!is.null(ssid)) {
+    .q <- inject_filter("AND BD.SURVEY_SERIES_ID IN", ssid, .q,
+      search_flag = "-- insert ssid here", conversion_func = I)
+  }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
