@@ -1,5 +1,7 @@
 ---
-output: md_document
+output:
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r echo=FALSE}
@@ -43,7 +45,12 @@ Generic functions for any similarly formatted data:
 
 ```{r}
 sort(fns[grepl("tidy", fns)])
-sort(fns[grepl("fit", fns)])
-sort(fns[grepl("plot", fns)])
 ```
 
+```{r}
+sort(fns[grepl("fit", fns)])
+```
+
+```{r}
+sort(fns[grepl("plot", fns)])
+```
