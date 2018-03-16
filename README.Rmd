@@ -21,10 +21,29 @@ Facilitates the creation of an annual groundfish data synopsis report with [gfsy
 
 # Installation
 
-The gfplot package is *not* ready for use yet. In particular, the documentation is far from complete. However, it can be installed with:
+The gfplot package is *not* ready for use yet. In particular, the documentation is far from complete. However, it can be installed and loaded with:
 
-```r
+```{r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("seananderson/gfplot")
+```
+
+```{r}
 library("gfplot")
 ```
+
+Functions specific to PBS:
+
+```{r}
+fns <- ls("package:gfplot")
+sort(fns[grepl("get", fns)])
+```
+
+Generic functions for any similarly formatted data:
+
+```{r}
+sort(fns[grepl("tidy", fns)])
+sort(fns[grepl("fit", fns)])
+sort(fns[grepl("plot", fns)])
+```
+
