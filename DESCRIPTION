@@ -1,12 +1,13 @@
 Package: gfplot
-Title: Data extraction and plotting for DFO PBS Groundfish Stocks
+Title: Data Extraction and Plotting for DFO PBS Groundfish Stocks
 Version: 0.0.0.9000
-Date: 2018-02-16
+Date: 2018-03-19
 Authors@R: c(person("Sean", "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
     person("Elise", "Keppel", role = "aut"))
-Description: Facilitates data extraction (at PBS), data tidying, 
-    model fitting, and plotting of groundfish data.
+Description: Facilitates groundfish data extraction at the Canadian Department
+    of Fisheries and Oceans (DFO) Pacific Biological Station (PBS), data
+    tidying, model fitting, and plotting.
 Depends: R (>= 3.2.0)
 License: GPL (>=2)
 Encoding: UTF-8

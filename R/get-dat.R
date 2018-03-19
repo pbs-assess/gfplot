@@ -65,7 +65,7 @@
 #'
 #' get_cpue_spatial("pacific cod")
 #' get_cpue_spatial_ll("arrowtooth flounder")
-#'}
+#' }
 #'
 #' @param species One or more species common names (e.g. `"pacific ocean
 #'   perch"`) or one or more species codes (e.g. `396`). Species codes can be
@@ -84,9 +84,11 @@ NULL
 #' @export
 #' @rdname get
 get_ssids <- function() {
-  .d <- run_sql("GFBioSQL",
+  .d <- run_sql(
+    "GFBioSQL",
     "SELECT SURVEY_SERIES_ID, SURVEY_SERIES_DESC
-      FROM SURVEY_SERIES")
+      FROM SURVEY_SERIES"
+  )
   names(.d) <- tolower(names(.d))
   .d <- unique(.d)
   as_tibble(.d)
@@ -95,9 +97,11 @@ get_ssids <- function() {
 #' @export
 #' @rdname get
 get_major_areas <- function() {
-  .d <- run_sql("GFFOS",
+  .d <- run_sql(
+    "GFFOS",
     "SELECT MAJOR_STAT_AREA_CODE, MAJOR_STAT_AREA_DESCRIPTION
-    FROM MAJOR_STAT_AREA")
+    FROM MAJOR_STAT_AREA"
+  )
   names(.d) <- tolower(names(.d))
   .d <- unique(.d)
   as_tibble(.d)
@@ -106,27 +110,33 @@ get_major_areas <- function() {
 #' @export
 #' @rdname get
 get_age_methods <- function() {
-  .d <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
+  .d <- DBI::dbGetQuery(
+    db_connection(database = "GFBioSQL"),
     "SELECT AGEING_METHOD_CODE, AGEING_METHOD_DESC, ROW_VERSION
-    FROM AGEING_METHOD")
+    FROM AGEING_METHOD"
+  )
   names(.d) <- tolower(names(.d))
   .d <- unique(.d)
   as_tibble(.d)
 }
 
 get_sample_trips <- function() {
-  run_sql("GFBioSQL",
-    "SELECT SPECIES_CODE, SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples")
+  run_sql(
+    "GFBioSQL",
+    "SELECT SPECIES_CODE, SAMPLE_ID, FISHING_EVENT_ID FROM B21_Samples"
+  )
 }
 
 get_strata_areas <- function() {
-  run_sql("GFBioSQL",
+  run_sql(
+    "GFBioSQL",
     "SELECT SG.SURVEY_ID,
     SG.GROUPING_CODE,
     G.AREA_KM2
     FROM SURVEY_GROUPING SG
     INNER JOIN GROUPING G ON
-    SG.GROUPING_CODE = G.GROUPING_CODE")
+    SG.GROUPING_CODE = G.GROUPING_CODE"
+  )
 }
 
 get_survey_ids <- function(ssid) {
@@ -137,24 +147,28 @@ get_survey_ids <- function(ssid) {
     FROM SURVEY S
     INNER JOIN GFBioSQL.dbo.SURVEY_SERIES SS ON
     SS.SURVEY_SERIES_ID = S.SURVEY_SERIES_ID
-    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")")
+    WHERE S.SURVEY_SERIES_ID IN (", paste(ssid, collapse = ", "), ")"
+  )
   run_sql("GFBioSQL", .q)
 }
 
 #' @export
+#' @param join_sample_ids TODO
 #' @rdname get
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
-  join_sample_ids = FALSE) {
-
+                            join_sample_ids = FALSE) {
   trawl <- c(1, 3, 4, 16, 2)
   ll <- c(14, 22, 36)
 
   missing <- setdiff(ssid, c(trawl, ll))
-  if (length(missing) > 0)
+  if (length(missing) > 0) {
     stop("ssid(s) ", missing, " is/are not supported. Must be one of ",
       paste(sort(c(trawl, ll)), collapse = ", "), ". ",
       "See the function `get_ssids()` for help identifying ",
-      "survey series IDs.", call. = FALSE)
+      "survey series IDs.",
+      call. = FALSE
+    )
+  }
 
   species_codes <- common2codes(species)
 
@@ -176,17 +190,25 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       ## }
 
       k <- k + 1
-      d_survs[[k]] <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-        paste0("EXEC ", sql_proc, " ", survey_ids$SURVEY_ID[j], ", '",
-          species_codes[i], "'"))
+      d_survs[[k]] <- DBI::dbGetQuery(
+        db_connection(database = "GFBioSQL"),
+        paste0(
+          "EXEC ", sql_proc, " ", survey_ids$SURVEY_ID[j], ", '",
+          species_codes[i], "'"
+        )
+      )
     }
   }
   .d <- bind_rows(d_survs)
 
   .d <- inner_join(.d,
-    unique(select(survey_ids,
+    unique(select(
+      survey_ids,
       SURVEY_SERIES_ID,
-      SURVEY_SERIES_DESC)), by = "SURVEY_SERIES_ID")
+      SURVEY_SERIES_DESC
+    )),
+    by = "SURVEY_SERIES_ID"
+  )
 
   ## if (length(.d$specimen_id) > length(unique(.d$specimen_id)))
   ##   warning("Duplicate specimen IDs are present because of overlapping survey ",
@@ -196,16 +218,21 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   ##     "Tidying and plotting functions with gfplot will do this for you.")
 
   .d <- inner_join(.d,
-    unique(select(species_df,
+    unique(select(
+      species_df,
       SPECIES_CODE,
       SPECIES_COMMON_NAME,
       SPECIES_SCIENCE_NAME,
-      SPECIES_DESC)), by = "SPECIES_CODE")
+      SPECIES_DESC
+    )),
+    by = "SPECIES_CODE"
+  )
 
   if (join_sample_ids) {
     # give us each sample_id associated with each fishing_event_id and species:
     .d <- left_join(.d, sample_trip_ids,
-      by = c("SPECIES_CODE", "FISHING_EVENT_ID")) %>%
+      by = c("SPECIES_CODE", "FISHING_EVENT_ID")
+    ) %>%
       left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
   }
 
@@ -213,7 +240,8 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   .d <- mutate(.d,
     species_science_name = tolower(species_science_name),
     species_desc = tolower(species_desc),
-    species_common_name = tolower(species_common_name))
+    species_common_name = tolower(species_common_name)
+  )
 
   stopifnot(all(species_codes %in% .d$species_code))
   as_tibble(.d)
@@ -229,13 +257,14 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL,
-  discard_keepers = TRUE, remove_bad_data = TRUE) {
-
+                               discard_keepers = TRUE, remove_bad_data = TRUE) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
-    .q <- inject_filter("AND S.SURVEY_SERIES_ID IN", ssid, sql_code = .q,
-      search_flag = "-- insert ssid here", conversion_func = I)
+    .q <- inject_filter("AND S.SURVEY_SERIES_ID IN", ssid,
+      sql_code = .q,
+      search_flag = "-- insert ssid here", conversion_func = I
+    )
   }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
@@ -260,25 +289,27 @@ get_survey_samples <- function(species, ssid = NULL,
   .d <- inner_join(.d, surveys, by = "survey_series_id")
   .d <- as_tibble(.d)
 
-  if (length(.d$specimen_id) > length(unique(.d$specimen_id)))
-    warning("Duplicate specimen IDs are present because of overlapping survey ",
+  if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
+    warning(
+      "Duplicate specimen IDs are present because of overlapping survey ",
       "stratifications. If working with the data yourelf, filter them after ",
       "selecting specific surveys. For example, ",
       "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-      "Tidying and plotting functions with gfplot will do this for you.")
+      "Tidying and plotting functions with gfplot will do this for you."
+    )
+  }
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
-        .d$species_common_name == "north pacific spiny dogfish"), ]
+      .d$species_common_name == "north pacific spiny dogfish"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "big skate"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "longnose skate"), ]
     .d <- .d[!(.d$length > 60 & .d$species_common_name == "pacific tomcod"), ]
     .d <- .d[!(.d$length > 50 &
-        .d$species_common_name == "quillback-rockfish"), ]
+      .d$species_common_name == "quillback-rockfish"), ]
     .d <- .d[!(.d$length < 10 & .d$weight / 1000 > 1.0 &
-        .d$species_common_name == "pacific flatnose"), ]
+      .d$species_common_name == "pacific flatnose"), ]
   }
-
 }
 
 #' @export
@@ -356,8 +387,10 @@ get_cpue_spatial_ll <- function(species) {
 get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
   .q <- read_sql("get-cpue-index.sql")
   i <- grep("-- insert filters here", .q)
-  .q[i] <- paste0("GEAR IN(", collapse_filters(toupper(gear)),
-    ") AND YEAR(BEST_DATE) >= ", min_year, " AND ")
+  .q[i] <- paste0(
+    "GEAR IN(", collapse_filters(toupper(gear)),
+    ") AND YEAR(BEST_DATE) >= ", min_year, " AND "
+  )
   .d <- run_sql("GFFOS", .q)
   names(.d) <- tolower(names(.d))
   as_tibble(.d)
@@ -380,7 +413,8 @@ get_survey_index <- function(species, ssid = NULL) {
   .q <- inject_filter("WHERE SP.SPECIES_CODE IN", species, .q)
   if (!is.null(ssid)) {
     .q <- inject_filter("AND BD.SURVEY_SERIES_ID IN", ssid, .q,
-      search_flag = "-- insert ssid here", conversion_func = I)
+      search_flag = "-- insert ssid here", conversion_func = I
+    )
   }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
@@ -393,11 +427,13 @@ get_survey_index <- function(species, ssid = NULL) {
 #' @rdname get
 get_sara_dat <- function() {
   .h <- xml2::read_html(
-    "http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm")
-  .d <- .h %>% rvest::html_nodes("table") %>%
+    "http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm"
+  )
+  .d <- .h %>%
+    rvest::html_nodes("table") %>%
     .[[1]] %>%
     rvest::html_table() %>%
-    .[- (1:2), ] %>%
+    .[-(1:2), ] %>%
     dplyr::as_tibble() %>%
     dplyr::filter(.data$Taxon %in% "Fishes") %>%
     dplyr::filter(!grepl("Salmon", .data$`Common name *`))
@@ -411,9 +447,9 @@ get_sara_dat <- function() {
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache") {
-
-  if (!is_dfo_windows())
+  if (!is_dfo_windows()) {
     stop("Not on a PBS windows machine. Cannot access data.")
+  }
 
   dir.create(path, showWarnings = FALSE)
 

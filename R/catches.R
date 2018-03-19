@@ -35,14 +35,14 @@ NULL
 #' @rdname plot_catch
 #' @export
 tidy_catch <- function(dat) {
-
   dat <- filter(dat, !is.na(species_common_name), !is.na(year)) %>%
     group_by(year, species_common_name, gear) %>%
     summarise(
       landed_kg = sum(landed_kg, na.rm = TRUE),
       discarded_kg = sum(discarded_kg, na.rm = TRUE),
       landed_pcs = sum(landed_pcs, na.rm = TRUE),
-      discarded_pcs = sum(discarded_pcs, na.rm = TRUE)) %>%
+      discarded_pcs = sum(discarded_pcs, na.rm = TRUE)
+    ) %>%
     ungroup() %>%
     arrange(species_common_name, year)
 
@@ -53,11 +53,14 @@ tidy_catch <- function(dat) {
       `HOOK AND LINE` = "Hook and line",
       `MIDWATER TRAWL` = "Midwater trawl",
       `TRAP` = "Trap",
-      `UNKNOWN TRAWL` = "Unknown/trawl")) %>%
+      `UNKNOWN TRAWL` = "Unknown/trawl"
+    )
+  ) %>%
     select(year, species_common_name, gear, landed_kg, discarded_kg)
 
   cm <- reshape2::melt(catches,
-    id.vars = c("year", "species_common_name", "gear"))
+    id.vars = c("year", "species_common_name", "gear")
+  )
 
   landings <- filter(cm, variable %in% c("landed_kg"))
   discards <- filter(cm, variable %in% c("discarded_kg"))
@@ -68,13 +71,16 @@ tidy_catch <- function(dat) {
 
   all_catch <- bind_rows(landings, discards)
   all_catch <- mutate(all_catch,
-    gear = forcats::fct_relevel(gear,
+    gear = forcats::fct_relevel(
+      gear,
       "Bottom trawl",
       "Midwater trawl",
       "Hook and line",
       "Trap",
       "Unknown/trawl",
-      "Discarded"))
+      "Discarded"
+    )
+  )
 
   all_catch <- group_by(all_catch, year, species_common_name, gear) %>%
     summarise(value = sum(value, na.rm = TRUE)) %>%
@@ -86,11 +92,12 @@ tidy_catch <- function(dat) {
 #' @rdname plot_catch
 #' @export
 plot_catch <- function(dat,
-  ylab = "Landings", units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
-  unreliable = c(1996, 2006), unreliable_alpha = 0.2) {
-
-  pal <-  c(RColorBrewer::brewer.pal(n = length(unique(dat$gear)) - 2,
-    "Paired"), "grey60", "grey30")[c(2, 1, 4, 3, 5, 6)]
+                       ylab = "Landings", units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
+                       unreliable = c(1996, 2006), unreliable_alpha = 0.2) {
+  pal <- c(RColorBrewer::brewer.pal(
+    n = length(unique(dat$gear)) - 2,
+    "Paired"
+  ), "grey60", "grey30")[c(2, 1, 4, 3, 5, 6)]
   names(pal) <- levels(dat$gear)
 
   scale_val <- units[[1]]
@@ -99,7 +106,7 @@ plot_catch <- function(dat,
   for (i in seq_along(units)) {
     if (max(dat$value) < (1000 * units[[i]])) {
       scale_val <- units[[i]]
-      ylab_gg <-  paste0(ylab, " (", names(units)[i], ")")
+      ylab_gg <- paste0(ylab, " (", names(units)[i], ")")
     }
   }
 
@@ -110,11 +117,14 @@ plot_catch <- function(dat,
       g <- g + ggplot2::annotate("rect",
         xmin = min(dat$year) - 1, xmax = unreliable[[i]], ymin = 0,
         ymax = max(dat$value / scale_val) * 1.5, alpha = unreliable_alpha,
-        fill = "black")
+        fill = "black"
+      )
   }
 
-  g <- g + geom_col(data = dat,
-    aes_string("year", "value/scale_val", colour = "gear", fill = "gear")) +
+  g <- g + geom_col(
+    data = dat,
+    aes_string("year", "value/scale_val", colour = "gear", fill = "gear")
+  ) +
     theme_pbs() +
     scale_fill_manual(values = pal) +
     scale_colour_manual(values = pal) +

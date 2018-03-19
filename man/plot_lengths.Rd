@@ -45,6 +45,10 @@ the same order as \code{survey_series_desc}. These are used in the plot.}
 
 \item{line_col}{Line colours for histograms. A named vector with names
 \code{"F"} and \code{"M"} for female and male.}
+
+\item{survey_cols}{TODO}
+
+\item{alpha}{TODO}
 }
 \description{
 Functions for plotting length frequency data. (Weighting not implimented

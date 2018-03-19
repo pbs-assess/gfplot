@@ -47,6 +47,14 @@ samples.}
 \item{year_increment}{Increment between year labels on x axis.}
 
 \item{ylab}{Y axis label.}
+
+\item{fill_col}{TODO}
+
+\item{line_col}{TODO}
+
+\item{survey_cols}{TODO}
+
+\item{alpha}{TODO}
 }
 \description{
 Functions for plotting age frequency data. (Weighting not implimented

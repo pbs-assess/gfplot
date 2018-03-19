@@ -58,12 +58,12 @@ test_that("get_* data functions work at PBS", {
   expect_error(get_survey_sets("lingcod", ssid = 99999))
 
   d <- get_survey_sets(c("yelloweye rockfish", "lingcod"),
-    join_sample_ids = TRUE)
-  dups <- d %>% filter(!is.na(sample_id)) %>%
+    join_sample_ids = TRUE
+  )
+  dups <- d %>%
+    filter(!is.na(sample_id)) %>%
     group_by(sample_id) %>%
     summarize(n = length(unique(species_common_name))) %>%
     filter(n > 1)
   expect_equal(nrow(dups), 0L)
-
 })
-

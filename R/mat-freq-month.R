@@ -8,24 +8,26 @@ NULL
 #' @export
 #' @rdname plot_maturity_months
 tidy_maturity_months <- function(dat, months = seq(1, 12),
-  ssid = NULL) {
-
+                                 ssid = NULL) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
   dat <- filter(dat, maturity_code <= maturity_convention_maxvalue)
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!
   dat <- dat %>%
-    select(species_common_name,
+    select(
+      species_common_name,
       month,
       maturity_convention_code,
       maturity_code,
       maturity_name,
-      sex)
+      sex
+    )
 
   dat <- filter(dat, !is.na(maturity_name), !is.na(sex))
 
   file <- system.file("extdata", "maturity_short_names.csv",
-    package = "gfplot")
+    package = "gfplot"
+  )
 
   mat_df <- readr::read_csv(file,
     col_types = readr::cols(
@@ -38,11 +40,13 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
       maturity_desc = readr::col_character(),
       mature_at = readr::col_integer(),
       maturity_name_short = readr::col_character()
-    ))
+    )
+  )
 
   dat <- left_join(dat,
     select(mat_df, sex, maturity_convention_code, maturity_code, maturity_name_short),
-    by = c("sex", "maturity_convention_code", "maturity_code"))
+    by = c("sex", "maturity_convention_code", "maturity_code")
+  )
 
   dat <- filter(dat, sex %in% c(1, 2))
   dat <- dat %>% mutate(sex = ifelse(sex == 2, "F", "M"))
@@ -63,14 +67,18 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
     "Spent",
     "Resorbing",
     "Recovering",
-    "Resting"))
+    "Resting"
+  ))
 
   mat_levels <- mat_levels[mat_levels %in% unique(dat$maturity_name_short)]
   dat$maturity_name_short <- factor(dat$maturity_name_short,
-    levels = mat_levels)
+    levels = mat_levels
+  )
 
-  dat <- select(dat, species_common_name, month,
-    maturity_name_short, sex) %>%
+  dat <- select(
+    dat, species_common_name, month,
+    maturity_name_short, sex
+  ) %>%
     rename(maturity = maturity_name_short) %>%
     ungroup()
 
@@ -97,18 +105,19 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 #' }
 
 plot_maturity_months <- function(dat,
-  max_size = 11,
-  sex_gap = 0.2,
-  fill_col = c("M" = "grey50", "F" = "#f44256"),
-  line_col = c("M" = "grey50", "F" = "#f44256"),
-  alpha = 0.8,
-  title = "Maturity frequencies",
-  n_label_pos = c(0.6, 0.8)) {
-
+                                 max_size = 11,
+                                 sex_gap = 0.2,
+                                 fill_col = c("M" = "grey50", "F" = "#f44256"),
+                                 line_col = c("M" = "grey50", "F" = "#f44256"),
+                                 alpha = 0.8,
+                                 title = "Maturity frequencies",
+                                 n_label_pos = c(0.6, 0.8)) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
-    mutate(month_jitter =
-        ifelse(sex == "M", month + sex_gap / 2, month - sex_gap / 2)) %>%
+    mutate(
+      month_jitter =
+        ifelse(sex == "M", month + sex_gap / 2, month - sex_gap / 2)
+    ) %>%
     group_by(sex, month, month_jitter, maturity) %>%
     summarise(.n = n()) %>%
     ungroup() %>%
@@ -120,26 +129,36 @@ plot_maturity_months <- function(dat,
   counts <- select(dat, sex, total_month, month_jitter) %>% unique()
   counts <- mutate(counts, y = ifelse(sex == "F",
     max(as.numeric(dat$maturity) + n_label_pos[[2]]),
-    max(as.numeric(dat$maturity) + n_label_pos[[1]])))
+    max(as.numeric(dat$maturity) + n_label_pos[[1]])
+  ))
 
   g <- ggplot(dat, aes_string("month_jitter", "maturity")) +
     geom_vline(xintercept = seq(1, 12), col = "grey95", lwd = 0.4) +
     geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
-      pch = 21, alpha = alpha) +
+      pch = 21, alpha = alpha
+    ) +
     scale_fill_manual(values = fill_col) +
     scale_colour_manual(values = line_col) +
     scale_size_area(max_size = max_size) +
     scale_x_continuous(breaks = seq(1, 12), labels = month.abb) +
     ylab("") + xlab("") +
-    guides(size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
-      fill = guide_legend(override.aes = list(size = 3.5))) +
+    guides(
+      size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
+      fill = guide_legend(override.aes = list(size = 3.5))
+    ) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-    geom_text(data = counts,
-      aes_string(y = "y", x = "month_jitter", label = "total_month",
-        colour = "sex"), size = 2.25, hjust = 0.5, show.legend = FALSE) +
-    coord_cartesian(ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1),
-      expand = FALSE) +
+    geom_text(
+      data = counts,
+      aes_string(
+        y = "y", x = "month_jitter", label = "total_month",
+        colour = "sex"
+      ), size = 2.25, hjust = 0.5, show.legend = FALSE
+    ) +
+    coord_cartesian(
+      ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1),
+      expand = FALSE
+    ) +
     theme(panel.spacing = unit(-0.1, "lines")) +
     labs(title = title, colour = "Sex", fill = "Sex")
 

@@ -91,30 +91,35 @@ bin_lengths <- function(dat, value, bin_size) {
 #' @export
 #' @rdname weight_comps
 tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
-  bin_size = NULL) {
-
+                                  bin_size = NULL) {
   value <- enquo(value)
   specimen_dat <- specimen_dat %>% filter(!is.na(!!value), sex %in% c(1, 2))
 
-  if (!is.null(bin_size))
+  if (!is.null(bin_size)) {
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
+  }
 
-  dat <- mutate(specimen_dat, month = lubridate::month(trip_start_date),
+  dat <- mutate(specimen_dat,
+    month = lubridate::month(trip_start_date),
     quarter = case_when(
       month %in% seq(1, 3) ~ 1,
       month %in% seq(4, 6) ~ 2,
       month %in% seq(7, 9) ~ 3,
       month %in% seq(10, 12) ~ 4
-    )) %>% select(-month)
+    )
+  ) %>% select(-month)
 
   catch_dat <- filter(catch_dat, !is.na(fe_end_date)) %>%
-    mutate(month = lubridate::month(fe_end_date),
+    mutate(
+      month = lubridate::month(fe_end_date),
       quarter = case_when(
         month %in% seq(1, 3) ~ 1,
         month %in% seq(4, 6) ~ 2,
         month %in% seq(7, 9) ~ 3,
         month %in% seq(10, 12) ~ 4
-      )) %>% select(-month)
+      )
+    ) %>%
+    select(-month)
 
   sampled_trip_id_catch <-
     unique(select(dat, year, quarter, trip_id, catch_weight)) %>%
@@ -135,11 +140,15 @@ tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
     mutate(landed_kg_year = sum(landed_kg_quarter))
 
   inner_join(freq_and_catch_by_trip,
-    species_catch_by_quarter, by = c("year", "quarter")) %>%
+    species_catch_by_quarter,
+    by = c("year", "quarter")
+  ) %>%
     inner_join(quarter_sampled_catch, by = c("year", "quarter")) %>%
-    select(year, sex, trip_id, quarter, !!value, freq,
+    select(
+      year, sex, trip_id, quarter, !!value, freq,
       samp_trip_catch_weight, samp_catch_weight_quarter,
-      landed_kg_quarter, landed_kg_year) %>% # re-order columns
+      landed_kg_quarter, landed_kg_year
+    ) %>% # re-order columns
     arrange(year, sex, trip_id, !!value) %>%
     ungroup()
 }
@@ -147,18 +156,21 @@ tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
 #' @export
 #' @rdname weight_comps
 tidy_comps_survey <- function(specimen_dat, survey_tows, value,
-  bin_size = NULL) {
-
+                              bin_size = NULL) {
   value <- enquo(value)
-  specimen_dat <- specimen_dat %>% filter(!is.na(!!value)) %>%
+  specimen_dat <- specimen_dat %>%
+    filter(!is.na(!!value)) %>%
     filter(sex %in% c(1, 2))
 
-  if (!is.null(bin_size))
+  if (!is.null(bin_size)) {
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
+  }
 
   strat_dat <- survey_tows %>%
-    select(year, survey_id, fishing_event_id, sample_id, grouping_code,
-      density_kgpm2, area_km2)
+    select(
+      year, survey_id, fishing_event_id, sample_id, grouping_code,
+      density_kgpm2, area_km2
+    )
 
   raw_comp <- specimen_dat %>%
     filter(!is.na(grouping_code)) %>%
@@ -173,20 +185,24 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
     group_by(year) %>%
     mutate(total_area_km2 = sum(area_km2))
 
-  strat_dens <- select(strat_dat, year, fishing_event_id,
-    grouping_code, density_kgpm2) %>%
+  strat_dens <- select(
+    strat_dat, year, fishing_event_id,
+    grouping_code, density_kgpm2
+  ) %>%
     unique() %>%
     group_by(year, grouping_code) %>%
     summarise(total_density = sum(density_kgpm2 * 1e6))
 
   sample_dens <- specimen_dat %>%
     inner_join(strat_dat,
-      by = c("year", "survey_id", "sample_id", "grouping_code")) %>%
+      by = c("year", "survey_id", "sample_id", "grouping_code")
+    ) %>%
     group_by(year, grouping_code, sample_id) %>%
     summarise(density = mean(density_kgpm2 * 1e6)) # should be one unique value
 
   inner_join(raw_comp, sample_dens,
-    by = c("year", "sample_id", "grouping_code")) %>%
+    by = c("year", "sample_id", "grouping_code")
+  ) %>%
     inner_join(strat_dens, by = c("year", "grouping_code")) %>%
     inner_join(strat_areas, by = c("year", "grouping_code")) %>%
     ungroup() %>%
@@ -217,12 +233,16 @@ weight_comps_base <- function(dat) {
     mutate(prop = weighting1 / weighting1_total) %>% # D.4
     # re-weight:
     group_by(year, grouping1, weighting2, weighting2_total, value) %>% # pre D.5
-    summarise(weighted_freq1 = sum(freq * prop), # D.5
-      sum_freq = sum(freq)) %>% # needed for D.6
+    summarise(
+      weighted_freq1 = sum(freq * prop), # D.5
+      sum_freq = sum(freq)
+    ) %>% # needed for D.6
 
     # re-standardize:
-    mutate(weighted_freq1_scaled =
-        weighted_freq1 * sum(sum_freq) / sum(weighted_freq1)) %>%  # D.6
+    mutate(
+      weighted_freq1_scaled =
+        weighted_freq1 * sum(sum_freq) / sum(weighted_freq1)
+    ) %>% # D.6
     group_by(year) %>% # pre D.7
 
     # second level (within years by catch or within survey-years by area):
@@ -232,17 +252,20 @@ weight_comps_base <- function(dat) {
     # re-weight:
     summarise(
       weighted_freq2 = sum(weighted_freq1_scaled * annual_prop), # D.8
-      sum_weighted_freq1 = sum(weighted_freq1_scaled)) %>% # needed for D.9
+      sum_weighted_freq1 = sum(weighted_freq1_scaled)
+    ) %>% # needed for D.9
     group_by(year) %>% # pre D.9
 
     # re-standardize:
     mutate(weighted_freq2_scaled = weighted_freq2 *
-        (sum(sum_weighted_freq1) / sum(weighted_freq2))) %>% # D.9
+      (sum(sum_weighted_freq1) / sum(weighted_freq2))) %>% # D.9
     group_by(year) %>%
 
     # calculate proportions:
-    mutate(weighted_prop =
-        weighted_freq2_scaled / sum(weighted_freq2_scaled)) %>% # D.10
+    mutate(
+      weighted_prop =
+        weighted_freq2_scaled / sum(weighted_freq2_scaled)
+    ) %>% # D.10
     select(-contains("freq")) %>%
     ungroup()
 }
@@ -250,9 +273,11 @@ weight_comps_base <- function(dat) {
 #' @export
 #' @rdname weight_comps
 weight_comps <- function(dat) {
-  names(dat) <- c("year", "id", "grouping1", "value", "freq",
+  names(dat) <- c(
+    "year", "id", "grouping1", "value", "freq",
     "weighting1", "weighting1_total",
-    "weighting2", "weighting2_total")
+    "weighting2", "weighting2_total"
+  )
   weight_comps_base(dat)
 }
 

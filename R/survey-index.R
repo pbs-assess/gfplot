@@ -26,73 +26,85 @@
 #' @rdname plot_survey_index
 #' @export
 tidy_survey_index <- function(dat,
-  surveys = c(
-    "West Coast Haida Gwaii Synoptic Survey",
-    "Hecate Strait Synoptic Survey",
-    "Queen Charlotte Sound Synoptic Survey",
-    "West Coast Vancouver Island Synoptic Survey",
-    "PHMA Rockfish Longline Survey - Outside North",
-    "PHMA Rockfish Longline Survey - Outside South",
-    "IRF Longline Survey (North)",
-    "IRF Longline Survey (South)",
-    "Hecate Strait Multispecies Assemblage Survey",
-    "IPHC Longline Survey"),
-  survey_names = c("West Coast Haida Gwaii Synoptic",
-    "Hecate Strait Synoptic",
-    "Queen Charlotte Sound Synoptic",
-    "West Coast Vancouver Island Synoptic",
-    "PHMA Rockfish LL - North",
-    "PHMA Rockfish LL - South",
-    "IRF LL Survey North",
-    "IRF LL Survey South",
-    "Hecate Strait Multispecies Assemblage",
-    "IPHC Longline"),
-  min_years = 3, year_range = NULL) {
-
-  if (is.null(year_range))
+                              surveys = c(
+                                "West Coast Haida Gwaii Synoptic Survey",
+                                "Hecate Strait Synoptic Survey",
+                                "Queen Charlotte Sound Synoptic Survey",
+                                "West Coast Vancouver Island Synoptic Survey",
+                                "PHMA Rockfish Longline Survey - Outside North",
+                                "PHMA Rockfish Longline Survey - Outside South",
+                                "IRF Longline Survey (North)",
+                                "IRF Longline Survey (South)",
+                                "Hecate Strait Multispecies Assemblage Survey",
+                                "IPHC Longline Survey"
+                              ),
+                              survey_names = c(
+                                "West Coast Haida Gwaii Synoptic",
+                                "Hecate Strait Synoptic",
+                                "Queen Charlotte Sound Synoptic",
+                                "West Coast Vancouver Island Synoptic",
+                                "PHMA Rockfish LL - North",
+                                "PHMA Rockfish LL - South",
+                                "IRF LL Survey North",
+                                "IRF LL Survey South",
+                                "Hecate Strait Multispecies Assemblage",
+                                "IPHC Longline"
+                              ),
+                              min_years = 3, year_range = NULL) {
+  if (is.null(year_range)) {
     year_range <- range(dat$year, na.rm = TRUE)
+  }
 
-  d <- filter(dat,
-    .data$survey_series_desc %in% surveys,
-    year >= year_range[[1]], year <= year_range[[2]])
+  d <- filter(
+    dat,
+    survey_series_desc %in% surveys,
+    year >= year_range[[1]], year <= year_range[[2]]
+  )
 
   dup <- dplyr::group_by(d, species_common_name) %>%
     summarise(n_spp = length(unique(species_science_name))) %>%
     filter(n_spp > 1L)
   assertthat::are_equal(nrow(dup), 0L)
 
-  dup <- dplyr::group_by(d, .data$year,
-    .data$survey_series_desc,
-    .data$species_science_name) %>%
+  dup <- dplyr::group_by(d, year, survey_series_desc, species_science_name) %>%
     summarise(n = n())
   assertthat::are_equal(max(dup$n), 1L)
 
   # must be N years
-  d <- d %>% arrange(.data$species_common_name,
-    .data$survey_series_desc, .data$year) %>%
-    group_by(.data$survey_series_desc, .data$species_common_name) %>%
-    mutate(n_years = length(unique(.data$year))) %>%
-    mutate(mean_cv = mean(.data$re, na.rm = TRUE)) %>%
+  d <- d %>%
+    arrange(species_common_name, survey_series_desc, year) %>%
+    group_by(survey_series_desc, species_common_name) %>%
+    mutate(n_years = length(unique(year))) %>%
+    mutate(mean_cv = mean(re, na.rm = TRUE)) %>%
     ungroup() %>%
-    filter(.data$n_years >= min_years)
+    filter(n_years >= min_years)
 
-  all_surv <- expand.grid(survey_series_desc = surveys,
+  all_surv <- expand.grid(
+    survey_series_desc = surveys,
     species_common_name = unique(d$species_common_name),
-    stringsAsFactors = FALSE)
-  d <- left_join(all_surv, d, by = c("species_common_name",
-      "survey_series_desc"))
+    stringsAsFactors = FALSE
+  )
+  d <- left_join(all_surv, d, by = c(
+    "species_common_name",
+    "survey_series_desc"
+  ))
 
-  trans <- tibble(survey_series_desc = surveys, survey_name = survey_names,
-    surv_order = seq(1, length(survey_names)))
+  trans <- tibble(
+    survey_series_desc = surveys, survey_name = survey_names,
+    surv_order = seq(1, length(survey_names))
+  )
   d <- inner_join(d, trans, by = "survey_series_desc") %>%
-    mutate(survey_name = fct_reorder(.data$survey_name, .data$surv_order))
-  select(d, .data$species_common_name, .data$survey_name, .data$year,
-    .data$biomass, .data$lowerci, .data$upperci, .data$mean_cv,
-    .data$num_sets, .data$num_pos_sets)
+    mutate(survey_name = fct_reorder(survey_name, surv_order))
+  select(
+    d, species_common_name, survey_name, year,
+    biomass, lowerci, upperci, mean_cv,
+    num_sets, num_pos_sets
+  )
 }
 
 #' @param col TODO
 #' @param title TODO
+#' @param survey_cols TODO
 #'
 #' @export
 #' @family plotting functions
@@ -100,16 +112,17 @@ tidy_survey_index <- function(dat,
 #' @rdname plot_survey_index
 
 plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
-  title = "Biomass indices", survey_cols = NULL) {
-
+                              title = "Biomass indices", survey_cols = NULL) {
   d <- dat %>%
-    group_by(.data$survey_name) %>%
-    mutate(biomass_scaled = .data$biomass / max(.data$upperci),
-      lowerci_scaled = .data$lowerci / max(.data$upperci),
-      upperci_scaled = .data$upperci / max(.data$upperci)) %>%
+    group_by(survey_name) %>%
+    mutate(
+      biomass_scaled = biomass / max(upperci),
+      lowerci_scaled = lowerci / max(upperci),
+      upperci_scaled = upperci / max(upperci)
+    ) %>%
     ungroup()
 
-  labs <- unique(select(d, .data$survey_name))
+  labs <- unique(select(d, survey_name))
   yrs <- range(d$year, na.rm = TRUE)
 
   if (!is.null(survey_cols)) {
@@ -122,12 +135,15 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   ggplot(d, aes_string("year", "biomass_scaled")) +
     geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey98") +
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey95") +
-    geom_ribbon(aes_string(ymin = "lowerci_scaled", ymax = "upperci_scaled",
-      fill = "survey_name"), colour = NA) +
+    geom_ribbon(aes_string(
+      ymin = "lowerci_scaled", ymax = "upperci_scaled",
+      fill = "survey_name"
+    ), colour = NA) +
     geom_line(col = "#00000050", size = 1) +
-    geom_point(pch = 21, colour = col[[2]], fill = "grey60", size = 1.6,
-      stroke = 1) +
-    facet_wrap(~survey_name, ncol = 2) +
+    geom_point(
+      pch = 21, colour = col[[2]], fill = "grey60", size = 1.6, stroke = 1
+    ) +
+    facet_wrap(~ survey_name, ncol = 2) +
     theme_pbs() +
     theme(panel.spacing = unit(-0.1, "lines")) +
     ylim(-0.01, NA) +
@@ -139,11 +155,14 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       axis.text.y = element_text(colour = "white"),
       axis.ticks.y = element_line(colour = "white"),
       strip.background = element_blank(),
-      strip.text.x = element_blank()) +
+      strip.text.x = element_blank()
+    ) +
     labs(title = title) +
     guides(fill = FALSE, colour = FALSE) +
-    geom_text(data = labs, x = yrs[1] + 0.5, y = 0.88,
+    geom_text(
+      data = labs, x = yrs[1] + 0.5, y = 0.88,
       aes_string(label = "survey_name"),
-      inherit.aes = FALSE, colour = "grey30", size = 2.75, hjust = 0) +
+      inherit.aes = FALSE, colour = "grey30", size = 2.75, hjust = 0
+    ) +
     scale_x_continuous(breaks = seq(0, yrs[2], 10))
 }

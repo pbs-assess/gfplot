@@ -10,20 +10,24 @@
 #' @family tidy data functions
 #' @template ageing-precision-examples
 tidy_age_precision <- function(dat, ageing_method_codes = c(3, 17)) {
-
   dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   # remove specimen id's for which there is no precision reading
   dbio <- group_by(dbio, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%
-    filter(has_precision) %>% select(-has_precision)
+    filter(has_precision) %>%
+    select(-has_precision)
 
   # organize dataframe with one record for each specimen id, age reading type
   # and age parameter
-  dbio <- tidyr::gather(dbio, ageing_param, age,
-    -(specimen_id:ageing_method_desc), -employee_id, -age_reading_id) %>%
+  dbio <- tidyr::gather(
+    dbio, ageing_param, age,
+    -(specimen_id:ageing_method_desc), -employee_id, -age_reading_id
+  ) %>%
     arrange(age_reading_id) %>%
-    group_by(specimen_id, age_reading_type_code, year, species_code,
-      ageing_param) %>%
+    group_by(
+      specimen_id, age_reading_type_code, year, species_code,
+      ageing_param
+    ) %>%
     summarise(age = age[[1]], employee_id = employee_id[[1]])
 
   # remove bad data
@@ -64,20 +68,29 @@ tidy_age_precision <- function(dat, ageing_method_codes = c(3, 17)) {
 #' @template ageing-precision-examples
 plot_age_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
   if (!is.null(seed)) set.seed(seed)
-  if (n < nrow(dat))
+  if (n < nrow(dat)) {
     dat <- dplyr::sample_n(dat, size = n)
+  }
   jit <- stats::runif(nrow(dat), -jitter, jitter)
   dat$prec_age <- dat$prec_age + jit
   dat$prim_age <- dat$prim_age + jit
   ggplot(dat, aes_string("prim_age", "prec_age")) +
     geom_point(pch = 21, colour = "grey20", alpha = 0.7) +
     ggplot2::geom_abline(intercept = 0, slope = 1, col = "grey50", lty = 2) +
-    ggplot2::geom_segment(aes_string(x = "prim_min_age", xend = "prim_max_age",
-      y = "prec_age", yend = "prec_age"), alpha = 0.5,
-      colour = "grey30") +
-    ggplot2::geom_segment(aes_string(x = "prim_age", xend = "prim_age",
-      y = "prec_min_age", yend = "prec_max_age"), alpha = 0.5,
-      colour = "grey30") +
+    ggplot2::geom_segment(aes_string(
+      x = "prim_min_age", xend = "prim_max_age",
+      y = "prec_age", yend = "prec_age"
+    ),
+    alpha = 0.5,
+    colour = "grey30"
+    ) +
+    ggplot2::geom_segment(aes_string(
+      x = "prim_age", xend = "prim_age",
+      y = "prec_min_age", yend = "prec_max_age"
+    ),
+    alpha = 0.5,
+    colour = "grey30"
+    ) +
     labs(title = "Ageing precision", x = "Primary age", y = "Precision age") +
     theme_pbs() +
     coord_fixed()

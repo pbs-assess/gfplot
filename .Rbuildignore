@@ -37,3 +37,4 @@
 ^inst/stan/*.rds
 ^appveyor\.yml$
 ^tags$
+^README.Rmd$

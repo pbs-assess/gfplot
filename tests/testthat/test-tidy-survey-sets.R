@@ -11,5 +11,4 @@ test_that("get_* data functions work at PBS", {
 
   d <- load_bath()
   expect_type(d$X, "numerical")
-
 })

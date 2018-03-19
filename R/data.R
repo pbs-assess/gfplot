@@ -52,4 +52,3 @@
 #'
 #' @format A data frame
 "sample_trip_ids"
-

@@ -16,4 +16,3 @@ names(out) <- surv
 survey_grids <- out
 
 usethis::use_data(survey_grids, internal = FALSE, overwrite = TRUE)
-

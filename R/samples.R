@@ -18,33 +18,37 @@
 #' }
 
 tidy_sample_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) {
-
   dat <- filter(dat, !is.na(year))
 
-  if (!is.null(year_range))
+  if (!is.null(year_range)) {
     dat <- dat[dat$year >= min(year_range) &
-        dat$year <= max(year_range), , drop = FALSE]
+      dat$year <= max(year_range), , drop = FALSE]
+  }
 
   dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
 
   out <- group_by(dat, species_common_name, year) %>%
     summarise(
       age = sum(!is.na(age) & age > 0 &
-          .data$ageing_method %in% ageing_method),
+        .data$ageing_method %in% ageing_method),
       length = sum(!is.na(length) & length > 0),
       weight = sum(!is.na(weight) & weight > 0),
       maturity = sum(!is.na(maturity_code) & maturity_code > 0)
-    ) %>% ungroup()
+    ) %>%
+    ungroup()
 
-  all_years <- expand.grid(year = seq(min(dat$year), max(dat$year), 1),
+  all_years <- expand.grid(
+    year = seq(min(dat$year), max(dat$year), 1),
     species_common_name = unique(dat$species_common_name),
-    stringsAsFactors = FALSE)
+    stringsAsFactors = FALSE
+  )
 
   out <- left_join(all_years, out, by = c("year", "species_common_name"))
 
   out <- reshape2::melt(out,
     id.vars = c("species_common_name", "year"),
-    variable.name = "type", value.name = "n") %>%
+    variable.name = "type", value.name = "n"
+  ) %>%
     as_tibble()
   out$n[is.na(out$n)] <- 0
   out
@@ -86,21 +90,22 @@ tidy_sample_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) 
 #' @export
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
-  palette = "Greys") {
-
+                              palette = "Greys") {
   dat$n_plot <- log(dat$n + 1)
   dat$n_text <- round_nice(dat$n)
   dat$type <- paste("#", firstup(as.character(dat$type)))
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
-  if (is.null(year_range))
+  if (is.null(year_range)) {
     year_range <- c(year_min, year_max)
+  }
 
   all <- expand.grid(
     type = unique(dat$type),
     year = seq(year_range[1], year_range[2]),
-    stringsAsFactors = FALSE)
+    stringsAsFactors = FALSE
+  )
   dat <- full_join(dat, all, by = c("type", "year"))
   dat$n_plot[is.na(dat$n_plot)] <- 0
 
@@ -108,16 +113,22 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
     theme_pbs() +
     coord_cartesian(expand = FALSE, xlim = year_range + c(-0.5, 0.5)) +
-    ggplot2::scale_fill_distiller(palette = palette,
-      limits = c(log(1), max(dat$n_plot)), direction = 1) +
+    ggplot2::scale_fill_distiller(
+      palette = palette,
+      limits = c(log(1), max(dat$n_plot)), direction = 1
+    ) +
     ggplot2::scale_x_continuous(
-      breaks = seq(round_down_even(year_range[1]), year_range[2], 2)) +
+      breaks = seq(round_down_even(year_range[1]), year_range[2], 2)
+    ) +
     theme(
       axis.ticks.x = element_blank(),
-      axis.ticks.y = element_blank()) +
+      axis.ticks.y = element_blank()
+    ) +
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
-    geom_text(aes_string(x = "year", label = "n_text"), colour = "white",
-      size = 1.75, alpha = 0.85) +
+    geom_text(aes_string(x = "year", label = "n_text"),
+      colour = "white",
+      size = 1.75, alpha = 0.85
+    ) +
     ggplot2::scale_y_discrete(position = "left") +
     ggplot2::ggtitle(title)
 }

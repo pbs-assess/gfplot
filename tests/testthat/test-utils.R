@@ -31,10 +31,12 @@ test_that("collapse_filters() works", {
 })
 
 test_that("inject_filter() works", {
-  x <- inject_filter("a", species = "b",
+  x <- inject_filter("a",
+    species = "b",
     sql_code = list("y", "\n-- insert here", "z"),
     search_flag = "-- insert here",
-    conversion_func = I)
+    conversion_func = I
+  )
 
   expect_equal(x[[1]], "y")
   expect_equal(x[[2]], "a ('b')")
@@ -71,4 +73,3 @@ test_that("read_sql works", {
   expect_gte(length(x), 1)
   expect_identical(class(x), "character")
 })
-

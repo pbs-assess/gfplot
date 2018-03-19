@@ -1,13 +1,16 @@
 db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
-  DBI::dbConnect(odbc::odbc(), driver = "SQL Server",
-    server = server, database = database)
+  DBI::dbConnect(odbc::odbc(),
+    driver = "SQL Server",
+    server = server, database = database
+  )
 }
 
 force_three_letter_species_code <- function(x) {
-  if (is.numeric(x))
+  if (is.numeric(x)) {
     sprintf(paste0("%0", 3L, "d"), x)
-  else
+  } else {
     as.character(x)
+  }
 }
 
 all_species_codes <- function(x) {
@@ -15,14 +18,18 @@ all_species_codes <- function(x) {
 }
 
 common2codes <- function(common) {
-
-  if (all_species_codes(common))
+  if (all_species_codes(common)) {
     return(force_three_letter_species_code(common))
+  }
 
-  species <- DBI::dbGetQuery(db_connection(database = "GFBioSQL"),
-    "SELECT * FROM SPECIES")
-  common_df <- data.frame(SPECIES_COMMON_NAME = toupper(common),
-    order_by = seq_along(common), stringsAsFactors = FALSE)
+  species <- DBI::dbGetQuery(
+    db_connection(database = "GFBioSQL"),
+    "SELECT * FROM SPECIES"
+  )
+  common_df <- data.frame(
+    SPECIES_COMMON_NAME = toupper(common),
+    order_by = seq_along(common), stringsAsFactors = FALSE
+  )
   .d <- filter(species, SPECIES_COMMON_NAME %in% toupper(common))
   # Remove erroneous species codes for basking shark and lingcod:
   .d <- filter(.d, !SPECIES_CODE %in% c("033", "465")) %>%
@@ -36,11 +43,13 @@ collapse_filters <- function(x) {
 }
 
 inject_filter <- function(sql_precode, species, sql_code,
-  search_flag = "-- insert species here", conversion_func = common2codes) {
+                          search_flag = "-- insert species here", conversion_func = common2codes) {
   i <- grep(search_flag, sql_code)
-  sql_code[i] <- paste0(sql_precode, " (",
-    collapse_filters(conversion_func(species)), ")")
-    sql_code
+  sql_code[i] <- paste0(
+    sql_precode, " (",
+    collapse_filters(conversion_func(species)), ")"
+  )
+  sql_code
 }
 
 run_sql <- function(database, query) {
@@ -54,9 +63,11 @@ firstup <- function(x) {
 }
 
 read_sql <- function(x) {
-  if(file.exists(system.file("sql", x, package = "gfplot")))
+  if (file.exists(system.file("sql", x, package = "gfplot"))) {
     readLines(system.file("sql", x, package = "gfplot"))
-  else stop("The sql file does not exist.")
+  } else {
+    stop("The sql file does not exist.")
+  }
 }
 
 round_nice <- function(x) {
@@ -66,11 +77,11 @@ round_nice <- function(x) {
   out
 }
 
-mround <- function(x, base){
+mround <- function(x, base) {
   base * round(x / base)
 }
 
-round_down_even <- function(x, base = 2){
+round_down_even <- function(x, base = 2) {
   base * floor(x / base)
 }
 
@@ -88,4 +99,3 @@ is_dfo <- function() {
 is_dfo_windows <- function() {
   if (is_windows() & is_dfo()) TRUE else FALSE
 }
-

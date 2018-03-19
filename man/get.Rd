@@ -61,6 +61,8 @@ names.}
 \code{\link{get_ssids}} if you for a look-up table of available survey
 series IDs with surveys series descriptions.}
 
+\item{join_sample_ids}{TODO}
+
 \item{discard_keepers}{Discard keepers?}
 
 \item{remove_bad_data}{Remove known bad data, such as unrealistic

@@ -37,6 +37,8 @@ plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
 \item{col}{TODO}
 
 \item{title}{TODO}
+
+\item{survey_cols}{TODO}
 }
 \description{
 Plot survey relative biomass mass index
