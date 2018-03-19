@@ -169,7 +169,7 @@ fit_glmmfields <- function(dat,
   message("Fitting positive component model...")
   m1 <- glmmfields::glmmfields(formula_positive,
     lon = "X", lat = "Y",
-    data = dplyr::filter(dat, present == 1), iter = iter,
+    data = filter(dat, present == 1), iter = iter,
     prior_gp_theta = glmmfields::half_t(100, 0, 10),
     prior_gp_sigma = glmmfields::half_t(100, 0, 10),
     prior_intercept = glmmfields::half_t(100, 0, 10),

@@ -435,8 +435,8 @@ get_sara_dat <- function() {
     rvest::html_table() %>%
     .[-(1:2), ] %>%
     dplyr::as_tibble() %>%
-    dplyr::filter(.data$Taxon %in% "Fishes") %>%
-    dplyr::filter(!grepl("Salmon", .data$`Common name *`))
+    filter(.data$Taxon %in% "Fishes") %>%
+    filter(!grepl("Salmon", .data$`Common name *`))
   names(.d) <- tolower(names(.d))
   names(.d) <- gsub(" ", "_", names(.d))
   names(.d) <- gsub("_\\*", "", names(.d))

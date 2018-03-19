@@ -27,7 +27,7 @@ fit_mat_ogive <- function(dat,
                           months = seq(1, 12),
                           ageing_method = c(3, 17)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
-  dat <- dplyr::filter(
+  dat <- filter(
     dat, month %in% months,
     ageing_method %in% ageing_method
   )

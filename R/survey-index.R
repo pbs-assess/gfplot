@@ -61,12 +61,12 @@ tidy_survey_index <- function(dat,
     year >= year_range[[1]], year <= year_range[[2]]
   )
 
-  dup <- dplyr::group_by(d, species_common_name) %>%
+  dup <- group_by(d, species_common_name) %>%
     summarise(n_spp = length(unique(species_science_name))) %>%
     filter(n_spp > 1L)
   assertthat::are_equal(nrow(dup), 0L)
 
-  dup <- dplyr::group_by(d, year, survey_series_desc, species_science_name) %>%
+  dup <- group_by(d, year, survey_series_desc, species_science_name) %>%
     summarise(n = n())
   assertthat::are_equal(max(dup$n), 1L)
 

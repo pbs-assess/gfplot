@@ -46,7 +46,7 @@ tidy_catch <- function(dat) {
     ungroup() %>%
     arrange(species_common_name, year)
 
-  catches <- dplyr::mutate(dat,
+  catches <- mutate(dat,
     gear = dplyr::recode(gear,
       UNKNOWN = "Unknown/trawl",
       `BOTTOM TRAWL` = "Bottom trawl",

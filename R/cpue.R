@@ -101,7 +101,7 @@ tidy_cpue_index <- function(dat, species_common,
     ungroup()
 
   # retain the data from our "fleet"
-  d_retained <- dplyr::semi_join(catch, fleet, by = "vessel_name") %>%
+  d_retained <- semi_join(catch, fleet, by = "vessel_name") %>%
     filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
     mutate(
       depth = factor_bin_clean(best_depth, depth_bands),
@@ -120,7 +120,7 @@ tidy_cpue_index <- function(dat, species_common,
   )
   d_retained <- left_join(d_retained, vessel_df, by = "vessel") %>%
     select(-vessel) %>%
-    dplyr::rename(vessel = scrambled_vessel)
+    rename(vessel = scrambled_vessel)
 
   arrange(d_retained, .data$year, .data$vessel) %>%
     dplyr::as_tibble()
@@ -286,8 +286,8 @@ predict_cpue_index <- function(object, center = FALSE) {
   }
 
   df %>%
-    dplyr::rename(se_link = .data$`Std. Error`) %>%
-    dplyr::rename(est_link = .data$Estimate) %>%
+    rename(se_link = .data$`Std. Error`) %>%
+    rename(est_link = .data$Estimate) %>%
     mutate(
       lwr = ifelse(model == "Binomial",
         plogis(est_link - 1.96 * se_link),
@@ -359,8 +359,8 @@ plot_cpue_index_coefs <- function(object) {
   sm$pars <- pars
 
   sm <- sm %>%
-    dplyr::rename(se = .data$`Std. Error`) %>%
-    dplyr::rename(est = .data$Estimate) %>%
+    rename(se = .data$`Std. Error`) %>%
+    rename(est = .data$Estimate) %>%
     filter(!grepl("prediction", pars))
   sm$par_name <- c(
     paste(model_prefixes[[1]], colnames(object$mm_bin)),
