@@ -26,7 +26,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
       dat$year <= max(year_range), , drop = FALSE]
   }
 
-  dat <- dat[!duplicated(dat$specimen_id), drop = FALSE] # critical!
+  dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
 
   out <- group_by(dat, species_common_name, year) %>%
     summarise(
