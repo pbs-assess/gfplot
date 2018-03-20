@@ -24,8 +24,8 @@ fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
 make_prediction_grid(dat, bath, n = 150, region = NULL,
   cache_folder = "prediction-grids", utm_zone = 9)
 
-fit_survey_sets(dat, survey, years, chains = 3, iter = 1200,
-  max_knots = 15, adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
+fit_survey_sets(dat, survey, years, chains = 3, iter = 1000,
+  max_knots = 18, adapt_delta = 0.95, thin = 1, prediction_grid_n = 200,
   mcmc_posterior_samples = 150, required_obs_percent = 0.1, utm_zone = 9)
 }
 \arguments{

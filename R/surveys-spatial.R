@@ -129,7 +129,7 @@ scale_survey_predictors <- function(dat) {
     depth_sd = sd(log(depth), na.rm = TRUE),
     depth_scaled = (log(depth) - depth_mean[1]) / depth_sd[1],
     depth_scaled2 = depth_scaled^2,
-    X10 = X / 10, Y10 = Y / 10
+    X10 = X / 10, Y10 = Y / 10 # to put spatial decay parameter on right scale
   )
 }
 
@@ -326,9 +326,14 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
 #' @rdname survey-spatial-modelling
 
 fit_survey_sets <- function(dat, survey, years,
-                            chains = 3, iter = 1200, max_knots = 15,
-                            adapt_delta = 0.95, thin = 2, prediction_grid_n = 150,
-                            mcmc_posterior_samples = 150, required_obs_percent = 0.1,
+                            chains = 3,
+                            iter = 1000,
+                            max_knots = 18,
+                            adapt_delta = 0.95,
+                            thin = 1,
+                            prediction_grid_n = 200,
+                            mcmc_posterior_samples = 150,
+                            required_obs_percent = 0.1,
                             utm_zone = 9) {
   region <- NA
   if (survey == "West Coast Haida Gwaii Synoptic Survey") region <- "WCHG"
@@ -401,6 +406,8 @@ fit_survey_sets <- function(dat, survey, years,
 #' @param extrapolation_buffer TODO
 #' @param show_model_predictions TODO
 #' @param utm_zone TODO
+#' @param fill_label TODO
+#' @param pt_label TODO
 #'
 #' @export
 #' @family spatial survey modelling functions
@@ -413,13 +420,19 @@ fit_survey_sets <- function(dat, survey, years,
 #' plot_survey_sets(x$predictions, x$data, fill_column = "combined")
 #' }
 
-plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
-                             fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
-                             pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60",
-                             pt_size_range = c(2, 7), show_legend = TRUE,
-                             extrapolate_depth = FALSE, extrapolation_buffer = 5,
+plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
+                             fill_scale =
+                               viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
+                             pt_col = "#FFFFFF90",
+                             pt_fill = "#FFFFFF60",
+                             pt_size_range = c(0.5, 9),
+                             show_legend = TRUE,
+                             extrapolate_depth = FALSE,
+                             extrapolation_buffer = 0,
                              show_model_predictions = TRUE,
-                             utm_zone = 9) {
+                             utm_zone = 9,
+                             fill_label = "Predicted\nbiomass\ndensity (kg/m)",
+                             pt_label = "Tow density (kg/m)") {
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,
@@ -464,13 +477,16 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
     ) +
     fill_scale +
     geom_point(
-      data = raw_dat,
+      data = filter(raw_dat, present == 1),
       aes_string(
-        x = "X", y = "Y", shape = "as.factor(present)",
-        size = "density"
-      ), fill = pt_fill, col = pt_col
+        x = "X", y = "Y",
+        size = "density_fake"
+      ), fill = pt_fill, col = pt_col, pch = 21
     ) +
-    ggplot2::scale_shape_manual(values = c(4, 21)) +
+    geom_point(
+      data = filter(raw_dat, present == 0),
+      aes_string(x = "X", y = "Y"), col = pt_col, pch = 4, size = 3
+    ) +
     ggplot2::scale_size_continuous(range = pt_size_range) +
     theme_pbs() +
     coord_equal(
@@ -486,7 +502,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column,
       fill = "grey50"
     ) +
     guides(shape = FALSE) +
-    labs(size = "Tow density (kg/m)")
+    labs(size = pt_label, fill = fill_label)
 
   if (!show_legend) {
     g <- g + theme(legend.position = "none")

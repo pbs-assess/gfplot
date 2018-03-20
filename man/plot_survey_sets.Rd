@@ -4,11 +4,13 @@
 \alias{plot_survey_sets}
 \title{Title TODO}
 \usage{
-plot_survey_sets(pred_dat, raw_dat, fill_column,
-  fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
-  pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60", pt_size_range = c(2, 7),
-  show_legend = TRUE, extrapolate_depth = FALSE, extrapolation_buffer = 5,
-  show_model_predictions = TRUE, utm_zone = 9)
+plot_survey_sets(pred_dat, raw_dat, fill_column = "combined",
+  fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
+  pt_col = "#FFFFFF90", pt_fill = "#FFFFFF60", pt_size_range = c(0.5, 9),
+  show_legend = TRUE, extrapolate_depth = FALSE, extrapolation_buffer = 0,
+  show_model_predictions = TRUE, utm_zone = 9,
+  fill_label = "Predicted\\nbiomass\\ndensity (kg/m)",
+  pt_label = "Tow density (kg/m)")
 }
 \arguments{
 \item{pred_dat}{TODO}
@@ -34,6 +36,10 @@ plot_survey_sets(pred_dat, raw_dat, fill_column,
 \item{show_model_predictions}{TODO}
 
 \item{utm_zone}{TODO}
+
+\item{fill_label}{TODO}
+
+\item{pt_label}{TODO}
 }
 \description{
 Title TODO
