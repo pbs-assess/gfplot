@@ -1,7 +1,10 @@
 ---
-title: "Example data extraction for Pacific cod using gfplot"
-author: "Sean Anderson"
-date: "2018-03-07"
+title: "Data extraction for Pacific cod using gfplot"
+author: "Sean C. Anderson"
+date: "2018-03-20"
+output:
+  html_document:
+    toc: true
 ---
 
 ```{r, echo = FALSE}
@@ -15,14 +18,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-If you don't already have the package installed then run:
+# Setup
+
+If you don't already have the package installed, then run:
 
 ```{r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("seananderson/gfplot")
 ```
 
-First we will load the package along with ggplot2 and dplyr since we will use them a bit here.
+First we will load the package along with ggplot2, dplyr, and rstan since we will use them within our code later.
 
 ```{r}
 library(gfplot)
@@ -31,7 +36,9 @@ library(dplyr)
 library(rstan)
 ```
 
-The package has a series of `get_*()` functions for extracting data on the fly. There's also a function `cache_pbs_data()` that runs all the `get_*()` functions and caches the data in a folder that you specify. I'm going to use that latter approach here because I'm not currently on the PBS network and it saves running the SQL queries multiple times. I'll try and show some of the associated `get_*()` functions here.
+# An overview of gfplot
+
+The package has a series of `get_*()` functions for extracting data on the fly.
 
 The complete list is:
 
@@ -46,36 +53,6 @@ sort(fns[grepl("plot", fns)])
 Here's how the various functions fit together:
 <https://github.com/seananderson/gfplot/blob/master/inst/function-web.pdf>
 
-The following helper function `cache_pbs_data()` will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
-
-```{r}
-if (!file.exists(file.path("pcod-cache", "pbs-survey-sets.rds"))) { # quick check for speed
-  cache_pbs_data("pacific cod", path = "pcod-cache")
-}
-```
-
-Let's read those data files in to work with here.
-
-```{r}
-cache <- file.path("pcod-cache")
-d_survey_sets <- readRDS(file.path(cache, "pbs-survey-sets.rds"))
-d_survey_samples <- readRDS(file.path(cache, "pbs-survey-samples.rds"))
-d_comm_samples <- readRDS(file.path(cache, "pbs-comm-samples.rds"))
-d_catch <- readRDS(file.path(cache, "pbs-catch.rds"))
-d_cpue_spatial <- readRDS(file.path(cache, "pbs-cpue-spatial.rds"))
-d_cpue_spatial_ll <- readRDS(file.path(cache, "pbs-cpue-spatial-ll.rds"))
-d_survey_index <- readRDS(file.path(cache, "pbs-survey-index.rds"))
-d_age_precision <- readRDS(file.path(cache, "pbs-age-precision.rds"))
-d_cpue_index <- readRDS(file.path(cache, "pbs-cpue-index.rds"))
-```
-
-Now let's create a folder for our figures to be created in.
-
-```{r}
-figs <- file.path("pcod-figs")
-dir.create(figs, showWarnings = FALSE)
-```
-
 All of the plotting functions have associated `get_*()` functions to extract data, `tidy_*()` and / or `fit_*()` functions to tidy that data or fit a model to be plotted. First let's look at the raw age frequencies from the surveys.
 
 There are some options for a number of the `get` functions in terms of what gets extracted. Many of the columns that you might want to filter on are just retained so that you can filter yourself with, for example, `dplyr::filter(dat, x = "y")`.
@@ -86,15 +63,13 @@ For the start of descriptions of the default filtering, see the end of the very-
 which references this SQL code:
 <https://github.com/seananderson/gfplot/tree/master/inst/sql>
 
-Within the next week or so we should have the text filled in describing the data filtering strategies.
-
-As an example, we could extract the data with the following function call if we were on a DFO laptop with appropriate database permissions and on the PBS network.
+As an example, we could extract the data with the following function call if we were on a DFO laptop, with appropriate database permissions, and on the PBS network:
 
 ```{r, eval=FALSE}
 get_survey_samples("pacific cod")
 ```
 
-If you'd rather you can also specify the species code or the species name in a variety of ways. The following all do the same thing:
+If you would rather, you can also specify the species code or the species name in a variety of ways. The following all do the same thing:
 
 ```{r, eval=FALSE}
 get_survey_samples("pacific cod")
@@ -111,7 +86,43 @@ get_survey_samples(c("pacific ocean perch", "pacific cod"))
 get_survey_samples(c(396, 442))
 ```
 
-For this example, we used the caching function for convenience and saved the data frame into `d_survey_samples`.
+# Caching the data from the SQL servers
+
+In addition to the individual `get_*()` functions, there is a function `cache_pbs_data()` that runs all the `get_*()` functions and caches the data in a folder that you specify. I'm going to use this approach here because I'm not currently on the PBS network and it saves running the SQL queries each time the R Markdown document is recompiled.
+
+The helper function `cache_pbs_data()` will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
+
+```{r}
+if (!file.exists(file.path("pcod-cache", "pbs-survey-sets.rds"))) { # quick check for speed
+  cache_pbs_data("pacific cod", path = "pcod-cache")
+}
+```
+
+Let's read those data files in to work with here.
+
+```{r}
+cache             <- file.path("pcod-cache")
+d_survey_sets     <- readRDS(file.path(cache, "pbs-survey-sets.rds"))
+d_survey_samples  <- readRDS(file.path(cache, "pbs-survey-samples.rds"))
+d_comm_samples    <- readRDS(file.path(cache, "pbs-comm-samples.rds"))
+d_catch           <- readRDS(file.path(cache, "pbs-catch.rds"))
+d_cpue_spatial    <- readRDS(file.path(cache, "pbs-cpue-spatial.rds"))
+d_cpue_spatial_ll <- readRDS(file.path(cache, "pbs-cpue-spatial-ll.rds"))
+d_survey_index    <- readRDS(file.path(cache, "pbs-survey-index.rds"))
+d_age_precision   <- readRDS(file.path(cache, "pbs-age-precision.rds"))
+d_cpue_index      <- readRDS(file.path(cache, "pbs-cpue-index.rds"))
+```
+
+Now let's create a folder to hold some PDF versions of our figures:
+
+```{r}
+figs <- file.path("pcod-figs")
+dir.create(figs, showWarnings = FALSE)
+```
+
+# Age and length frequencies
+
+Let's start by looking at the age and length frequencies. For this example, we used the caching function for convenience and saved the data frame into `d_survey_samples`.
 
 ```{r}
 glimpse(d_survey_samples)
@@ -148,12 +159,16 @@ In all cases, the `get_*()` and `tidy_*()` functions can operate on one or multi
 Let's make our previous age frequency plot but just for the synoptic surveys:
 
 ```{r}
-g <- tidy_ages_raw(d_survey_samples, survey_series_desc =
-    c("West Coast Haida Gwaii Synoptic Survey",
+g <- tidy_ages_raw(d_survey_samples,
+  survey_series_desc =
+    c(
+      "West Coast Haida Gwaii Synoptic Survey",
       "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-      "West Coast Vancouver Island Synoptic Survey"),
+      "West Coast Vancouver Island Synoptic Survey"
+    ),
   survey = c("WCHG", "HS", "QCS", "WCVI"),
-  ageing_method_codes = 6) %>%
+  ageing_method_codes = 6
+) %>%
   plot_ages()
 g
 ```
@@ -174,28 +189,98 @@ Or modify the plot by doing things like suppressing the legend or changing the t
 
 ```{r}
 g + guides(colour = FALSE) +
-  labs(title = "Pacific cod age frequencies", subtitle = "Synoptic surveys only",
-    caption = paste("Made on", Sys.Date())) +
+  labs(
+    title = "Pacific cod age frequencies", subtitle = "Synoptic surveys only",
+    caption = paste("Made on", Sys.Date())
+  ) +
   scale_color_manual(values = c("M" = "blue", "F" = "red"))
 ```
+
+That plot was with unweighted age frequencies. If instead we wanted to create age frequencies with samples weighted according to strata density and area, we can use the function `tidy_ages_weighted()`. In that case, we also need to supply a data frame that specifies the information on the survey strata. We previously cached that data frame into `d_survey_sets`, but we could generate it with `get_survey_sets("pacific cod")`.
+
+```{r}
+g <- tidy_ages_weighted(d_survey_samples,
+  survey_series_desc =
+    c(
+      "West Coast Haida Gwaii Synoptic Survey",
+      "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
+      "West Coast Vancouver Island Synoptic Survey"
+    ),
+  survey = c("WCHG", "HS", "QCS", "WCVI"),
+  ageing_method_codes = 6,
+  dat_survey_sets = d_survey_sets
+) %>%
+  plot_ages()
+g
+```
+
+Or for the commercial samples with the following code that makes use of the cached data frames `d_comm_samples` and `d_catch`. The latter data frame is used as part of the weighting.
+
+```{r}
+# g <- tidy_ages_weighted(d_comm_samples,
+#   ageing_method_codes = 6,
+#   area_grep_pattern = "*",
+#   sample_type = "commercial",
+#   dat_catch = d_catch
+# ) %>%
+#   plot_ages()
+# g
+```
+
+In the above, the `area_grep_pattern` argument supplies the search string to `grep()` to filter the data for specific statistical area codes. For example, `"5[CD]+"` would find all areas 5C and 5D.
 
 Let's do the same thing but for the length frequencies:
 
 ```{r, fig.width=8.5, fig.height=9}
-g <- tidy_lengths_raw(d_survey_samples, bin_size = 2,
-  year_lim = c(2002, Inf)) %>%
+g <- tidy_lengths_raw(d_survey_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf)
+) %>%
   plot_lengths()
 g
 ggsave(file.path(figs, "lengths-raws.pdf"), width = 9, height = 9)
 ```
 
-We can look at aging precision.
+Or weighted:
+
+```{r, fig.width=8.5, fig.height=9}
+g <- tidy_lengths_weighted(d_survey_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf),
+  dat_survey_sets = d_survey_sets
+) %>%
+  plot_lengths()
+g
+ggsave(file.path(figs, "lengths-weighted.pdf"), width = 9, height = 9)
+```
+
+For commercial samples, weighted:
+
+```{r, fig.width=8.5, fig.height=9}
+g <- tidy_lengths_weighted(d_comm_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf),
+  sample_type = "commercial",
+  dat_catch = d_catch
+) %>%
+  plot_lengths()
+g
+ggsave(file.path(figs, "lengths-weighted-commercial.pdf"), width = 9, height = 9)
+```
+
+By default, we are discarding commercial "keeper" samples.
+
+# Ageing precision
+
+We can look at ageing precision. By default, this picks a random 250 fish that have primary and precision ageing values.
 
 ```{r}
 tidy_age_precision(d_age_precision, ageing_method_codes = 6) %>%
   plot_age_precision()
 ggsave(file.path(figs, "age-precision.pdf"), width = 5, height = 5)
 ```
+
+# Commercial catch
 
 Catch:
 
@@ -204,6 +289,8 @@ tidy_catch(d_catch) %>%
   plot_catch()
 ggsave(file.path(figs, "catch.pdf"), width = 6, height = 3)
 ```
+
+# Survey relative biomass indices
 
 The survey indices with bootstrapped confidence intervals:
 
@@ -217,65 +304,78 @@ Again, we could just select some surveys:
 
 ```{r, fig.width=7, fig.height=4}
 tidy_survey_index(d_survey_index,
-  surveys = c("West Coast Haida Gwaii Synoptic Survey",
+  surveys = c(
+    "West Coast Haida Gwaii Synoptic Survey",
     "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-    "West Coast Vancouver Island Synoptic Survey"),
-  survey_names = c("WCHG", "HS", "QCS", "WCVI")) %>%
+    "West Coast Vancouver Island Synoptic Survey"
+  ),
+  survey_names = c("WCHG", "HS", "QCS", "WCVI")
+) %>%
   plot_survey_index()
 ```
 
-We can look at the biological sample availability from commercial and survey sources:
+# Overall biological sample availability
+
+We can look at the biological sample (number of specimens) availability from commercial and survey sources:
 
 ```{r, fig.width=6, fig.height=2}
-tidy_sample_avail(d_comm_samples) %>%
+tidy_sample_avail(d_comm_samples, ageing_method_codes = 6) %>%
   plot_sample_avail(title = "Commercial samples", year_range = c(1994, 2017))
 ggsave(file.path(figs, "comm-samp-avail.pdf"), width = 6, height = 1.75)
 
-tidy_sample_avail(d_survey_samples) %>%
+tidy_sample_avail(d_survey_samples, ageing_method_codes = 6) %>%
   plot_sample_avail(title = "Survey samples", year_range = c(1994, 2017))
 ggsave(file.path(figs, "surv-samp-avail.pdf"), width = 6, height = 1.75)
 ```
 
-We can fit a von Bertalanffy growth model and plot it. Currently this is just on of the survey data. Shortly I'm going to add a simple function to join in the survey and commercial samples when needed.
+# Growth and maturity
+
+We can fit a von Bertalanffy growth model and plot it. We could fit this to just the survey data or just the commercial data or we can combine those two data sets with the function `bind_samples()`.
 
 ```{r, fig.width=5, fig.height=3.5}
-vb_m <- fit_vb(d_survey_samples, sex = "male", method = "mpd")
-vb_f <- fit_vb(d_survey_samples, sex = "female", method = "mpd")
+combined_samples <- bind_samples(d_survey_samples, d_comm_samples)
+
+vb_m <- fit_vb(combined_samples, sex = "male", method = "mpd")
+vb_f <- fit_vb(combined_samples, sex = "female", method = "mpd")
 plot_vb(object_female = vb_m, object_male = vb_f)
 ggsave(file.path(figs, "vb.pdf"), width = 5, height = 4)
 
-lw_m <- fit_length_weight(d_survey_samples, sex = "male", method = "rlm")
-lw_f <- fit_length_weight(d_survey_samples, sex = "female", method = "rlm")
+lw_m <- fit_length_weight(combined_samples, sex = "male", method = "rlm")
+lw_f <- fit_length_weight(combined_samples, sex = "female", method = "rlm")
 plot_length_weight(object_female = lw_m, object_male = lw_f)
 ggsave(file.path(figs, "length-wt.pdf"), width = 5, height = 4)
 ```
 
-Similarly, we can fit a logistic maturity ogive:
+Similarly, we can fit a logistic maturity ogive. I'll use the combined survey and commercial data, but you could just as easily substitute `d_survey_samples` or `d_comm_samples` for `combined_samples` in the following code chunk.
 
 ```{r, fig.width=5, fig.height=3.5}
-mat_age <- d_survey_samples %>%
+mat_age <- combined_samples %>%
   fit_mat_ogive(
     type = "age",
-    months = seq(4, 6),
-    ageing_method = c(3, 17))
+    months = seq(1, 12),
+    ageing_method_codes = 6
+  )
 plot_mat_ogive(mat_age)
 ggsave(file.path(figs, "age-mat-ogive.pdf"), width = 6, height = 3.5)
 
-mat_length <- d_survey_samples %>%
+mat_length <- combined_samples %>%
   fit_mat_ogive(
     type = "length",
-    months = seq(1, 12))
+    months = seq(1, 12)
+  )
 plot_mat_ogive(mat_length)
 ggsave(file.path(figs, "length-mat-ogive.pdf"), width = 6, height = 3.5)
 ```
 
-There's also the functionality to specify random intercepts for the sample IDs (this will take longer):
+There is also the functionality to specify random intercepts for the sample IDs (this will take much longer to fit):
 
 ```{r, fig.width=5, fig.height=3.5}
 mat_length <- d_survey_samples %>%
   fit_mat_ogive(
     type = "length",
-    months = seq(1, 12), sample_id_re = TRUE)
+    months = seq(1, 12),
+    sample_id_re = TRUE
+  )
 plot_mat_ogive(mat_length)
 ```
 
@@ -287,22 +387,28 @@ tidy_maturity_months(d_survey_samples) %>%
 ggsave(file.path(figs, "maturity-months.pdf"), width = 6, height = 4)
 ```
 
-We can plot the trawl and hook and line CPUE on maps. Note that the hook and line "CPUE" is just kg per fishing event right now since it seems like quantifing effort across all stocks might be troublesome.
+# Commercial CPUE maps
+
+We can plot the trawl and hook and line CPUE on maps. Note that the hook and line "CPUE" is just kg per fishing event right now since it seems like quantifying effort across all stocks might be troublesome.
 
 ```{r}
-dplyr::filter(d_cpue_spatial, year >= 2012) %>%
+filter(d_cpue_spatial, year >= 2012) %>%
   plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3) +
   ggtitle("Trawl CPUE") +
   labs(subtitle = "Since 2012; including discards; 3-vessel minimum")
 ggsave(file.path(figs, "cpue-spatial.pdf"), width = 6, height = 4.75)
 
 filter(d_cpue_spatial_ll, year >= 2008) %>%
-  plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3,
-    fill_lab = "CPUE (kg/fe)") +
+  plot_cpue_spatial(
+    bin_width = 7, n_minimum_vessels = 3,
+    fill_lab = "CPUE (kg/fe)"
+  ) +
   ggtitle("Hook and line CPUE") +
   labs(subtitle = "Since 2008; excluding discards; 3-vessel minimum")
 ggsave(file.path(figs, "cpue-spatial-ll.pdf"), width = 6, height = 4.75)
 ```
+
+# Commercial CPUE indexed standardization
 
 We can fit an index standardization delta-lognormal GLM to the commercial trawl CPUE data.
 
@@ -318,9 +424,9 @@ pcod_fleet <- tidy_cpue_index(d_cpue_index,
   area_grep_pattern = "5[CDE]+",
   min_positive_tows = 100,
   min_positive_trips = 4,
-  min_yrs_with_trips = 4)
+  min_yrs_with_trips = 4
+)
 ```
-
 
 ```{r}
 names(pcod_fleet)
@@ -332,22 +438,22 @@ How many vessels make up the "fleet?":
 length(unique(pcod_fleet$vessel_name))
 ```
 
-
 We can fit the CPUE in the index standardization model with whatever formulas we want for the binomial and lognormal components:
 
-`f()` in the next chunk is a custom helper function to generate sequential factor values that can be safely passed to TMB. Anything that should be treated as a factor should be wrapped in it.
+`f()` in the next chunk is a custom helper function to generate sequential factor values that can be safely passed to TMB. Anything that should be treated as a factor (except year) should be wrapped in it.
 
 ```{r fit-cpue, message=FALSE, warning=FALSE,  results='hide', cache=TRUE}
 m_cpue <- fit_cpue_index(pcod_fleet,
   formula_binomial =
     pos_catch ~ year_factor + f(month) + f(vessel) +
-    f(locality) + f(depth) + f(latitude),
+      f(locality) + f(depth) + f(latitude),
   formula_lognormal =
-    log(spp_catch/hours_fished) ~ year_factor + f(month) +
-    f(vessel) + f(locality) + f(depth) + f(latitude))
+    log(spp_catch / hours_fished) ~ year_factor + f(month) +
+      f(vessel) + f(locality) + f(depth) + f(latitude)
+)
 ```
 
-We can plot the coefficients from the models. Note that the coefficient values for the factor predictors are all relative to the first level, which is set to 0 in the model.
+We can plot the coefficients from the models. Note that the coefficient values for the factor predictors are all relative to the first (lowest) level, which is set to 0 in the model.
 
 ```{r, warnings=FALSE, message=FALSE, fig.width=9, fig.height=9}
 plot_cpue_index_coefs(m_cpue)
@@ -376,12 +482,14 @@ predict_cpue_index(m_cpue, center = TRUE) %>%
   plot_cpue_index(all_models = FALSE)
 ```
 
-There is a built-in function to jackknife out each of the predictors to assess the sensitivity of the model to each predictor. In the following plot, the dashed grey line represents the standardized and centered index. Each of the colored indices represents removing that predictor.
+There is a built-in function to jackknife out each of the predictors to assess the sensitivity of the model to each predictor. In the following plot, the dashed grey line represents the standardized and centered index. Each of the coloured indices represents removing that predictor.
 
 ```{r cpue-jk, warnings=FALSE, message=FALSE, fig.width=8, fig.height=4, cache=TRUE}
 plot_cpue_index_jk(m_cpue)
 ggsave(file.path(figs, "trawl-commercial-cpue-jk.pdf"), width = 9, height = 6)
 ```
+
+# Modelling relative biomass from the surveys spatially
 
 There are also functions to fit spatial models to the survey data with Stan. They currently only work for the synoptic surveys.
 
@@ -396,10 +504,11 @@ As an example, I will fit a delta-lognormal GLMM with spatial random fields to t
 ```{r fit-surveys, message=FALSE, warning=FALSE,  results='hide', cache=TRUE}
 m_wcvi <- fit_survey_sets(d_survey_sets,
   survey = "Queen Charlotte Sound Synoptic Survey",
-  years = 2017, chains = 3, iter = 1000)
+  years = 2017, chains = 3, iter = 1000
+)
 ```
 
-The following plotting function is a work in progress. The coordinates are in UTMS.
+The following plotting function is a work in progress. The coordinates are in UTMS for UTM zone 9.
 
 First is a plot of the combined binary and lognormal components:
 
@@ -412,27 +521,31 @@ And here are the binary and lognormal components on their own:
 
 ```{r}
 plot_survey_sets(m_wcvi$predictions, m_wcvi$data, fill_column = "bin") +
-  scale_fill_gradient2(midpoint = 0.5,
-    low = scales::muted("blue"), high = scales::muted("red"))
+  scale_fill_gradient2(
+    midpoint = 0.5,
+    low = scales::muted("blue"), high = scales::muted("red")
+  )
 plot_survey_sets(m_wcvi$predictions, m_wcvi$data, fill_column = "pos") +
   viridis::scale_fill_viridis(option = "C")
 ```
 
+# Addendum
+
 Finally, let's look at the raw data extracted. You can do whatever you want with it.
 
 ```{r}
+# glimpse(d_cpue_spatial) # commented out for privacy
+# glimpse(d_cpue_spatial_ll) # commented out for privacy
+# glimpse(d_cpue_index) # commented out for privacy
 glimpse(d_survey_sets)
 glimpse(d_survey_samples)
 glimpse(d_comm_samples)
 glimpse(d_catch)
-# glimpse(d_cpue_spatial) # commented out for privacy
-# glimpse(d_cpue_spatial_ll) # commented out for privacy
 glimpse(d_survey_index)
 glimpse(d_age_precision)
-# glimpse(d_cpue_index) # commented out for privacy
 ```
 
-There's also a bonus function that we plan to use for the description at the top. Look up the SARA/COSEWIC status of your favorite species! This gets scraped dynamically from tables on a website.
+There is also a bonus function that we plan to use for the description at the top. Look up the SARA/COSEWIC status of your favourite species! This gets scraped dynamically from tables on <http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm>.
 
 ```{r}
 d <- get_sara_dat()
