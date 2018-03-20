@@ -4,7 +4,7 @@
 \alias{tidy_sample_avail}
 \title{Tidy PBS samples data for \code{\link{plot_sample_avail}}}
 \usage{
-tidy_sample_avail(dat, year_range = NULL, ageing_method = c(3, 17))
+tidy_sample_avail(dat, year_range = NULL, ageing_method_codes = c(3, 17))
 }
 \arguments{
 \item{dat}{Input data frame from \code{\link{get_survey_samples}}.}
@@ -13,7 +13,7 @@ tidy_sample_avail(dat, year_range = NULL, ageing_method = c(3, 17))
 or a numeric vector of length two giving the lower and upper years to
 include.}
 
-\item{ageing_method}{TODO}
+\item{ageing_method_codes}{TODO}
 }
 \description{
 Tidy PBS samples data for \code{\link{plot_sample_avail}}

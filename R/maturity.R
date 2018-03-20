@@ -3,7 +3,7 @@
 #' @param dat TODO
 #' @param sample_id_re TODO
 #' @param months TODO
-#' @param ageing_method TODO
+#' @param ageing_method_codes TODO
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples
@@ -25,13 +25,18 @@ fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,
                           months = seq(1, 12),
-                          ageing_method = c(3, 17)) {
+                          ageing_method_codes = c(3, 17)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
-  dat <- filter(
-    dat, month %in% months,
-    ageing_method %in% ageing_method
-  )
-  dat <- dat[!duplicated(dat$specimen_id), ] # critical!
+
+
+  type <- match.arg(type)
+
+  dat <- filter(dat, month %in% months)
+
+  if (type == "age") 
+    dat <- filter(dat, ageing_method %in% ageing_method_codes)
+
+  dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
   dat <- dat %>%
     select(
       species_common_name,

@@ -12,7 +12,7 @@
 #' @param allow_slow_mcmc TODO
 #' @param est_method TODO
 #' @param min_samples TODO
-#' @param ageing_method TODO
+#' @param ageing_method_codes TODO
 #' @param ... TODO
 #' @family growth functions
 #' @importFrom stats median quantile rlnorm runif median
@@ -53,7 +53,7 @@ fit_vb <- function(dat,
                    allow_slow_mcmc = FALSE,
                    est_method = median,
                    min_samples = 50L,
-                   ageing_method = c(3, 17),
+                   ageing_method_codes = c(3, 17),
                    ...) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) != 1L) {
@@ -65,8 +65,8 @@ fit_vb <- function(dat,
     }
   }
 
-  dat <- filter(dat, .data$ageing_method %in% ageing_method)
-  dat <- dat[!duplicated(dat), , drop = FALSE]
+  dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+  dat <- dat[!duplicated(dat), , drop = FALSE] # critical
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
 
   dat <- switch(sex[[1]],

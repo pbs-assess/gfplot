@@ -4,7 +4,7 @@
 #' @param year_range Either \code{NULL}, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
-#' @param ageing_method TODO
+#' @param ageing_method_codes TODO
 #'
 #' @export
 #'
@@ -17,7 +17,8 @@
 #' tidy_sample_avail(d)
 #' }
 
-tidy_sample_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) {
+tidy_sample_avail <- function(dat, year_range = NULL, 
+  ageing_method_codes = c(3, 17)) {
   dat <- filter(dat, !is.na(year))
 
   if (!is.null(year_range)) {
@@ -25,12 +26,12 @@ tidy_sample_avail <- function(dat, year_range = NULL, ageing_method = c(3, 17)) 
       dat$year <= max(year_range), , drop = FALSE]
   }
 
-  dat <- dat[!duplicated(dat$specimen_id), ] # critical!!
+  dat <- dat[!duplicated(dat$specimen_id), drop = FALSE] # critical!
 
   out <- group_by(dat, species_common_name, year) %>%
     summarise(
       age = sum(!is.na(age) & age > 0 &
-        .data$ageing_method %in% ageing_method),
+        .data$ageing_method %in% ageing_method_codes),
       length = sum(!is.na(length) & length > 0),
       weight = sum(!is.na(weight) & weight > 0),
       maturity = sum(!is.na(maturity_code) & maturity_code > 0)

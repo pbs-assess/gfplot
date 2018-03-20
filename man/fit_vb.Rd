@@ -7,7 +7,8 @@
 fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
   downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
-  est_method = median, min_samples = 50L, ageing_method = c(3, 17), ...)
+  est_method = median, min_samples = 50L, ageing_method_codes = c(3, 17),
+  ...)
 }
 \arguments{
 \item{dat}{TODO}
@@ -30,7 +31,7 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 
 \item{min_samples}{TODO}
 
-\item{ageing_method}{TODO}
+\item{ageing_method_codes}{TODO}
 
 \item{...}{TODO}
 }

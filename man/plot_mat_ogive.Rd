@@ -6,7 +6,7 @@
 \title{Fit and plot maturity ogives}
 \usage{
 fit_mat_ogive(dat, type = c("age", "length"), sample_id_re = FALSE,
-  months = seq(1, 12), ageing_method = c(3, 17))
+  months = seq(1, 12), ageing_method_codes = c(3, 17))
 
 plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
   else "Length (cm)", title = if (object$type[[1]] == "age") "Age at maturity"
@@ -21,7 +21,7 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
 
 \item{months}{TODO}
 
-\item{ageing_method}{TODO}
+\item{ageing_method_codes}{TODO}
 
 \item{object}{TODO}
 
