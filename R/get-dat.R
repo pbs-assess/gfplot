@@ -253,11 +253,9 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 
 #' @export
 #' @rdname get
-#' @param discard_keepers Discard keepers?
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
-get_survey_samples <- function(species, ssid = NULL,
-                               discard_keepers = TRUE, remove_bad_data = TRUE) {
+get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -313,6 +311,7 @@ get_survey_samples <- function(species, ssid = NULL,
 }
 
 #' @export
+#' @param discard_keepers TODO
 #' @rdname get
 get_comm_samples <- function(species, discard_keepers = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
@@ -460,7 +459,7 @@ cache_pbs_data <- function(species, path = "data-cache") {
   d <- get_survey_samples(species)
   saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"))
 
-  d <- get_comm_samples(species)
+  d <- get_comm_samples(species, discard_keepers = TRUE)
   saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"))
 
   d <- get_catch(species)
