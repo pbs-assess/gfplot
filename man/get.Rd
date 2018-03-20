@@ -27,8 +27,7 @@ get_age_methods()
 get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE)
 
-get_survey_samples(species, ssid = NULL, discard_keepers = TRUE,
-  remove_bad_data = TRUE)
+get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE)
 
 get_comm_samples(species, discard_keepers = TRUE)
 
@@ -63,10 +62,10 @@ series IDs with surveys series descriptions.}
 
 \item{join_sample_ids}{TODO}
 
-\item{discard_keepers}{Discard keepers?}
-
 \item{remove_bad_data}{Remove known bad data, such as unrealistic
 length or weight values.}
+
+\item{discard_keepers}{TODO}
 
 \item{gear}{The gear type(s) to include. Will be converted to uppercase.}
 

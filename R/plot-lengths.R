@@ -88,6 +88,9 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     mutate(proportion = proportion / max(proportion)) %>%
     ungroup()
 
+  dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bars shaded on top
+  dat <- arrange(dat, year, survey, sex)
+
   g <- ggplot(dat, aes_string("length_bin", "proportion")) +
     geom_col(
       width = bin_size,

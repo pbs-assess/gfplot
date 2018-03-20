@@ -5,9 +5,8 @@
 \title{Plot age frequency data}
 \usage{
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)", year_range = NULL, fill_col = c(M = "grey50", F =
-  "#f44256"), line_col = c(M = "grey50", F = "#f44256"), survey_cols = NULL,
-  alpha = 0.85)
+  ylab = "Age (years)", year_range = NULL, line_col = c(M = "#666666", F =
+  "#f44256"), survey_cols = NULL, alpha = 0.2, grid_col = "grey95")
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or
@@ -24,13 +23,15 @@ plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 \item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
 all years included in original data.}
 
-\item{fill_col}{TODO}
-
 \item{line_col}{TODO}
 
 \item{survey_cols}{TODO}
 
 \item{alpha}{TODO}
+
+\item{grid_col}{TODO}
+
+\item{fill_col}{TODO}
 }
 \description{
 Functions for plotting age frequency data.

@@ -23,6 +23,7 @@
 #' @param line_col TODO
 #' @param survey_cols TODO
 #' @param alpha TODO
+#' @param grid_col TODO
 #'
 #' @family age- and length-frequency functions
 #'
@@ -57,10 +58,8 @@
 #' @export
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
                       ylab = "Age (years)", year_range = NULL,
-                      fill_col = c("M" = "grey50", "F" = "#f44256"),
-                      line_col = c("M" = "grey50", "F" = "#f44256"),
-                      survey_cols = NULL, alpha = 0.85) {
-
+                      line_col = c("M" = "#666666", "F" = "#f44256"),
+                      survey_cols = NULL, alpha = 0.2, grid_col = "grey95") {
   if (nrow(dat) > 0) {
     age_max <- max(dat$age, na.rm = TRUE)
   } else {
@@ -80,6 +79,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   age_range <- diff(range(dat$age, na.rm = TRUE))
 
   if (!is.null(survey_cols)) {
+    stop("survey_cols argument is broken!", call. = FALSE)
     survey_col_names <- names(survey_cols)
     col <- stats::setNames(survey_cols, paste("F", survey_col_names))
     col <- c(col, stats::setNames(
@@ -91,6 +91,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     dat$sex <- paste(dat$sex, dat$survey)
   }
 
+  fill_col <- paste0(substr(line_col, 1L, 7L), as.character(alpha * 100))
+
   if (is.null(year_range)) {
     year_range <- c(min(dat$year, na.rm = TRUE), max(dat$year, na.rm = TRUE))
   }
@@ -99,16 +101,20 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   #   levels = levels(dat$survey)
   # )), by = "survey")
 
+  # empty plot:
   if (sum(!is.na(dat$age)) == 0) {
     dat$age <- 0
     age_range <- 1
   }
 
+  dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bubbles shaded on top
+  dat <- arrange(dat, year_jitter, survey, sex)
+
   g <- ggplot(dat, aes_string("year_jitter", "age")) +
     facet_wrap(~ survey, nrow = 1) +
     scale_x_continuous(
       breaks =
-        seq(round_down_even(year_range[1]), year_range[2], year_increment)
+        seq(round_down_even(min(year_range)), max(year_range), year_increment)
     ) +
     xlab("") +
     ylab(ylab) +
@@ -118,10 +124,10 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     labs(title = "Age frequencies", colour = "Sex", fill = "Sex") +
     geom_vline(
       xintercept = seq(year_range[1], year_range[2], 1),
-      col = "grey95", lwd = 0.4
+      col = grid_col, lwd = 0.4
     ) +
     geom_hline(
-      yintercept = seq(0, age_max, 10), col = "grey95",
+      yintercept = seq(0, age_max, 10), col = grid_col,
       lwd = 0.4
     ) +
     coord_cartesian(
@@ -131,12 +137,15 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 
   if (sum(dat$age > 0, na.rm = TRUE) > 0) {
     g <- g +
+      ggplot2::geom_abline(
+        intercept = seq(-2200, -1000, 5), slope = 1,
+        colour = grid_col
+      ) +
       scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
       scale_colour_manual(values = line_col, breaks = c("M", "F")) +
       scale_size_area(max_size = max_size) +
       guides(
-        size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
-        fill = guide_legend(override.aes = list(size = 3.5))
+        size = FALSE, colour = guide_legend(override.aes = list(size = 3.5))
       ) +
       geom_text(
         data = counts, y = age_max + 0.005 * age_range,
@@ -144,9 +153,10 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
         inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 1,
         angle = 90
       ) +
-      geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
-        pch = 21, alpha = 0.9
-      )
+      geom_point(aes_string(
+        size = "n_scaled", group = "sex", fill = "sex",
+        colour = "sex"
+      ), pch = 21)
   }
 
   if (!is.null(survey_cols)) {

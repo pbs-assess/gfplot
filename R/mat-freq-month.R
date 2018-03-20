@@ -11,7 +11,7 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
                                  ssid = NULL) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
-  dat <- filter(dat, maturity_code <= maturity_convention_maxvalue)
+  # dat <- filter(dat, maturity_code <= maturity_convention_maxvalue) # TODO: Elise - done in data now?
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
   dat <- dat %>%
     select(
