@@ -49,8 +49,8 @@ Title TODO
 x <- fit_survey_sets(pop_surv,
   years = 2015,
   survey = "Queen Charlotte Sound Synoptic Survey",
-  iter = 600, chains = 1, mcmc_posterior_samples = 100)
-plot_survey_sets(x$predictions, x$data, fill_column = "combined")
+  iter = 600, chains = 1) # for speed in this example
+plot_survey_sets(x$predictions, x$data)
 }
 }
 \seealso{
