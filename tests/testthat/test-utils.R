@@ -1,4 +1,4 @@
-context("Utility functions work as expected")
+context("Utility functions work as expected.")
 
 test_that("all_species_codes() works", {
   expect_false(all_species_codes("a"))
