@@ -2,43 +2,16 @@
 % Please edit documentation in R/ages.R
 \name{plot_ages}
 \alias{plot_ages}
-\alias{tidy_ages_raw}
-\alias{plot_ages}
 \title{Plot age frequency data}
 \usage{
-tidy_ages_raw(dat,
-  survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
-  "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-  "West Coast Vancouver Island Synoptic Survey",
-  "PHMA Rockfish Longline Survey - Outside North",
-  "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
-  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"), year_range = NULL, spp_cat_code = 1, ageing_method_codes = c(3,
-  17))
-
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL, fill_col = c(M = "grey50", F =
   "#f44256"), line_col = c(M = "grey50", F = "#f44256"), survey_cols = NULL,
   alpha = 0.85)
 }
 \arguments{
-\item{dat}{Input data frame. For \code{tidy_ages_raw()} should be from
-\code{\link[=get_survey_samples]{get_survey_samples()}} and or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_ages()} should
-be from \code{tidy_ages_raw()} or be formatted similarly. See details.}
-
-\item{survey_series_desc}{A character vector of survey series to include.}
-
-\item{survey}{A character vector of shorter/cleaner survey names to use in
-the same order as \code{survey_series_desc}. These are used in the plot.}
-
-\item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
-all years included in original data.}
-
-\item{spp_cat_code}{A numeric vector of species categorical codes to include
-for the commercial samples. Defaults to \code{1}, which refers to unsorted
-samples.}
-
-\item{ageing_method_codes}{TODO}
+\item{dat}{Input data frame. Should be from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or
+\code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} or be formatted similarly. See details.}
 
 \item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
 
@@ -47,6 +20,9 @@ samples.}
 \item{year_increment}{Increment between year labels on x axis.}
 
 \item{ylab}{Y axis label.}
+
+\item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
+all years included in original data.}
 
 \item{fill_col}{TODO}
 
@@ -57,31 +33,46 @@ samples.}
 \item{alpha}{TODO}
 }
 \description{
-Functions for plotting age frequency data. (Weighting not implimented
-yet. TODO)
+Functions for plotting age frequency data.
 }
 \details{
 \itemize{
-\item \code{tidy_ages_raw()} Prepares PBS data for \code{plot_ages()}. Works across one
+\item \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or \code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} prepare PBS data for \code{plot_ages()}. These work across one
 or multiple species.
-\item \code{plot_ages()} Plots age frequencies for each year for selected
-surveys for a single species. Input data frame should come from
-\code{tidy_ages_raw()} or follow the following format: The input data frame must
-have the columns (in any order): \code{year}, \code{sex} (coded as \code{"M"} and
-\code{"F"}), \code{age}, \code{survey}, \code{n_scaled}.
+\item \code{plot_ages()} Plots age frequencies for each year for selected surveys for
+a single species. Input data frame should come from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or
+\code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} or follow the following format: The input data frame
+must have the columns (in any order): \code{survey}, \code{year}, \code{sex} (coded as \code{"M"}
+and \code{"F"}), \code{age}, \code{proportion}, \code{total} (for the total sample number label).
 }
 }
 \examples{
 \dontrun{
-d <- get_survey_samples("lingcod")
-tidy_ages_raw(d)
-plot_ages(d)
+# # main age/length data:
+# rs_comm_samples <- get_comm_samples("redstripe rockfish",
+#   discard_keepers = TRUE)
+# rs_survey_samples <- get_survey_samples("redstripe rockfish")
+#
+# # for weighting:
+# rs_catch <- get_catch("redstripe rockfish")
+# rs_survey_sets <- get_survey_sets("redstripe rockfish")
 
-d <- get_survey_samples("canary rockfish")
-tidy_ages_raw(d) \%>\%
+# survey raw age frequencies:
+tidy_ages_raw(rs_survey_samples,
+  sample_type = "survey") \%>\%
+  plot_ages()
+
+# survey weighted age frequencies:
+tidy_ages_weighted(rs_survey_samples,
+  sample_type = "survey",
+  dat_survey_sets = rs_survey_sets) \%>\%
+  plot_ages()
+
+# commercial raw age frequencies:
+tidy_ages_raw(rs_comm_samples,
+  sample_type = "commercial") \%>\%
   plot_ages()
 }
-
 }
 \seealso{
 Other age- and length-frequency functions: \code{\link{plot_lengths}},

@@ -1,10 +1,12 @@
 #' Age and length frequency weighting
 #'
-#' These functions weight age or length frequencies.
-#' `tidy_comps_commercial()` and `tidy_comps_survey()` join the necessary data
-#' for commercial or survey samples, respectively, and format it for
-#' weighting. `weight_comps()` does the actual weighting based on the output
-#' from the `tidy_*` functions.
+#' In general, you shouldn't have to use these functions directly. However, they
+#' are exposed to the user in case you need the flexibility of using them
+#' yourself and as a place to hold documentation about the weighting schemes.
+#' These functions weight age or length frequencies. `tidy_comps_commercial()`
+#' and `tidy_comps_survey()` join the necessary data for commercial or survey
+#' samples, respectively, and format it for weighting. `weight_comps()` does the
+#' actual weighting based on the output from the `tidy_*` functions.
 #'
 #' @param specimen_dat Specimen data. E.g. from [get_comm_samples()] for
 #' commercial data or [get_survey_samples()] for survey data.
@@ -22,15 +24,18 @@
 #' 1. weighting unit ID (e.g. trip ID or sample ID)
 #' 1. grouping variable for first weighting (e.g. quarter or stratum)
 #' 1. value of weighting variable (e.g. age or length bin)
-#' 1. frequency of that weighting variable (e.g. frequency of that age or length bin)
+#' 1. frequency of that weighting variable (e.g. frequency of that age or
+#'    length bin)
 #' 1. numerator in first weighting (e.g. sample catch weight or density)
-#' 2. denominator in first weighting (e.g. quarter catch weight or total stratum density)
+#' 2. denominator in first weighting (e.g. quarter catch weight or total
+#'    stratum density)
 #' 1. numerator in second weighting (e.g. catch that quarter or stratum area)
-#' 1. denominator in second weighting (e.g. catch that year or total survey area)
+#' 1. denominator in second weighting (e.g. catch that year or total survey
+#'    area)
 #'
-#' `tidy_comps_commercial()` and `tidy_comps_survey()` both output data frames in
-#' this format and so you ordinarily would not have to worry about this.
-#' The names of the columns do not matter, only their contents. The data frame
+#' `tidy_comps_commercial()` and `tidy_comps_survey()` both output data frames
+#' in this format and so you ordinarily would not have to worry about this. The
+#' names of the columns do not matter, only their contents. The data frame
 #' should contain these columns and only these columns.
 #'
 #' @references
@@ -43,38 +48,38 @@
 #' @family age- and length-frequency functions
 #' @examples
 #' \dontrun{
-#' species <- "pacific ocean perch"
+#' species <- "redstripe rockfish"
 #'
 #' ## Surveys:
 #' ## ssid = 1 is Queen Charlotte Sound Synoptic Survey:
-#' survey_samples <- get_survey_samples(species, ssid = 1)
-#' survey_tows <- get_survey_tows(species, ssid = 1)
+#' # rs_survey_samples <- get_survey_samples(species, ssid = 1)
+#' # rs_survey_sets <- get_survey_sets(species, ssid = 1)
 #'
-#' surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
+#' surv_lengths <- tidy_comps_survey(rs_survey_samples, rs_survey_sets,
 #'   value = length, bin_size = 2)
 #' surv_lengths
 #' weight_comps(surv_lengths)
 #'
-#' surv_ages <- tidy_comps_survey(survey_samples, survey_tows, value = age)
+#' surv_ages <- tidy_comps_survey(rs_survey_samples, rs_survey_sets, value = age)
 #' surv_ages
 #' weight_comps(surv_ages)
 #'
 #' ## Commercial:
-#' com_samples <- get_comm_samples(species)
-#' com_catch <- get_catch(species)
+#' # rs_comm_samples <- get_comm_samples(species)
+#' # rs_catch <- get_catch(species)
 #'
-#' com_lengths <- tidy_comps_commercial(com_samples, com_catch,
+#' com_lengths <- tidy_comps_commercial(rs_comm_samples, rs_catch,
 #'   value = length, bin_size = 2)
 #' com_lengths
 #' weight_comps(com_lengths)
 #'
-#' com_ages <- tidy_comps_commercial(com_samples, com_catch,
+#' com_ages <- tidy_comps_commercial(rs_comm_samples, rs_catch,
 #'   value = age)
 #' com_ages
 #' weight_comps(com_ages)
 #'
 #' ## These functions are pipe (%>%) friendly. E.g.:
-#' tidy_comps_survey(survey_samples, survey_tows, value = age) %>%
+#' tidy_comps_survey(rs_survey_samples, rs_survey_sets, value = age) %>%
 #'   weight_comps()
 #' }
 #' @name weight_comps
@@ -82,7 +87,12 @@ NULL
 
 bin_lengths <- function(dat, value, bin_size) {
   value <- enquo(value)
-  bin_range <- dat %>% select(!!value) %>% pull() %>% range()
+  bin_range <- dat %>%
+    select(!!value) %>%
+    pull() %>%
+    range()
+  bin_range[1] <- round_down_even(bin_range[1])
+  bin_range[2] <- ceiling(bin_range[2])
   bins <- seq(min(bin_range), max(bin_range), by = bin_size)
   mutate(dat, !!quo_name(value) :=
     bins[findInterval(!!value, bins)] + bin_size / 2)
@@ -93,7 +103,11 @@ bin_lengths <- function(dat, value, bin_size) {
 tidy_comps_commercial <- function(specimen_dat, catch_dat, value,
                                   bin_size = NULL) {
   value <- enquo(value)
-  specimen_dat <- specimen_dat %>% filter(!is.na(!!value), sex %in% c(1, 2))
+  specimen_dat <- specimen_dat %>% filter(!is.na(!!value))
+
+  if (identical(class(specimen_dat$sex), "numeric")) {
+    specimen_dat <- filter(specimen_dat, sex %in% c(1, 2))
+  }
 
   if (!is.null(bin_size)) {
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
@@ -159,8 +173,11 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
                               bin_size = NULL) {
   value <- enquo(value)
   specimen_dat <- specimen_dat %>%
-    filter(!is.na(!!value)) %>%
-    filter(sex %in% c(1, 2))
+    filter(!is.na(!!value))
+
+  if (identical(class(specimen_dat$sex), "numeric")) {
+    specimen_dat <- filter(specimen_dat, sex %in% c(1, 2))
+  }
 
   if (!is.null(bin_size)) {
     specimen_dat <- bin_lengths(specimen_dat, !!value, bin_size = bin_size)
@@ -174,7 +191,7 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
 
   raw_comp <- specimen_dat %>%
     filter(!is.na(grouping_code)) %>%
-    select(year, sample_id, !!value, weight, sex, grouping_code) %>%
+    select(year, sample_id, !!value, sex, grouping_code) %>%
     group_by(year, sex, sample_id, grouping_code, !!value) %>%
     summarise(freq = n())
 
@@ -232,7 +249,7 @@ weight_comps_base <- function(dat) {
     # first level (within quarters by catch or within strata by survey catch):
     mutate(prop = weighting1 / weighting1_total) %>% # D.4
     # re-weight:
-    group_by(year, grouping1, weighting2, weighting2_total, value) %>% # pre D.5
+    group_by(year, grouping1, weighting2, weighting2_total, sex, value) %>% # pre D.5
     summarise(
       weighted_freq1 = sum(freq * prop), # D.5
       sum_freq = sum(freq)
@@ -247,7 +264,7 @@ weight_comps_base <- function(dat) {
 
     # second level (within years by catch or within survey-years by area):
     mutate(annual_prop = weighting2 / sum(weighting2_total)) %>% # D.7
-    group_by(year, value) %>% # pre D.8
+    group_by(year, sex, value) %>% # pre D.8
 
     # re-weight:
     summarise(
@@ -273,22 +290,17 @@ weight_comps_base <- function(dat) {
 #' @export
 #' @rdname weight_comps
 weight_comps <- function(dat) {
+  assertthat::assert_that(identical(ncol(dat), 10L))
+  assertthat::assert_that(identical(
+    names(dat)[seq_len(2)],
+    c("year", "sex")
+  ))
+  assertthat::assert_that(names(dat)[[3]] %in% c("sample_id", "trip_id"))
+
   names(dat) <- c(
-    "year", "id", "grouping1", "value", "freq",
+    "year", "sex", "id", "grouping1", "value", "freq",
     "weighting1", "weighting1_total",
     "weighting2", "weighting2_total"
   )
   weight_comps_base(dat)
-}
-
-#' @export
-#' @rdname weight_comps
-tidy_ages_weighted <- function() {
-  stop("Not implemented yet.") # TODO
-}
-
-#' @export
-#' @rdname weight_comps
-tidy_lengths_weighted <- function() {
-  stop("Not implemented yet.") # TODO
 }

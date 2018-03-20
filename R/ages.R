@@ -1,27 +1,18 @@
 #' Plot age frequency data
 #'
-#' Functions for plotting age frequency data. (Weighting not implimented
-#' yet. TODO)
+#' Functions for plotting age frequency data.
 #'
 #' @details
 #'
-#' * `tidy_ages_raw()` Prepares PBS data for `plot_ages()`. Works across one
+#' * [tidy_ages_raw()] or [tidy_ages_weighted()] prepare PBS data for `plot_ages()`. These work across one
 #'   or multiple species.
-#' * `plot_ages()` Plots age frequencies for each year for selected
-#'   surveys for a single species. Input data frame should come from
-#'   `tidy_ages_raw()` or follow the following format: The input data frame must
-#'   have the columns (in any order): `year`, `sex` (coded as `"M"` and
-#'   `"F"`), `age`, `survey`, `n_scaled`.
-#'
-#' @param dat Input data frame. For `tidy_ages_raw()` should be from
-#' [get_survey_samples()] and or [get_comm_samples()]. For `plot_ages()` should
-#' be from `tidy_ages_raw()` or be formatted similarly. See details.
-#' @param survey_series_desc A character vector of survey series to include.
-#' @param survey A character vector of shorter/cleaner survey names to use in
-#' the same order as `survey_series_desc`. These are used in the plot.
-#' @param spp_cat_code A numeric vector of species categorical codes to include
-#'   for the commercial samples. Defaults to `1`, which refers to unsorted
-#'   samples.
+#' * `plot_ages()` Plots age frequencies for each year for selected surveys for
+#' a single species. Input data frame should come from [tidy_ages_raw()] or
+#' [tidy_ages_weighted()] or follow the following format: The input data frame
+#' must have the columns (in any order): `survey`, `year`, `sex` (coded as `"M"`
+#' and `"F"`), `age`, `proportion`, `total` (for the total sample number label).
+#' @param dat Input data frame. Should be from [tidy_ages_raw()] or
+#'   [tidy_ages_weighted()] or be formatted similarly. See details.
 #' @param max_size Maximum dot size (passed to [ggplot2::scale_size_area()]).
 #' @param sex_gap Horizontal gap between male and female bubbles.
 #' @param year_increment Increment between year labels on x axis.
@@ -37,112 +28,39 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_survey_samples("lingcod")
-#' tidy_ages_raw(d)
-#' plot_ages(d)
+#' # # main age/length data:
+#' # rs_comm_samples <- get_comm_samples("redstripe rockfish",
+#' #   discard_keepers = TRUE)
+#' # rs_survey_samples <- get_survey_samples("redstripe rockfish")
+#' #
+#' # # for weighting:
+#' # rs_catch <- get_catch("redstripe rockfish")
+#' # rs_survey_sets <- get_survey_sets("redstripe rockfish")
 #'
-#' d <- get_survey_samples("canary rockfish")
-#' tidy_ages_raw(d) %>%
+#' # survey raw age frequencies:
+#' tidy_ages_raw(rs_survey_samples,
+#'   sample_type = "survey") %>%
+#'   plot_ages()
+#'
+#' # survey weighted age frequencies:
+#' tidy_ages_weighted(rs_survey_samples,
+#'   sample_type = "survey",
+#'   dat_survey_sets = rs_survey_sets) %>%
+#'   plot_ages()
+#'
+#' # commercial raw age frequencies:
+#' tidy_ages_raw(rs_comm_samples,
+#'   sample_type = "commercial") %>%
 #'   plot_ages()
 #' }
-#'
-#' @name plot_ages
-NULL
 
-
-#' @rdname plot_ages
-#' @param ageing_method_codes TODO
-#' @export
-tidy_ages_raw <- function(dat,
-                          survey_series_desc = c(
-                            "West Coast Haida Gwaii Synoptic Survey",
-                            "Hecate Strait Synoptic Survey",
-                            "Queen Charlotte Sound Synoptic Survey",
-                            "West Coast Vancouver Island Synoptic Survey",
-                            "PHMA Rockfish Longline Survey - Outside North",
-                            "PHMA Rockfish Longline Survey - Outside South",
-                            "IPHC Longline Survey"
-                          ),
-                          survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)", "IPHC"),
-                          year_range = NULL,
-                          spp_cat_code = 1, ageing_method_codes = c(3, 17)) {
-  if (!"survey_series_desc" %in% names(dat)) {
-    dat <- filter(dat, species_category_code %in% spp_cat_code) # TODO not in data yet
-    dat <- filter(dat, !is.na(year))
-    dat$survey_series_desc <- "Commercial"
-  }
-
-  dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
-  dbio <- filter(dbio, .data$sex %in% c(1, 2))
-  dbio <- filter(dbio, !is.na(.data$year))
-
-  if (nrow(dbio) == 0) {
-    warning("No data available after filtering for those ageing codes.",
-      call. = FALSE
-    )
-  }
-
-  dbio <- filter(dbio, survey_series_desc %in% survey_series_desc)
-  dbio <- dbio[!duplicated(dbio$specimen_id), ] # critical!!
-  dup <- group_by(dbio, species_common_name) %>%
-    summarise(n_spp = length(unique(species_science_name))) %>%
-    arrange(-n_spp) %>%
-    filter(n_spp > 1)
-  stopifnot(nrow(dup) == 0)
-
-  dbio <- dbio %>%
-    select(
-      species_common_name, species_science_name, year, age,
-      length, weight, maturity_code, sex, survey_series_desc
-    )
-
-  surv <- tibble(survey_series_desc = survey_series_desc, survey = survey)
-  dbio$survey <- NULL # extra careful
-  dbio <- inner_join(dbio, surv, by = "survey_series_desc")
-
-  dbio_ages <- filter(dbio, !is.na(age)) %>%
-    group_by(species_common_name, survey_series_desc) %>%
-    mutate(n_ages = n()) %>%
-    ungroup()
-
-  d <- filter(dbio_ages, !is.na(.data$age))
-  ds <- d %>% mutate(sex = ifelse(sex == 2, "F", "M"))
-
-  all_surveys <- tibble(survey = survey)
-
-  if (is.null(year_range)) {
-    year_range <- c(min(dbio_ages$year), max(dbio_ages$year))
-  }
-
-  dbio_ages <- filter(
-    dbio_ages,
-    year >= year_range[[1]], year <= year_range[[2]]
-  )
-
-  # complete_df <- expand.grid(
-  #   survey = survey,
-  #   age = 1,
-  #   year = seq(year_range[[1]], year_range[[2]], 1),
-  #   sex = NA,
-  #   stringsAsFactors = FALSE
-  # )
-  # if (nrow(ds) == 0)
-  #   ds <- complete_df
-
-  # ds <- full_join(ds, all_surveys, by = "survey") %>%
-  #   select(-survey_series_desc)
-  ds$survey <- factor(ds$survey, levels = survey)
-  ds
-}
-
-#' @rdname plot_ages
 #' @export
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
                       ylab = "Age (years)", year_range = NULL,
                       fill_col = c("M" = "grey50", "F" = "#f44256"),
                       line_col = c("M" = "grey50", "F" = "#f44256"),
                       survey_cols = NULL, alpha = 0.85) {
-  dat <- filter(dat, )
+
   if (nrow(dat) > 0) {
     age_max <- max(dat$age, na.rm = TRUE)
   } else {
@@ -153,18 +71,12 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     mutate(year_jitter = ifelse(sex == "M",
       year + sex_gap / 2, year - sex_gap / 2
     )) %>%
-    group_by(year, .data$year_jitter, age, sex, survey) %>%
-    summarise(n = n()) %>%
-    group_by(year, survey) %>%
-    mutate(n_scaled = n / max(n), total = sum(n)) %>%
+    group_by(year, year_jitter, survey) %>%
+    mutate(n_scaled = proportion / max(proportion)) %>%
     ungroup()
 
-  counts <- select(
-    dat, .data$total, .data$year,
-    .data$survey
-  ) %>% unique()
+  counts <- select(dat, total, year, survey) %>% unique()
 
-  dat$sex[is.na(dat$sex)] <- "F" # just for legend or we'll have "NAs"
   age_range <- diff(range(dat$age, na.rm = TRUE))
 
   if (!is.null(survey_cols)) {
@@ -183,9 +95,9 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     year_range <- c(min(dat$year, na.rm = TRUE), max(dat$year, na.rm = TRUE))
   }
 
-  dat <- full_join(dat, tibble(survey = factor(levels(dat$survey),
-    levels = levels(dat$survey)
-  )), by = "survey")
+  # dat <- full_join(dat, tibble(survey = factor(levels(dat$survey),
+  #   levels = levels(dat$survey)
+  # )), by = "survey")
 
   if (sum(!is.na(dat$age)) == 0) {
     dat$age <- 0
@@ -219,8 +131,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 
   if (sum(dat$age > 0, na.rm = TRUE) > 0) {
     g <- g +
-      scale_fill_manual(values = fill_col) +
-      scale_colour_manual(values = line_col) +
+      scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
+      scale_colour_manual(values = line_col, breaks = c("M", "F")) +
       scale_size_area(max_size = max_size) +
       guides(
         size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),

@@ -14,3 +14,10 @@ bind_samples(dat_comm, dat_survey)
 \description{
 Join survey and commercial samples
 }
+\examples{
+\dontrun{
+dat_comm <- get_comm_samples("lingcod")
+dat_survey <- get_survey_samples("lingcod")
+dat <- bind_samples(dat_comm, dat_survey)
+}
+}

@@ -2,39 +2,18 @@
 % Please edit documentation in R/lengths.R
 \name{plot_lengths}
 \alias{plot_lengths}
-\alias{tidy_lengths_raw}
-\alias{plot_lengths}
 \title{Plot length frequency data}
 \usage{
-tidy_lengths_raw(dat, bin_size = 2, min_specimens = 20L,
-  survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
-  "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-  "West Coast Vancouver Island Synoptic Survey",
-  "PHMA Rockfish Longline Survey - Outside North",
-  "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
-  surveys = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"), year_lim = c(1996, Inf))
-
 plot_lengths(dat, xlab = "Length (cm)", ylab = "Relative length frequency",
   fill_col = c(M = "grey80", F = "#FF000010"), line_col = c(M = "grey40", F
-  = "red"), survey_cols = NULL, alpha = 0.24)
+  = "red"), survey_cols = NULL, alpha = 0.24, bin_size = 2)
 }
 \arguments{
-\item{dat}{Input data frame. For \code{tidy_lengths_raw()} should be from
-\code{\link[=get_survey_samples]{get_survey_samples()}} and or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_lengths()} should
-be from \code{tidy_length()} or formatted similarly. See details TODO.}
-
-\item{bin_size}{Bin size.}
-
-\item{min_specimens}{Minimum number of specimens for histogram data to be
-computed/shown.}
-
-\item{survey_series_desc}{A character vector of survey series to include.}
-
-\item{surveys}{A character vector of shorter/cleaner survey names to use in
-the same order as \code{survey_series_desc}. These are used in the plot.}
-
-\item{year_lim}{TODO}
+\item{dat}{A data frame from \code{\link[=tidy_lengths_raw]{tidy_lengths_raw()}} or \code{\link[=tidy_lengths_weighted]{tidy_lengths_weighted()}}
+or a similarly formatted data frame. Must have columns named \code{survey},
+\code{year}, \code{sex} (\code{"M"} and \code{"F"}), \code{length_bin}, \code{proportion}, \code{total} (for
+the total number of samples for that year and survey/commercial
+combination).}
 
 \item{xlab}{X axis label.}
 
@@ -49,6 +28,9 @@ the same order as \code{survey_series_desc}. These are used in the plot.}
 \item{survey_cols}{TODO}
 
 \item{alpha}{TODO}
+
+\item{bin_size}{Bin size. Should match the bin size used with the \code{tidy_*()}
+function.}
 }
 \description{
 Functions for plotting length frequency data. (Weighting not implimented
@@ -56,10 +38,41 @@ yet. TODO)
 }
 \details{
 \itemize{
-\item \code{tidy_lengths_raw()} Prepares PBS data for \code{plot_lengths()}. Works across one
-or multiple species.
+\item \code{\link[=tidy_lengths_raw]{tidy_lengths_raw()}} or \code{\link[=tidy_lengths_weighted]{tidy_lengths_weighted()}} prepares PBS data for
+\code{plot_lengths()}. Works across one or multiple species.
 \item \code{plot_lengths()} Plots length frequencies for each year for selected
 surveys for a single species.
+}
+}
+\examples{
+\dontrun{
+# # main age/length data:
+# rs_comm_samples <- get_comm_samples("redstripe rockfish",
+#   discard_keepers = TRUE)
+# rs_survey_samples <- get_survey_samples("redstripe rockfish")
+#
+# # for weighting:
+# rs_catch <- get_catch("redstripe rockfish")
+# rs_survey_sets <- get_survey_sets("redstripe rockfish")
+
+# survey raw length frequencies:
+tidy_lengths_raw(rs_survey_samples,
+  sample_type = "survey",
+  bin_size = 2) \%>\%
+  plot_lengths()
+
+# survey weighted length frequencies:
+tidy_lengths_weighted(rs_survey_samples,
+  sample_type = "survey",
+  bin_size = 2,
+  dat_survey_sets = rs_survey_sets) \%>\%
+  plot_lengths()
+
+# commercial raw length frequencies:
+tidy_lengths_raw(rs_comm_samples,
+  sample_type = "commercial",
+  bin_size = 2) \%>\%
+  plot_lengths()
 }
 }
 \seealso{

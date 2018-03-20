@@ -132,10 +132,10 @@ factor_bin_clean <- function(x, bins, clean = TRUE) {
   ndec <- ndecimals(out)
   if (clean & ndec == 0) {
     out <- sprintf(paste0("%0", max_char, "d"), out)
-  }  # pad with zeros
+  } # pad with zeros
   if (clean & ndec > 0) {
     out <- sprintf(paste0("%.", ndec, "f"), out)
-  }  # pad after decimal
+  } # pad after decimal
   as.factor(out)
 }
 
@@ -144,10 +144,10 @@ factor_clean <- function(x) {
   ndec <- ndecimals(x)
   if (ndec == 0) {
     out <- sprintf(paste0("%0", max_char, "d"), x)
-  }  # pad with zeros
+  } # pad with zeros
   if (ndec > 0) {
     out <- sprintf(paste0("%.", ndec, "f"), x)
-  }  # pad after decimal
+  } # pad after decimal
   as.factor(out)
 }
 

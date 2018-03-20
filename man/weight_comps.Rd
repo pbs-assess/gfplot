@@ -5,8 +5,6 @@
 \alias{tidy_comps_commercial}
 \alias{tidy_comps_survey}
 \alias{weight_comps}
-\alias{tidy_ages_weighted}
-\alias{tidy_lengths_weighted}
 \title{Age and length frequency weighting}
 \usage{
 tidy_comps_commercial(specimen_dat, catch_dat, value, bin_size = NULL)
@@ -14,10 +12,6 @@ tidy_comps_commercial(specimen_dat, catch_dat, value, bin_size = NULL)
 tidy_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
 
 weight_comps(dat)
-
-tidy_ages_weighted()
-
-tidy_lengths_weighted()
 }
 \arguments{
 \item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_comm_samples]{get_comm_samples()}} for
@@ -36,11 +30,13 @@ commercial data or \code{\link[=get_survey_samples]{get_survey_samples()}} for s
 \code{tidy_comps_survey()} or \code{tidy_comps_commercial()}. See details.}
 }
 \description{
-These functions weight age or length frequencies.
-\code{tidy_comps_commercial()} and \code{tidy_comps_survey()} join the necessary data
-for commercial or survey samples, respectively, and format it for
-weighting. \code{weight_comps()} does the actual weighting based on the output
-from the \code{tidy_*} functions.
+In general, you shouldn't have to use these functions directly. However, they
+are exposed to the user in case you need the flexibility of using them
+yourself and as a place to hold documentation about the weighting schemes.
+These functions weight age or length frequencies. \code{tidy_comps_commercial()}
+and \code{tidy_comps_survey()} join the necessary data for commercial or survey
+samples, respectively, and format it for weighting. \code{weight_comps()} does the
+actual weighting based on the output from the \code{tidy_*} functions.
 }
 \details{
 The input data frame to \code{weight_comps()} must have columns in the
@@ -50,52 +46,55 @@ following order:
 \item weighting unit ID (e.g. trip ID or sample ID)
 \item grouping variable for first weighting (e.g. quarter or stratum)
 \item value of weighting variable (e.g. age or length bin)
-\item frequency of that weighting variable (e.g. frequency of that age or length bin)
+\item frequency of that weighting variable (e.g. frequency of that age or
+length bin)
 \item numerator in first weighting (e.g. sample catch weight or density)
-\item denominator in first weighting (e.g. quarter catch weight or total stratum density)
+\item denominator in first weighting (e.g. quarter catch weight or total
+stratum density)
 \item numerator in second weighting (e.g. catch that quarter or stratum area)
-\item denominator in second weighting (e.g. catch that year or total survey area)
+\item denominator in second weighting (e.g. catch that year or total survey
+area)
 }
 
-\code{tidy_comps_commercial()} and \code{tidy_comps_survey()} both output data frames in
-this format and so you ordinarily would not have to worry about this.
-The names of the columns do not matter, only their contents. The data frame
+\code{tidy_comps_commercial()} and \code{tidy_comps_survey()} both output data frames
+in this format and so you ordinarily would not have to worry about this. The
+names of the columns do not matter, only their contents. The data frame
 should contain these columns and only these columns.
 }
 \examples{
 \dontrun{
-species <- "pacific ocean perch"
+species <- "redstripe rockfish"
 
 ## Surveys:
 ## ssid = 1 is Queen Charlotte Sound Synoptic Survey:
-survey_samples <- get_survey_samples(species, ssid = 1)
-survey_tows <- get_survey_tows(species, ssid = 1)
+# rs_survey_samples <- get_survey_samples(species, ssid = 1)
+# rs_survey_sets <- get_survey_sets(species, ssid = 1)
 
-surv_lengths <- tidy_comps_survey(survey_samples, survey_tows,
+surv_lengths <- tidy_comps_survey(rs_survey_samples, rs_survey_sets,
   value = length, bin_size = 2)
 surv_lengths
 weight_comps(surv_lengths)
 
-surv_ages <- tidy_comps_survey(survey_samples, survey_tows, value = age)
+surv_ages <- tidy_comps_survey(rs_survey_samples, rs_survey_sets, value = age)
 surv_ages
 weight_comps(surv_ages)
 
 ## Commercial:
-com_samples <- get_comm_samples(species)
-com_catch <- get_catch(species)
+# rs_comm_samples <- get_comm_samples(species)
+# rs_catch <- get_catch(species)
 
-com_lengths <- tidy_comps_commercial(com_samples, com_catch,
+com_lengths <- tidy_comps_commercial(rs_comm_samples, rs_catch,
   value = length, bin_size = 2)
 com_lengths
 weight_comps(com_lengths)
 
-com_ages <- tidy_comps_commercial(com_samples, com_catch,
+com_ages <- tidy_comps_commercial(rs_comm_samples, rs_catch,
   value = age)
 com_ages
 weight_comps(com_ages)
 
 ## These functions are pipe (\%>\%) friendly. E.g.:
-tidy_comps_survey(survey_samples, survey_tows, value = age) \%>\%
+tidy_comps_survey(rs_survey_samples, rs_survey_sets, value = age) \%>\%
   weight_comps()
 }
 }
