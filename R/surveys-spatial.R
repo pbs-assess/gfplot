@@ -163,8 +163,8 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 fit_glmmfields <- function(dat,
                            formula_positive = density ~ depth_scaled + depth_scaled2,
                            formula_binary = present ~ depth_scaled + depth_scaled2, n_knots = 15,
-                           iter = 500,
-                           chains = 1, adapt_delta = 0.98, cores = parallel::detectCores(), ...) {
+                           iter = 1000,
+                           chains = 4, adapt_delta = 0.98, cores = parallel::detectCores(), ...) {
   n_beta <- 2L
   message("Fitting positive component model...")
   m1 <- glmmfields::glmmfields(formula_positive,
@@ -326,12 +326,12 @@ make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
 #' @rdname survey-spatial-modelling
 
 fit_survey_sets <- function(dat, survey, years,
-                            chains = 3,
+                            chains = 4,
                             iter = 1000,
-                            max_knots = 18,
+                            max_knots = 20,
                             adapt_delta = 0.95,
                             thin = 1,
-                            prediction_grid_n = 200,
+                            prediction_grid_n = 150,
                             mcmc_posterior_samples = 150,
                             required_obs_percent = 0.1,
                             utm_zone = 9) {
@@ -416,8 +416,8 @@ fit_survey_sets <- function(dat, survey, years,
 #' x <- fit_survey_sets(pop_surv,
 #'   years = 2015,
 #'   survey = "Queen Charlotte Sound Synoptic Survey",
-#'   iter = 600, chains = 1, mcmc_posterior_samples = 100)
-#' plot_survey_sets(x$predictions, x$data, fill_column = "combined")
+#'   iter = 600, chains = 1) # for speed in this example
+#' plot_survey_sets(x$predictions, x$data)
 #' }
 
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
