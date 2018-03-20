@@ -30,8 +30,8 @@ fit_mat_ogive <- function(dat,
 
 
   type <- match.arg(type)
-
-  dat <- filter(dat, month %in% months)
+  dat <- dat[dat$sex %in% c(1, 2), , drop = FALSE]
+  dat <- dat[dat$month %in% months, , drop = FALSE]
 
   if (type == "age") 
     dat <- filter(dat, ageing_method %in% ageing_method_codes)

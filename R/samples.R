@@ -17,7 +17,7 @@
 #' tidy_sample_avail(d)
 #' }
 
-tidy_sample_avail <- function(dat, year_range = NULL, 
+tidy_sample_avail <- function(dat, year_range = NULL,
   ageing_method_codes = c(3, 17)) {
   dat <- filter(dat, !is.na(year))
 

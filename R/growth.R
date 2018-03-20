@@ -69,15 +69,16 @@ fit_vb <- function(dat,
   dat <- dat[!duplicated(dat), , drop = FALSE] # critical
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
 
-  dat <- switch(sex[[1]],
-    "female" = filter(dat, sex == 2),
-    "male" = filter(dat, sex == 1),
-    stop("`sex` argument must be 'female' or 'male'.", call. = FALSE)
+  sex <- match.arg(sex)
+  dat <- switch(sex,
+    "female" = filter(dat, sex == 2L),
+    "male" = filter(dat, sex == 1L)
   )
 
   if (nrow(dat) < min_samples) {
     return(list(
-      predictions = tibble(ages = NA, length = NA),
+      predictions = tibble(
+      ages = NA, length = NA),
       pars = list(k = NA, linf = NA, t0 = NA),
       data = dat,
       model = NA

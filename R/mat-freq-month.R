@@ -48,8 +48,8 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
     by = c("sex", "maturity_convention_code", "maturity_code")
   )
 
-  dat <- filter(dat, sex %in% c(1, 2))
-  dat <- dat %>% mutate(sex = ifelse(sex == 2, "F", "M"))
+  dat <- filter(dat, sex %in% c(1L, 2L))
+  dat <- dat %>% mutate(sex = ifelse(sex == 2L, "F", "M"))
 
   mat_levels <- rev(c(
     "Immature",
