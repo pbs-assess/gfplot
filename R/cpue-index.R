@@ -87,10 +87,10 @@ fit_cpue_index <- function(dat,
       X1_pred_ij = mm_pred1, X2_pred_ij = mm_pred2
     ),
     parameters = list(
-      # b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
-      # b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
-      b1_j = rnorm(ncol(mm_pred1), 0, 0.2),
-      b2_j = rnorm(ncol(mm_pred2), 0, 0.2),
+      b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
+      b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
+      # b1_j = rnorm(ncol(mm_pred1), 0, 0.2),
+      # b2_j = rnorm(ncol(mm_pred2), 0, 0.2),
       log_sigma = log(summary(m_pos)$sigma) + rnorm(1, 0, 0.001)
     ),
     # log_sigma = rnorm(1, 0, 0.2)),
