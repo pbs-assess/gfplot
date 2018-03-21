@@ -7,7 +7,7 @@
 plot_cpue_index_coefs(object)
 }
 \arguments{
-\item{object}{Model output from \code{\link{fit_cpue_index}}}
+\item{object}{Model output from \code{\link[=fit_cpue_index]{fit_cpue_index()}}.}
 }
 \value{
 A ggplot object

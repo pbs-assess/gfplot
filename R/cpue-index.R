@@ -333,23 +333,12 @@ plot_cpue_index <- function(dat, all_models = TRUE) {
   g
 }
 
-#' Plot coefficients from a CPUE index standardization model
+#' Extract coefficients from a CPUE index standardization model
 #'
-#' @param object Model output from \code{\link{fit_cpue_index}}
-#'
-#' @details Note that for coefficients for predictors treated as factors (i.e.
-#'   likely all of the predictors), the coefficients represent the difference
-#'   from the base level factor, which would be the first factor level
-#'   alpha-numerically. For example, month 02 represents the estimated
-#'   difference between February and January.
-#'
-#' @return A ggplot object
+#' @param object Model output from [fit_cpue_index()].
 #' @export
-#' @family plotting functions
-#'
-#' @template cpue-examples
 
-plot_cpue_index_coefs <- function(object) {
+tidy_cpue_index_coefs <- function(object) {
   model_prefixes <- c("Bin.", "Pos.")
 
   sm <- summary(object$sdreport)
@@ -367,19 +356,45 @@ plot_cpue_index_coefs <- function(object) {
     paste(model_prefixes[[2]], colnames(object$mm_pos)),
     "log_sigma"
   )
-  sm <- sm %>%
-    filter(!grepl("Intercept", par_name)) %>%
-    filter(!grepl("year", par_name))
 
   sm$par_name <- sub("f\\(", "", sm$par_name)
   sm$par_name <- sub("\\)", "", sm$par_name)
-  sm$par_group <- sub("[0-9.]+$", "", sm$par_name)
   sm$par_name <- sub("([0-9.]+$)", " \\1", sm$par_name)
+  sm$par_name <- sub("\\(", "", sm$par_name)
+  sm$par_group <- sub("[0-9. ]+$", "", sm$par_name)
+
+  sm
+}
+
+#' Plot coefficients from a CPUE index standardization model
+#'
+#' @param object Model output from [fit_cpue_index()].
+#'
+#' @details Note that for coefficients for predictors treated as factors (i.e.
+#'   likely all of the predictors), the coefficients represent the difference
+#'   from the base level factor, which would be the first factor level
+#'   alpha-numerically. For example, month 02 represents the estimated
+#'   difference between February and January.
+#'
+#' @return A ggplot object
+#' @export
+#' @family plotting functions
+#'
+#' @template cpue-examples
+
+plot_cpue_index_coefs <- function(object) {
+  sm <- tidy_cpue_index_coefs(object)
+  model_prefixes <- c("Bin.", "Pos.")
   sm$par_group <- forcats::fct_relevel(sm$par_group, "log_sigma", after = Inf)
   sm <- mutate(sm, se_too_big = se > 10, se = ifelse(se > 10, NA, se))
   sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
 
+  sm <- sm %>%
+    filter(!grepl("Intercept", par_name)) %>%
+    filter(!grepl("year", par_name))
+
   cols <- RColorBrewer::brewer.pal(3, "Blues")
+
 
   ggplot(sm, aes_string("est", "forcats::fct_rev(par_name)",
     yend = "forcats::fct_rev(par_name)", colour = "type"
