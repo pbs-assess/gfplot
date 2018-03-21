@@ -1,0 +1,120 @@
+             est         se      pars              par_name        par_group
+1   2.955952e+00 0.29735198      b1_j        Bin. Intercept   Bin. Intercept
+2   2.571645e-05 0.36425850      b1_j Bin. year_factor 1997 Bin. year_factor
+3  -3.271901e+00 0.32528954      b1_j Bin. year_factor 1998 Bin. year_factor
+4  -1.864079e+00 0.31317069      b1_j Bin. year_factor 1999 Bin. year_factor
+5  -1.832660e+00 0.31328916      b1_j Bin. year_factor 2000 Bin. year_factor
+6  -1.511194e+00 0.31558107      b1_j Bin. year_factor 2001 Bin. year_factor
+7  -1.832660e+00 0.31328916      b1_j Bin. year_factor 2002 Bin. year_factor
+8  -4.235310e+00 0.35807434      b1_j Bin. year_factor 2003 Bin. year_factor
+9  -4.357344e+00 0.36445890      b1_j Bin. year_factor 2004 Bin. year_factor
+10 -5.056084e-01 0.33894051      b1_j Bin. year_factor 2005 Bin. year_factor
+11 -1.957871e+00 0.31292280      b1_j Bin. year_factor 2006 Bin. year_factor
+12 -3.387621e+00 0.32790991      b1_j Bin. year_factor 2007 Bin. year_factor
+13 -1.673889e+00 0.31416895      b1_j Bin. year_factor 2008 Bin. year_factor
+14 -6.002197e-01 0.33541309      b1_j Bin. year_factor 2009 Bin. year_factor
+15  7.874225e-01 0.43317163      b1_j Bin. year_factor 2010 Bin. year_factor
+16 -2.268565e+00 0.31319081      b1_j Bin. year_factor 2011 Bin. year_factor
+17 -1.769521e+00 0.31358216      b1_j Bin. year_factor 2012 Bin. year_factor
+18 -3.592271e+00 0.33330142      b1_j Bin. year_factor 2013 Bin. year_factor
+19 -1.342788e+00 0.31762951      b1_j Bin. year_factor 2014 Bin. year_factor
+20 -2.268565e+00 0.31319081      b1_j Bin. year_factor 2015 Bin. year_factor
+21 -1.873865e+00 0.20444299      b1_j       Bin. vessel 101      Bin. vessel
+22 -8.195731e-01 0.19971609      b1_j       Bin. vessel 102      Bin. vessel
+23 -9.297341e-01 0.19954958      b1_j       Bin. vessel 103      Bin. vessel
+24 -5.959155e-01 0.20051679      b1_j       Bin. vessel 104      Bin. vessel
+25 -1.496006e+00 0.20109020      b1_j       Bin. vessel 105      Bin. vessel
+26  4.021863e-01 0.21208445      b1_j       Bin. vessel 106      Bin. vessel
+27 -1.385598e+00 0.20046973      b1_j       Bin. vessel 107      Bin. vessel
+28  8.082881e-01 0.22114821      b1_j       Bin. vessel 108      Bin. vessel
+29 -1.385606e+00 0.20046977      b1_j       Bin. vessel 109      Bin. vessel
+30  2.672298e+00 0.03326056      b2_j        Pos. Intercept   Pos. Intercept
+31  1.024410e+00 0.03746236      b2_j Pos. year_factor 1997 Pos. year_factor
+32 -2.724509e+00 0.05359760      b2_j Pos. year_factor 1998 Pos. year_factor
+33 -1.546319e+00 0.04222579      b2_j Pos. year_factor 1999 Pos. year_factor
+34 -1.433253e+00 0.04206607      b2_j Pos. year_factor 2000 Pos. year_factor
+35 -6.305867e-01 0.04072134      b2_j Pos. year_factor 2001 Pos. year_factor
+36 -1.619044e+00 0.04210571      b2_j Pos. year_factor 2002 Pos. year_factor
+37 -3.938729e+00 0.07026404      b2_j Pos. year_factor 2003 Pos. year_factor
+38 -3.734539e+00 0.07309502      b2_j Pos. year_factor 2004 Pos. year_factor
+39  8.483117e-02 0.03815673      b2_j Pos. year_factor 2005 Pos. year_factor
+40 -1.613879e+00 0.04273109      b2_j Pos. year_factor 2006 Pos. year_factor
+41 -3.118922e+00 0.05518473      b2_j Pos. year_factor 2007 Pos. year_factor
+42 -1.511020e+00 0.04137354      b2_j Pos. year_factor 2008 Pos. year_factor
+43 -8.498990e-02 0.03829279      b2_j Pos. year_factor 2009 Pos. year_factor
+44  5.916552e-01 0.03685486      b2_j Pos. year_factor 2010 Pos. year_factor
+45 -1.664711e+00 0.04447047      b2_j Pos. year_factor 2011 Pos. year_factor
+46 -1.480816e+00 0.04177478      b2_j Pos. year_factor 2012 Pos. year_factor
+47 -3.013043e+00 0.05819449      b2_j Pos. year_factor 2013 Pos. year_factor
+48 -7.919256e-01 0.04018247      b2_j Pos. year_factor 2014 Pos. year_factor
+49 -1.970707e+00 0.04445502      b2_j Pos. year_factor 2015 Pos. year_factor
+50 -1.978047e+00 0.03627346      b2_j       Pos. vessel 101      Pos. vessel
+51 -1.012963e+00 0.03184356      b2_j       Pos. vessel 102      Pos. vessel
+52 -7.677040e-01 0.03219152      b2_j       Pos. vessel 103      Pos. vessel
+53 -1.014998e+00 0.03120702      b2_j       Pos. vessel 104      Pos. vessel
+54 -1.481253e+00 0.03433955      b2_j       Pos. vessel 105      Pos. vessel
+55  1.315819e-01 0.02933263      b2_j       Pos. vessel 106      Pos. vessel
+56 -1.483783e+00 0.03381347      b2_j       Pos. vessel 107      Pos. vessel
+57  5.855738e-01 0.02888017      b2_j       Pos. vessel 108      Pos. vessel
+58 -1.411931e+00 0.03386156      b2_j       Pos. vessel 109      Pos. vessel
+59 -1.190234e+00 0.01726189 log_sigma             log_sigma        log_sigma
+        true_b
+1   2.67582810
+2   0.98177574
+3  -2.69373036
+4  -1.58365842
+5  -1.43819099
+6  -0.66891926
+7  -1.58912258
+8  -3.96132508
+9  -3.74533658
+10  0.01524369
+11 -1.61150825
+12 -3.08617809
+13 -1.47678701
+14 -0.09019496
+15  0.59032381
+16 -1.73533879
+17 -1.56213904
+18 -3.06803274
+19 -0.84477230
+20 -1.94486453
+21 -1.93565662
+22 -1.00783004
+23 -0.73809584
+24 -0.96669012
+25 -1.47708296
+26  0.14056355
+27 -1.46561749
+28  0.64746527
+29 -1.43367255
+30  2.67582810
+31  0.98177574
+32 -2.69373036
+33 -1.58365842
+34 -1.43819099
+35 -0.66891926
+36 -1.58912258
+37 -3.96132508
+38 -3.74533658
+39  0.01524369
+40 -1.61150825
+41 -3.08617809
+42 -1.47678701
+43 -0.09019496
+44  0.59032381
+45 -1.73533879
+46 -1.56213904
+47 -3.06803274
+48 -0.84477230
+49 -1.94486453
+50 -1.93565662
+51 -1.00783004
+52 -0.73809584
+53 -0.96669012
+54 -1.47708296
+55  0.14056355
+56 -1.46561749
+57  0.64746527
+58 -1.43367255
+59 -1.04982212

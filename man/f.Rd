@@ -10,5 +10,8 @@ f(x)
 \item{x}{A parameter name}
 }
 \description{
-Force factors to be sequential within the positive or binary data sets for TMB
+This is necessary because sometimes, for example, a certain depth factor
+level appears in the binary data set (because this depth was fished at), but
+not in the positive data set (because a given species was now are caught at
+that depth).
 }

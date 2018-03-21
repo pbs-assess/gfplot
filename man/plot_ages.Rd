@@ -30,8 +30,6 @@ all years included in original data.}
 \item{alpha}{TODO}
 
 \item{grid_col}{TODO}
-
-\item{fill_col}{TODO}
 }
 \description{
 Functions for plotting age frequency data.

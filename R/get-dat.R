@@ -269,10 +269,6 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-  if (discard_keepers) {
-    .d <- .discard_keepers(.d)
-  }
-
   ## TODO: is this just the keepers?
   ## } else {
   ##   .d <- .d %>% filter(

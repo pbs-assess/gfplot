@@ -99,3 +99,53 @@ is_dfo <- function() {
 is_dfo_windows <- function() {
   if (is_windows() & is_dfo()) TRUE else FALSE
 }
+
+factor_bin_clean <- function(x, bins, clean = TRUE) {
+  out <- bins[findInterval(x, bins)]
+  max_char <- max(nchar(out))
+  ndec <- ndecimals(out)
+  if (clean & ndec == 0) {
+    out <- sprintf(paste0("%0", max_char, "d"), out)
+  } # pad with zeros
+  if (clean & ndec > 0) {
+    out <- sprintf(paste0("%.", ndec, "f"), out)
+  } # pad after decimal
+  as.factor(out)
+}
+
+factor_clean <- function(x) {
+  max_char <- max(nchar(x))
+  ndec <- ndecimals(x)
+  if (ndec == 0) {
+    out <- sprintf(paste0("%0", max_char, "d"), x)
+  } # pad with zeros
+  if (ndec > 0) {
+    out <- sprintf(paste0("%.", ndec, "f"), x)
+  } # pad after decimal
+  as.factor(out)
+}
+
+ndecimals <- function(x) {
+  out <- nchar(strsplit(as.character(x), "\\.")[[1]][2])
+  if (is.na(out)) out <- 0
+  out
+}
+
+# make prediction [m]odel [m]atrix
+make_pred_mm <- function(x, years) {
+  mm_pred <- x[seq_along(years), ]
+  for (i in 1:ncol(mm_pred)) {
+    for (j in 1:nrow(mm_pred)) {
+      mm_pred[j, i] <- 0
+    }
+  }
+  mm_pred[, 1] <- 1
+  for (i in 1:ncol(mm_pred)) {
+    for (j in 1:nrow(mm_pred)) {
+      if (i == j) {
+        mm_pred[j, i] <- 1
+      }
+    }
+  }
+  mm_pred
+}

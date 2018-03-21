@@ -63,8 +63,5 @@ plot_survey_index(d_tidy)
 Other tidy data functions: \code{\link{tidy_age_precision}},
   \code{\link{tidy_cpue_index}}
 
-Other plotting functions: \code{\link{fit_mat_ogive}},
-  \code{\link{plot_cpue_index_coefs}},
-  \code{\link{plot_cpue_index_jk}},
-  \code{\link{plot_cpue_index}}
+Other plotting functions: \code{\link{fit_mat_ogive}}
 }

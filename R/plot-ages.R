@@ -19,7 +19,6 @@
 #' @param ylab Y axis label.
 #' @param year_range If not `NULL`, a the range of years to plot. Defaults to
 #'   all years included in original data.
-#' @param fill_col TODO
 #' @param line_col TODO
 #' @param survey_cols TODO
 #' @param alpha TODO

@@ -54,8 +54,5 @@ plot_mat_ogive(m)
 }
 }
 \seealso{
-Other plotting functions: \code{\link{plot_cpue_index_coefs}},
-  \code{\link{plot_cpue_index_jk}},
-  \code{\link{plot_cpue_index}},
-  \code{\link{plot_survey_index}}
+Other plotting functions: \code{\link{plot_survey_index}}
 }

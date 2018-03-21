@@ -1,209 +1,63 @@
-#' Tidy commercial PBS CPUE data
-#'
-#' @param dat An input data frame from \code{\link{get_cpue_index}}
-#' @param species_common The species common name
-#' @param year_range The range of years to include
-#' @param lat_range The range of latitudes to include
-#' @param min_positive_tows The minimum number of positive tows over all years
-#' @param min_positive_trips The minimum number of annual positive trips
-#' @param min_yrs_with_trips The number of years in which the
-#'   \code{min_positive_trips} criteria needs to be met
-#' @param area_grep_pattern A regular expression to extract the management areas
-#'   of interest
-#' @param lat_bands A sequence of latitude bans
-#' @param depth_bands A sequence of depth bands
-#' @param gear Gear types
-#' @family tidy data functions
-#'
-#' @export
-#'
-#' @template cpue-examples
-
-tidy_cpue_index <- function(dat, species_common,
-                            year_range = c(1996, Inf),
-                            lat_range = c(48, Inf),
-                            min_positive_tows = 100,
-                            min_positive_trips = 4,
-                            min_yrs_with_trips = 4,
-                            area_grep_pattern = "5[CDE]+",
-                            lat_bands = seq(48, 59, 0.1),
-                            depth_bands = seq(50, 450, 25),
-                            gear = "BOTTOM TRAWL") {
-  pbs_areas <- gfplot::pbs_areas[grep(
-    area_grep_pattern,
-    gfplot::pbs_areas$major_stat_area_description
-  ), ]
-  names(dat) <- tolower(names(dat))
-  dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
-
-  # basic filtering:
-  catch <- dat %>%
-    inner_join(pbs_areas, by = "major_stat_area_code") %>%
-    mutate(year = lubridate::year(best_date)) %>%
-    filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
-    filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
-    filter(!is.na(latitude), !is.na(longitude)) %>%
-    filter(gear %in% toupper(gear)) %>%
-    filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
-    mutate(month = lubridate::month(best_date)) %>%
-    mutate(
-      hours_fished =
-        as.numeric(difftime(fe_end_date, fe_start_date, units = "hours"))
-    ) %>%
-    filter(hours_fished > 0) %>%
-    mutate(catch = landed_kg + discarded_kg) %>%
-    group_by(fishing_event_id) %>%
-    mutate(n_date = length(unique(best_date))) %>%
-    filter(n_date < Inf) %>%
-    select(-n_date) %>% # remove FE_IDs with multiple dates
-    ungroup()
-
-  # catch for target spp:
-  catch <- group_by(
-    catch, fishing_event_id, best_date, month, locality_code,
-    vessel_name, year, trip_id, hours_fished
-  ) %>%
-    mutate(
-      spp_in_fe = toupper(species_common) %in% species_common_name,
-      spp_in_row = species_common_name == toupper(species_common)
-    ) %>%
-    summarise(
-      pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
-      # hours_fished = mean(hours_fished, na.rm = TRUE),
-      spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
-      best_depth = mean(best_depth, na.rm = TRUE),
-      latitude = mean(latitude, na.rm = TRUE)
-    ) %>%
-    ungroup()
-
-  # figure out which vessels should be considered part of the spp. fleet
-  fleet <- catch %>%
-    group_by(vessel_name) %>%
-    mutate(total_positive_tows = sum(pos_catch)) %>%
-    filter(total_positive_tows >= min_positive_tows) %>%
-    filter(spp_catch > 0) %>%
-    group_by(year, vessel_name, trip_id) %>%
-    summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
-    filter(sum_catch > 0) %>%
-    group_by(vessel_name) %>%
-    mutate(n_years = length(unique(year))) %>%
-    # for speed (filter early known cases):
-    filter(n_years >= min_yrs_with_trips) %>%
-    group_by(year, vessel_name) %>%
-    summarise(n_trips_per_year = length(unique(trip_id))) %>%
-    mutate(
-      trips_over_treshold_this_year =
-        n_trips_per_year >= min_positive_trips
-    ) %>%
-    group_by(vessel_name) %>%
-    summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
-    filter(trips_over_thresh >= min_yrs_with_trips) %>%
-    ungroup()
-
-  # retain the data from our "fleet"
-  d_retained <- semi_join(catch, fleet, by = "vessel_name") %>%
-    filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
-    mutate(
-      depth = factor_bin_clean(best_depth, depth_bands),
-      vessel = as.factor(vessel_name),
-      latitude = factor_bin_clean(latitude, lat_bands),
-      locality = factor_clean(locality_code),
-      year_factor = factor_clean(year),
-      month = factor_clean(month)
-    ) %>%
-    mutate(pos_catch = ifelse(spp_catch > 0, 1, 0))
-
-  # anonymize the vessels
-  vessel_df <- dplyr::tibble(
-    vessel = unique(d_retained$vessel),
-    scrambled_vessel = factor_clean(seq_along(vessel))
-  )
-  d_retained <- left_join(d_retained, vessel_df, by = "vessel") %>%
-    select(-vessel) %>%
-    rename(vessel = scrambled_vessel)
-
-  arrange(d_retained, .data$year, .data$vessel) %>%
-    dplyr::as_tibble()
-}
-
-factor_bin_clean <- function(x, bins, clean = TRUE) {
-  out <- bins[findInterval(x, bins)]
-  max_char <- max(nchar(out))
-  ndec <- ndecimals(out)
-  if (clean & ndec == 0) {
-    out <- sprintf(paste0("%0", max_char, "d"), out)
-  } # pad with zeros
-  if (clean & ndec > 0) {
-    out <- sprintf(paste0("%.", ndec, "f"), out)
-  } # pad after decimal
-  as.factor(out)
-}
-
-factor_clean <- function(x) {
-  max_char <- max(nchar(x))
-  ndec <- ndecimals(x)
-  if (ndec == 0) {
-    out <- sprintf(paste0("%0", max_char, "d"), x)
-  } # pad with zeros
-  if (ndec > 0) {
-    out <- sprintf(paste0("%.", ndec, "f"), x)
-  } # pad after decimal
-  as.factor(out)
-}
-
-ndecimals <- function(x) {
-  out <- nchar(strsplit(as.character(x), "\\.")[[1]][2])
-  if (is.na(out)) out <- 0
-  out
-}
-
-# make prediction [m]odel [m]atrix
-make_pred_mm <- function(x, years) {
-  mm_pred <- x[seq_along(years), ]
-  for (i in 1:ncol(mm_pred)) {
-    for (j in 1:nrow(mm_pred)) {
-      mm_pred[j, i] <- 0
-    }
-  }
-  mm_pred[, 1] <- 1
-  for (i in 1:ncol(mm_pred)) {
-    for (j in 1:nrow(mm_pred)) {
-      if (i == j) {
-        mm_pred[j, i] <- 1
-      }
-    }
-  }
-  mm_pred
-}
-
-#' Force factors to be sequential within the positive or binary data sets for TMB
-#'
-#' @param x A parameter name
-#'
-#' @export
-f <- function(x) as.factor(as.character(x))
-
-#' Fit a delta-lognormal commercial CPUE standardization model
-#'
-#' @param dat A data frame from \code{\link{tidy_cpue_index}}, or a similarly
-#'   formatted data frame
-#' @param formula_binomial Formula for the binomial model
-#' @param formula_lognormal Formula for the lognormal model
-#'
-#' @export
-#' @family Fitting functions
-#' @template cpue-examples
-
-fit_cpue_index <- function(dat,
-                           formula_binomial = pos_catch ~ year_factor + f(month) + f(vessel) +
-                             f(locality) + f(depth) + f(latitude),
-                           formula_lognormal = log(spp_catch / hours_fished) ~ year_factor +
-                             f(month) + f(vessel) +
-                             f(locality) + f(depth) + f(latitude)) {
+load_tmb_cpue <- function() {
   tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "gfplot")
   TMB::compile(tmb_cpp)
   dyn.load(TMB::dynlib(sub("\\.cpp", "", tmb_cpp)))
+}
 
+#' Commercial CPUE index standardization
+#'
+#' @description * `fit_cpue_index()` fits a delta-lognormal commercial CPUE
+#'   standardization model
+#'
+#' @param dat A data frame from [tidy_cpue_index()], or a similarly
+#'   formatted data frame.
+#' @param formula_binomial Formula for the binomial model.
+#' @param formula_lognormal Formula for the lognormal model.
+#'
+#' @examples
+#' # A simulated example:
+#' set.seed(1)
+#' d <- sim_cpue()
+#' d
+#'
+#' m <- fit_cpue_index(d,
+#'   formula_binomial = pos_catch ~ year_factor + f(vessel),
+#'   formula_lognormal = log(spp_catch / hours_fished) ~ year_factor + f(vessel)
+#' )
+#'
+#' plot_cpue_index_coefs(m)
+#'
+#' predict_cpue_index(m) %>%
+#'   plot_cpue_index()
+#'
+#' plot_cpue_index_jk(m, terms = "f(vessel)")
+#'
+#' \dontrun{
+#' # An example with PBS data:
+#' # (the data extraction will be slow)
+#'
+#' d <- get_cpue_index(gear = "bottom trawl")
+#' walleye <- tidy_cpue_index(d, "walleye pollock",
+#'   area_grep_pattern = "5[CDE]+")
+#'
+#' m <- fit_cpue_index(walleye)
+#'
+#' plot_cpue_index_coefs(m)
+#'
+#' predict_cpue_index(m) %>%
+#'   plot_cpue_index()
+#'
+#' plot_cpue_index_jk(m)
+#' }
+#' @export
+#' @rdname cpue-index
+
+fit_cpue_index <- function(dat,
+                           formula_binomial = pos_catch ~ year_factor + f(month)
+                             + f(vessel) + f(locality) + f(depth) + f(latitude),
+                           formula_lognormal = log(spp_catch / hours_fished) ~
+                           year_factor + f(month) + f(vessel) +
+                             f(locality) + f(depth) + f(latitude)) {
   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
 
   mm1 <- model.matrix(formula_binomial, data = dat)
@@ -218,6 +72,12 @@ fit_cpue_index <- function(dat,
   )
   m_pos <- lm(formula_lognormal, data = pos_dat)
 
+  dlls <- getLoadedDLLs()
+  if (!any(vapply(dlls, function(x)
+    x[["name"]] == "deltalognormal", FUN.VALUE = TRUE))) {
+    load_tmb_cpue()
+  }
+
   message("Fitting CPUE model ...")
   obj <- TMB::MakeADFun(
     data = list(
@@ -227,10 +87,10 @@ fit_cpue_index <- function(dat,
       X1_pred_ij = mm_pred1, X2_pred_ij = mm_pred2
     ),
     parameters = list(
-      b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
-      b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
-      # b1_j = rnorm(ncol(mm_pred1), 0, 0.2),
-      # b2_j = rnorm(ncol(mm_pred2), 0, 0.2),
+      # b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
+      # b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
+      b1_j = rnorm(ncol(mm_pred1), 0, 0.2),
+      b2_j = rnorm(ncol(mm_pred2), 0, 0.2),
       log_sigma = log(summary(m_pos)$sigma) + rnorm(1, 0, 0.001)
     ),
     # log_sigma = rnorm(1, 0, 0.2)),
@@ -257,14 +117,15 @@ fit_cpue_index <- function(dat,
   )
 }
 
-#' Predict from a delta-lognormal commercial CPUE standardization model
+#' @description * `predict_cpue_index()` predicts from a delta-lognormal
+#'   commercial CPUE standardization model
 #'
-#' @param object A model object from \code{\link{fit_cpue_index}}
+#' @param object Model output from [fit_cpue_index()].
 #' @param center Should the index be centered by subtracting the mean in link space?
 #'
 #' @export
 #'
-#' @template cpue-examples
+#' @rdname cpue-index
 
 predict_cpue_index <- function(object, center = FALSE) {
   report_sum <- summary(object$sdreport)
@@ -305,23 +166,23 @@ predict_cpue_index <- function(object, center = FALSE) {
     select(year, model, est_link, se_link, est, lwr, upr)
 }
 
-#' Plot a delta-lognormal commercial CPUE standardization model
+#' @description * `plot_cpue_index()` plots a delta-lognormal commercial CPUE
+#'   standardization model
 #'
-#' @param dat Input data frame, for example from \code{\link{predict_cpue_index}}
+#' @param predicted_dat Input data frame, for example from [predict_cpue_index()].
 #' @param all_models TODO
 #'
 #' @export
-#' @family plotting functions
 #' @return A ggplot object
 #'
-#' @template cpue-examples
+#' @rdname cpue-index
 
-plot_cpue_index <- function(dat, all_models = TRUE) {
+plot_cpue_index <- function(predicted_dat, all_models = TRUE) {
   if (!all_models) {
-    dat <- filter(dat, model == "Combined")
+    predicted_dat <- filter(predicted_dat, model == "Combined")
   }
 
-  g <- ggplot(dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
+  g <- ggplot(predicted_dat, aes_string("year", "est", ymin = "upr", ymax = "lwr")) +
     ggplot2::geom_ribbon(fill = "grey70") +
     geom_line() +
     theme_pbs() +
@@ -333,10 +194,11 @@ plot_cpue_index <- function(dat, all_models = TRUE) {
   g
 }
 
-#' Extract coefficients from a CPUE index standardization model
+#' @description * `tidy_cpue_index_coefs()` extracts coefficients from a CPUE
+#'   index standardization model
 #'
-#' @param object Model output from [fit_cpue_index()].
 #' @export
+#' @rdname cpue-index
 
 tidy_cpue_index_coefs <- function(object) {
   model_prefixes <- c("Bin.", "Pos.")
@@ -366,9 +228,8 @@ tidy_cpue_index_coefs <- function(object) {
   sm
 }
 
-#' Plot coefficients from a CPUE index standardization model
-#'
-#' @param object Model output from [fit_cpue_index()].
+#' @description * `plot_cpue_index_coefs()` plots coefficients from a CPUE index
+#'   standardization model
 #'
 #' @details Note that for coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
@@ -378,9 +239,8 @@ tidy_cpue_index_coefs <- function(object) {
 #'
 #' @return A ggplot object
 #' @export
-#' @family plotting functions
 #'
-#' @template cpue-examples
+#' @rdname cpue-index
 
 plot_cpue_index_coefs <- function(object) {
   sm <- tidy_cpue_index_coefs(object)
@@ -394,7 +254,6 @@ plot_cpue_index_coefs <- function(object) {
     filter(!grepl("year", par_name))
 
   cols <- RColorBrewer::brewer.pal(3, "Blues")
-
 
   ggplot(sm, aes_string("est", "forcats::fct_rev(par_name)",
     yend = "forcats::fct_rev(par_name)", colour = "type"
@@ -415,16 +274,14 @@ plot_cpue_index_coefs <- function(object) {
     labs(y = "", x = "Coefficient value")
 }
 
-#' Title
+#' @description * `plot_cpue_index_jk()` TODO
 #'
-#' @param object TODO
 #' @param terms TODO
 #'
 #' @return TODO
 #' @export
-#' @family plotting functions
 #'
-#' @template cpue-examples
+#' @rdname cpue-index
 
 plot_cpue_index_jk <- function(object,
                                terms = c(
@@ -522,3 +379,66 @@ plot_cpue_index_jk <- function(object,
     labs(colour = "Excluded", y = "Relative CPUE index", x = "") +
     facet_wrap(~ term)
 }
+
+#' Simulate fake commercial CPUE data for examples and testing
+#'
+#' @param sigma TODO
+#' @param n_samples TODO
+#' @param n_years TODO
+#' @param n_vessels TODO
+#'
+#' @export
+#' @examples
+#' sim_cpue()
+sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
+                     n_vessels = 8) {
+  fake_fleet <- expand.grid(
+    year_factor = as.factor(seq(1996, 1996 + (n_years - 1))),
+    vessel = rep(as.factor(as.character(seq(100, 100 + (n_vessels - 1)))),
+      each = n_samples
+    )
+  )
+
+  vessel_effects <- data.frame(
+    vessel = unique(fake_fleet$vessel),
+    vessel_effect = stats::rnorm(length(unique(fake_fleet$vessel)), 0, 1)
+  )
+
+  year_effects <- data.frame(
+    year_factor = unique(fake_fleet$year),
+    year_effect = stats::rnorm(length(unique(fake_fleet$year)), 0, 1)
+  )
+
+  fake_fleet <- inner_join(fake_fleet, vessel_effects, by = "vessel")
+  fake_fleet <- inner_join(fake_fleet, year_effects, by = "year_factor")
+
+  fake_fleet <- mutate(fake_fleet,
+    pos_catch = stats::rbinom(nrow(fake_fleet),
+      size = 1,
+      prob = stats::plogis(vessel_effect + year_effect)
+    ),
+    spp_catch = ifelse(pos_catch == 1,
+      rlnorm(nrow(fake_fleet),
+        meanlog = vessel_effect + year_effect,
+        sdlog = 0.3
+      ), 0
+    ),
+    hours_fished = 1
+  )
+
+  fake_fleet$year <- as.numeric(as.character(fake_fleet$year_factor))
+
+  dplyr::as.tbl(fake_fleet)
+}
+
+#' Force factors to be sequential within the positive or binary data sets for TMB
+#'
+#' This is necessary because sometimes, for example, a certain depth factor
+#' level appears in the binary data set (because this depth was fished at), but
+#' not in the positive data set (because a given species was now are caught at
+#' that depth).
+#'
+#' @param x A parameter name
+#'
+#' @export
+f <- function(x) as.factor(as.character(x))

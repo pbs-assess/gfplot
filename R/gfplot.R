@@ -115,6 +115,8 @@ if (getRversion() >= "2.15.1") {
     "total_month", "month_jitter", "maturity_name_short", "survey_series_id",
     ".n", "maturity", "maturity_name",
 
-    "ageing_method", "length_bin", "weighted_prop", "year_jitter"
+    "ageing_method", "length_bin", "weighted_prop", "year_jitter",
+
+    "vessel_effect", "year_effect"
   ))
 }

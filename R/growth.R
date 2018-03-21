@@ -17,15 +17,27 @@
 #' @family growth functions
 #' @importFrom stats median quantile rlnorm runif median
 #'
+#' @details Note that in some cases you must load the rstan package first
+#' and you may choose to do so just in case. If the rstan package is not loaded
+#' first, you may get the warning:
+#'
+#' `Error in cpp_object_initializer(.self, .refClassDef, ...) :`
+#' `could not find function "cpp_object_initializer"`
+#'
 #' @export
 #' @examples
-#' \dontrun{
-#' ## with `rstan::optimizing()` for the mode of the posterior density:
-#' x <- fit_vb(pop_samples, method = "mpd")
-#' x$model
+#' library(rstan) # must load first
+#' # with `rstan::optimizing()` for the mode of the posterior density:
+#' pop_samples$ageing_method <- 3 # TODO fix
+#' model_f <- fit_vb(pop_samples, sex = "female")
+#' model_m <- fit_vb(pop_samples, sex = "male")
+#' plot_vb(model_f, model_m)
+#' model_f$model
+#' model_f$predictions
 #'
-#' ## with MCMC via Stan:
-#' x <- fit_vb(pop_samples, method = "mcmc")
+#' # with MCMC via Stan (slower):
+#' x <- fit_vb(pop_samples, method = "mcmc",
+#'   chains = 1, iter = 800) # just for a fast example
 #' x$pars
 #' x$predictions
 #' x$data
@@ -33,15 +45,10 @@
 #' posterior <- rstan::extract(x$model)
 #' hist(posterior$linf)
 #'
-#' model_f <- fit_vb(pop_samples, sex = "female")
-#' model_m <- fit_vb(pop_samples, sex = "male")
-#' plot_vb(model_f, model_m)
-#'
-#' ## If less than `min_samples`, fit_vb() returns an empty object that
-#' ## plot_vb() will correctly parse and produce an empty plot:
+#' # If less than `min_samples`, fit_vb() returns an empty object that
+#' # plot_vb() will correctly parse and produce an empty plot:
 #' obj <- fit_vb(pop_samples[1:2,])
 #' plot_vb(obj, obj)
-#' }
 
 fit_vb <- function(dat,
                    sex = c("female", "male"),
@@ -87,6 +94,7 @@ fit_vb <- function(dat,
 
   rstan::rstan_options(auto_write = TRUE)
   model_file <- system.file("stan", "vb.stan", package = "gfplot")
+
   mod <- rstan::stan_model(model_file)
 
   if (nrow(dat) > downsample) {
