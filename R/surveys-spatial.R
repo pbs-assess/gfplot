@@ -480,7 +480,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
       data = filter(raw_dat, present == 1),
       aes_string(
         x = "X", y = "Y",
-        size = "density_fake"
+        size = "density"
       ), fill = pt_fill, col = pt_col, pch = 21
     ) +
     geom_point(
