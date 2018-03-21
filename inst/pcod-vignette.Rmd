@@ -1,10 +1,11 @@
 ---
 title: "Data extraction for Pacific cod using gfplot"
 author: "Sean C. Anderson"
-date: "2018-03-20"
+date: "2018-03-21"
 output:
   html_document:
     toc: true
+    toc_float: true
 ---
 
 ```{r, echo = FALSE}
@@ -332,11 +333,17 @@ ggsave(file.path(figs, "surv-samp-avail.pdf"), width = 6, height = 1.75)
 
 We can fit a von Bertalanffy growth model and plot it. We could fit this to just the survey data or just the commercial data or we can combine those two data sets with the function `bind_samples()`.
 
+```{r, echo=FALSE}
+# TODO FIX ME!!!!!!!! memory mapping problem
+model_file <- system.file("stan", "vb.stan", package = "gfplot")
+mod <- rstan::stan_model(model_file)
+```
+
 ```{r, fig.width=5, fig.height=3.5}
 combined_samples <- bind_samples(d_survey_samples, d_comm_samples)
 
-vb_m <- fit_vb(combined_samples, sex = "male", method = "mpd")
-vb_f <- fit_vb(combined_samples, sex = "female", method = "mpd")
+vb_m <- fit_vb(combined_samples, sex = "male", method = "mpd", ageing_method_codes = 6)
+vb_f <- fit_vb(combined_samples, sex = "female", method = "mpd", ageing_method_codes = 6)
 plot_vb(object_female = vb_m, object_male = vb_f)
 ggsave(file.path(figs, "vb.pdf"), width = 5, height = 4)
 
