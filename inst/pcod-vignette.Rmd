@@ -628,7 +628,7 @@ indices_centered <- purrr::map_df(cpue_models, function(x) {
 
 Coefficients from models:
 
-```{r plot-cpue-coefs-all, warnings=FALSE, message=FALSE, fig.width=9, fig.height=9}
+```{r plot-cpue-coefs-all, warnings=FALSE, message=FALSE, fig.width=12, fig.height=9}
 coef_plots <- lapply(cpue_models, function(x) {
   plot_cpue_index_coefs(x$model) + labs(title = x$area)
 })

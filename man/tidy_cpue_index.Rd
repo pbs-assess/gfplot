@@ -4,9 +4,9 @@
 \alias{tidy_cpue_index}
 \title{Tidy commercial PBS CPUE data}
 \usage{
-tidy_cpue_index(dat, species_common, year_range = c(1996, format(Sys.Date(),
-  "\%Y") - 1), lat_range = c(48, Inf), min_positive_tows = 100,
-  min_positive_trips = 4, min_yrs_with_trips = 4,
+tidy_cpue_index(dat, species_common, year_range = c(1996,
+  as.numeric(format(Sys.Date(), "\%Y")) - 1), lat_range = c(48, Inf),
+  min_positive_tows = 100, min_positive_trips = 4, min_yrs_with_trips = 4,
   area_grep_pattern = "5[CDE]+", lat_band_width = 0.2,
   depth_band_width = 50, clean_bins = TRUE, depth_bin_quantiles = c(0.01,
   0.99), lat_bin_quantiles = c(0.01, 0.99), gear = "BOTTOM TRAWL")
