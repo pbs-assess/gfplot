@@ -58,7 +58,8 @@
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
                       ylab = "Age (years)", year_range = NULL,
                       line_col = c("M" = "#666666", "F" = "#f44256"),
-                      survey_cols = NULL, alpha = 0.2, grid_col = "grey95") {
+                      survey_cols = NULL, alpha = 0.2, grid_col = "grey95",
+                      diagonal_lines = seq(-2100, -1850, 10)) {
   if (nrow(dat) > 0) {
     age_max <- max(dat$age, na.rm = TRUE)
   } else {
@@ -96,9 +97,9 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     year_range <- c(min(dat$year, na.rm = TRUE), max(dat$year, na.rm = TRUE))
   }
 
-  # dat <- full_join(dat, tibble(survey = factor(levels(dat$survey),
-  #   levels = levels(dat$survey)
-  # )), by = "survey")
+  dat <- full_join(dat, tibble(survey = factor(levels(dat$survey),
+    levels = levels(dat$survey)
+  )), by = "survey")
 
   # empty plot:
   if (sum(!is.na(dat$age)) == 0) {
@@ -137,7 +138,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   if (sum(dat$age > 0, na.rm = TRUE) > 0) {
     g <- g +
       ggplot2::geom_abline(
-        intercept = seq(-2200, -1000, 5), slope = 1,
+        intercept = diagonal_lines, slope = 1,
         colour = grid_col
       ) +
       scale_fill_manual(values = fill_col, breaks = c("M", "F")) +

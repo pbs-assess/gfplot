@@ -2,16 +2,26 @@
 % Please edit documentation in R/cpue-index.R
 \name{f}
 \alias{f}
+\alias{get_most_common_level}
 \title{Force factors to be sequential within the positive or binary data sets for TMB}
 \usage{
-f(x)
+f(x, ref = get_most_common_level)
+
+get_most_common_level(x)
 }
 \arguments{
-\item{x}{A parameter name}
+\item{x}{A vector of factor/character values.}
+
+\item{base}{A function to define the base "reference" level or a character
+object definining the base level. Defaults to the most common level.}
 }
 \description{
 This is necessary because sometimes, for example, a certain depth factor
 level appears in the binary data set (because this depth was fished at), but
 not in the positive data set (because a given species was now are caught at
-that depth).
+that depth). This function also sets the base/reference level of the factor.
+}
+\examples{
+f(a)
+f(a, "b")
 }

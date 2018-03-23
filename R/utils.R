@@ -85,6 +85,10 @@ round_down_even <- function(x, base = 2) {
   base * floor(x / base)
 }
 
+round_up_even <- function(x, base = 2) {
+  base * ceiling(x / base)
+}
+
 is_windows <- function() {
   identical(.Platform$OS.type, "windows")
 }

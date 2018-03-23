@@ -4,11 +4,12 @@
 \alias{tidy_cpue_index}
 \title{Tidy commercial PBS CPUE data}
 \usage{
-tidy_cpue_index(dat, species_common, year_range = c(1996, Inf),
-  lat_range = c(48, Inf), min_positive_tows = 100, min_positive_trips = 4,
-  min_yrs_with_trips = 4, area_grep_pattern = "5[CDE]+",
-  lat_bands = seq(48, 59, 0.1), depth_bands = seq(50, 450, 25),
-  gear = "BOTTOM TRAWL")
+tidy_cpue_index(dat, species_common, year_range = c(1996, format(Sys.Date(),
+  "\%Y") - 1), lat_range = c(48, Inf), min_positive_tows = 100,
+  min_positive_trips = 4, min_yrs_with_trips = 4,
+  area_grep_pattern = "5[CDE]+", lat_band_width = 0.2,
+  depth_band_width = 50, clean_bins = TRUE, depth_bin_quantiles = c(0.01,
+  0.99), lat_bin_quantiles = c(0.01, 0.99), gear = "BOTTOM TRAWL")
 }
 \arguments{
 \item{dat}{An input data frame from \code{\link{get_cpue_index}}}
@@ -16,8 +17,6 @@ tidy_cpue_index(dat, species_common, year_range = c(1996, Inf),
 \item{species_common}{The species common name}
 
 \item{year_range}{The range of years to include}
-
-\item{lat_range}{The range of latitudes to include}
 
 \item{min_positive_tows}{The minimum number of positive tows over all years}
 
@@ -29,11 +28,11 @@ tidy_cpue_index(dat, species_common, year_range = c(1996, Inf),
 \item{area_grep_pattern}{A regular expression to extract the management areas
 of interest}
 
+\item{gear}{Gear types}
+
 \item{lat_bands}{A sequence of latitude bans}
 
 \item{depth_bands}{A sequence of depth bands}
-
-\item{gear}{Gear types}
 }
 \description{
 Tidy commercial PBS CPUE data

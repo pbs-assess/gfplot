@@ -3,7 +3,6 @@
 #' @param dat An input data frame from \code{\link{get_cpue_index}}
 #' @param species_common The species common name
 #' @param year_range The range of years to include
-#' @param lat_range The range of latitudes to include
 #' @param min_positive_tows The minimum number of positive tows over all years
 #' @param min_positive_trips The minimum number of annual positive trips
 #' @param min_yrs_with_trips The number of years in which the
@@ -25,15 +24,23 @@
 #' }
 
 tidy_cpue_index <- function(dat, species_common,
-  year_range = c(1996, Inf),
+  year_range = c(1996, as.numeric(format(Sys.Date(), "%Y")) - 1),
   lat_range = c(48, Inf),
   min_positive_tows = 100,
   min_positive_trips = 4,
   min_yrs_with_trips = 4,
   area_grep_pattern = "5[CDE]+",
-  lat_bands = seq(48, 59, 0.1),
-  depth_bands = seq(50, 450, 25),
+  # lat_bands = seq(48, 59, 0.2),
+  # depth_bands = seq(50, 450, 25),
+  lat_band_width = 0.2,
+  depth_band_width = 50,
+  clean_bins = TRUE,
+  depth_bin_quantiles = c(0.01, 0.99),
+  lat_bin_quantiles = c(0.01, 0.99),
   gear = "BOTTOM TRAWL") {
+
+  # lat_range <- range(lat_bands)
+
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
     gfplot::pbs_areas$major_stat_area_description
@@ -47,7 +54,7 @@ tidy_cpue_index <- function(dat, species_common,
     mutate(year = lubridate::year(best_date)) %>%
     filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
     filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
-    filter(!is.na(latitude), !is.na(longitude)) %>%
+    filter(!is.na(latitude), !is.na(longitude), !is.na(best_depth)) %>%
     filter(gear %in% toupper(gear)) %>%
     filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
     mutate(month = lubridate::month(best_date)) %>%
@@ -106,7 +113,32 @@ tidy_cpue_index <- function(dat, species_common,
     ungroup()
 
   # retain the data from our "fleet"
-  d_retained <- semi_join(catch, fleet, by = "vessel_name") %>%
+  d_retained <- semi_join(catch, fleet, by = "vessel_name")
+
+  lat_range <- stats::quantile(d_retained$latitude,
+    probs = c(min(lat_bin_quantiles), max(lat_bin_quantiles))
+  )
+  depth_range <- stats::quantile(d_retained$best_depth,
+    probs = c(min(depth_bin_quantiles), max(depth_bin_quantiles))
+  )
+
+  if (clean_bins) {
+    lat_range[1] <- round_down_even(lat_range[1], lat_band_width)
+    lat_range[2] <- round_up_even(lat_range[2], lat_band_width)
+    depth_range[1] <- round_down_even(depth_range[1], depth_band_width)
+    depth_range[2] <- round_up_even(depth_range[2], depth_band_width)
+  }
+
+  d_retained <- filter(d_retained,
+    latitude > lat_range[[1]],
+    latitude < lat_range[[2]],
+    best_depth > depth_range[[1]],
+    best_depth < depth_range[[2]]
+  )
+  lat_bands <- seq(lat_range[[1]], lat_range[[2]], lat_band_width)
+  depth_bands <- seq(depth_range[[1]], depth_range[[2]], depth_band_width)
+
+  d_retained <- d_retained %>%
     filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
     mutate(
       depth = factor_bin_clean(best_depth, depth_bands),

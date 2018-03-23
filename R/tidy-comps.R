@@ -336,10 +336,12 @@ tidy_comps <- function(dat,
   # -------------------------------------------
   # Join in the counts for labels:
   if (age_length == "age") {
-    counts <- group_by(dat, species_common_name, survey) %>%
+    counts <- group_by(dat, year, species_common_name, survey) %>%
       summarise(total = n()) %>%
       ungroup()
-    freq <- left_join(freq, counts, by = c("species_common_name", "survey"))
+    freq <- left_join(freq, counts,
+      by = c("species_common_name", "year", "survey")
+    )
     freq <- select(
       freq, species_common_name, survey, year, sex, age,
       proportion, total

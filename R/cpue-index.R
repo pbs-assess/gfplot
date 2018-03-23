@@ -436,9 +436,31 @@ sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
 #' This is necessary because sometimes, for example, a certain depth factor
 #' level appears in the binary data set (because this depth was fished at), but
 #' not in the positive data set (because a given species was now are caught at
-#' that depth).
+#' that depth). This function also sets the base/reference level of the factor.
 #'
-#' @param x A parameter name
+#' @param x A vector of factor/character values.
+#' @param base A function to define the base "reference" level or a character
+#'   object definining the base level. Defaults to the most common level.
 #'
 #' @export
-f <- function(x) as.factor(as.character(x))
+#' @examples
+# a <- factor(c("a", "b", "c", "c"))
+# get_most_common_level(a)
+#' f(a)
+#' f(a, "b")
+
+f <- function(x, ref = get_most_common_level) {
+
+  out <- as.factor(as.character(x))
+  if (is.character(ref)) {
+    relevel(out, ref = ref)
+  } else {
+    relevel(out, ref = ref(x))
+  }
+}
+
+#' @export
+#' @rdname f
+get_most_common_level <- function(x) {
+  rev(names(sort(table(x))))[[1]]
+}

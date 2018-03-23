@@ -16,8 +16,10 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   vessel_effects <- select(fake_fleet, vessel_effect) %>% unique()
 
   m <- fit_cpue_index(fake_fleet,
-    formula_binomial = pos_catch ~ year_factor + f(vessel),
-    formula_lognormal = log(spp_catch / hours_fished) ~ year_factor + f(vessel)
+    formula_binomial = pos_catch ~
+      year_factor + f(vessel, function(x) as.character(x)[[1]]),
+    formula_lognormal = log(spp_catch / hours_fished) ~
+      year_factor + f(vessel, function(x) as.character(x)[[1]])
   )
 
   if (make_plots) {
