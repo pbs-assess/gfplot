@@ -22,6 +22,7 @@ not in the positive data set (because a given species was now are caught at
 that depth). This function also sets the base/reference level of the factor.
 }
 \examples{
+a <- factor(c("a", "b", "c", "c"))
 f(a)
 f(a, "b")
 }

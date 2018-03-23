@@ -444,7 +444,7 @@ sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
 #'
 #' @export
 #' @examples
-# a <- factor(c("a", "b", "c", "c"))
+#' a <- factor(c("a", "b", "c", "c"))
 # get_most_common_level(a)
 #' f(a)
 #' f(a, "b")
