@@ -130,9 +130,13 @@ factor_clean <- function(x) {
 }
 
 ndecimals <- function(x) {
-  out <- nchar(strsplit(as.character(x), "\\.")[[1]][2])
-  if (is.na(out)) out <- 0
-  out
+  ndec <- nchar(lapply(strsplit(as.character(x), "\\."), function(x) x[2]))
+  if (!all(is.na(ndec))) {
+    ndec <- max(ndec, na.rm = TRUE)
+  } else {
+    ndec <- 0
+  }
+  ndec
 }
 
 # make prediction [m]odel [m]atrix
