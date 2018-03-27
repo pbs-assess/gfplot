@@ -208,14 +208,13 @@ fit_glmmfields <- function(dat,
   list(pos = m1, bin = m2)
 }
 
-#' @param bath TODO
 #' @param n TODO
 #' @param region TODO
 #' @param cache_folder TODO
 #'
 #' @export
 #' @rdname survey-spatial-modelling
-make_prediction_grid <- function(dat, bath, n = 150, region = NULL,
+make_prediction_grid <- function(dat, n = 150, region = NULL,
                                  cache_folder = "prediction-grids", utm_zone = 9) {
   if (n != 150) stop("Grid is currently fixed at 150. Leave `n = 150`.")
   if (is.null(region)) {
