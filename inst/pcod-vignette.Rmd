@@ -76,15 +76,15 @@ If you would rather, you can also specify the species code or the species name i
 get_survey_samples("pacific cod")
 get_survey_samples("Pacific cod")
 get_survey_samples("PaCiFiC cOD")
-get_survey_samples("442")
-get_survey_samples(442)
+get_survey_samples("222")
+get_survey_samples(222)
 ```
 
 You can also extract multiple species at once:
 
 ```{r, eval=FALSE}
 get_survey_samples(c("pacific ocean perch", "pacific cod"))
-get_survey_samples(c(396, 442))
+get_survey_samples(c(396, 222))
 ```
 
 # Caching the data from the SQL servers
