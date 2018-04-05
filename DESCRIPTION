@@ -46,10 +46,11 @@ Imports:
     speedglm,
     tidyr,
     viridis,
-    xml2
+    xml2,
+    INLA
 Remotes: github::pbs-software/pbs-data/PBSdata,
     github::seananderson/glmmfields
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
 Suggests: 
     knitr,
