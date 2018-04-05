@@ -2,15 +2,17 @@
 #'
 #' @param dat A data frame from [get_age_precision()]
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
-#'   on. Defaults to codes `3` and `17`, which represent otolith
-#'   'break and burn' and 'break and bake' methods. See [get_age_methods()].
+#'   on. Default to `NULL`, which brings in all valid ageing codes.
+#'   See [get_age_methods()].
 #'
 #' @export
 #'
 #' @family tidy data functions
 #' @template ageing-precision-examples
-tidy_age_precision <- function(dat, ageing_method_codes = c(3, 17)) {
-  dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
+
+  if (!is.null(ageing_method_codes))
+    dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   # remove specimen id's for which there is no precision reading
   dbio <- group_by(dbio, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%

@@ -18,8 +18,8 @@
 #'   area descriptions. The pattern `"*"` will return all areas. For example,
 #'   `"5[CDE]+"` would return areas 5C, 5D, and 5E.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
-#'   on. Defaults to codes `3` and `17`, which represent otolith 'break and
-#'   burn' and 'break and bake' methods. See [get_age_methods()].
+#'   on. Default to `NULL`, which brings in all valid ageing codes.
+#'   See [get_age_methods()].
 #' @param bin_size Bin size for length binning.
 #' @param age_length Should the function operate on ages or lengths?
 #' @param sample_type Are the samples from a commercial or survey source?
@@ -133,7 +133,7 @@ tidy_comps <- function(dat,
                        year_range = NULL,
                        spp_cat_code = 1,
                        area_grep_pattern = "*",
-                       ageing_method_codes = c(3, 17),
+                       ageing_method_codes = NULL,
                        bin_size = 2,
                        age_length = c("age", "length"),
                        sample_type = c("survey", "commercial"),
@@ -196,7 +196,8 @@ tidy_comps <- function(dat,
   # -------------------------------------------
   # Filter down data (ages):
   if (age_length == "age") {
-    dat <- filter(dat, ageing_method %in% ageing_method_codes)
+    if (!is.null(ageing_method_codes))
+      dat <- filter(dat, ageing_method %in% ageing_method_codes)
     dat <- filter(dat, !is.na(age))
     if (nrow(dat) == 0) {
       warning("No data available after filtering for those ageing codes.",

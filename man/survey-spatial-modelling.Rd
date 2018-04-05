@@ -17,7 +17,7 @@ interp_survey_bathymetry(dat, utm_zone = 9)
 scale_survey_predictors(dat)
 
 fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
-  formula_binary = present ~ depth_scaled + depth_scaled2, n_knots = 15,
+  formula_binary = present ~ depth_scaled + depth_scaled2, n_knots = 20,
   iter = 1000, chains = 4, adapt_delta = 0.98,
   cores = parallel::detectCores(), ...)
 
@@ -26,7 +26,7 @@ make_prediction_grid(dat, cell_width = 2, region = NULL,
 
 fit_survey_sets(dat, survey, years, chains = 4, iter = 1000,
   max_knots = 20, adapt_delta = 0.95, thin = 1,
-  mcmc_posterior_samples = 150, required_obs_percent = 0.1, utm_zone = 9,
+  mcmc_posterior_samples = 150, required_obs_percent = 0.05, utm_zone = 9,
   model = c("glmmfields", "inla"), include_depth = TRUE, ...)
 }
 \arguments{

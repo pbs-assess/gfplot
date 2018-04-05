@@ -282,6 +282,9 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
     )
   }
 
+  # remove ages from unaccepted ageing methods:
+  .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
+
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
       .d$species_common_name == "north pacific spiny dogfish"), ]

@@ -24,7 +24,7 @@ tidy_comps(dat,
   "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
   survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
   "IPHC"), year_range = NULL, spp_cat_code = 1, area_grep_pattern = "*",
-  ageing_method_codes = c(3, 17), bin_size = 2, age_length = c("age",
+  ageing_method_codes = NULL, bin_size = 2, age_length = c("age",
   "length"), sample_type = c("survey", "commercial"),
   frequency_type = c("raw", "weighted"), dat_survey_sets = NULL,
   dat_catch = NULL)
@@ -51,8 +51,8 @@ area descriptions. The pattern \code{"*"} will return all areas. For example,
 \code{"5[CDE]+"} would return areas 5C, 5D, and 5E.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
-on. Defaults to codes \code{3} and \code{17}, which represent otolith 'break and
-burn' and 'break and bake' methods. See \code{\link[=get_age_methods]{get_age_methods()}}.}
+on. Default to \code{NULL}, which brings in all valid ageing codes.
+See \code{\link[=get_age_methods]{get_age_methods()}}.}
 
 \item{bin_size}{Bin size for length binning.}
 

@@ -3,7 +3,9 @@
 #' @param dat TODO
 #' @param sample_id_re TODO
 #' @param months TODO
-#' @param ageing_method_codes TODO
+#' @param ageing_method_codes A numeric vector of ageing method codes to filter
+#'   on. Default to `NULL`, which brings in all valid ageing codes.
+#'   See [get_age_methods()].
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples
@@ -25,7 +27,7 @@ fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,
                           months = seq(1, 12),
-                          ageing_method_codes = c(3, 17)) {
+                          ageing_method_codes = NULL) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
 
 
@@ -33,7 +35,7 @@ fit_mat_ogive <- function(dat,
   dat <- dat[dat$sex %in% c(1, 2), , drop = FALSE]
   dat <- dat[dat$month %in% months, , drop = FALSE]
 
-  if (type == "age") 
+  if (type == "age" && !is.null(ageing_method_codes))
     dat <- filter(dat, ageing_method %in% ageing_method_codes)
 
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!

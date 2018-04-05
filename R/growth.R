@@ -12,7 +12,9 @@
 #' @param allow_slow_mcmc TODO
 #' @param est_method TODO
 #' @param min_samples TODO
-#' @param ageing_method_codes TODO
+#' @param ageing_method_codes A numeric vector of ageing method codes to filter
+#'   on. Default to `NULL`, which brings in all valid ageing codes.
+#'   See [get_age_methods()].
 #' @param ... TODO
 #' @family growth functions
 #' @importFrom stats median quantile rlnorm runif median
@@ -60,7 +62,7 @@ fit_vb <- function(dat,
                    allow_slow_mcmc = FALSE,
                    est_method = median,
                    min_samples = 50L,
-                   ageing_method_codes = c(3, 17),
+                   ageing_method_codes = NULL,
                    ...) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) != 1L) {
@@ -72,7 +74,8 @@ fit_vb <- function(dat,
     }
   }
 
-  dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+  if (!is.null(ageing_method_codes))
+    dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   dat <- dat[!duplicated(dat), , drop = FALSE] # critical
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
 

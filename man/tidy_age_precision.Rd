@@ -4,14 +4,14 @@
 \alias{tidy_age_precision}
 \title{Tidy PBS ageing precision data}
 \usage{
-tidy_age_precision(dat, ageing_method_codes = c(3, 17))
+tidy_age_precision(dat, ageing_method_codes = NULL)
 }
 \arguments{
 \item{dat}{A data frame from \code{\link[=get_age_precision]{get_age_precision()}}}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
-on. Defaults to codes \code{3} and \code{17}, which represent otolith
-'break and burn' and 'break and bake' methods. See \code{\link[=get_age_methods]{get_age_methods()}}.}
+on. Default to \code{NULL}, which brings in all valid ageing codes.
+See \code{\link[=get_age_methods]{get_age_methods()}}.}
 }
 \description{
 Tidy PBS ageing precision data
