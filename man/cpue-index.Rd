@@ -23,7 +23,7 @@ tidy_cpue_index_coefs(object)
 plot_cpue_index_coefs(object)
 
 plot_cpue_index_jk(object, terms = c("f(month)", "f(vessel)", "f(locality)",
-  "f(depth)", "f(latitude)"))
+  "f(depth)", "f(latitude)"), return_data = FALSE)
 }
 \arguments{
 \item{dat}{A data frame from \code{\link[=tidy_cpue_index]{tidy_cpue_index()}}, or a similarly
