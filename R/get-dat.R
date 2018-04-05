@@ -247,10 +247,6 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   as_tibble(.d)
 }
 
-.discard_keepers <- function(x) {
-  x %>% filter(!species_category_code %in% c(2, 3))
-}
-
 #' @export
 #' @rdname get
 #' @param remove_bad_data Remove known bad data, such as unrealistic
@@ -269,13 +265,6 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-  ## TODO: is this just the keepers?
-  ## } else {
-  ##   .d <- .d %>% filter(
-  ##     (species_category_code == 1 & sample_source_code == 2) |
-  ##       (species_category_code == 3 & !sample_source_code == 1))
-  ## }
-
   surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
   surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(surveys) <- tolower(names(surveys))
@@ -289,7 +278,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
       "stratifications. If working with the data yourelf, filter them after ",
       "selecting specific surveys. For example, ",
       "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-      "Tidying and plotting functions with gfplot will do this for you."
+      "Tidying and plotting functions within gfplot will do this for you."
     )
   }
 
@@ -318,18 +307,16 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   .d$species_science_name <- tolower(.d$species_science_name)
   .d <- mutate(.d, year = lubridate::year(trip_start_date))
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
-  as_tibble(.d)
 
+  # TODO: Elise test:
+  .d <- mutate(.d, keeper =
+      (species_category_code == 1 & sample_source_code == 2) |
+      (species_category_code == 3 & !sample_source_code == 1))
   if (discard_keepers) {
-    .d <- .discard_keepers(.d)
+    .d <- filter(.d, !keeper)
   }
 
-  ## TODO: is this just the keepers?
-  ## } else {
-  ##   .d <- .d %>% filter(
-  ##     (species_category_code == 1 & sample_source_code == 2) |
-  ##       (species_category_code == 3 & !sample_source_code == 1))
-  ## }
+  as_tibble(.d)
 }
 
 #' @export
