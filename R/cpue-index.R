@@ -286,8 +286,8 @@ plot_cpue_index_coefs <- function(object) {
 plot_cpue_index_jk <- function(object,
                                terms = c(
                                  "f(month)", "f(vessel)", "f(locality)",
-                                 "f(depth)", "f(latitude)"
-                               )) {
+                                 "f(depth)", "f(latitude)"),
+                               return_data = FALSE) {
   pos_dat <- object$data[object$data$pos_catch == 1, , drop = FALSE]
 
   mm1 <- model.matrix(pos_catch ~ year_factor, data = object$data)
@@ -324,6 +324,7 @@ plot_cpue_index_jk <- function(object,
     stringsAsFactors = FALSE
   )
 
+  if (!is.null(terms)) {
   fitm <- function(drop_term) {
     message(paste("Dropping", drop_term, "..."))
     f1 <- update.formula(
@@ -353,9 +354,16 @@ plot_cpue_index_jk <- function(object,
 
   out <- lapply(terms, fitm)
   out <- do.call("rbind", out)
-  out <- bind_rows(none, full) %>%
-    bind_rows(out)
-  out <- group_by(out, term) %>%
+  }
+
+  temp <- bind_rows(none, full)
+
+  if (!is.null(terms))
+    temp <- bind_rows(temp, out)
+  else
+    out <- temp
+
+    out <- group_by(out, term) %>%
     mutate(pred = pred / exp(mean(log(pred)))) %>%
     ungroup()
 
@@ -378,6 +386,10 @@ plot_cpue_index_jk <- function(object,
     theme_pbs() + guides(size = FALSE, colour = FALSE) +
     labs(colour = "Excluded", y = "Relative CPUE index", x = "") +
     facet_wrap(~ term)
+
+  if (return_data)
+    bind_rows(out, data.frame(all, term = "Standardized",
+      stringsAsFactors = FALSE))
 }
 
 #' Simulate fake commercial CPUE data for examples and testing

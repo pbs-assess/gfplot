@@ -8,7 +8,6 @@
 #' @param utm_zone TODO
 #' @param bath TODO
 #' @param fill_scale TODO
-#' @param add_survey_boxes TODO
 #' @param surv_cols TODO
 #' @param fill_lab TODO
 #'
@@ -30,13 +29,14 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
                               xlim_ll = c(-134.1, -123.0),
                               ylim_ll = c(48.4, 54.25), utm_zone = 9, bath = c(100, 200, 500),
                               fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
-                              add_survey_boxes = FALSE,
                               surv_cols = c(
                                 "WCHG" = "#6BAED6",
                                 "HS" = "#74C476",
                                 "QCS" = "#FB6A4A",
                                 "WCVI" = "#9E9AC8"
                               ),
+                              rotation_angle = 0,
+                              rotation_center = c(500, 5700),
                               fill_lab = "CPUE (kg/hr)") {
   dat <- rename(dat, X = .data$lon, Y = .data$lat) %>%
     filter(!is.na(.data$cpue))
@@ -100,6 +100,10 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     }
   }
 
+  # rotate if needed:
+  isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
+  coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
+
   g <- ggplot() + geom_path(
     data = isobath_utm, aes_string(
       x = "X", y = "Y",
@@ -109,8 +113,11 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
   )
 
   if (plot_hexagons) {
+    public_dat$X <- public_dat$x
+    public_dat$Y <- public_dat$y
+    public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
     g <- g + geom_polygon(data = public_dat, aes_string(
-      x = "x", y = "y",
+      x = "X", y = "Y",
       fill = "cpue", group = "hex_id"
     ), inherit.aes = FALSE) + fill_scale
   }
@@ -123,14 +130,14 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     coord_equal(xlim = xlim, ylim = ylim) +
     theme_pbs() + labs(fill = fill_lab, y = "Northing", x = "Easting")
 
-  # `boxes` is from R/sysdata.rda
-  if (add_survey_boxes) {
-    g <- g + ggplot2::geom_rect(data = boxes, aes_string(
-      xmin = "xmin", ymin = "ymin", ymax = "ymax", xmax = "xmax",
-      colour = "survey"
-    ), inherit.aes = FALSE, fill = NA) +
-      scale_colour_manual(values = surv_cols)
-  }
+##  # `boxes` is from R/sysdata.rda
+##  if (add_survey_boxes) {
+##    g <- g + ggplot2::geom_rect(data = boxes, aes_string(
+##      xmin = "xmin", ymin = "ymin", ymax = "ymax", xmax = "xmax",
+##      colour = "survey"
+##    ), inherit.aes = FALSE, fill = NA) +
+##      scale_colour_manual(values = surv_cols)
+##  }
 
   g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
   g
@@ -166,4 +173,38 @@ load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
     ylim = ylim_ll + c(-3, 3)
   )
   ll2utm(isobath, utm_zone = utm_zone)
+}
+
+#' @examples
+#' x <- c(1:100, rep(100, 100), 100:1, rep(1, 100))
+#' y <- c(rep(1, 100), 1:100, rep(100, 100), 100:1)
+#' plot(x, y, asp = 1)
+#' points(50, 50, col = "red")
+#' z <- rotate_coords(x = x, y = y, rotation_angle = 24,
+#'   rotation_center = c(50, 50))
+#' plot(z$x, z$y, asp = 1)
+#' points(50, 50, col = "red")
+rotate_coords <- function(x, y, rotation_angle, rotation_center) {
+  assertthat::assert_that(identical(class(rotation_center), "numeric"))
+  assertthat::assert_that(identical(class(rotation_angle), "numeric"))
+  assertthat::assert_that(identical(length(rotation_center), 2L))
+  assertthat::assert_that(identical(length(rotation_angle), 1L))
+  assertthat::assert_that(identical(length(x), length(y)))
+
+  rot <- -rotation_angle * pi / 180
+  newangles <- atan2(y - rotation_center[2], x - rotation_center[1]) + rot
+  mags <- sqrt((x - rotation_center[1])^2 + (y - rotation_center[2])^2)
+  x <- rotation_center[1] + cos(newangles) * mags
+  y <- rotation_center[2] + sin(newangles) * mags
+  dplyr::tibble(x = x, y = y)
+}
+
+rotate_df <- function(df, rotation_angle, rotation_center) {
+  r <- rotate_coords(df$X, df$Y,
+    rotation_angle = rotation_angle,
+    rotation_center = rotation_center
+  )
+  df$X <- r$x
+  df$Y <- r$y
+  df
 }

@@ -12,17 +12,17 @@
 tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
 
   if (!is.null(ageing_method_codes))
-    dbio <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+    dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   # remove specimen id's for which there is no precision reading
-  dbio <- group_by(dbio, specimen_id, species_code) %>%
+  dat <- group_by(dat, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%
     filter(has_precision) %>%
     select(-has_precision)
 
   # organize dataframe with one record for each specimen id, age reading type
   # and age parameter
-  dbio <- tidyr::gather(
-    dbio, ageing_param, age,
+  dat <- tidyr::gather(
+    dat, ageing_param, age,
     -(specimen_id:ageing_method_desc), -employee_id, -age_reading_id
   ) %>%
     arrange(age_reading_id) %>%
@@ -33,15 +33,15 @@ tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
     summarise(age = age[[1]], employee_id = employee_id[[1]])
 
   # remove bad data
-  precision_aged_by_same <- group_by(dbio, specimen_id) %>%
+  precision_aged_by_same <- group_by(dat, specimen_id) %>%
     summarise(n_employee = length(unique(employee_id))) %>%
     filter(n_employee < 2) %>%
     dplyr::pull(specimen_id)
-  dbio <- dbio %>%
+  dat <- dat %>%
     filter(!specimen_id %in% precision_aged_by_same)
 
   # organize data into individual columns for aging parameter + age reading type
-  ageing_prec <- dbio %>%
+  ageing_prec <- dat %>%
     mutate(temp = paste(age_reading_type_code, ageing_param, sep = "_")) %>%
     reshape2::dcast(specimen_id + year + species_code ~ temp, value.var = "age")
   names(ageing_prec) <- sub("2", "prim", names(ageing_prec))

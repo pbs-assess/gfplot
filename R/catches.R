@@ -34,9 +34,23 @@ NULL
 
 #' @rdname plot_catch
 #' @export
-tidy_catch <- function(dat) {
+tidy_catch <- function(dat, areas = NULL) {
+
+  if (!is.null(areas)) {
+   dat$major_stat_area_description <- NULL # in case
+   dat <- dplyr::inner_join(dat, gfplot::pbs_areas, by = "major_stat_area_code")
+   dat$area <- NA
+   for (i in seq_along(areas)) {
+     dat[grepl(areas[[i]], dat$major_stat_area_description), "area"] <-
+       gsub("\\[|\\]|\\+", "", areas[[i]])
+   }
+   dat <- dat[!is.na(dat$area), , drop = FALSE]
+  } else {
+    dat$area <- "Coastwide"
+  }
+
   dat <- filter(dat, !is.na(species_common_name), !is.na(year)) %>%
-    group_by(year, species_common_name, gear) %>%
+    group_by(year, species_common_name, gear, area) %>%
     summarise(
       landed_kg = sum(landed_kg, na.rm = TRUE),
       discarded_kg = sum(discarded_kg, na.rm = TRUE),
@@ -56,10 +70,10 @@ tidy_catch <- function(dat) {
       `UNKNOWN TRAWL` = "Unknown/trawl"
     )
   ) %>%
-    select(year, species_common_name, gear, landed_kg, discarded_kg)
+    select(year, area, species_common_name, gear, landed_kg, discarded_kg)
 
   cm <- reshape2::melt(catches,
-    id.vars = c("year", "species_common_name", "gear")
+    id.vars = c("year", "species_common_name", "area", "gear")
   )
 
   landings <- filter(cm, variable %in% c("landed_kg"))
@@ -82,7 +96,7 @@ tidy_catch <- function(dat) {
     )
   )
 
-  all_catch <- group_by(all_catch, year, species_common_name, gear) %>%
+  all_catch <- group_by(all_catch, year, species_common_name, area, gear) %>%
     summarise(value = sum(value, na.rm = TRUE)) %>%
     ungroup()
 
@@ -92,8 +106,9 @@ tidy_catch <- function(dat) {
 #' @rdname plot_catch
 #' @export
 plot_catch <- function(dat,
-                       ylab = "Landings", units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
-                       unreliable = c(1996, 2006), unreliable_alpha = 0.2) {
+                       ylab = "Landings",
+                       units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
+                       unreliable = c(1996, 2006), unreliable_alpha = 0.1) {
   pal <- c(RColorBrewer::brewer.pal(
     n = length(unique(dat$gear)) - 2,
     "Paired"
@@ -131,11 +146,15 @@ plot_catch <- function(dat,
     ylim(0, NA) +
     coord_cartesian(xlim = range(dat$year) + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
-    ## ggplot2::theme(legend.position = "right") +
+    ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(fill = "", colour = "") +
     labs(title = "Commercial catch") +
-    ggplot2::theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
+    # ggplot2::theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
     ggplot2::theme(legend.background = element_rect(fill = "#FFFFFF99"))
+
+  if (!all(dat$area == "Coastwide")) {
+    g <- g + facet_wrap(~area, ncol = 1)
+  }
 
   g
 }
