@@ -164,8 +164,34 @@ get_survey_ids <- function(ssid) {
 #' @rdname get
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
                             join_sample_ids = FALSE) {
-  trawl <- c(1, 3, 4, 16, 2)
-  ll <- c(14, 22, 36)
+  trawl <- run_sql("GFBioSQL", "SELECT
+    S.SURVEY_SERIES_ID
+    FROM SURVEY_SERIES SS
+    LEFT JOIN SURVEY S ON S.SURVEY_SERIES_ID = SS.SURVEY_SERIES_ID
+    LEFT JOIN TRIP_SURVEY TS ON TS.SURVEY_ID = S.SURVEY_ID
+    LEFT JOIN FISHING_EVENT FE ON FE.TRIP_ID = TS.TRIP_ID
+    WHERE GEAR_CODE IN(1, 6, 8, 11, 14, 16) AND
+    S.SURVEY_SERIES_ID <> 0
+    GROUP BY S.SURVEY_SERIES_ID, [SURVEY_SERIES_DESC]
+    ,[SURVEY_SERIES_TYPE_CODE]
+    ,[SURVEY_SERIES_ALT_DESC],
+    TRAWL_IND, GEAR_CODE
+    ORDER BY S.SURVEY_SERIES_ID")
+  trawl <- unique(trawl$SURVEY_SERIES_ID)
+  ll <- run_sql("GFBioSQL", "SELECT
+    S.SURVEY_SERIES_ID
+    FROM SURVEY_SERIES SS
+    LEFT JOIN SURVEY S ON S.SURVEY_SERIES_ID = SS.SURVEY_SERIES_ID
+    LEFT JOIN TRIP_SURVEY TS ON TS.SURVEY_ID = S.SURVEY_ID
+    LEFT JOIN FISHING_EVENT FE ON FE.TRIP_ID = TS.TRIP_ID
+    WHERE GEAR_CODE IN(4,5,7,10,12) AND
+    S.SURVEY_SERIES_ID <> 0
+    GROUP BY S.SURVEY_SERIES_ID, [SURVEY_SERIES_DESC]
+    ,[SURVEY_SERIES_TYPE_CODE]
+    ,[SURVEY_SERIES_ALT_DESC],
+    TRAWL_IND, GEAR_CODE
+    ORDER BY S.SURVEY_SERIES_ID")
+  ll <- unique(ll$SURVEY_SERIES_ID)
 
   missing <- setdiff(ssid, c(trawl, ll))
   if (length(missing) > 0) {
