@@ -208,15 +208,16 @@ fit_glmmfields <- function(dat,
   list(pos = m1, bin = m2)
 }
 
-#' @param n TODO
-#' @param region TODO
+#' @param cell_width Cell width in units of the data (e.g. UTM km).
+#' @param region Optional region abbreviation to search for a spatial polygon
+#'   file. TODO
 #' @param cache_folder TODO
 #'
 #' @export
 #' @rdname survey-spatial-modelling
-make_prediction_grid <- function(dat, n = 150, region = NULL,
+make_prediction_grid <- function(dat, cell_width = 2, region = NULL,
                                  cache_folder = "prediction-grids", utm_zone = 9) {
-  if (n != 150) stop("Grid is currently fixed at 150. Leave `n = 150`.")
+  # if (n != 150) stop("Grid is currently fixed at 150. Leave `n = 150`.")
   if (is.null(region)) {
     x <- dat$X
     y <- dat$Y
@@ -230,8 +231,8 @@ make_prediction_grid <- function(dat, n = 150, region = NULL,
       data = data.frame(ID = 1)
     )
     pred_grid <- expand.grid(
-      X = seq(min(dat$X), max(dat$X), length.out = n),
-      Y = seq(min(dat$Y), max(dat$Y), length.out = n),
+      X = seq(round_down_even(min(dat$X)), max(dat$X), cell_width),
+      Y = seq(round_down_even(min(dat$Y)), max(dat$Y), cell_width),
       year = unique(dat$year)
     )
   } else {
@@ -245,11 +246,21 @@ make_prediction_grid <- function(dat, n = 150, region = NULL,
       data = data.frame(ID = 1)
     )
     pred_grid <- expand.grid(
-      X = seq(min(shape_utm$X), max(shape_utm$X), length.out = n),
-      Y = seq(min(shape_utm$Y), max(shape_utm$Y), length.out = n),
+      X = seq(round_down_even(min(shape_utm$X)), max(shape_utm$X), cell_width),
+      Y = seq(round_down_even(min(shape_utm$Y)), max(shape_utm$Y), cell_width),
       year = unique(dat$year)
     )
   }
+
+  # widths <- seq(min(shape_utm$X), max(shape_utm$X), cell_width)
+  # cell_width <- unique(round(diff(widths), 9))[[1]]
+  #
+  # heights <- seq(min(shape_utm$Y), max(shape_utm$Y), cell_width)
+  # cell_height <- unique(round(diff(heights), 9))[[1]]
+  cell_width <- cell_width
+  cell_height <- cell_width
+  cell_area <- cell_width * cell_height
+
   sp::coordinates(pred_grid) <- c("X", "Y")
   inside <- !is.na(sp::over(pred_grid, as(sp_poly_df, "SpatialPolygons")))
   pred_grid <- pred_grid[inside, ]
@@ -261,7 +272,7 @@ make_prediction_grid <- function(dat, n = 150, region = NULL,
   dir.create(cache_folder, showWarnings = FALSE)
   file_name <- paste0(
     cache_folder, "/", region,
-    "pred-grid-interp-n-", n, ".rds"
+    "pred-grid-interp-cell-width-", cell_width, ".rds"
   )
 
   if (file.exists(file_name) & !is.null(region)) {
@@ -306,10 +317,11 @@ make_prediction_grid <- function(dat, n = 150, region = NULL,
     )
   }
 
+  pred_grid <- filter(pred_grid, !is.na(akima_depth))
   pred_grid$depth_scaled <-
     (log(pred_grid$akima_depth) - dat$depth_mean[1]) / dat$depth_sd[1]
   pred_grid$depth_scaled2 <- pred_grid$depth_scaled^2
-  pred_grid
+  list(grid = pred_grid, cell_area = cell_area)
 }
 
 #' Title TODO
@@ -330,10 +342,12 @@ fit_survey_sets <- function(dat, survey, years,
                             max_knots = 20,
                             adapt_delta = 0.95,
                             thin = 1,
-                            prediction_grid_n = 150,
                             mcmc_posterior_samples = 150,
-                            required_obs_percent = 0.1,
-                            utm_zone = 9) {
+                            required_obs_percent = 0.05,
+                            utm_zone = 9,
+                            model = c("glmmfields", "inla"),
+                            include_depth = TRUE, ...) {
+
   region <- NA
   if (survey == "West Coast Haida Gwaii Synoptic Survey") region <- "WCHG"
   if (survey == "West Coast Vancouver Island Synoptic Survey") region <- "WCVI"
@@ -351,34 +365,77 @@ fit_survey_sets <- function(dat, survey, years,
 
   .d_interp <- interp_survey_bathymetry(.d_tidy)
   .d_scaled <- scale_survey_predictors(.d_interp$data)
-  pg <- make_prediction_grid(.d_scaled, .d_interp$bath,
-    n = prediction_grid_n,
+  pg <- make_prediction_grid(.d_scaled,
     region = ifelse(is.na(region), NULL, region)
-  )
+  )$grid
 
   if (sum(.d_scaled$present) / nrow(.d_scaled) < required_obs_percent) {
     return(list(
       predictions = pg, data = .d_tidy,
-      models = NA, survey = survey, species = species,
+      models = NA, survey = survey,
       years = years, region = region
     ))
   }
 
-  m <- fit_glmmfields(.d_scaled,
-    chains = chains, iter = iter,
-    n_knots = min(sum(.d_tidy$present) - 2, max_knots),
-    adapt_delta = adapt_delta, thin = thin
-  )
+  model <- match.arg(model)
+  if (model == "glmmfields") {
+    if (!include_depth) {
+      warning("Depth is currently always included with the glmmmfields model.")
+    }
+    if (mcmc_posterior_samples[[1]] > 0.5 * iter[[1]]) {
+      stop(
+        "`mcmc_posterior_samples` must be <= `0.5 * iter`",
+        "(0.5 because of 50% warmup iterations)."
+      )
+    }
 
-  message("Predicting density onto grid...")
-  pos <- predict(m$pos,
-    newdata = data.frame(pg, time = 1),
-    type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
-  )
-  bin <- predict(m$bin,
-    newdata = data.frame(pg, time = 1),
-    type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
-  )
+    m <- fit_glmmfields(.d_scaled,
+      chains = chains, iter = iter,
+      n_knots = min(sum(.d_tidy$present) - 2, max_knots),
+      adapt_delta = adapt_delta, thin = thin
+    )
+
+    message("Predicting density onto grid...")
+
+    pos <- predict(m$pos,
+      newdata = data.frame(pg),
+      type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
+    )
+    bin <- predict(m$bin,
+      newdata = data.frame(pg),
+      type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
+    )
+  } else {
+
+    message("Predicting density onto grid...")
+    bin <- fit_inla(.d_scaled,
+      response = "present", family = "binomial",
+      include_depth = include_depth, n_knots = min(c(nrow(.d_scaled) - 1, 100)),
+      ...
+    )
+
+    dpos <- filter(.d_scaled, present == 1)
+    pos <- fit_inla(dpos,
+      response = "density", family = "gamma",
+      include_depth = include_depth, n_knots = min(c(nrow(dpos) - 1), 75),
+      ...
+    )
+    m <- list()
+    m$bin <- bin
+    m$pos <- pos
+
+    p_bin <- predict_inla(bin, pg,
+      include_depth = include_depth,
+      samples = mcmc_posterior_samples
+    )
+    p_pos <- predict_inla(pos, pg,
+      include_depth = include_depth,
+      samples = mcmc_posterior_samples
+    )
+
+    bin <- stats::plogis(p_bin)
+    pos <- exp(p_pos)
+  }
 
   com <- bin * pos
   pg$combined <- apply(com, 1, median)
@@ -419,27 +476,64 @@ fit_survey_sets <- function(dat, survey, years,
 #' plot_survey_sets(x$predictions, x$data)
 #' }
 
+
+#' @examples
+#' x <- c(1:100, rep(100, 100), 100:1, rep(1, 100))
+#' y <- c(rep(1, 100), 1:100, rep(100, 100), 100:1)
+#' plot(x, y, asp = 1)
+#' points(50, 50, col = "red")
+#' z <- rotate_coords(x = x, y = y, rotation_angle = 24, center_point = c(50, 50))
+#' plot(z$x, z$y, asp = 1)
+#' points(50, 50, col = "red")
+rotate_coords <- function(x, y, rotation_angle, rotation_center) {
+  assertthat::assert_that(identical(class(rotation_center), "numeric"))
+  assertthat::assert_that(identical(class(rotation_angle), "numeric"))
+  assertthat::assert_that(identical(length(rotation_center), 2L))
+  assertthat::assert_that(identical(length(rotation_angle), 1L))
+  assertthat::assert_that(identical(length(x), length(y)))
+
+  rot <- -rotation_angle * pi / 180
+  newangles <- atan2(y - rotation_center[2], x - rotation_center[1]) + rot
+  mags <- sqrt((x - rotation_center[1])^2 + (y - rotation_center[2])^2)
+  x <- rotation_center[1] + cos(newangles) * mags
+  y <- rotation_center[2] + sin(newangles) * mags
+  dplyr::tibble(x = x, y = y)
+}
+
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
                              fill_scale =
                                viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
-                             pt_col = "#FFFFFF90",
-                             pt_fill = "#FFFFFF60",
+  colour_scale =
+    viridis::scale_colour_viridis(trans = "sqrt", option = "C"),
+                             pos_pt_col = "#FFFFFF60",
+                             bin_pt_col = "#FFFFFF40",
+                             pos_pt_fill = "#FFFFFF05",
                              pt_size_range = c(0.5, 9),
                              show_legend = TRUE,
-                             extrapolate_depth = FALSE,
+                             extrapolate_depth = TRUE,
                              extrapolation_buffer = 0,
                              show_model_predictions = TRUE,
+                             show_raw_data = TRUE,
                              utm_zone = 9,
-                             fill_label = "Predicted\nbiomass\ndensity (kg/m)",
-                             pt_label = "Tow density (kg/m)") {
+                             fill_label = "Predicted\nbiomass\ndensity (kg/m^2)",
+                             pt_label = "Tow density (kg/km^2)",
+                             rotation_angle = 0,
+                             rotation_center = c(500, 5700),
+                             show_axes = TRUE,
+                             xlim = NULL,
+                             ylim = NULL,
+                             x_buffer = c(-5, 5),
+                             y_buffer = c(-5, 5),
+                             north_symbol = FALSE,
+                             north_symbol_coord = c(130, 5975),
+                             north_symbol_length = 30,
+                             cell_size = 2) {
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,
       akima_depth >= min(raw_dat$depth, na.rm = TRUE) - extrapolation_buffer,
       akima_depth <= max(raw_dat$depth, na.rm = TRUE) + extrapolation_buffer,
-      akima_depth > 0,
-      akima_depth >= min(raw_dat$depth),
-      akima_depth <= max(raw_dat$depth)
+      akima_depth > 0
     )
   }
 
@@ -465,46 +559,170 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
   #   ylim <- c(mid_pt - needed_yrange/2, mid_pt + needed_yrange/2)
   # }
 
-  coast <- load_coastline(range(raw_dat$lon), range(raw_dat$lat),
+  if (show_model_predictions) {
+    # turn grids into explicit rectangles for possible rotation:
+    pred_dat <- lapply(seq_len(nrow(pred_dat)), function(i) {
+      row_dat <- pred_dat[i, , drop = FALSE]
+      X <- row_dat$X
+      Y <- row_dat$Y
+      data.frame(
+        X = c(X - cell_size / 2, X + cell_size / 2,
+          X + cell_size / 2, X - cell_size / 2),
+        Y = c(Y - cell_size / 2, Y - cell_size / 2,
+          Y + cell_size / 2, Y + cell_size / 2),
+        combined = row_dat$combined,
+        bin = row_dat$bin,
+        pos = row_dat$pos,
+        year = row_dat$year,
+        id = i
+      )
+    }) %>% bind_rows()
+  }
+
+  if (north_symbol) {
+    north <- data.frame(
+      X = c(north_symbol_coord[1], north_symbol_coord[1]),
+      Y = c(north_symbol_coord[2], north_symbol_coord[2] + north_symbol_length)
+    )
+    north_lab_coord <- c(north$X[1], north$Y[1] - 15)
+
+    r <- rotate_coords(north$X, north$Y,
+      rotation_angle = rotation_angle,
+      rotation_center = rotation_center
+    )
+    north$X <- r$x
+    north$Y <- r$y
+    north_sym <- data.frame(
+      X = north$X[1],
+      Xend = north$X[2],
+      Y = north$Y[1],
+      Yend = north$Y[2]
+    )
+
+    r <- rotate_coords(north_lab_coord[1], north_lab_coord[2],
+      rotation_angle = rotation_angle,
+      rotation_center = rotation_center
+    )
+    north_lab_coord <- c(r$x, r$y)
+  }
+
+  coast <- load_coastline(range(raw_dat$lon) + c(-1, 1),
+    range(raw_dat$lat) + c(-1, 1),
     utm_zone = utm_zone
   )
 
-  g <- ggplot() +
-    ggplot2::geom_tile(
-      data = pred_dat, aes_string("X", "Y", fill = fill_column),
-      colour = NA
+  r <- rotate_coords(coast$X, coast$Y,
+    rotation_angle = rotation_angle,
+    rotation_center = rotation_center
+  )
+  coast$X <- r$x
+  coast$Y <- r$y
+
+  r <- rotate_coords(pred_dat$X, pred_dat$Y,
+    rotation_angle = rotation_angle,
+    rotation_center = rotation_center
+  )
+  pred_dat$X <- r$x
+  pred_dat$Y <- r$y
+
+  r <- rotate_coords(raw_dat$X, raw_dat$Y,
+    rotation_angle = rotation_angle,
+    rotation_center = rotation_center
+  )
+  raw_dat$X <- r$x
+  raw_dat$Y <- r$y
+
+  isobath <- load_isobath(range(raw_dat$lon) + c(-5, 5),
+    range(raw_dat$lat) + c(-5, 5),
+    bath = c(100, 200, 500), utm_zone = 9
+  )
+  r <- rotate_coords(isobath$X, isobath$Y,
+    rotation_angle = rotation_angle,
+    rotation_center = rotation_center
+  )
+  isobath$X <- r$x
+  isobath$Y <- r$y
+
+  if (is.null(xlim) || is.null(ylim)) {
+    xlim <- range(raw_dat$X) + x_buffer
+    ylim <- range(raw_dat$Y) + y_buffer
+  }
+
+  g <- ggplot()
+
+  if (show_model_predictions) {
+    g <- g + ggplot2::geom_polygon(
+      data = pred_dat, aes_string("X", "Y", fill = fill_column,
+        colour = fill_column, group = "id"),
     ) +
-    fill_scale +
+      fill_scale + colour_scale
+  }
+  if (show_raw_data) {
+  g <- g +
+    geom_point(
+      data = filter(raw_dat, present == 0),
+      aes_string(x = "X", y = "Y"),
+      col = if (show_model_predictions) bin_pt_col else "grey50",
+      pch = 4, size = 2
+    ) +
     geom_point(
       data = filter(raw_dat, present == 1),
       aes_string(
         x = "X", y = "Y",
-        size = "density"
-      ), fill = pt_fill, col = pt_col, pch = 21
-    ) +
-    geom_point(
-      data = filter(raw_dat, present == 0),
-      aes_string(x = "X", y = "Y"), col = pt_col, pch = 4, size = 3
-    ) +
+        size = "density * 1e6"
+      ), fill = pos_pt_fill,
+      col = if (show_model_predictions) pos_pt_col else "grey30", pch = 21
+    )
+
+  }
+
+  g <- g +
     ggplot2::scale_size_continuous(range = pt_size_range) +
     theme_pbs() +
-    coord_equal(
-      xlim = range(raw_dat$X),
-      ylim = range(raw_dat$Y)
-    ) +
+    coord_equal(xlim = xlim, ylim = ylim) +
     guides(
       shape = ggplot2::guide_legend(override.aes = list(colour = "grey30")),
       size = ggplot2::guide_legend(override.aes = list(colour = "grey30"))
     ) +
     geom_polygon(
       data = coast, aes_string(x = "X", y = "Y", group = "PID"),
-      fill = "grey50"
+      fill = "grey87", col = "grey70", lwd = 0.2
     ) +
-    guides(shape = FALSE) +
-    labs(size = pt_label, fill = fill_label)
+    guides(shape = FALSE, colour = FALSE) +
+    labs(size = pt_label, fill = fill_label) +
+    ylab("Northing") + xlab("Easting")
 
   if (!show_legend) {
     g <- g + theme(legend.position = "none")
+  }
+
+  if (!show_axes) {
+    g <- g + theme(
+      axis.title = element_blank(),
+      axis.text = element_blank(),
+      axis.ticks = element_blank()
+    )
+  }
+
+  g <- g + geom_path(
+    data = isobath, aes_string(
+      x = "X", y = "Y",
+      group = "paste(PID, SID)"
+    ),
+    inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+  )
+
+  if (north_symbol) {
+    g <- g + ggplot2::geom_segment(
+      data = north_sym,
+      aes_string(x = "X", y = "Y", xend = "Xend", yend = "Yend"),
+      inherit.aes = FALSE, colour = "grey30", lwd = 0.8,
+      arrow = ggplot2::arrow(length = unit(0.7, "char"))
+    )
+    g <- g + ggplot2::annotate("text",
+      label = "N", colour = "grey30",
+      x = north_lab_coord[1], y = north_lab_coord[2]
+    )
   }
 
   g
