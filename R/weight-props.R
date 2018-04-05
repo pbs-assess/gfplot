@@ -217,6 +217,8 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
     group_by(year, grouping_code, sample_id) %>%
     summarise(density = mean(density_kgpm2 * 1e6)) # should be one unique value
 
+  assertthat::assert_that(all(!duplicated(sample_dens$sample_id)))
+
   inner_join(raw_comp, sample_dens,
     by = c("year", "sample_id", "grouping_code")
   ) %>%
