@@ -21,12 +21,13 @@ fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
   iter = 1000, chains = 4, adapt_delta = 0.98,
   cores = parallel::detectCores(), ...)
 
-make_prediction_grid(dat, bath, n = 150, region = NULL,
+make_prediction_grid(dat, cell_width = 2, region = NULL,
   cache_folder = "prediction-grids", utm_zone = 9)
 
 fit_survey_sets(dat, survey, years, chains = 4, iter = 1000,
-  max_knots = 20, adapt_delta = 0.95, thin = 1, prediction_grid_n = 150,
-  mcmc_posterior_samples = 150, required_obs_percent = 0.1, utm_zone = 9)
+  max_knots = 20, adapt_delta = 0.95, thin = 1,
+  mcmc_posterior_samples = 150, required_obs_percent = 0.1, utm_zone = 9,
+  model = c("glmmfields", "inla"), include_depth = TRUE, ...)
 }
 \arguments{
 \item{dat}{TODO}
@@ -53,11 +54,10 @@ fit_survey_sets(dat, survey, years, chains = 4, iter = 1000,
 
 \item{...}{TODO}
 
-\item{bath}{TODO}
+\item{cell_width}{Cell width in units of the data (e.g. UTM km).}
 
-\item{n}{TODO}
-
-\item{region}{TODO}
+\item{region}{Optional region abbreviation to search for a spatial polygon
+file. TODO}
 
 \item{cache_folder}{TODO}
 
@@ -65,16 +65,14 @@ fit_survey_sets(dat, survey, years, chains = 4, iter = 1000,
 
 \item{thin}{TODO}
 
-\item{prediction_grid_n}{TODO}
-
 \item{mcmc_posterior_samples}{TODO}
 
 \item{required_obs_percent}{TODO}
+
+\item{prediction_grid_n}{TODO}
 }
 \description{
 Long description here
-
-Title TODO
 }
 \details{
 \itemize{
@@ -112,5 +110,6 @@ plot_survey_sets(pg, dat, fill_column = "combined")
 }
 }
 \seealso{
-Other spatial survey modelling functions: \code{\link{plot_survey_sets}}
+Other spatial survey modelling functions: \code{\link{rotate_coords}}
 }
+\concept{spatial survey modelling functions}

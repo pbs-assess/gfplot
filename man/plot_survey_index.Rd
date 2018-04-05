@@ -3,7 +3,6 @@
 \name{plot_survey_index}
 \alias{plot_survey_index}
 \alias{tidy_survey_index}
-\alias{plot_survey_index}
 \title{Plot survey relative biomass mass index}
 \usage{
 tidy_survey_index(dat, surveys = c("West Coast Haida Gwaii Synoptic Survey",
@@ -65,3 +64,5 @@ Other tidy data functions: \code{\link{tidy_age_precision}},
 
 Other plotting functions: \code{\link{fit_mat_ogive}}
 }
+\concept{plotting functions}
+\concept{tidy data functions}

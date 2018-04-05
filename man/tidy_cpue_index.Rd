@@ -48,3 +48,4 @@ walleye <- tidy_cpue_index(d, "walleye pollock",
 Other tidy data functions: \code{\link{plot_survey_index}},
   \code{\link{tidy_age_precision}}
 }
+\concept{tidy data functions}

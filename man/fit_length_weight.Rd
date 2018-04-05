@@ -37,3 +37,4 @@ plot_length_weight(model_f, model_m)
 Other growth functions: \code{\link{fit_vb}},
   \code{\link{plot_growth}}
 }
+\concept{growth functions}

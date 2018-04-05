@@ -33,3 +33,5 @@ Other tidy data functions: \code{\link{plot_survey_index}},
 
 Other ageing precision functions: \code{\link{plot_age_precision}}
 }
+\concept{ageing precision functions}
+\concept{tidy data functions}

@@ -56,3 +56,4 @@ plot_mat_ogive(m)
 \seealso{
 Other plotting functions: \code{\link{plot_survey_index}}
 }
+\concept{plotting functions}
