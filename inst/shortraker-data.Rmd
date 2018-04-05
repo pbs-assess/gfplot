@@ -1,0 +1,620 @@
+---
+title: "Data extraction for shortraker rockfish"
+author: "Sean C. Anderson"
+date: "2018-03-29"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = TRUE,
+  autodep = TRUE,
+  fig.path = "shortraker-knitr-figs/",
+  cache.path = "shortraker-knitr-cache/"
+)
+```
+
+# Setup
+
+```{r, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("seananderson/gfplot")
+```
+
+```{r, cache=FALSE}
+library(gfplot)
+library(ggplot2)
+library(dplyr)
+library(rstan)
+```
+
+# Caching the data from the SQL servers
+
+In addition to the individual `get_*()` functions, there is a function `cache_pbs_data()` that runs all the `get_*()` functions and caches the data in a folder that you specify. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
+
+**This will only work on an authorized computer on the PBS network.**
+
+```{r}
+if (!file.exists(file.path("shortraker-cache", "pbs-survey-sets.rds"))) { # random check
+  cache_pbs_data("shortraker rockfish", path = "shortraker-cache")
+}
+```
+
+Let's read those data files in to work with here.
+
+```{r}
+cache <- file.path("shortraker-cache")
+d_survey_sets <- readRDS(file.path(cache, "pbs-survey-sets.rds"))
+d_survey_samples <- readRDS(file.path(cache, "pbs-survey-samples.rds"))
+d_comm_samples <- readRDS(file.path(cache, "pbs-comm-samples.rds"))
+d_catch <- readRDS(file.path(cache, "pbs-catch.rds"))
+d_cpue_spatial <- readRDS(file.path(cache, "pbs-cpue-spatial.rds"))
+d_cpue_spatial_ll <- readRDS(file.path(cache, "pbs-cpue-spatial-ll.rds"))
+d_survey_index <- readRDS(file.path(cache, "pbs-survey-index.rds"))
+d_age_precision <- readRDS(file.path(cache, "pbs-age-precision.rds"))
+d_cpue_index <- readRDS(file.path(cache, "pbs-cpue-index.rds"))
+```
+
+```{r, include=FALSE}
+spp <- "shortraker rockfish"
+d_survey_sets <- filter(d_survey_sets, species_common_name == spp)
+d_survey_samples <- filter(d_survey_samples, species_common_name == spp)
+d_comm_samples <- filter(d_comm_samples, species_common_name == spp)
+d_catch <- filter(d_catch, species_common_name == spp)
+d_cpue_spatial <- filter(d_cpue_spatial, species_common_name == spp)
+d_cpue_spatial_ll <- filter(d_cpue_spatial_ll, species_common_name == spp)
+d_survey_index <- filter(d_survey_index, species_common_name == spp)
+d_age_precision <- filter(d_age_precision, species_code == 403) # TODO fix
+```
+
+# Overall biological sample availability
+
+We can look at the biological sample (number of specimens) availability from commercial and survey sources:
+
+```{r, fig.width=6, fig.height=2}
+tidy_sample_avail(d_comm_samples) %>%
+  plot_sample_avail(title = "Commercial samples", year_range = c(1994, 2017))
+
+tidy_sample_avail(d_survey_samples) %>%
+  plot_sample_avail(title = "Survey samples", year_range = c(1994, 2017))
+```
+
+# Age and length frequencies
+
+Let's start by looking at the age and length frequencies. For this example, we used the caching function for convenience and saved the data frame into `d_survey_samples`.
+
+```{r}
+glimpse(d_survey_samples)
+```
+
+If we pass a data frame into the function `tidy_ages_raw()` we will get a 'tidied' data frame that is ready for plotting with `plot_ages()`. Here, we only have ages from the break and burn method, but they have been considered unreliable in the past:
+
+```{r}
+unique(d_survey_samples$ageing_method)
+```
+
+Raw age frequencies:
+
+```{r}
+ages_raw <- tidy_ages_raw(d_survey_samples,
+  dat_survey_sets = d_survey_sets,
+  ageing_method_codes = c(3, 17)
+)
+plot_ages(ages_raw)
+```
+
+Plot of age frequencies weighted by survey area and density:
+
+```{r}
+ages_weighted <- tidy_ages_weighted(d_survey_samples,
+  dat_survey_sets = d_survey_sets,
+  ageing_method_codes = c(3, 17)
+)
+plot_ages(ages_weighted)
+```
+
+Or for the commercial samples with the following code that makes use of the cached data frames `d_comm_samples` and `d_catch`. The latter data frame is used as part of the weighting.
+
+There are no commercial ages available:
+
+```{r}
+# tidy_ages_raw(d_comm_samples,
+#   sample_type = "commercial",
+#   dat_catch = d_catch
+# ) %>%
+#   plot_ages()
+```
+
+Let's do the same thing but for the length frequencies:
+
+```{r, fig.width=8.5, fig.height=9}
+lengths_raw <- tidy_lengths_raw(d_survey_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf)
+)
+plot_lengths(lengths_raw)
+```
+
+Or weighted: (TODO there's currently a bug joining the longline surveys in for weighting, so they are blank in the next plot)
+
+```{r, fig.width=8.5, fig.height=9}
+lengths_weighted <- tidy_lengths_weighted(d_survey_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf),
+  dat_survey_sets = d_survey_sets
+)
+plot_lengths(lengths_weighted)
+```
+
+For commercial samples:
+
+```{r, fig.width=8.5, fig.height=9}
+tidy_lengths_raw(d_comm_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf),
+  sample_type = "commercial",
+  dat_catch = d_catch
+) %>%
+  plot_lengths()
+```
+
+Weighted:
+
+```{r, fig.width=8.5, fig.height=9}
+tidy_lengths_weighted(d_comm_samples,
+  bin_size = 2,
+  year_range = c(2002, Inf),
+  sample_type = "commercial",
+  dat_catch = d_catch
+) %>%
+  plot_lengths()
+```
+
+By default, we are discarding commercial "keeper" samples (samples taken after some were discarded).
+
+# Ageing precision
+
+We can look at ageing precision. By default, this picks a random 250 fish that have primary and precision ageing values.
+
+```{r}
+tidy_age_precision(d_age_precision) %>%
+  plot_age_precision()
+```
+
+# Commercial catch
+
+Catch:
+
+```{r, fig.width=6, fig.height=4}
+tidy_catch(d_catch) %>%
+  plot_catch()
+```
+
+# Survey relative biomass indices
+
+The survey indices with bootstrapped 95% confidence intervals:
+
+```{r, fig.width=7, fig.height=7.5}
+tidy_survey_index(d_survey_index) %>%
+  plot_survey_index()
+```
+
+# Growth and maturity
+
+We can fit a von Bertalanffy growth model and plot it. We could fit this to just the survey data or just the commercial data or we can combine those two data sets with the function `bind_samples()`.
+
+```{r, echo=FALSE}
+# TODO: memory mapping problem; for now just loading this:
+model_file <- system.file("stan", "vb.stan", package = "gfplot")
+mod <- rstan::stan_model(model_file)
+```
+
+We can fit the von Bertalanffy finding the mode of the join posterior distribution or via MCMC with Stan. There aren't a lot of samples here so we can quickly run the MCMC version. Note that the ages are suspect. I have an alternative version, not included here, with ageing error on the ages, although it doesn't make a big difference. I think we might be able to trust the ages sufficiently for a growth curve but should check it against nearby growth curves from Alaska. I believe they were close.
+
+```{r, fig.width=5, fig.height=3.5, results='hide', warning=FALSE, message=FALSE}
+combined_samples <- bind_samples(d_survey_samples, d_comm_samples)
+
+vb_m <- fit_vb(combined_samples,
+  sex = "male", method = "mcmc",
+  ageing_method_codes = c(3, 17)
+)
+vb_f <- fit_vb(combined_samples,
+  sex = "female", method = "mcmc",
+  ageing_method_codes = c(3, 17)
+)
+plot_vb(object_female = vb_m, object_male = vb_f)
+```
+
+Length-weight relationship. By default, this is fit with a robust linear regression using `MASS::rlm()` to automatically down weight outliers, which can create problems for `lm()`.
+
+```{r}
+lw_m <- fit_length_weight(combined_samples, sex = "male", method = "rlm")
+lw_f <- fit_length_weight(combined_samples, sex = "female", method = "rlm")
+plot_length_weight(object_female = lw_m, object_male = lw_f)
+```
+
+Similarly, we can fit a logistic maturity ogive. I'll use the combined survey and commercial data, but you could just as easily substitute `d_survey_samples` or `d_comm_samples` for `combined_samples` in the following code chunk.
+
+The age at maturity plot looks suspect, especially for the males.
+
+TODO Perhaps the months should be restricted.
+
+```{r, fig.width=5, fig.height=3.5}
+mat_age <- combined_samples %>%
+  fit_mat_ogive(
+    type = "age",
+    months = seq(1, 12),
+    ageing_method_codes = c(3, 17)
+  )
+plot_mat_ogive(mat_age)
+```
+
+```{r, fig.width=5, fig.height=3.5}
+mat_length <- combined_samples %>%
+  fit_mat_ogive(
+    type = "length",
+    months = seq(1, 12)
+  )
+plot_mat_ogive(mat_length)
+```
+
+There is also the functionality to specify random intercepts for the sample IDs (this will take much longer to fit):
+
+```{r, fig.width=5, fig.height=3.5}
+mat_length <- d_survey_samples %>%
+  fit_mat_ogive(
+    type = "length",
+    months = seq(1, 12),
+    sample_id_re = TRUE
+  )
+plot_mat_ogive(mat_length)
+```
+
+And look at maturity by month (for the surveys right now):
+
+```{r, fig.width=5, fig.height=3}
+tidy_maturity_months(d_survey_samples) %>%
+  plot_maturity_months()
+```
+
+# Commercial CPUE maps
+
+We can plot the trawl and hook and line CPUE on maps. Note that the hook and line "CPUE" is just kg per fishing event right now since it seems like quantifying effort across all stocks might be troublesome.
+
+(TODO: There's a problem with the longline fleet data for this dataset that I need to work out to ensure the 3-vessel privacy rule.)
+
+```{r}
+filter(d_cpue_spatial, year >= 2012) %>%
+  plot_cpue_spatial(bin_width = 7, n_minimum_vessels = 3) +
+  ggtitle("Trawl CPUE") +
+  labs(subtitle = "Since 2012; including discards; 3-vessel minimum")
+
+# filter(d_cpue_spatial_ll, year >= 2008) %>%
+#   plot_cpue_spatial(
+#     bin_width = 7, n_minimum_vessels = 3,
+#     fill_lab = "CPUE (kg/fe)"
+#   ) +  ggtitle("Hook and line CPUE") +
+#   labs(subtitle = "Since 2008; excluding discards; 3-vessel minimum")
+```
+
+# Commercial CPUE indexe standardization
+
+We can fit an index standardization delta-lognormal GLM to the commercial trawl CPUE data.
+
+```{r, eval=FALSE}
+d_cpue_index <- get_cpue_index(gear = "bottom trawl")
+```
+
+I'll define the "fleet" as any vessel that has made at least 100 tows that caught some of the species over all years and has at least 4 years with 4 trips that caught some of the species. I will run this for effectly the entire coast at this point.
+
+We may be able to go back further than 1996, but the effort data (and eventually also catch data) becomes suspect. Even after 1996, because it is not targeted, CPUE may not be that reliable here.
+
+```{r}
+fleet <- tidy_cpue_index(d_cpue_index,
+  species_common = "shortraker rockfish",
+  year_range = c(1996, 2017),
+  area_grep_pattern = "5[ABCDE]+|3[CD]+",
+  min_positive_tows = 100,
+  min_positive_trips = 4,
+  min_yrs_with_trips = 4
+)
+```
+
+```{r}
+names(fleet)
+```
+
+How many vessels make up the "fleet?":
+
+```{r}
+length(unique(fleet$vessel_name))
+```
+
+We can fit the CPUE in the index standardization model with whatever formulas we want for the binomial and lognormal components:
+
+`f()` in the next chunk is a custom helper function to generate sequential factor values that can be safely passed to TMB. Anything that should be treated as a factor (except year) should be wrapped in it. It also lets you control what the 'base' or 'reference' level is for the factor. This affects the final CPUE index slightly because the binomial and log-normal models are combined on the natural scale, not the link scale. The default is to take the most common factor level (e.g. most common month or most common depth bin).
+
+```{r fit-cpue, message=FALSE, warning=FALSE,  results='hide', cache=TRUE}
+m_cpue <- fit_cpue_index(fleet,
+  formula_binomial =
+    pos_catch ~ year_factor + f(month) + f(vessel) +
+      f(locality) + f(depth) + f(latitude),
+  formula_lognormal =
+    log(spp_catch / hours_fished) ~ year_factor + f(month) +
+      f(vessel) + f(locality) + f(depth) + f(latitude)
+)
+```
+
+We can plot the coefficients from the models. Note that the coefficient values for the factor predictors are all relative to the first level, which is set to 0 in the model.
+
+```{r, warnings=FALSE, message=FALSE, fig.width=9, fig.height=9}
+plot_cpue_index_coefs(m_cpue)
+```
+
+We can plot the resulting index in its raw form (which depends somewhat on what the base levels of the factors are):
+
+```{r, warnings=FALSE, message=FALSE, fig.width=9, fig.height=3}
+predict_cpue_index(m_cpue) %>%
+  plot_cpue_index()
+```
+
+Or we can center them so that the combined and lognormal indices have a geometric mean of 1 and the binomial model has a mean of 0 in logit link space (i.e. centered on 0.5 in probability space):
+
+```{r, fig.width=9, fig.height=3}
+predict_cpue_index(m_cpue, center = TRUE) %>%
+  plot_cpue_index()
+```
+
+If you just want the combined model:
+
+```{r, warnings=FALSE, message=FALSE, fig.width=4, fig.height=2.5}
+predict_cpue_index(m_cpue, center = TRUE) %>%
+  plot_cpue_index(all_models = FALSE)
+```
+
+There is a built-in function to jackknife out each of the predictors to assess the sensitivity of the model to each predictor. In the following plot, the dashed grey line represents the standardized and centered index. Each of the coloured indices represents removing that predictor.
+
+```{r cpue-jk, warnings=FALSE, message=FALSE, fig.width=8, fig.height=4, cache=TRUE}
+plot_cpue_index_jk(m_cpue)
+```
+
+# CPUE exploration across three areas
+
+I started building an example to iterate over areas for CPUE index standardization. If this ends up being useful, I might add some cleaned up versions of these functions to the package.
+
+First, let's fit models for 3CD, 5CD, and 5AB separately. We will make the reference factor level the most common factor level (e.g. a month or depth bin) from all fishing events that caught shortraker rockfish.
+
+```{r fit-cpue-all, message=FALSE, warning=FALSE, results='hide'}
+areas <- c("3[CD]+", "5[CD]+", "5[AB]+")
+
+cpue_models <- lapply(areas, function(area) {
+  message("Determining qualified fleet for area ", area, ".")
+  fleet <- tidy_cpue_index(d_cpue_index,
+    year_range = c(1996, 2017),
+    species_common = "shortraker rockfish",
+    area_grep_pattern = area,
+    min_positive_tows = 100,
+    min_positive_trips = 4,
+    min_yrs_with_trips = 4,
+    lat_band_width = 0.2,
+    depth_band_width = 50,
+    clean_bins = TRUE,
+    depth_bin_quantiles = c(0.02, 0.98),
+    lat_bin_quantiles = c(0.01, 0.99)
+  )
+  
+  if (length(unique(fleet$vessel_name)) < 10)
+    return(NA)
+  
+  pos_catch_fleet <- filter(fleet, pos_catch == 1)
+  base_month    <- get_most_common_level(pos_catch_fleet$month)
+  base_depth    <- get_most_common_level(pos_catch_fleet$depth)
+  base_lat      <- get_most_common_level(pos_catch_fleet$latitude)
+  base_vessel   <- get_most_common_level(pos_catch_fleet$vessel)
+  base_locality <- get_most_common_level(pos_catch_fleet$locality)
+
+  message("Fitting standardization model for area ", area, ".")
+  m_cpue <- fit_cpue_index(fleet,
+    formula_binomial = pos_catch ~ year_factor + 
+      f(month, base_month) + 
+      f(vessel, base_vessel) + 
+      f(locality, base_locality) + 
+      f(depth, base_depth) + 
+      f(latitude, base_lat),
+    formula_lognormal = log(spp_catch / hours_fished) ~
+      year_factor + 
+      f(month, base_month) + 
+      f(vessel, base_vessel) + 
+      f(locality, base_locality) + 
+      f(depth, base_depth) + 
+      f(latitude, base_lat)
+  )
+  list(model = m_cpue, fleet = fleet, area = gsub("\\[|\\]|\\+", "", area))
+})
+
+indices <- purrr::map_df(cpue_models, function(x) {
+  if (is.na(x[[1]])[[1]]) return()
+  p <- predict_cpue_index(x$model, center = FALSE)
+  p$area <- x$area
+  p
+})
+
+indices_centered <- purrr::map_df(cpue_models, function(x) {
+  if (is.na(x[[1]])[[1]]) return()
+  p <- predict_cpue_index(x$model, center = TRUE)
+  p$area <- x$area
+  p
+})
+```
+
+Coefficients from models:
+
+```{r plot-cpue-coefs-all, warnings=FALSE, message=FALSE, fig.width=12, fig.height=9}
+coef_plots <- lapply(cpue_models, function(x) {
+  if (is.na(x[[1]])[[1]]) return()
+  plot_cpue_index_coefs(x$model) + labs(title = x$area)
+})
+ignore <- lapply(coef_plots, print)
+```
+
+Standardized indices:
+
+```{r plot-cpue-all, fig.width=8, fig.height=5.5}
+plot_cpue_facet <- function(dat, scales = "free_y") {
+  dat %>%
+    ggplot(aes(year, est, ymin = lwr, ymax = upr, fill = model)) +
+    geom_ribbon(alpha = 0.3) +
+    geom_line() +
+    facet_grid(model~area, scales = scales) +
+    theme_pbs() +
+    ylab("Estimate") + xlab("Year") +
+    guides(fill = FALSE)
+}
+
+plot_cpue_facet(indices) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+```{r plot-cpue-all-combined-only, fig.width=4, fig.height=5.5}
+plot_cpue_facet(filter(indices_centered, model == "Combined")) +
+  facet_wrap(~area, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = "black")
+```
+
+Sensitivity:
+
+```{r jk-cpue-all, message=FALSE, fig.width=8, fig.height=4}
+jks <- lapply(cpue_models, function(x) {
+  if (is.na(x[[1]])[[1]]) return()
+  plot_cpue_index_jk(x$model, terms = c(
+    "f(month, base_month)", 
+    "f(vessel, base_vessel)", 
+    "f(locality, base_locality)",
+    "f(depth, base_depth)", 
+    "f(latitude, base_lat)")) + 
+      labs(title = x$area)
+})
+ignore <- lapply(jks, print)
+```
+
+# Modelling relative biomass from the surveys spatially
+
+There are also functions to fit spatial models to the survey data with Stan. They currently only work for the synoptic surveys.
+
+Let's see what is available:
+
+```{r}
+table(d_survey_sets$survey_series_desc, d_survey_sets$year)
+```
+
+As an example, I will fit a delta-lognormal GLMM with spatial random fields to the Queen Charlotte Sound Synoptic Survey data with our glmmfields package / Stan. The model is using depth as a predictor along with a residual spatial random effect surface (the random field).
+
+```{r temporary-chunk, echo=FALSE, include=FALSE}
+devtools::load_all("../")
+```
+
+```{r fit-surveys, message=FALSE, warning=FALSE,  results='hide', cache=TRUE}
+surveys <- c(
+  "Queen Charlotte Sound Synoptic Survey",
+  "Hecate Strait Synoptic Survey",
+  "West Coast Vancouver Island Synoptic Survey",
+  "West Coast Haida Gwaii Synoptic Survey"
+)
+years <- c(2017, 2017, 2016, 2016)
+models <- purrr::map2(surveys, years, function(x, y)
+  fit_survey_sets(d_survey_sets,
+    survey = x, years = y, chains = 1, iter = 200,
+    mcmc_posterior_samples = 100, adapt_delta = 0.99,
+    required_obs_percent = 5
+  ))
+```
+
+The following plotting function is a work in progress. The coordinates are in UTMS for UTM zone 9.
+
+First is a plot of the combined binary and lognormal components. Because none are found in more than 5% of tows, the `fit_survey_sets()` function doesn't fit a model and just returns the tows themselves:
+
+```{r}
+purrr::walk(models, function(x) {
+  if ("combined" %in% names(x$predictions)) {
+    show_model_predictions <- TRUE
+  } else {
+    show_model_predictions <- FALSE
+  }
+  plot_survey_sets(x$predictions, x$data,
+    show_model_predictions = show_model_predictions
+  ) %>% print()
+})
+```
+
+And here are the binary and lognormal components on their own:
+
+```{r}
+# plot_survey_sets(m_wcvi$predictions, m_wcvi$data, fill_column = "bin") +
+#   scale_fill_gradient2(
+#     midpoint = 0.5,
+#     low = scales::muted("blue"), high = scales::muted("red")
+#   )
+# plot_survey_sets(m_wcvi$predictions, m_wcvi$data, fill_column = "pos") +
+#   viridis::scale_fill_viridis(option = "C")
+```
+
+# Raw data
+
+Finally, let's look at the raw data. You can do whatever you want with it.
+
+```{r}
+# glimpse(d_cpue_spatial) # commented out for privacy
+# glimpse(d_cpue_spatial_ll) # commented out for privacy
+# glimpse(d_cpue_index) # commented out for privacy
+# glimpse(d_catch) # commented out for privacy
+# glimpse(d_comm_samples) # commented out for privacy
+glimpse(d_survey_sets)
+glimpse(d_survey_samples)
+glimpse(d_survey_index)
+glimpse(d_age_precision)
+```
+
+If you do work with `d_survey_sets` or `d_survey_samples`, note that you must remove duplicated samples after selecting a given set of surveys. Or for all available samples:
+
+```{r}
+d <- d_survey_samples
+d <- d[!duplicated(d$specimen_id), , drop = FALSE]
+```
+
+`1` are males and `2` are females. E.g.
+
+```{r}
+d$sex <- dplyr::case_when(
+    d$sex == 1 ~ "M",
+    d$sex == 2 ~ "F",
+    TRUE ~ ""
+)
+```
+
+Here are the 'tidied' data frames you may want to work with:
+
+```{r}
+glimpse(ages_weighted)
+glimpse(lengths_weighted)
+glimpse(ages_raw)
+glimpse(lengths_raw)
+
+catches <- tidy_catch(d_catch)
+glimpse(catches)
+
+survey_indices <- tidy_survey_index(d_survey_index)
+glimpse(survey_indices)
+```
+
+```{r}
+save(d_survey_sets, d_survey_samples, d_survey_index, d_age_precision,
+  ages_weighted, lengths_weighted, ages_raw, lengths_raw,
+  commercial_cpue_by_area,
+  file = "shortraker-pbs.rda"
+)
+```
