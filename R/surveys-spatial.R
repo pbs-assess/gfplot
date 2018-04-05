@@ -480,31 +480,6 @@ fit_survey_sets <- function(dat, survey, years,
 #' plot_survey_sets(x$predictions, x$data)
 #' }
 
-
-#' @examples
-#' x <- c(1:100, rep(100, 100), 100:1, rep(1, 100))
-#' y <- c(rep(1, 100), 1:100, rep(100, 100), 100:1)
-#' plot(x, y, asp = 1)
-#' points(50, 50, col = "red")
-#' z <- rotate_coords(x = x, y = y, rotation_angle = 24,
-#'   rotation_center = c(50, 50))
-#' plot(z$x, z$y, asp = 1)
-#' points(50, 50, col = "red")
-rotate_coords <- function(x, y, rotation_angle, rotation_center) {
-  assertthat::assert_that(identical(class(rotation_center), "numeric"))
-  assertthat::assert_that(identical(class(rotation_angle), "numeric"))
-  assertthat::assert_that(identical(length(rotation_center), 2L))
-  assertthat::assert_that(identical(length(rotation_angle), 1L))
-  assertthat::assert_that(identical(length(x), length(y)))
-
-  rot <- -rotation_angle * pi / 180
-  newangles <- atan2(y - rotation_center[2], x - rotation_center[1]) + rot
-  mags <- sqrt((x - rotation_center[1])^2 + (y - rotation_center[2])^2)
-  x <- rotation_center[1] + cos(newangles) * mags
-  y <- rotation_center[2] + sin(newangles) * mags
-  dplyr::tibble(x = x, y = y)
-}
-
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
                              fill_scale =
                                viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
@@ -591,12 +566,8 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
     )
     north_lab_coord <- c(north$X[1], north$Y[1] - 15)
 
-    r <- rotate_coords(north$X, north$Y,
-      rotation_angle = rotation_angle,
-      rotation_center = rotation_center
-    )
-    north$X <- r$x
-    north$Y <- r$y
+    north <- rotate_df(north, rotation_angle, rotation_center)
+
     north_sym <- data.frame(
       X = north$X[1],
       Xend = north$X[2],
@@ -615,38 +586,16 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
     range(raw_dat$lat) + c(-1, 1),
     utm_zone = utm_zone
   )
-
-  r <- rotate_coords(coast$X, coast$Y,
-    rotation_angle = rotation_angle,
-    rotation_center = rotation_center
-  )
-  coast$X <- r$x
-  coast$Y <- r$y
-
-  r <- rotate_coords(pred_dat$X, pred_dat$Y,
-    rotation_angle = rotation_angle,
-    rotation_center = rotation_center
-  )
-  pred_dat$X <- r$x
-  pred_dat$Y <- r$y
-
-  r <- rotate_coords(raw_dat$X, raw_dat$Y,
-    rotation_angle = rotation_angle,
-    rotation_center = rotation_center
-  )
-  raw_dat$X <- r$x
-  raw_dat$Y <- r$y
+  coast <- rotate_df(coast, rotation_angle, rotation_center)
 
   isobath <- load_isobath(range(raw_dat$lon) + c(-5, 5),
     range(raw_dat$lat) + c(-5, 5),
     bath = c(100, 200, 500), utm_zone = 9
   )
-  r <- rotate_coords(isobath$X, isobath$Y,
-    rotation_angle = rotation_angle,
-    rotation_center = rotation_center
-  )
-  isobath$X <- r$x
-  isobath$Y <- r$y
+  isobath <- rotate_df(isobath, rotation_angle, rotation_center)
+
+  pred_dat <- rotate_df(pred_dat, rotation_angle, rotation_center)
+  raw_dat <- rotate_df(raw_dat, rotation_angle, rotation_center)
 
   if (is.null(xlim) || is.null(ylim)) {
     xlim <- range(raw_dat$X) + x_buffer
