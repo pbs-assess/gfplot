@@ -20,7 +20,7 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
                      kmeans = TRUE,
                      plot = FALSE, fit_model = TRUE,
                      extend = list(n = 8, offset = -0.1),
-                     offset = c(1, 5), cutoff = 1,
+                     offset = c(10, 50), cutoff = 1,
                      include_depth = TRUE,
                      verbose = FALSE,
                      debug = FALSE) {
@@ -34,8 +34,8 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
       extend = extend
     )
   } else {
-    bnd <- inla.nonconvex.hull(coords)
-    mesh <- inla.mesh.2d(
+    bnd <- INLA::inla.nonconvex.hull(coords)
+    mesh <- INLA::inla.mesh.2d(
       offset = offset,
       boundary = bnd,
       max.edge = max_edge,
@@ -101,7 +101,6 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
     "+ f(i2D, model=spde)"
   ))
 
-  # library("INLA")
   if (fit_model) {
     model <- INLA::inla(formula,
       family = family,
@@ -110,6 +109,9 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
         compute = TRUE,
         A = INLA::inla.stack.A(sdat)
       ),
+      control.fixed = list(
+        mean = 0, prec = 1/(4^2),
+        mean.intercept = 0, prec.intercept = 1/(25^2)),
       control.compute = list(config = TRUE),
       verbose = verbose,
       debug = debug,
