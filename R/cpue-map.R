@@ -149,11 +149,11 @@ ll2utm <- function(x, utm_zone = 9) {
   suppressMessages(PBSmapping::convUL(x))
 }
 
-load_coastline <- function(xlim_ll, ylim_ll, utm_zone) {
+load_coastline <- function(xlim_ll, ylim_ll, utm_zone, buffer = 2) {
   data("nepacLLhigh", package = "PBSmapping", envir = environment())
   np <- PBSmapping::clipPolys(nepacLLhigh,
-    xlim = xlim_ll + c(-2, 2),
-    ylim = ylim_ll + c(-2, 2)
+    xlim = xlim_ll + c(-buffer, buffer),
+    ylim = ylim_ll + c(-buffer, buffer)
   )
   ll2utm(np, utm_zone = utm_zone)
 }
