@@ -283,7 +283,8 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   }
 
   # remove ages from unaccepted ageing methods:
-  .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
+  .d <- mutate(.d, age = ifelse(is.na(ageing_method_code), NA, age))
+  .d <- rename(.d, ageing_method = ageing_method_code)
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
@@ -296,6 +297,8 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
     .d <- .d[!(.d$length < 10 & .d$weight / 1000 > 1.0 &
       .d$species_common_name == "pacific flatnose"), ]
   }
+
+  .d
 }
 
 #' @export
@@ -318,6 +321,10 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   if (discard_keepers) {
     .d <- filter(.d, !keeper)
   }
+
+  # remove ages from unaccepted ageing methods:
+  .d <- mutate(.d, age = ifelse(is.na(ageing_method_code), NA, age))
+  .d <- rename(.d, ageing_method = ageing_method_code)
 
   as_tibble(.d)
 }
