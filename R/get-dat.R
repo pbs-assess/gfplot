@@ -283,8 +283,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   }
 
   # remove ages from unaccepted ageing methods:
-  .d <- mutate(.d, age = ifelse(is.na(ageing_method_code), NA, age))
-  .d <- rename(.d, ageing_method = ageing_method_code)
+  .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
@@ -323,8 +322,7 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   }
 
   # remove ages from unaccepted ageing methods:
-  .d <- mutate(.d, age = ifelse(is.na(ageing_method_code), NA, age))
-  .d <- rename(.d, ageing_method = ageing_method_code)
+  .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
 
   as_tibble(.d)
 }
