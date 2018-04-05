@@ -412,14 +412,16 @@ fit_survey_sets <- function(dat, survey, years,
     message("Predicting density onto grid...")
     bin <- fit_inla(.d_scaled,
       response = "present", family = "binomial",
-      include_depth = include_depth, n_knots = min(c(nrow(.d_scaled) - 1, 100)),
+      include_depth = include_depth,
+      n_knots = min(c(nrow(.d_scaled) - 1, 100)),
       ...
     )
 
     dpos <- filter(.d_scaled, present == 1)
     pos <- fit_inla(dpos,
       response = "density", family = "gamma",
-      include_depth = include_depth, n_knots = min(c(nrow(dpos) - 1), 75),
+      include_depth = include_depth,
+      n_knots = min(c(nrow(dpos) - 1), 75),
       ...
     )
     m <- list()
