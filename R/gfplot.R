@@ -118,6 +118,10 @@ if (getRversion() >= "2.15.1") {
 
     "ageing_method", "length_bin", "weighted_prop", "year_jitter",
 
-    "vessel_effect", "year_effect"
+    "vessel_effect", "year_effect",
+
+    "sample_source_code", "keeper", "area"
+
+
   ))
 }

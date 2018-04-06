@@ -469,9 +469,9 @@ sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
 f <- function(x, ref = get_most_common_level) {
   out <- as.factor(as.character(x))
   if (is.character(ref)) {
-    relevel(out, ref = ref)
+    stats::relevel(out, ref = ref)
   } else {
-    relevel(out, ref = ref(x))
+    stats::relevel(out, ref = ref(x))
   }
 }
 
