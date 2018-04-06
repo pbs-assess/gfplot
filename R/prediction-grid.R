@@ -9,7 +9,7 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
                                  cache_folder = "prediction-grids",
                                  utm_zone = 9,
                                  survey_boundary = NULL) {
-  if (is.null(region)) {
+  if (is.null(survey)) {
     region <- "no-region"
     x <- dat$X
     y <- dat$Y
@@ -74,7 +74,7 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
 
   if (file.exists(file_name) & !is.null(region)) {
     message("Preloading interpolated depth for prediction grid...")
-    ii <- readRDS(file_name, compress = FALSE)
+    ii <- readRDS(file_name)
   }
 
   if (!file.exists(file_name) & !is.null(region)) {
