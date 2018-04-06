@@ -117,7 +117,7 @@ tidy_lengths_weighted <- function(...) {
 tidy_comps <- function(dat,
                        survey = c(
                          "SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI", "HBLL_OUT N",
-                         "HBLL_OUT S", "IPHC_FISS"
+                         "HBLL_OUT S", "IPHC_FISS", "HS MSA"
                        ),
                        year_range = NULL,
                        spp_cat_code = 1,
