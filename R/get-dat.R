@@ -298,9 +298,10 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-  # temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
-  if (.d$survey_series_desc == "Hecate Strait Multispecies Assemblage Bottom Trawl")
-    .d <- .d %>% mutate(survey_abbrev = "HS MSBT")
+  # TODO: temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
+  .d <- .d %>% mutate(survey_abbrev =
+      ifelse(survey_series_desc ==
+          "Hecate Strait Multispecies Assemblage Bottom Trawl", "MSA HS", survey_abbrev))
 
   if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
     warning(
