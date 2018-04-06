@@ -3,8 +3,8 @@
 #' @param dat TODO
 #' @param bin_width TODO
 #' @param n_minimum_vessels TODO
-#' @param xlim_ll TODO
-#' @param ylim_ll TODO
+#' @param xlim TODO in UTM zone 9
+#' @param ylim TODO in UTM zone 9
 #' @param utm_zone TODO
 #' @param bath TODO
 #' @param fill_scale TODO
@@ -26,8 +26,9 @@
 #' plot_cpue_spatial(d, bin_width = 15, n_minimum_vessels = 1)
 
 plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
-                              xlim_ll = c(-134.1, -123.0),
-                              ylim_ll = c(48.4, 54.25), utm_zone = 9, bath = c(100, 200, 500),
+                              xlim = c(122, 890),
+                              ylim = c(5373, 6027),
+                              utm_zone = 9, bath = c(100, 200, 500),
                               fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
                               surv_cols = c(
                                 "WCHG" = "#6BAED6",
@@ -38,23 +39,22 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
                               rotation_angle = 0,
                               rotation_center = c(500, 5700),
                               fill_lab = "CPUE (kg/hr)") {
-  dat <- rename(dat, X = .data$lon, Y = .data$lat) %>%
-    filter(!is.na(.data$cpue))
+  dat <- filter(dat, !is.na(.data$cpue))
+
   plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
 
   coastline_utm <- load_coastline(
-    xlim_ll = xlim_ll, ylim_ll = ylim_ll,
+    xlim_ll = range(dat$lon, na.rm = TRUE) + c(-5, 5),
+    ylim_ll = range(dat$lat, na.rm = TRUE) + c(-5, 5),
     utm_zone = utm_zone
   )
   isobath_utm <- load_isobath(
-    xlim_ll = xlim_ll, ylim_ll = ylim_ll,
+    xlim_ll = range(dat$lon, na.rm = TRUE) + c(-5, 5),
+    ylim_ll = range(dat$lat, na.rm = TRUE) + c(-12, 12),
     bath = bath, utm_zone = utm_zone
   )
 
-  lims <- data.frame(X = sort(xlim_ll), Y = sort(ylim_ll))
-  lims <- ll2utm(lims, utm_zone = utm_zone)
-  xlim <- lims$X
-  ylim <- lims$Y
+  dat <- rename(dat, X = .data$lon, Y = .data$lat)
 
   if (plot_hexagons) {
     dat <- ll2utm(dat, utm_zone = utm_zone)
