@@ -96,7 +96,7 @@ get_ssids <- function() {
      INNER JOIN SURVEY_SERIES_TYPE SST ON
       SST.SURVEY_SERIES_TYPE_CODE = SS.SURVEY_SERIES_TYPE_CODE"
   )
-  names(.d) <- tolower(names(.d))
+  #names(.d) <- tolower(names(.d))
   .d <- unique(.d)
   as_tibble(.d)
 }
@@ -210,6 +210,8 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   sample_trip_ids <- get_sample_trips()
   areas <- get_strata_areas()
   survey_ids <- get_survey_ids(ssid)
+  surveys <- get_ssids()
+
 
   d_survs <- list()
   k <- 0
@@ -237,9 +239,10 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 
   .d <- inner_join(.d,
     unique(select(
-      survey_ids,
+      surveys,
       SURVEY_SERIES_ID,
-      SURVEY_SERIES_DESC
+      SURVEY_SERIES_DESC,
+      SURVEY_ABBREV
     )),
     by = "SURVEY_SERIES_ID"
   )
