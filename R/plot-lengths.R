@@ -24,6 +24,8 @@
 #' @param alpha TODO
 #' @param bin_size Bin size. Should match the bin size used with the `tidy_*()`
 #'   function.
+#' @param min_total Minimum number of fish for a given survey and year needed
+#'   before a histogram is shown.
 #'
 #' @family age- and length-frequency functions
 #' @export
@@ -64,7 +66,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
                          fill_col = c("M" = "grey80", "F" = "#FF000010"),
                          line_col = c("M" = "grey40", "F" = "red"),
                          survey_cols = NULL, alpha = 0.24,
-                         bin_size = 2) {
+                         bin_size = 2, min_total = 20) {
   if (!is.null(survey_cols)) {
     survey_col_names <- names(survey_cols)
     col <- stats::setNames(survey_cols, paste("F", survey_col_names))
@@ -90,6 +92,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
 
   dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bars shaded on top
   dat <- arrange(dat, year, survey_abbrev, sex)
+
+  dat <- mutate(dat, proportion = ifelse(total >= min_total, proportion, NA))
 
   g <- ggplot(dat, aes_string("length_bin", "proportion")) +
     geom_col(
