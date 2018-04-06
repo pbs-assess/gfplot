@@ -54,12 +54,12 @@ Title TODO
 \dontrun{
 x <- fit_survey_sets(pop_surv,
   years = 2015,
-  survey = "Queen Charlotte Sound Synoptic Survey",
+  survey = "SYN QCS",
   iter = 600, chains = 1) # for speed in this example
 plot_survey_sets(x$predictions, x$data)
 }
 }
 \seealso{
-Other spatial survey modelling functions: \code{\link{survey-spatial-modelling}}
+Other spatial survey modelling functions: \code{\link{make_prediction_grid}}
 }
 \concept{spatial survey modelling functions}

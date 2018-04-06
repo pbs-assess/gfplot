@@ -5,9 +5,9 @@
 \alias{tidy_survey_index}
 \title{Plot survey relative biomass mass index}
 \usage{
-tidy_survey_index(dat, survey = c("SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI",
-  "HBLL_OUT N", "HBLL_OUT S", "HBLL_INS N", "HBLL_INS S", "MSA_HS",
-  "IPHC_FISS"), min_years = 3, year_range = NULL)
+tidy_survey_index(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
+  "HBLL OUT N", "HBLL OUT S", "HBLL INS N", "HBLL INS S", "MSA HS",
+  "IPHC FISS"), min_years = 3, year_range = NULL)
 
 plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices", survey_cols = NULL)

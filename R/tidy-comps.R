@@ -116,8 +116,8 @@ tidy_lengths_weighted <- function(...) {
 #' @rdname tidy_comps
 tidy_comps <- function(dat,
                        survey = c(
-                         "SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI", "HBLL_OUT N",
-                         "HBLL_OUT S", "IPHC_FISS", "HS MSA"
+                         "SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI", "HBLL OUT N",
+                         "HBLL OUT S", "IPHC FISS"
                        ),
                        year_range = NULL,
                        spp_cat_code = 1,
@@ -239,8 +239,6 @@ tidy_comps <- function(dat,
   } else {
     dat$survey_abbrev <- "Commercial"
   }
-
-  # dat$survey_series_desc <- NULL
 
   # -------------------------------------------
   # Calculate the actual age or length frequencies:

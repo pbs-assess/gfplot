@@ -16,8 +16,8 @@ tidy_lengths_raw(...)
 
 tidy_lengths_weighted(...)
 
-tidy_comps(dat, survey = c("SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI",
-  "HBLL_OUT N", "HBLL_OUT S", "IPHC_FISS"), year_range = NULL,
+tidy_comps(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
+  "HBLL OUT N", "HBLL OUT S", "IPHC FISS"), year_range = NULL,
   spp_cat_code = 1, area_grep_pattern = "*", ageing_method_codes = NULL,
   bin_size = 2, age_length = c("age", "length"), sample_type = c("survey",
   "commercial"), frequency_type = c("raw", "weighted"),
