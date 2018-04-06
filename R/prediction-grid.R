@@ -9,7 +9,6 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
                                  cache_folder = "prediction-grids",
                                  utm_zone = 9,
                                  survey_boundary = NULL) {
-  # if (n != 150) stop("Grid is currently fixed at 150. Leave `n = 150`.")
   if (is.null(region)) {
     region <- "no-region"
     x <- dat$X
@@ -34,7 +33,7 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
     if (!region %in% names(gfplot::survey_grids) && is.null(survey_boundary)) {
       stop(
         survey, " is not defined in `gfplot::survey_grids`.",
-        " Please supply your own survey boundary to the make_prediction_grid()",
+        " Please supply your own survey boundary to the",
         " `survey_boundary` argument as a data frame with columns `X` and `Y`."
       )
     }
@@ -108,7 +107,7 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
   pred_grid <- left_join(pred_grid, z, by = c("X", "Y"))
   pred_grid <- mutate(pred_grid, akima_depth = exp(akima_depth))
 
-  if (is.null(region)) {
+  if (is.null(survey)) {
     pred_grid <- filter(
       pred_grid, akima_depth >= min(dat$akima_depth),
       akima_depth <= max(dat$akima_depth)
