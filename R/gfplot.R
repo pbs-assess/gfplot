@@ -77,6 +77,7 @@ if (getRversion() >= "2.15.1") {
     "survey",
     "variable",
     "survey_series_desc",
+    "survey_abbrev",
 
     # lengths:
     "bin_size", "counts", "proportion", "total",

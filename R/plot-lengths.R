@@ -74,22 +74,22 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     ))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
     line_col <- col
-    dat$sex <- paste(dat$sex, dat$survey)
+    dat$sex <- paste(dat$sex, dat$survey_abbrev)
   }
 
   x_breaks <- pretty(dat$length_bin, 4L)
   N <- length(x_breaks)
   x_breaks <- x_breaks[seq(1, N - 1)]
   range_lengths <- diff(range(dat$length_bin, na.rm = TRUE))
-  counts <- select(dat, survey, year, total) %>% unique()
+  counts <- select(dat, survey_abbrev, year, total) %>% unique()
 
   # make max value 1.0 each year-survey combo for plotting:
-  dat <- group_by(dat, year, survey) %>%
+  dat <- group_by(dat, year, survey_abbrev) %>%
     mutate(proportion = proportion / max(proportion)) %>%
     ungroup()
 
   dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bars shaded on top
-  dat <- arrange(dat, year, survey, sex)
+  dat <- arrange(dat, year, survey_abbrev, sex)
 
   g <- ggplot(dat, aes_string("length_bin", "proportion")) +
     geom_col(
@@ -97,7 +97,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       aes_string(colour = "sex", fill = "sex"), size = 0.3,
       position = position_identity()
     ) +
-    facet_grid(forcats::fct_rev(as.character(year)) ~ survey) +
+    facet_grid(forcats::fct_rev(as.character(year)) ~ survey_abbrev) +
     theme_pbs() +
     scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
     scale_colour_manual(values = line_col, breaks = c("M", "F")) +

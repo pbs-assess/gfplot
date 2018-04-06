@@ -18,37 +18,18 @@
 
 #' @name plot_survey_index
 #' @param dat TODO
-#' @param surveys TODO
-#' @param survey_names TODO
+#' @param survey TODO
 #' @param min_years TODO
 #' @param year_range TODO
 #' @family tidy data functions
 #' @rdname plot_survey_index
 #' @export
 tidy_survey_index <- function(dat,
-                              surveys = c(
-                                "West Coast Haida Gwaii Synoptic Survey",
-                                "Hecate Strait Synoptic Survey",
-                                "Queen Charlotte Sound Synoptic Survey",
-                                "West Coast Vancouver Island Synoptic Survey",
-                                "PHMA Rockfish Longline Survey - Outside North",
-                                "PHMA Rockfish Longline Survey - Outside South",
-                                "IRF Longline Survey (North)",
-                                "IRF Longline Survey (South)",
-                                "Hecate Strait Multispecies Assemblage Survey",
-                                "IPHC Longline Survey"
-                              ),
-                              survey_names = c(
-                                "West Coast Haida Gwaii Synoptic",
-                                "Hecate Strait Synoptic",
-                                "Queen Charlotte Sound Synoptic",
-                                "West Coast Vancouver Island Synoptic",
-                                "PHMA Rockfish LL - North",
-                                "PHMA Rockfish LL - South",
-                                "IRF LL Survey North",
-                                "IRF LL Survey South",
-                                "Hecate Strait Multispecies Assemblage",
-                                "IPHC Longline"
+                              survey = c(
+                                "SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI",
+                                "HBLL_OUT N",
+                                "HBLL_OUT S", "HBLL_INS N", "HBLL_INS S",
+                                "MSA_HS", "IPHC_FISS"
                               ),
                               min_years = 3, year_range = NULL) {
   if (is.null(year_range)) {
@@ -57,7 +38,7 @@ tidy_survey_index <- function(dat,
 
   d <- filter(
     dat,
-    survey_series_desc %in% surveys,
+    survey_abbrev %in% survey,
     year >= year_range[[1]], year <= year_range[[2]]
   )
 
@@ -66,37 +47,37 @@ tidy_survey_index <- function(dat,
     filter(n_spp > 1L)
   assertthat::are_equal(nrow(dup), 0L)
 
-  dup <- group_by(d, year, survey_series_desc, species_science_name) %>%
+  dup <- group_by(d, year, survey_abbrev, species_science_name) %>%
     summarise(n = n())
   assertthat::are_equal(max(dup$n), 1L)
 
   # must be N years
   d <- d %>%
-    arrange(species_common_name, survey_series_desc, year) %>%
-    group_by(survey_series_desc, species_common_name) %>%
+    arrange(species_common_name, survey_abbrev, year) %>%
+    group_by(survey_abbrev, species_common_name) %>%
     mutate(n_years = length(unique(year))) %>%
     mutate(mean_cv = mean(re, na.rm = TRUE)) %>%
     ungroup() %>%
     filter(n_years >= min_years)
 
   all_surv <- expand.grid(
-    survey_series_desc = surveys,
+    survey_abbrev = survey,
     species_common_name = unique(d$species_common_name),
     stringsAsFactors = FALSE
   )
   d <- left_join(all_surv, d, by = c(
     "species_common_name",
-    "survey_series_desc"
+    "survey_abbrev"
   ))
 
   trans <- tibble(
-    survey_series_desc = surveys, survey_name = survey_names,
-    surv_order = seq(1, length(survey_names))
+    survey_abbrev = survey,
+    surv_order = seq(1, length(survey))
   )
-  d <- inner_join(d, trans, by = "survey_series_desc") %>%
-    mutate(survey_name = fct_reorder(survey_name, surv_order))
+  d <- inner_join(d, trans, by = "survey_abbrev") %>%
+    mutate(survey_abbrev = fct_reorder(survey_abbrev, surv_order))
   select(
-    d, species_common_name, survey_name, year,
+    d, species_common_name, survey_abbrev, year,
     biomass, lowerci, upperci, mean_cv,
     num_sets, num_pos_sets
   )
@@ -114,7 +95,7 @@ tidy_survey_index <- function(dat,
 plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               title = "Biomass indices", survey_cols = NULL) {
   d <- dat %>%
-    group_by(survey_name) %>%
+    group_by(survey_abbrev) %>%
     mutate(
       biomass_scaled = biomass / max(upperci),
       lowerci_scaled = lowerci / max(upperci),
@@ -122,14 +103,14 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     ) %>%
     ungroup()
 
-  labs <- unique(select(d, survey_name))
+  labs <- unique(select(d, survey_abbrev))
   yrs <- range(d$year, na.rm = TRUE)
 
   if (!is.null(survey_cols)) {
-    fill_col <- stats::setNames(survey_cols, levels(d$survey_name))
+    fill_col <- stats::setNames(survey_cols, levels(d$survey_abbrev))
     fill_col <- paste0(substr(fill_col, 1L, 7L), as.character(0.7 * 100))
   } else {
-    fill_col <- rep(col[[1]], length(levels(d$survey_name)))
+    fill_col <- rep(col[[1]], length(levels(d$survey_abbrev)))
   }
 
   ggplot(d, aes_string("year", "biomass_scaled")) +
@@ -137,13 +118,13 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey95") +
     geom_ribbon(aes_string(
       ymin = "lowerci_scaled", ymax = "upperci_scaled",
-      fill = "survey_name"
+      fill = "survey_abbrev"
     ), colour = NA) +
     geom_line(col = "#00000050", size = 1) +
     geom_point(
       pch = 21, colour = col[[2]], fill = "grey60", size = 1.6, stroke = 1
     ) +
-    facet_wrap(~ survey_name, ncol = 2) +
+    facet_wrap(~survey_abbrev, ncol = 2) +
     theme_pbs() +
     theme(panel.spacing = unit(-0.1, "lines")) +
     ylim(-0.01, NA) +
@@ -161,7 +142,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     guides(fill = FALSE, colour = FALSE) +
     geom_text(
       data = labs, x = yrs[1] + 0.5, y = 0.88,
-      aes_string(label = "survey_name"),
+      aes_string(label = "survey_abbrev"),
       inherit.aes = FALSE, colour = "grey30", size = 2.75, hjust = 0
     ) +
     scale_x_continuous(breaks = seq(0, yrs[2], 10))

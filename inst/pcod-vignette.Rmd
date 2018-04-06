@@ -161,20 +161,12 @@ Let's make our previous age frequency plot but just for the synoptic surveys:
 
 ```{r}
 g <- tidy_ages_raw(d_survey_samples,
-  survey_series_desc =
-    c(
-      "West Coast Haida Gwaii Synoptic Survey",
-      "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-      "West Coast Vancouver Island Synoptic Survey"
-    ),
-  survey = c("WCHG", "HS", "QCS", "WCVI"),
+  survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI"),
   ageing_method_codes = 6
 ) %>%
   plot_ages()
 g
 ```
-
-The `survey_series_desc` argument has to match the existing values in the column `survey_series_desc` and the `survey` argument specifies our abbreviations for them.
 
 Because the output from the plotting functions is a ggplot object we can do things like add our own theme:
 
@@ -201,13 +193,7 @@ That plot was with unweighted age frequencies. If instead we wanted to create ag
 
 ```{r}
 g <- tidy_ages_weighted(d_survey_samples,
-  survey_series_desc =
-    c(
-      "West Coast Haida Gwaii Synoptic Survey",
-      "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-      "West Coast Vancouver Island Synoptic Survey"
-    ),
-  survey = c("WCHG", "HS", "QCS", "WCVI"),
+  survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI"),
   ageing_method_codes = 6,
   dat_survey_sets = d_survey_sets
 ) %>%
@@ -511,7 +497,7 @@ As an example, I will fit a delta-lognormal GLMM with spatial random fields to t
 
 ```{r fit-surveys, message=FALSE, warning=FALSE,  results='hide', cache=TRUE}
 m_wcvi <- fit_survey_sets(d_survey_sets,
-  survey = "Queen Charlotte Sound Synoptic Survey",
+  survey = "Queen Charlotte Sound Synoptic Bottom Trawl",
   years = 2017, chains = 3, iter = 1000
 )
 ```

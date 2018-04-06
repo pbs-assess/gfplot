@@ -16,18 +16,12 @@ tidy_lengths_raw(...)
 
 tidy_lengths_weighted(...)
 
-tidy_comps(dat,
-  survey_series_desc = c("West Coast Haida Gwaii Synoptic Survey",
-  "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-  "West Coast Vancouver Island Synoptic Survey",
-  "PHMA Rockfish Longline Survey - Outside North",
-  "PHMA Rockfish Longline Survey - Outside South", "IPHC Longline Survey"),
-  survey = c("WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)", "PHMA LL (S)",
-  "IPHC"), year_range = NULL, spp_cat_code = 1, area_grep_pattern = "*",
-  ageing_method_codes = NULL, bin_size = 2, age_length = c("age",
-  "length"), sample_type = c("survey", "commercial"),
-  frequency_type = c("raw", "weighted"), dat_survey_sets = NULL,
-  dat_catch = NULL)
+tidy_comps(dat, survey = c("SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI",
+  "HBLL_OUT N", "HBLL_OUT S", "IPHC_FISS"), year_range = NULL,
+  spp_cat_code = 1, area_grep_pattern = "*", ageing_method_codes = NULL,
+  bin_size = 2, age_length = c("age", "length"), sample_type = c("survey",
+  "commercial"), frequency_type = c("raw", "weighted"),
+  dat_survey_sets = NULL, dat_catch = NULL)
 }
 \arguments{
 \item{...}{Arguments to pass to \code{tidy_comps()}.}
@@ -35,10 +29,7 @@ tidy_comps(dat,
 \item{dat}{The input samples data frame from \code{\link[=get_comm_samples]{get_comm_samples()}} or
 \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
-\item{survey_series_desc}{A character vector of survey series to include.}
-
-\item{survey}{A character vector of shorter/cleaner survey names to use in
-the same order as \code{survey_series_desc}. These are used in the plot.}
+\item{survey}{A character vector of shorter/cleaner survey names to use.}
 
 \item{year_range}{An optional range of years to plot.}
 

@@ -56,7 +56,7 @@ tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
   ), , drop = FALSE]
 
   dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
-    filter(survey_series_desc %in% survey) %>%
+    filter(survey_abbrev %in% survey) %>%
     filter(year %in% years) %>%
     rename(density = density_kgpm2)
 
@@ -210,122 +210,6 @@ fit_glmmfields <- function(dat,
   list(pos = m1, bin = m2)
 }
 
-#' @param cell_width Cell width in units of the data (e.g. UTM km).
-#' @param region Optional region abbreviation to search for a spatial polygon
-#'   file. TODO
-#' @param cache_folder TODO
-#'
-#' @export
-#' @rdname survey-spatial-modelling
-make_prediction_grid <- function(dat, cell_width = 2, region = NULL,
-                                 cache_folder = "prediction-grids", utm_zone = 9) {
-  # if (n != 150) stop("Grid is currently fixed at 150. Leave `n = 150`.")
-  if (is.null(region)) {
-    x <- dat$X
-    y <- dat$Y
-    z <- chull(x, y)
-    coords <- cbind(x[z], y[z])
-    coords <- rbind(coords, coords[1, ])
-    sp_poly <- sp::SpatialPolygons(
-      list(sp::Polygons(list(sp::Polygon(coords)), ID = 1))
-    )
-    sp_poly_df <- sp::SpatialPolygonsDataFrame(sp_poly,
-      data = data.frame(ID = 1)
-    )
-    pred_grid <- expand.grid(
-      X = seq(round_down_even(min(dat$X)), max(dat$X), cell_width),
-      Y = seq(round_down_even(min(dat$Y)), max(dat$Y), cell_width),
-      year = unique(dat$year)
-    )
-  } else {
-    shape_utm <- ll2utm(gfplot::survey_grids[[region]],
-      utm_zone = utm_zone
-    )
-    sp_poly <- sp::SpatialPolygons(
-      list(sp::Polygons(list(sp::Polygon(shape_utm)), ID = 1))
-    )
-    sp_poly_df <- sp::SpatialPolygonsDataFrame(sp_poly,
-      data = data.frame(ID = 1)
-    )
-    pred_grid <- expand.grid(
-      X = seq(round_down_even(min(shape_utm$X)), max(shape_utm$X), cell_width),
-      Y = seq(round_down_even(min(shape_utm$Y)), max(shape_utm$Y), cell_width),
-      year = unique(dat$year)
-    )
-  }
-
-  # widths <- seq(min(shape_utm$X), max(shape_utm$X), cell_width)
-  # cell_width <- unique(round(diff(widths), 9))[[1]]
-  #
-  # heights <- seq(min(shape_utm$Y), max(shape_utm$Y), cell_width)
-  # cell_height <- unique(round(diff(heights), 9))[[1]]
-  cell_width <- cell_width
-  cell_height <- cell_width
-  cell_area <- cell_width * cell_height
-
-  sp::coordinates(pred_grid) <- c("X", "Y")
-  inside <- !is.na(sp::over(pred_grid, as(sp_poly_df, "SpatialPolygons")))
-  pred_grid <- pred_grid[inside, ]
-  pred_grid <- as.data.frame(pred_grid)
-
-  xo <- sort(unique(pred_grid$X))
-  yo <- sort(unique(pred_grid$Y))
-
-  dir.create(cache_folder, showWarnings = FALSE)
-  file_name <- paste0(
-    cache_folder, "/", region,
-    "pred-grid-interp-cell-width-", cell_width, ".rds"
-  )
-
-  if (file.exists(file_name) & !is.null(region)) {
-    message("Preloading interpolated depth for prediction grid...")
-    ii <- readRDS(file_name)
-  }
-
-  if (!file.exists(file_name) & !is.null(region)) {
-    message("Interpolating depth for prediction grid...")
-    bath <- load_bath(utm_zone = utm_zone) %>%
-      filter(
-        X < max(dat$X + 20),
-        X > min(dat$X - 20),
-        Y < max(dat$Y + 20),
-        Y > min(dat$Y - 20),
-        depth > 0
-      )
-    ii <- akima::interp(
-      x = bath$X,
-      y = bath$Y,
-      z = log(bath$depth),
-      xo = xo,
-      yo = yo, extrap = TRUE, linear = TRUE
-    )
-    saveRDS(ii, file_name)
-  }
-
-  z <- reshape2::melt(ii$z)
-  z$x <- ii$x[z$Var1]
-  z$y <- ii$y[z$Var2]
-  z <- filter(z, paste(x, y) %in% paste(pred_grid$X, pred_grid$Y))
-  z <- rename(z, X = x, Y = y, akima_depth = value) %>%
-    select(-Var1, -Var2)
-
-  pred_grid <- left_join(pred_grid, z, by = c("X", "Y"))
-  pred_grid <- mutate(pred_grid, akima_depth = exp(akima_depth))
-
-  if (is.null(region)) {
-    pred_grid <- filter(
-      pred_grid, akima_depth >= min(dat$akima_depth),
-      akima_depth <= max(dat$akima_depth)
-    )
-  }
-
-  pred_grid <- filter(pred_grid, !is.na(akima_depth))
-  pred_grid$depth_scaled <-
-    (log(pred_grid$akima_depth) - dat$depth_mean[1]) / dat$depth_sd[1]
-  pred_grid$depth_scaled2 <- pred_grid$depth_scaled^2
-  list(grid = pred_grid, cell_area = cell_area)
-}
-
 #' Title TODO
 #'
 #' @param prediction_grid_n TODO
@@ -338,7 +222,7 @@ make_prediction_grid <- function(dat, cell_width = 2, region = NULL,
 #'
 #' @rdname survey-spatial-modelling
 
-fit_survey_sets <- function(dat, survey, years,
+fit_survey_sets <- function(dat, years, survey = NULL,
                             chains = 4,
                             iter = 1000,
                             max_knots = 20,
@@ -348,13 +232,9 @@ fit_survey_sets <- function(dat, survey, years,
                             required_obs_percent = 0.05,
                             utm_zone = 9,
                             model = c("glmmfields", "inla"),
-                            include_depth = TRUE, ...) {
-
-  region <- NA
-  if (survey == "West Coast Haida Gwaii Synoptic Survey") region <- "WCHG"
-  if (survey == "West Coast Vancouver Island Synoptic Survey") region <- "WCVI"
-  if (survey == "Queen Charlotte Sound Synoptic Survey") region <- "QCS"
-  if (survey == "Hecate Strait Synoptic Survey") region <- "HS"
+                            include_depth = TRUE,
+                            survey_boundary = NULL,
+                            ...) {
 
   .d_tidy <- tidy_survey_sets(dat, survey, years = years)
 
@@ -362,20 +242,21 @@ fit_survey_sets <- function(dat, survey, years,
     stop("No survey data for species-survey-year combination.")
   }
 
-  assertthat::assert_that(length(unique(.d_tidy$year)) == 1L)
-  assertthat::assert_that(nrow(.d_tidy) > 0)
+  assertthat::assert_that(length(unique(.d_tidy$year)) == 1L,
+    msg = "fit_survey_sets() only works with a single year of data.")
+  assertthat::assert_that(nrow(.d_tidy) > 0,
+    msg = "No data found for the specified survey and years.")
 
   .d_interp <- interp_survey_bathymetry(.d_tidy)
   .d_scaled <- scale_survey_predictors(.d_interp$data)
-  pg <- make_prediction_grid(.d_scaled,
-    region = ifelse(is.na(region), NULL, region)
-  )$grid
+  pg <- make_prediction_grid(.d_scaled, survey = survey,
+    survey_boundary = survey_boundary)$grid
 
   if (sum(.d_scaled$present) / nrow(.d_scaled) < required_obs_percent) {
     return(list(
       predictions = pg, data = .d_tidy,
       models = NA, survey = survey,
-      years = years, region = region
+      years = years
     ))
   }
 
@@ -448,7 +329,7 @@ fit_survey_sets <- function(dat, survey, years,
 
   list(
     predictions = pg, data = .d_scaled, models = m, survey = survey,
-    years = years, region = region
+    years = years
   )
 }
 
@@ -475,7 +356,7 @@ fit_survey_sets <- function(dat, survey, years,
 #' \dontrun{
 #' x <- fit_survey_sets(pop_surv,
 #'   years = 2015,
-#'   survey = "Queen Charlotte Sound Synoptic Survey",
+#'   survey = "SYN QCS",
 #'   iter = 600, chains = 1) # for speed in this example
 #' plot_survey_sets(x$predictions, x$data)
 #' }
@@ -517,30 +398,8 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
     )
   }
 
-  # if (region == "") {
-  #   xlim <- range(raw_dat$X) + c(-10, 10)
-  #   ylim <- range(raw_dat$Y) + c(-10, 10)
-  # } else {
-  #   # b <- readRDS("data/boxes.rds")
-  #   xlim <- b[[region]]$xlim * 10
-  #   ylim <- b[[region]]$ylim * 10
-  # }
-  #
-  # xrange <- diff(xlim)
-  # yrange <- diff(ylim)
-  # if (yrange / xrange > aspect_ratio) { # too tall
-  #   needed_xrange <- yrange / aspect_ratio
-  #   mid_pt <- xlim[1] + xrange/2
-  #   xlim <- c(mid_pt - needed_xrange/2, mid_pt + needed_xrange/2)
-  # }
-  # if (yrange / xrange < aspect_ratio) { # too wide
-  #   needed_yrange <- xrange * aspect_ratio
-  #   mid_pt <- ylim[1] + yrange/2
-  #   ylim <- c(mid_pt - needed_yrange/2, mid_pt + needed_yrange/2)
-  # }
-
   if (show_model_predictions) {
-    # turn grids into explicit rectangles for possible rotation:
+    # turn grid into explicit rectangles for possible rotation:
     pred_dat <- lapply(seq_len(nrow(pred_dat)), function(i) {
       row_dat <- pred_dat[i, , drop = FALSE]
       X <- row_dat$X

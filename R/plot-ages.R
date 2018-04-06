@@ -70,11 +70,11 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     mutate(year_jitter = ifelse(sex == "M",
       year + sex_gap / 2, year - sex_gap / 2
     )) %>%
-    group_by(year, year_jitter, survey) %>%
+    group_by(year, year_jitter, survey_abbrev) %>%
     mutate(n_scaled = proportion / max(proportion)) %>%
     ungroup()
 
-  counts <- select(dat, total, year, survey) %>% unique()
+  counts <- select(dat, total, year, survey_abbrev) %>% unique()
 
   age_range <- diff(range(dat$age, na.rm = TRUE))
 
@@ -88,7 +88,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     ))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
     line_col <- col
-    dat$sex <- paste(dat$sex, dat$survey)
+    dat$sex <- paste(dat$sex, dat$survey_abbrev)
   }
 
   fill_col <- paste0(substr(line_col, 1L, 7L), as.character(alpha * 100))
@@ -97,9 +97,9 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     year_range <- c(min(dat$year, na.rm = TRUE), max(dat$year, na.rm = TRUE))
   }
 
-  dat <- full_join(dat, tibble(survey = factor(levels(dat$survey),
-    levels = levels(dat$survey)
-  )), by = "survey")
+  dat <- full_join(dat, tibble(survey_abbrev = factor(levels(dat$survey_abbrev),
+    levels = levels(dat$survey_abbrev)
+  )), by = "survey_abbrev")
 
   # empty plot:
   if (sum(!is.na(dat$age)) == 0) {
@@ -108,10 +108,10 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   }
 
   dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bubbles shaded on top
-  dat <- arrange(dat, year_jitter, survey, sex)
+  dat <- arrange(dat, year_jitter, survey_abbrev, sex)
 
   g <- ggplot(dat, aes_string("year_jitter", "age")) +
-    facet_wrap(~ survey, nrow = 1) +
+    facet_wrap(~ survey_abbrev, nrow = 1) +
     scale_x_continuous(
       breaks =
         seq(round_down_even(min(year_range)), max(year_range), year_increment)

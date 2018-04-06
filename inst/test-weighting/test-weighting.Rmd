@@ -38,7 +38,7 @@ survey_samples <- readRDS("data-cache/pbs-survey-samples.rds")
 survey_sets <- readRDS("data-cache/pbs-survey-sets.rds")
 
 survey_samples <- survey_samples %>%
-  filter(survey_series_desc == "Queen Charlotte Sound Synoptic Survey" )
+  filter(survey_series_desc == "Queen Charlotte Sound Synoptic Bottom Trawl" )
 
 dd <- tidy_comps_survey(survey_samples, survey_sets, value = age)
 dd$age <- paste(ifelse(dd$sex == 1, "M", "F"), dd$age)

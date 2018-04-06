@@ -175,6 +175,13 @@ load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
   ll2utm(isobath, utm_zone = utm_zone)
 }
 
+#' Rotate coords
+#'
+#' @param x TODO
+#' @param y TODO
+#' @param rotation_angle TODO
+#' @param rotation_center TODO
+#'
 #' @examples
 #' x <- c(1:100, rep(100, 100), 100:1, rep(1, 100))
 #' y <- c(rep(1, 100), 1:100, rep(100, 100), 100:1)

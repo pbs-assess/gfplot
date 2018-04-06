@@ -7,9 +7,7 @@
 #'
 #' @param dat The input samples data frame from [get_comm_samples()] or
 #'   [get_survey_samples()].
-#' @param survey_series_desc A character vector of survey series to include.
-#' @param survey A character vector of shorter/cleaner survey names to use in
-#'   the same order as `survey_series_desc`. These are used in the plot.
+#' @param survey A character vector of shorter/cleaner survey names to use.
 #' @param year_range An optional range of years to plot.
 #' @param spp_cat_code A numeric vector of species categorical codes to include
 #'   for the commercial samples. Defaults to `1`, which refers to unsorted
@@ -117,18 +115,9 @@ tidy_lengths_weighted <- function(...) {
 #' @export
 #' @rdname tidy_comps
 tidy_comps <- function(dat,
-                       survey_series_desc = c(
-                         "West Coast Haida Gwaii Synoptic Survey",
-                         "Hecate Strait Synoptic Survey",
-                         "Queen Charlotte Sound Synoptic Survey",
-                         "West Coast Vancouver Island Synoptic Survey",
-                         "PHMA Rockfish Longline Survey - Outside North",
-                         "PHMA Rockfish Longline Survey - Outside South",
-                         "IPHC Longline Survey"
-                       ),
                        survey = c(
-                         "WCHG", "HS", "QCS", "WCVI", "PHMA LL (N)",
-                         "PHMA LL (S)", "IPHC"
+                         "SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI", "HBLL_OUT N",
+                         "HBLL_OUT S", "IPHC_FISS"
                        ),
                        year_range = NULL,
                        spp_cat_code = 1,
@@ -178,7 +167,7 @@ tidy_comps <- function(dat,
   # Filter down data (commercial):
   if (sample_type == "commercial") {
     dat <- filter(dat, species_category_code %in% spp_cat_code)
-    dat$survey_series_desc <- "Commercial"
+    dat$survey_abbrev <- "Commercial"
 
     pbs_areas <- gfplot::pbs_areas[grep(
       area_grep_pattern,
@@ -190,7 +179,7 @@ tidy_comps <- function(dat,
   # -------------------------------------------
   # Filter down data (survey):
   if (sample_type == "survey") {
-    dat <- filter(dat, survey_series_desc %in% survey_series_desc)
+    dat <- filter(dat, survey_abbrev %in% survey)
   }
 
   # -------------------------------------------
@@ -219,20 +208,20 @@ tidy_comps <- function(dat,
   if (frequency_type == "raw") {
     dat <- dat %>%
       select(
-        species_common_name, survey_series_desc, year, sex, age,
+        species_common_name, survey_abbrev, year, sex, age,
         .data$length
       )
   } else {
     if (sample_type == "survey") {
       dat <- dat %>%
         select(
-          species_common_name, survey_series_desc, year, sex, age,
+          species_common_name, survey_abbrev, year, sex, age,
           .data$length, sample_id, grouping_code, survey_id
         )
     } else {
       dat <- dat %>%
         select(
-          species_common_name, survey_series_desc, year, sex, age,
+          species_common_name, survey_abbrev, year, sex, age,
           .data$length, sample_id, trip_start_date, trip_id, catch_weight
         )
     }
@@ -243,14 +232,14 @@ tidy_comps <- function(dat,
   # -------------------------------------------
   # Join in survey names if needed:
   if (sample_type == "survey") {
-    surv <- tibble(survey_series_desc = survey_series_desc, survey = survey)
-    dat <- inner_join(dat, surv, by = "survey_series_desc")
-    dat$survey <- factor(dat$survey, levels = survey)
+    # surv <- tibble(survey_abbrev = survey_abbrev, survey = survey)
+    # dat <- inner_join(dat, surv, by = "survey_series_desc")
+    dat$survey_abbrev <- factor(dat$survey_abbrev, levels = survey)
   } else {
-    dat$survey <- "Commercial"
+    dat$survey_abbrev <- "Commercial"
   }
 
-  dat$survey_series_desc <- NULL
+  # dat$survey_series_desc <- NULL
 
   # -------------------------------------------
   # Calculate the actual age or length frequencies:
@@ -259,9 +248,9 @@ tidy_comps <- function(dat,
   # Raw (commercial or survey):
   if (age_length == "age" && frequency_type == "raw") {
     freq <- dat %>%
-      group_by(species_common_name, year, age, sex, survey) %>%
+      group_by(species_common_name, year, age, sex, survey_abbrev) %>%
       summarise(n = n()) %>%
-      group_by(year, survey) %>%
+      group_by(year, survey_abbrev) %>%
       mutate(proportion = n / sum(n)) %>%
       select(-n) %>%
       ungroup()
@@ -271,9 +260,9 @@ tidy_comps <- function(dat,
     freq <- dat %>%
       dplyr::do(bin_lengths(dat, value = length, bin_size = bin_size)) %>%
       rename(length_bin = .data$length) %>%
-      group_by(species_common_name, year, length_bin, sex, survey) %>%
+      group_by(species_common_name, year, length_bin, sex, survey_abbrev) %>%
       summarise(n = n()) %>%
-      group_by(year, survey) %>%
+      group_by(year, survey_abbrev) %>%
       mutate(proportion = n / sum(n)) %>%
       select(-n) %>%
       ungroup()
@@ -284,9 +273,9 @@ tidy_comps <- function(dat,
   if (age_length == "age" && frequency_type == "weighted" &&
     sample_type == "survey") {
     freq <- dat %>%
-      group_by(species_common_name, survey) %>%
+      group_by(species_common_name, survey_abbrev) %>%
       dplyr::do(tidy_comps_survey(., dat_survey_sets, value = age)) %>%
-      # -(1:2) excludes the 'species' and 'survey' columns from weight_comps():
+      # -(1:2) excludes the 'species' and 'survey_abbrev' columns from weight_comps():
       dplyr::do(weight_comps(.[, -(1:2)])) %>%
       ungroup()
   }
@@ -294,7 +283,7 @@ tidy_comps <- function(dat,
   if (age_length == "length" && frequency_type == "weighted" &&
     sample_type == "survey") {
     freq <- dat %>%
-      group_by(species_common_name, survey) %>%
+      group_by(species_common_name, survey_abbrev) %>%
       dplyr::do(tidy_comps_survey(., dat_survey_sets,
         value = length, bin_size = bin_size
       )) %>%
@@ -307,7 +296,7 @@ tidy_comps <- function(dat,
   if (age_length == "age" && frequency_type == "weighted" &&
     sample_type == "commercial") {
     freq <- dat %>%
-      group_by(species_common_name, survey) %>%
+      group_by(species_common_name, survey_abbrev) %>%
       dplyr::do(tidy_comps_commercial(., dat_catch, value = age)) %>%
       dplyr::do(weight_comps(.[, -(1:2)])) %>%
       ungroup()
@@ -316,7 +305,7 @@ tidy_comps <- function(dat,
   if (age_length == "length" && frequency_type == "weighted" &&
     sample_type == "commercial") {
     freq <- dat %>%
-      group_by(species_common_name, survey) %>%
+      group_by(species_common_name, survey_abbrev) %>%
       dplyr::do(tidy_comps_commercial(., dat_catch,
         value = length, bin_size = bin_size
       )) %>%
@@ -337,30 +326,30 @@ tidy_comps <- function(dat,
   # -------------------------------------------
   # Join in the counts for labels:
   if (age_length == "age") {
-    counts <- group_by(dat, year, species_common_name, survey) %>%
+    counts <- group_by(dat, year, species_common_name, survey_abbrev) %>%
       summarise(total = n()) %>%
       ungroup()
     freq <- left_join(freq, counts,
-      by = c("species_common_name", "year", "survey")
+      by = c("species_common_name", "year", "survey_abbrev")
     )
     freq <- select(
-      freq, species_common_name, survey, year, sex, age,
+      freq, species_common_name, survey_abbrev, year, sex, age,
       proportion, total
     )
   }
 
   if (age_length == "length") { # also by year
-    counts <- group_by(dat, year, species_common_name, survey) %>%
+    counts <- group_by(dat, year, species_common_name, survey_abbrev) %>%
       summarise(total = n()) %>%
       ungroup()
     freq <- left_join(freq, counts,
-      by = c("species_common_name", "year", "survey")
+      by = c("species_common_name", "year", "survey_abbrev")
     )
     freq <- select(
-      freq, species_common_name, survey, year, sex, length_bin,
+      freq, species_common_name, survey_abbrev, year, sex, length_bin,
       proportion, total
     )
   }
 
-  arrange(freq, species_common_name, survey, year, sex)
+  arrange(freq, species_common_name, survey_abbrev, year, sex)
 }

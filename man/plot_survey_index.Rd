@@ -5,19 +5,9 @@
 \alias{tidy_survey_index}
 \title{Plot survey relative biomass mass index}
 \usage{
-tidy_survey_index(dat, surveys = c("West Coast Haida Gwaii Synoptic Survey",
-  "Hecate Strait Synoptic Survey", "Queen Charlotte Sound Synoptic Survey",
-  "West Coast Vancouver Island Synoptic Survey",
-  "PHMA Rockfish Longline Survey - Outside North",
-  "PHMA Rockfish Longline Survey - Outside South",
-  "IRF Longline Survey (North)", "IRF Longline Survey (South)",
-  "Hecate Strait Multispecies Assemblage Survey", "IPHC Longline Survey"),
-  survey_names = c("West Coast Haida Gwaii Synoptic",
-  "Hecate Strait Synoptic", "Queen Charlotte Sound Synoptic",
-  "West Coast Vancouver Island Synoptic", "PHMA Rockfish LL - North",
-  "PHMA Rockfish LL - South", "IRF LL Survey North", "IRF LL Survey South",
-  "Hecate Strait Multispecies Assemblage", "IPHC Longline"), min_years = 3,
-  year_range = NULL)
+tidy_survey_index(dat, survey = c("SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI",
+  "HBLL_OUT N", "HBLL_OUT S", "HBLL_INS N", "HBLL_INS S", "MSA_HS",
+  "IPHC_FISS"), min_years = 3, year_range = NULL)
 
 plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices", survey_cols = NULL)
@@ -25,9 +15,7 @@ plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
 \arguments{
 \item{dat}{TODO}
 
-\item{surveys}{TODO}
-
-\item{survey_names}{TODO}
+\item{survey}{TODO}
 
 \item{min_years}{TODO}
 
