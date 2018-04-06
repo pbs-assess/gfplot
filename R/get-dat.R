@@ -302,13 +302,6 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   if (.d$survey_series_desc == "Hecate Strait Multispecies Assemblage Bottom Trawl")
     .d <- .d %>% mutate(survey_abbrev = "HS MSBT")
 
-  surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
-  surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
-  names(surveys) <- tolower(names(surveys))
-
-  .d <- inner_join(.d, surveys, by = "survey_series_id")
-  .d <- as_tibble(.d)
-
   if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
     warning(
       "Duplicate specimen IDs are present because of overlapping survey ",
