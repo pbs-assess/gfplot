@@ -463,9 +463,13 @@ get_sara_dat <- function() {
 }
 
 #' @param path The folder where the cached data will be saved
+#' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
+#'   reading and writing at the expense of disk space.
+#' @param min_cpue_year Minimum year for the CPUE data.
 #' @export
 #' @rdname get
-cache_pbs_data <- function(species, path = "data-cache") {
+cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
+  min_cpue_year = 1996) {
   if (!is_dfo_windows()) {
     stop("Not on a PBS windows machine. Cannot access data.")
   }
@@ -473,32 +477,41 @@ cache_pbs_data <- function(species, path = "data-cache") {
   dir.create(path, showWarnings = FALSE)
 
   d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE)
-  ## TODO: filter out dups
-  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"))
+
+  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
+    compress = compress)
 
   d <- get_survey_samples(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"))
+  saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"),
+    compress = compress)
 
   d <- get_comm_samples(species, discard_keepers = TRUE)
-  saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"))
+  saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"),
+    compress = compress)
 
   d <- get_catch(species)
-  saveRDS(d, file = file.path(path, "pbs-catch.rds"))
+  saveRDS(d, file = file.path(path, "pbs-catch.rds"),
+    compress = compress)
 
   d <- get_cpue_spatial(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"))
+  saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"),
+    compress = compress)
 
   d <- get_cpue_spatial_ll(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue-spatial-ll.rds"))
+  saveRDS(d, file = file.path(path, "pbs-cpue-spatial-ll.rds"),
+    compress = compress)
 
   d <- get_survey_index(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-index.rds"))
+  saveRDS(d, file = file.path(path, "pbs-survey-index.rds"),
+    compress = compress)
 
   d <- get_age_precision(species)
-  saveRDS(d, file = file.path(path, "pbs-age-precision.rds"))
+  saveRDS(d, file = file.path(path, "pbs-age-precision.rds"),
+    compress = compress)
 
-  d <- get_cpue_index(gear = "bottom trawl", min_year = 1996)
-  saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"))
+  d <- get_cpue_index(gear = "bottom trawl", min_year = min_cpue_year)
+  saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"),
+    compress = compress)
 
   message("All data extracted and saved in the folder `", path, "`.")
 }
