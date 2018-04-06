@@ -27,12 +27,12 @@
 #'
 #' ## internally, fit_survey_sets() does something like this:
 #' dat <- tidy_survey_sets(pop_surv,
-#'  survey = "Queen Charlotte Sound Synoptic Survey",
+#'  survey = "SYN QCS",
 #'  years = 2015)
 #' dat_interp <- interp_survey_bathymetry(dat)
 #' dat_scaled <- scale_survey_predictors(dat_interp$data)
 #' m <- fit_glmmfields(dat_scaled)
-#' pg <- make_prediction_grid(dat_scaled, region = "QCS")
+#' pg <- make_prediction_grid(dat_scaled, survey = "SYN QCS")
 #' pos <- predict(m$pos, newdata = data.frame(pg, time = 1),
 #'  type = "response", return_mcmc = TRUE, iter = 100)
 #' bin <- predict(m$bin, newdata = data.frame(pg, time = 1),

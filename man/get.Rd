@@ -45,7 +45,8 @@ get_survey_index(species, ssid = NULL)
 
 get_sara_dat()
 
-cache_pbs_data(species, path = "data-cache")
+cache_pbs_data(species, path = "data-cache", compress = FALSE,
+  min_cpue_year = 1996)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
@@ -72,6 +73,11 @@ length or weight values.}
 \item{min_year}{Minimum year to return.}
 
 \item{path}{The folder where the cached data will be saved}
+
+\item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
+reading and writing at the expense of disk space.}
+
+\item{min_cpue_year}{Minimum year for the CPUE data.}
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific

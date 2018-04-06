@@ -26,10 +26,10 @@
 #' @export
 tidy_survey_index <- function(dat,
                               survey = c(
-                                "SYN_WCHG", "SYN_HS", "SYN_QCS", "SYN_WCVI",
-                                "HBLL_OUT N",
-                                "HBLL_OUT S", "HBLL_INS N", "HBLL_INS S",
-                                "MSA_HS", "IPHC_FISS"
+                                "SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
+                                "HBLL OUT N",
+                                "HBLL OUT S", "HBLL INS N", "HBLL INS S",
+                                "MSA HS", "IPHC FISS"
                               ),
                               min_years = 3, year_range = NULL) {
   if (is.null(year_range)) {

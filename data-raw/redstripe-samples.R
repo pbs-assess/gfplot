@@ -8,16 +8,14 @@ rs_survey_samples <- readRDS("../gfsynopsis/report/data-cache/pbs-survey-samples
 rs_catch <- readRDS("../gfsynopsis/report/data-cache/pbs-catch.rds")
 rs_survey_sets <- readRDS("../gfsynopsis/report/data-cache/pbs-survey-sets.rds")
 
-spp <- "redbanded rockfish"
+spp <- "pacific ocean perch"
 
-rs_survey_sets <- dplyr::filter(dat$survey_sets, species_common_name == spp)
-rs_survey_samples <- dplyr::filter(dat$survey_samples, species_common_name == spp)
-rs_comm_samples <- dplyr::filter(dat$comm_samples, species_common_name == spp)
-rs_catch <- dplyr::filter(dat$catch, species_common_name == spp)
+rs_survey_sets <- dplyr::filter(rs_survey_sets, species_common_name == spp)
+rs_survey_samples <- dplyr::filter(rs_survey_samples, species_common_name == spp)
+rs_comm_samples <- dplyr::filter(rs_comm_samples, species_common_name == spp)
+rs_catch <- dplyr::filter(rs_catch, species_common_name == spp)
 
 library(dplyr)
-rs_survey_samples$survey_series_desc.y <- NULL
-rs_survey_samples <- rename(rs_survey_samples, survey_series_desc = survey_series_desc.x)
 
 # # main age/length data:
 # rs_comm_samples <- get_comm_samples("redstripe rockfish", discard_keepers = TRUE)
