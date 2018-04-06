@@ -243,13 +243,6 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     by = "SURVEY_SERIES_ID"
   )
 
-  ## if (length(.d$specimen_id) > length(unique(.d$specimen_id)))
-  ##   warning("Duplicate specimen IDs are present because of overlapping survey ",
-  ##     "stratifications. If working with the data yourelf, filter them after ",
-  ##     "selecting specific surveys. For example, ",
-  ##     "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-  ##     "Tidying and plotting functions with gfplot will do this for you.")
-
   .d <- inner_join(.d,
     unique(select(
       species_df,
@@ -309,7 +302,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
       "stratifications. If working with the data yourelf, filter them after ",
       "selecting specific surveys. For example, ",
       "`dat <- dat[!duplicated(dat$specimen_id), ]`. ",
-      "Tidying and plotting functions within gfplot will do this for you."
+      "The tidying and plotting functions within gfplot will do this for you."
     )
   }
 
@@ -328,7 +321,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
       .d$species_common_name == "pacific flatnose"), ]
   }
 
-  .d
+  as_tibble(.d)
 }
 
 #' @export
