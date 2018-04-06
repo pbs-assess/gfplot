@@ -111,7 +111,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   dat <- arrange(dat, year_jitter, survey_abbrev, sex)
 
   g <- ggplot(dat, aes_string("year_jitter", "age")) +
-    facet_wrap(~ survey_abbrev, nrow = 1) +
+    facet_wrap(~survey_abbrev, nrow = 1) +
     scale_x_continuous(
       breaks =
         seq(round_down_even(min(year_range)), max(year_range), year_increment)

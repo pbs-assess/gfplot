@@ -235,7 +235,6 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             include_depth = TRUE,
                             survey_boundary = NULL,
                             ...) {
-
   .d_tidy <- tidy_survey_sets(dat, survey, years = years)
 
   if (nrow(.d_tidy) == 0) {
@@ -243,14 +242,18 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   }
 
   assertthat::assert_that(length(unique(.d_tidy$year)) == 1L,
-    msg = "fit_survey_sets() only works with a single year of data.")
+    msg = "fit_survey_sets() only works with a single year of data."
+  )
   assertthat::assert_that(nrow(.d_tidy) > 0,
-    msg = "No data found for the specified survey and years.")
+    msg = "No data found for the specified survey and years."
+  )
 
   .d_interp <- interp_survey_bathymetry(.d_tidy)
   .d_scaled <- scale_survey_predictors(.d_interp$data)
-  pg <- make_prediction_grid(.d_scaled, survey = survey,
-    survey_boundary = survey_boundary)$grid
+  pg <- make_prediction_grid(.d_scaled,
+    survey = survey,
+    survey_boundary = survey_boundary
+  )$grid
 
   if (sum(.d_scaled$present) / nrow(.d_scaled) < required_obs_percent) {
     return(list(
@@ -289,7 +292,6 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
     )
   } else {
-
     message("Predicting density onto grid...")
     bin <- fit_inla(.d_scaled,
       response = "present", family = "binomial",
@@ -364,8 +366,8 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
                              fill_scale =
                                viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
-  colour_scale =
-    viridis::scale_colour_viridis(trans = "sqrt", option = "C"),
+                             colour_scale =
+                               viridis::scale_colour_viridis(trans = "sqrt", option = "C"),
                              pos_pt_col = "#FFFFFF60",
                              bin_pt_col = "#FFFFFF40",
                              pos_pt_fill = "#FFFFFF05",
@@ -405,10 +407,14 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
       X <- row_dat$X
       Y <- row_dat$Y
       data.frame(
-        X = c(X - cell_size / 2, X + cell_size / 2,
-          X + cell_size / 2, X - cell_size / 2),
-        Y = c(Y - cell_size / 2, Y - cell_size / 2,
-          Y + cell_size / 2, Y + cell_size / 2),
+        X = c(
+          X - cell_size / 2, X + cell_size / 2,
+          X + cell_size / 2, X - cell_size / 2
+        ),
+        Y = c(
+          Y - cell_size / 2, Y - cell_size / 2,
+          Y + cell_size / 2, Y + cell_size / 2
+        ),
         combined = row_dat$combined,
         bin = row_dat$bin,
         pos = row_dat$pos,
@@ -465,28 +471,29 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
 
   if (show_model_predictions) {
     g <- g + ggplot2::geom_polygon(
-      data = pred_dat, aes_string("X", "Y", fill = fill_column,
-        colour = fill_column, group = "id"),
+      data = pred_dat, aes_string("X", "Y",
+        fill = fill_column,
+        colour = fill_column, group = "id"
+      ),
     ) +
       fill_scale + colour_scale
   }
   if (show_raw_data) {
-  g <- g +
-    geom_point(
-      data = filter(raw_dat, present == 0),
-      aes_string(x = "X", y = "Y"),
-      col = if (show_model_predictions) bin_pt_col else "grey50",
-      pch = 4, size = 2
-    ) +
-    geom_point(
-      data = filter(raw_dat, present == 1),
-      aes_string(
-        x = "X", y = "Y",
-        size = "density * 1e6"
-      ), fill = pos_pt_fill,
-      col = if (show_model_predictions) pos_pt_col else "grey30", pch = 21
-    )
-
+    g <- g +
+      geom_point(
+        data = filter(raw_dat, present == 0),
+        aes_string(x = "X", y = "Y"),
+        col = if (show_model_predictions) bin_pt_col else "grey50",
+        pch = 4, size = 2
+      ) +
+      geom_point(
+        data = filter(raw_dat, present == 1),
+        aes_string(
+          x = "X", y = "Y",
+          size = "density * 1e6"
+        ), fill = pos_pt_fill,
+        col = if (show_model_predictions) pos_pt_col else "grey30", pch = 21
+      )
   }
 
   g <- g +

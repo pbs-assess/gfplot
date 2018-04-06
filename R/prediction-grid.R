@@ -6,9 +6,9 @@
 #' @export
 #' @rdname survey-spatial-modelling
 make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
-  cache_folder = "prediction-grids",
-  utm_zone = 9,
-  survey_boundary = NULL) {
+                                 cache_folder = "prediction-grids",
+                                 utm_zone = 9,
+                                 survey_boundary = NULL) {
   # if (n != 150) stop("Grid is currently fixed at 150. Leave `n = 150`.")
   if (is.null(region)) {
     region <- "no-region"
@@ -31,10 +31,13 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
   } else {
     region <- gsub("SYN[ _]+", "", survey)
 
-    if (!region %in% names(gfplot::survey_grids) && is.null(survey_boundary))
-      stop(survey, " is not defined in `gfplot::survey_grids`.",
+    if (!region %in% names(gfplot::survey_grids) && is.null(survey_boundary)) {
+      stop(
+        survey, " is not defined in `gfplot::survey_grids`.",
         " Please supply your own survey boundary to the make_prediction_grid()",
-        " `survey_boundary` argument as a data frame with columns `X` and `Y`.")
+        " `survey_boundary` argument as a data frame with columns `X` and `Y`."
+      )
+    }
 
     shape_utm <- ll2utm(gfplot::survey_grids[[region]],
       utm_zone = utm_zone

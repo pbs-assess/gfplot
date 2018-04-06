@@ -10,9 +10,9 @@
 #' @family tidy data functions
 #' @template ageing-precision-examples
 tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
-
-  if (!is.null(ageing_method_codes))
+  if (!is.null(ageing_method_codes)) {
     dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+  }
   # remove specimen id's for which there is no precision reading
   dat <- group_by(dat, specimen_id, species_code) %>%
     mutate(has_precision = 3 %in% age_reading_type_code) %>%

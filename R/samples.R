@@ -20,7 +20,7 @@
 #' }
 
 tidy_sample_avail <- function(dat, year_range = NULL,
-  ageing_method_codes = NULL) {
+                              ageing_method_codes = NULL) {
   dat <- filter(dat, !is.na(year))
 
   if (!is.null(year_range)) {
@@ -30,8 +30,9 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
 
-  if (!is.null(ageing_method_codes))
+  if (!is.null(ageing_method_codes)) {
     dat <- filter(dat, ageing_method %in% ageing_method_codes)
+  }
 
   out <- group_by(dat, species_common_name, year) %>%
     summarise(

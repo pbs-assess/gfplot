@@ -185,8 +185,9 @@ tidy_comps <- function(dat,
   # -------------------------------------------
   # Filter down data (ages):
   if (age_length == "age") {
-    if (!is.null(ageing_method_codes))
+    if (!is.null(ageing_method_codes)) {
       dat <- filter(dat, ageing_method %in% ageing_method_codes)
+    }
     dat <- filter(dat, !is.na(age))
     if (nrow(dat) == 0) {
       warning("No data available after filtering for those ageing codes.",

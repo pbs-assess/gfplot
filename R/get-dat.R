@@ -215,11 +215,12 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   k <- 0
   for (i in seq_along(species_codes)) {
     for (j in seq_along(survey_ids$SURVEY_ID)) {
-
-      if (survey_ids$SURVEY_SERIES_ID[j] %in% trawl)
-      sql_proc <- "proc_catmat_2011"
-      if (survey_ids$SURVEY_SERIES_ID[j] %in% ll)
-      sql_proc <- "proc_catmat_ll_2013"
+      if (survey_ids$SURVEY_SERIES_ID[j] %in% trawl) {
+        sql_proc <- "proc_catmat_2011"
+      }
+      if (survey_ids$SURVEY_SERIES_ID[j] %in% ll) {
+        sql_proc <- "proc_catmat_ll_2013"
+      }
       ## }
 
       k <- k + 1
@@ -292,9 +293,11 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d$species_science_name <- tolower(.d$species_science_name)
 
   # TODO: temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
-  .d <- .d %>% mutate(survey_abbrev =
+  .d <- .d %>% mutate(
+    survey_abbrev =
       ifelse(survey_series_desc ==
-          "Hecate Strait Multispecies Assemblage Bottom Trawl", "MSA HS", survey_abbrev))
+        "Hecate Strait Multispecies Assemblage Bottom Trawl", "MSA HS", survey_abbrev)
+  )
 
   if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
     warning(
@@ -338,9 +341,11 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
 
   # TODO: Elise test:
-  .d <- mutate(.d, keeper =
+  .d <- mutate(.d,
+    keeper =
       (species_category_code == 1 & sample_source_code == 2) |
-      (species_category_code == 3 & !sample_source_code == 1))
+        (species_category_code == 3 & !sample_source_code == 1)
+  )
   if (discard_keepers) {
     .d <- filter(.d, !keeper)
   }

@@ -130,15 +130,6 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     coord_equal(xlim = xlim, ylim = ylim) +
     theme_pbs() + labs(fill = fill_lab, y = "Northing", x = "Easting")
 
-##  # `boxes` is from R/sysdata.rda
-##  if (add_survey_boxes) {
-##    g <- g + ggplot2::geom_rect(data = boxes, aes_string(
-##      xmin = "xmin", ymin = "ymin", ymax = "ymax", xmax = "xmax",
-##      colour = "survey"
-##    ), inherit.aes = FALSE, fill = NA) +
-##      scale_colour_manual(values = surv_cols)
-##  }
-
   g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
   g
 }

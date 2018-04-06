@@ -35,8 +35,9 @@ fit_mat_ogive <- function(dat,
   dat <- dat[dat$sex %in% c(1, 2), , drop = FALSE]
   dat <- dat[dat$month %in% months, , drop = FALSE]
 
-  if (type == "age" && !is.null(ageing_method_codes))
+  if (type == "age" && !is.null(ageing_method_codes)) {
     dat <- filter(dat, ageing_method %in% ageing_method_codes)
+  }
 
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
   dat <- dat %>%

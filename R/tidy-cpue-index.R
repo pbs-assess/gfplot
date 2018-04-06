@@ -24,20 +24,20 @@
 #' }
 
 tidy_cpue_index <- function(dat, species_common,
-  year_range = c(1996, as.numeric(format(Sys.Date(), "%Y")) - 1),
-  lat_range = c(48, Inf),
-  min_positive_tows = 100,
-  min_positive_trips = 4,
-  min_yrs_with_trips = 4,
-  area_grep_pattern = "5[CDE]+",
-  # lat_bands = seq(48, 59, 0.2),
-  # depth_bands = seq(50, 450, 25),
-  lat_band_width = 0.2,
-  depth_band_width = 50,
-  clean_bins = TRUE,
-  depth_bin_quantiles = c(0.01, 0.99),
-  lat_bin_quantiles = c(0.01, 0.99),
-  gear = "BOTTOM TRAWL") {
+                            year_range = c(1996, as.numeric(format(Sys.Date(), "%Y")) - 1),
+                            lat_range = c(48, Inf),
+                            min_positive_tows = 100,
+                            min_positive_trips = 4,
+                            min_yrs_with_trips = 4,
+                            area_grep_pattern = "5[CDE]+",
+                            # lat_bands = seq(48, 59, 0.2),
+                            # depth_bands = seq(50, 450, 25),
+                            lat_band_width = 0.2,
+                            depth_band_width = 50,
+                            clean_bins = TRUE,
+                            depth_bin_quantiles = c(0.01, 0.99),
+                            lat_bin_quantiles = c(0.01, 0.99),
+                            gear = "BOTTOM TRAWL") {
 
   # lat_range <- range(lat_bands)
 
@@ -129,7 +129,8 @@ tidy_cpue_index <- function(dat, species_common,
     depth_range[2] <- round_up_even(depth_range[2], depth_band_width)
   }
 
-  d_retained <- filter(d_retained,
+  d_retained <- filter(
+    d_retained,
     latitude > lat_range[[1]],
     latitude < lat_range[[2]],
     best_depth > depth_range[[1]],

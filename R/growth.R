@@ -74,8 +74,9 @@ fit_vb <- function(dat,
     }
   }
 
-  if (!is.null(ageing_method_codes))
+  if (!is.null(ageing_method_codes)) {
     dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+  }
   dat <- dat[!duplicated(dat), , drop = FALSE] # critical
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
 
@@ -88,7 +89,8 @@ fit_vb <- function(dat,
   if (nrow(dat) < min_samples) {
     return(list(
       predictions = tibble(
-      ages = NA, length = NA),
+        ages = NA, length = NA
+      ),
       pars = list(k = NA, linf = NA, t0 = NA),
       data = dat,
       model = NA

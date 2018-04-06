@@ -6,7 +6,7 @@ library(dplyr)
 library(ggplot2)
 
 sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
-  n_years = 20, n_vessels = 10) {
+                           n_years = 20, n_vessels = 10) {
   fake_fleet <- sim_cpue(
     sigma = sigma, n_samples = n_samples,
     n_years = n_years, n_vessels = n_vessels
@@ -17,9 +17,9 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
 
   m <- fit_cpue_index(fake_fleet,
     formula_binomial = pos_catch ~
-      year_factor + f(vessel, function(x) as.character(x)[[1]]),
+    year_factor + f(vessel, function(x) as.character(x)[[1]]),
     formula_lognormal = log(spp_catch / hours_fished) ~
-      year_factor + f(vessel, function(x) as.character(x)[[1]])
+    year_factor + f(vessel, function(x) as.character(x)[[1]])
   )
 
   if (make_plots) {
@@ -48,7 +48,7 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
       filter(!grepl("Intercept", par_group)) %>%
       ggplot(aes(true_b, est)) + geom_point() +
       geom_linerange(aes(ymin = est - 2 * se, ymax = est + 2 * se)) +
-      facet_wrap(~ par_group) +
+      facet_wrap(~par_group) +
       geom_abline(intercept = 0, slope = 1) +
       coord_equal()
     print(g)

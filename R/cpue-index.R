@@ -189,7 +189,7 @@ plot_cpue_index <- function(predicted_dat, all_models = TRUE) {
     labs(y = "CPUE index", x = "") +
     ylim(0, NA)
   if (all_models) {
-    g <- g + facet_wrap(~ model, scales = "free_y")
+    g <- g + facet_wrap(~model, scales = "free_y")
   }
   g
 }
@@ -269,7 +269,7 @@ plot_cpue_index_coefs <- function(object) {
     geom_point(aes_string(shape = "se_too_big"), bg = "white") +
     scale_shape_manual(values = c("TRUE" = 4, "FALSE" = 21)) +
     scale_colour_manual(values = c("TRUE" = "grey30", "FALSE" = cols[[3]])) +
-    facet_wrap(~ par_group, scales = "free") +
+    facet_wrap(~par_group, scales = "free") +
     theme_pbs() + guides(shape = FALSE, colour = FALSE) +
     labs(y = "", x = "Coefficient value")
 }
@@ -286,7 +286,8 @@ plot_cpue_index_coefs <- function(object) {
 plot_cpue_index_jk <- function(object,
                                terms = c(
                                  "f(month)", "f(vessel)", "f(locality)",
-                                 "f(depth)", "f(latitude)"),
+                                 "f(depth)", "f(latitude)"
+                               ),
                                return_data = FALSE) {
   pos_dat <- object$data[object$data$pos_catch == 1, , drop = FALSE]
 
@@ -325,45 +326,46 @@ plot_cpue_index_jk <- function(object,
   )
 
   if (!is.null(terms)) {
-  fitm <- function(drop_term) {
-    message(paste("Dropping", drop_term, "..."))
-    f1 <- update.formula(
-      formula(m_bin),
-      as.formula(paste0(". ~ . -", drop_term))
-    )
-    f2 <- update.formula(
-      formula(m_pos),
-      as.formula(paste0(". ~ . -", drop_term))
-    )
-    mm1 <- model.matrix(f1, data = object$data)
-    mm2 <- model.matrix(f2, data = pos_dat)
-    mm1 <- make_pred_mm(mm1, years = object$years)
-    mm2 <- make_pred_mm(mm2, years = object$years)
-    m_bin <- speedglm::speedglm(f1,
-      data = object$data,
-      family = binomial(link = "logit")
-    )
-    m_pos <- lm(f2, data = pos_dat)
-    p1 <- plogis(mm1 %*% coef(m_bin))
-    p2 <- exp(mm2 %*% coef(m_pos))
-    data.frame(
-      year = object$years, term = drop_term, pred = p1 * p2,
-      stringsAsFactors = FALSE
-    )
-  }
+    fitm <- function(drop_term) {
+      message(paste("Dropping", drop_term, "..."))
+      f1 <- update.formula(
+        formula(m_bin),
+        as.formula(paste0(". ~ . -", drop_term))
+      )
+      f2 <- update.formula(
+        formula(m_pos),
+        as.formula(paste0(". ~ . -", drop_term))
+      )
+      mm1 <- model.matrix(f1, data = object$data)
+      mm2 <- model.matrix(f2, data = pos_dat)
+      mm1 <- make_pred_mm(mm1, years = object$years)
+      mm2 <- make_pred_mm(mm2, years = object$years)
+      m_bin <- speedglm::speedglm(f1,
+        data = object$data,
+        family = binomial(link = "logit")
+      )
+      m_pos <- lm(f2, data = pos_dat)
+      p1 <- plogis(mm1 %*% coef(m_bin))
+      p2 <- exp(mm2 %*% coef(m_pos))
+      data.frame(
+        year = object$years, term = drop_term, pred = p1 * p2,
+        stringsAsFactors = FALSE
+      )
+    }
 
-  out <- lapply(terms, fitm)
-  out <- do.call("rbind", out)
+    out <- lapply(terms, fitm)
+    out <- do.call("rbind", out)
   }
 
   temp <- bind_rows(none, full)
 
-  if (!is.null(terms))
+  if (!is.null(terms)) {
     temp <- bind_rows(temp, out)
-  else
+  } else {
     out <- temp
+  }
 
-    out <- group_by(out, term) %>%
+  out <- group_by(out, term) %>%
     mutate(pred = pred / exp(mean(log(pred)))) %>%
     ungroup()
 
@@ -385,11 +387,14 @@ plot_cpue_index_jk <- function(object,
     geom_line(lwd = 1.0) +
     theme_pbs() + guides(size = FALSE, colour = FALSE) +
     labs(colour = "Excluded", y = "Relative CPUE index", x = "") +
-    facet_wrap(~ term)
+    facet_wrap(~term)
 
-  if (return_data)
-    bind_rows(out, data.frame(all, term = "Standardized",
-      stringsAsFactors = FALSE))
+  if (return_data) {
+    bind_rows(out, data.frame(all,
+      term = "Standardized",
+      stringsAsFactors = FALSE
+    ))
+  }
 }
 
 #' Simulate fake commercial CPUE data for examples and testing
@@ -462,7 +467,6 @@ sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
 #' f(a, "b")
 
 f <- function(x, ref = get_most_common_level) {
-
   out <- as.factor(as.character(x))
   if (is.character(ref)) {
     relevel(out, ref = ref)
