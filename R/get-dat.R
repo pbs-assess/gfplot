@@ -298,6 +298,10 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
+  # temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
+  if (.d$survey_series_desc == "Hecate Strait Multispecies Assemblage Bottom Trawl")
+    .d <- .d %>% mutate(survey_abbrev = "HS MSBT")
+
   surveys <- run_sql("GFBioSQL", "SELECT * FROM SURVEY_SERIES")
   surveys <- select(surveys, -SURVEY_SERIES_TYPE_CODE)
   names(surveys) <- tolower(names(surveys))
