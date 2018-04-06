@@ -178,6 +178,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     TRAWL_IND, GEAR_CODE
     ORDER BY S.SURVEY_SERIES_ID")
   trawl <- unique(trawl$SURVEY_SERIES_ID)
+  trawl <- as.list(trawl)
   ll <- run_sql("GFBioSQL", "SELECT
     S.SURVEY_SERIES_ID
     FROM SURVEY_SERIES SS
@@ -192,6 +193,8 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     TRAWL_IND, GEAR_CODE
     ORDER BY S.SURVEY_SERIES_ID")
   ll <- unique(ll$SURVEY_SERIES_ID)
+  ll <- as.list(ll)
+
 
   missing <- setdiff(ssid, c(trawl, ll))
   if (length(missing) > 0) {
@@ -215,11 +218,10 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   for (i in seq_along(species_codes)) {
     for (j in seq_along(survey_ids$SURVEY_ID)) {
 
-      ## if (survey_ids$SURVEY_SERIES_ID[j] %in% trawl)
+      if (survey_ids$SURVEY_SERIES_ID[j] %in% trawl)
       sql_proc <- "proc_catmat_2011"
-      ## if (survey_ids$SURVEY_SERIES_ID[j] %in% ll) {
-      ##   stop("Long line surveys are not yet supported. TODO")
-      ##   sql_proc <- "proc_catmat_ll_2013"
+      if (survey_ids$SURVEY_SERIES_ID[j] %in% ll)
+      sql_proc <- "proc_catmat_ll_2013"
       ## }
 
       k <- k + 1
