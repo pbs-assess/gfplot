@@ -42,6 +42,8 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
                               fill_lab = "CPUE (kg/hr)") {
   dat <- filter(dat, !is.na(.data$cpue))
 
+  dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
+
   plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
 
   coastline_utm <- load_coastline(
@@ -75,7 +77,7 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     g <- ggplot(dat, aes_string("X", "Y")) +
       coord_equal(xlim = xlim, ylim = ylim) +
       stat_summary_hex(
-        aes_string(x = "X", y = "Y", z = "cpue"), # TODO log
+        aes_string(x = "X", y = "Y", z = "cpue"),
         data = dat, binwidth = bin_width,
         fun = function(x) exp(mean(log(x), na.rm = FALSE))
       )
@@ -83,7 +85,10 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     # enact the privacy rule:
     gdat <- ggplot2::ggplot_build(g)$data[[1]]
     gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
-    stopifnot(nrow(gdat) == nrow(gdat_count))
+
+    assertthat::assert_that(nrow(gdat) == nrow(gdat_count),
+      msg = "Number of hexagon cells for vessel count and CPUE didn't match. ",
+      "Stopping because the privacy rule might not remain valid in this case.")
     gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
 
     if (nrow(gdat) == 0) {
