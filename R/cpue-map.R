@@ -86,9 +86,10 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     gdat <- ggplot2::ggplot_build(g)$data[[1]]
     gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
 
-    assertthat::assert_that(nrow(gdat) == nrow(gdat_count),
-      msg = "Number of hexagon cells for vessel count and CPUE didn't match. ",
-      "Stopping because the privacy rule might not remain valid in this case.")
+    stopifnot(identical(nrow(gdat), nrow(gdat_count)))
+    # Number of hexagon cells for vessel count and CPUE didn't match.
+    # Stopping because the privacy rule might not remain valid in this case.
+
     gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
 
     if (nrow(gdat) == 0) {
