@@ -212,6 +212,11 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   survey_ids <- get_survey_ids(ssid)
   surveys <- get_ssids()
 
+  fe <- run_sql("GFBioSQL", "SELECT
+    FISHING_EVENT_ID,
+    FE_START_LATTITUDE_DEGREE + FE_START_LATTITUDE_MINUTE / 60 AS LATITUDE,
+    -(FE_START_LONGITUDE_DEGREE + FE_START_LONGITUDE_MINUTE / 60) AS LONGITUDE, FE_BEGINNING_BOTTOM_DEPTH AS DEPTH_M
+    FROM B21_Samples")
 
   d_survs <- list()
   k <- 0
@@ -271,6 +276,16 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     species_science_name = tolower(species_science_name),
     species_desc = tolower(species_desc),
     species_common_name = tolower(species_common_name)
+  )
+
+  .d <- inner_join(.d,
+    unique(select(
+      fe,
+      LATITUDE,
+      LONGITUDE,
+      DEPTH_M
+    )),
+    by = "FISHING_EVENT_ID"
   )
 
   stopifnot(all(species_codes %in% .d$species_code))
