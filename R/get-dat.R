@@ -271,21 +271,22 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
   }
 
-  names(.d) <- tolower(names(.d))
-  .d <- mutate(.d,
-    species_science_name = tolower(species_science_name),
-    species_desc = tolower(species_desc),
-    species_common_name = tolower(species_common_name)
-  )
-
   .d <- inner_join(.d,
     unique(select(
       fe,
+      FISHING_EVENT_ID,
       LATITUDE,
       LONGITUDE,
       DEPTH_M
     )),
     by = "FISHING_EVENT_ID"
+  )
+
+  names(.d) <- tolower(names(.d))
+  .d <- mutate(.d,
+    species_science_name = tolower(species_science_name),
+    species_desc = tolower(species_desc),
+    species_common_name = tolower(species_common_name)
   )
 
   stopifnot(all(species_codes %in% .d$species_code))
