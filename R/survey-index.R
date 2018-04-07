@@ -119,7 +119,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     geom_ribbon(aes_string(
       ymin = "lowerci_scaled", ymax = "upperci_scaled",
       fill = "survey_abbrev"
-    ), colour = NA) +
+    ), colour = NA, alpha = 0.3) +
     geom_line(col = "#00000050", size = 1) +
     geom_point(
       pch = 21, colour = col[[2]], fill = "grey60", size = 1.6, stroke = 1

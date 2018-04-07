@@ -111,7 +111,7 @@ plot_maturity_months <- function(dat,
                                  line_col = c("M" = "grey50", "F" = "#f44256"),
                                  alpha = 0.8,
                                  title = "Maturity frequencies",
-                                 n_label_pos = c(0.6, 0.8)) {
+                                 n_label_pos = c(0.7, 1)) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
     mutate(
@@ -156,7 +156,7 @@ plot_maturity_months <- function(dat,
       ), size = 2.25, hjust = 0.5, show.legend = FALSE
     ) +
     coord_cartesian(
-      ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1),
+      ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.5),
       expand = FALSE
     ) +
     theme(panel.spacing = unit(-0.1, "lines")) +

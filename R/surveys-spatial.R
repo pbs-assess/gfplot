@@ -47,7 +47,8 @@ NULL
 #' @param years TODO
 #' @export
 #' @rdname survey-spatial-modelling
-tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
+tidy_survey_sets <- function(dat, survey, years, utm_zone = 9,
+  density_column = "density_kgpm2") {
 
   # Make sure here are no duplicated fishing events in surveyed tows
   # Could be there because of the sample ID column being emerged in
@@ -55,14 +56,14 @@ tidy_survey_sets <- function(dat, survey, years, utm_zone = 9) {
     select(dat, year, fishing_event_id)
   ), , drop = FALSE]
 
-  dat <- rename(dat, start_lon = longitude, start_lat = latitude) %>%
+  dat <- dat %>%
     filter(survey_abbrev %in% survey) %>%
-    filter(year %in% years) %>%
-    rename(density = density_kgpm2)
+    filter(year %in% years)
 
+  names(dat)[names(dat) %in% density_column] <- "density"
 
-  dat <- select(dat, year, start_lon, start_lat, depth_m, density) %>%
-    rename(X = start_lon, Y = start_lat) %>%
+  dat <- select(dat, year, longitude, latitude, depth_m, density) %>%
+    rename(X = longitude, Y = latitude) %>%
     rename(depth = depth_m)
   dat <- mutate(dat, present = ifelse(density > 0, 1, 0))
 
@@ -223,6 +224,7 @@ fit_glmmfields <- function(dat,
 #' @rdname survey-spatial-modelling
 
 fit_survey_sets <- function(dat, years, survey = NULL,
+                            density_column = "density_kgpm2",
                             chains = 4,
                             iter = 1000,
                             max_knots = 20,
@@ -235,7 +237,8 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             include_depth = TRUE,
                             survey_boundary = NULL,
                             ...) {
-  .d_tidy <- tidy_survey_sets(dat, survey, years = years)
+  .d_tidy <- tidy_survey_sets(dat, survey = survey,
+    years = years, density_column = density_column)
 
   if (nrow(.d_tidy) == 0) {
     stop("No survey data for species-survey-year combination.")

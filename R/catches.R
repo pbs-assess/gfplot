@@ -107,7 +107,7 @@ tidy_catch <- function(dat, areas = NULL) {
 plot_catch <- function(dat,
                        ylab = "Landings",
                        units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
-                       unreliable = c(1996, 2006), unreliable_alpha = 0.1) {
+                       unreliable = c(1996, 2006), unreliable_alpha = 0.05) {
   pal <- c(RColorBrewer::brewer.pal(
     n = length(unique(dat$gear)) - 2,
     "Paired"
@@ -124,7 +124,12 @@ plot_catch <- function(dat,
     }
   }
 
+  yrs <- range(dat$year)
   g <- ggplot()
+
+  g <- g + geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey98") +
+    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5),
+      col = "grey95")
 
   if (!is.na(unreliable[[1]])) {
     for (i in seq_along(unreliable))
@@ -135,7 +140,8 @@ plot_catch <- function(dat,
       )
   }
 
-  g <- g + geom_col(
+  g <- g +
+    geom_col(
     data = dat,
     aes_string("year", "value/scale_val", colour = "gear", fill = "gear")
   ) +
