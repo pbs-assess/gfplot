@@ -23,7 +23,8 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
                      offset = c(10, 50), cutoff = 1,
                      include_depth = TRUE,
                      verbose = FALSE,
-                     debug = FALSE) {
+                     debug = FALSE,
+                     trials = 10) {
   d <- dat
   coords <- as.matrix(unique(d[, c("X", "Y")]))
 
@@ -102,26 +103,39 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
   ))
 
   if (fit_model) {
-    model <- INLA::inla(formula,
-      family = family,
-      data = INLA::inla.stack.data(sdat),
-      control.predictor = list(
-        compute = TRUE,
-        A = INLA::inla.stack.A(sdat)
-      ),
-      control.fixed = list(
-        mean = 0, prec = 1 / (4^2),
-        mean.intercept = 0, prec.intercept = 1 / (25^2)
-      ),
-      control.compute = list(config = TRUE),
-      verbose = verbose,
-      debug = debug,
-      keep = FALSE
-    )
+    try_fitting <- TRUE
+    trial_i <- 1
+    while (try_fitting && trial_i <= trials) {
+      model <- try(INLA::inla(formula,
+        family = family,
+        data = INLA::inla.stack.data(sdat),
+        control.predictor = list(
+          compute = TRUE,
+          A = INLA::inla.stack.A(sdat)
+        ),
+        control.fixed = list(
+          mean = 0, prec = 1 / (4^2),
+          mean.intercept = 0, prec.intercept = 1 / (25^2)
+        ),
+        control.compute = list(config = TRUE),
+        verbose = verbose,
+        debug = debug,
+        keep = FALSE
+      ))
+      trial_i <- trial_i + 1
+      if (class(model) != "try-error") {
+        try_fitting <- FALSE
+      } else {
+        if (trial_i > 5) browser()
+        message("INLA error. Trying again.")
+      }
+    }
+    if (class(model) == "try-error") {
+      model <- NA
+    }
   } else {
     model <- NA
   }
-
   list(
     model = model, mesh = mesh, spde = spde, data = dat,
     formula = formula, iset = iset
