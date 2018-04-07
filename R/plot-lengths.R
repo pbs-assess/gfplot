@@ -95,7 +95,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     ifelse(ie, x, "")
   }
 
-  dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bars shaded on top
+  dat$sex <- factor(dat$sex, levels = rev(sort(unique(dat$sex)))) # to get F bars shaded on top
   dat <- arrange(dat, year, survey_abbrev, sex)
 
   dat <- mutate(dat, proportion = ifelse(total >= min_total, proportion, NA))
