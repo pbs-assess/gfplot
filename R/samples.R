@@ -97,7 +97,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
                               palette = "Greys") {
-  dat$n_plot <- log(dat$n + 1)
+  dat$n_plot <- sqrt(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- paste("#", firstup(as.character(dat$type)))
 
