@@ -93,7 +93,10 @@ tidy_survey_index <- function(dat,
 #' @rdname plot_survey_index
 
 plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
-                              title = "Biomass indices", survey_cols = NULL) {
+                              title = "Biomass indices",
+                              max_cv = 0.4,
+                              max_set_fraction = 0.05,
+                              survey_cols = NULL) {
   d <- dat %>%
     group_by(survey_abbrev) %>%
     mutate(
@@ -107,29 +110,54 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   yrs <- range(d$year, na.rm = TRUE)
 
   if (!is.null(survey_cols)) {
-    fill_col <- stats::setNames(survey_cols, levels(d$survey_abbrev))
-    fill_col <- paste0(substr(fill_col, 1L, 7L), as.character(0.7 * 100))
+    line_col <- survey_cols
+    fill_col <- paste0(substr(line_col, 1L, 7L), as.character(0.7 * 100))
+    names(fill_col) <- names(line_col)
   } else {
+    line_col <- rep(col[[2]], length(levels(d$survey_abbrev)))
     fill_col <- rep(col[[1]], length(levels(d$survey_abbrev)))
   }
 
+  stats_df <- select(d, survey_abbrev, mean_cv, num_sets, num_pos_sets) %>%
+    group_by(survey_abbrev) %>%
+    summarise(
+      mean_cv = sprintf("%.2f", round(mean(mean_cv, na.rm = TRUE), 2)),
+      mean_num_pos_sets = sprintf("%.0f", round(mean(num_pos_sets, na.rm = TRUE), 0)),
+      mean_num_sets = sprintf("%.0f", round(mean(num_sets, na.rm = TRUE), 0))) %>%
+    mutate(sets = paste0("Mean sets: ", mean_num_pos_sets, "/", mean_num_sets)) %>%
+    mutate(cv = paste0("Mean CV: ", mean_cv)) %>%
+    mutate(cv = ifelse(mean_cv == "NaN", "", cv)) %>%
+    mutate(sets = ifelse(mean_num_pos_sets == "NaN", "", sets)) %>%
+    mutate(mean_cv = as.numeric(mean_cv)) %>%
+    mutate(mean_num_pos_sets = as.numeric(mean_num_pos_sets),
+      mean_num_sets = as.numeric(mean_num_sets))
+
+  uncertain <- stats_df %>%
+    mutate(uncertain = mean_cv > max_cv |
+        mean_num_pos_sets / mean_num_sets < max_set_fraction |
+        sets == "") %>%
+    filter(uncertain)
+
   ggplot(d, aes_string("year", "biomass_scaled")) +
-    geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey98") +
-    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey95") +
+    geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
+      ymax = 1.1, inherit.aes = FALSE, fill = "grey96") +
+    geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", lwd = 0.3) +
+    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93") +
     geom_ribbon(aes_string(
       ymin = "lowerci_scaled", ymax = "upperci_scaled",
       fill = "survey_abbrev"
     ), colour = NA, alpha = 0.3) +
     geom_line(col = "#00000050", size = 1) +
-    geom_point(
-      pch = 21, colour = col[[2]], fill = "grey60", size = 1.6, stroke = 1
+    geom_point(aes_string(colour = "survey_abbrev"),
+      pch = 21, fill = "grey95", size = 1.4, stroke = 1
     ) +
     facet_wrap(~survey_abbrev, ncol = 2) +
     theme_pbs() +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    ylim(-0.01, NA) +
+    ylim(-0.005, 1.05) +
     coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5)) +
     scale_fill_manual(values = fill_col) +
+    scale_colour_manual(values = line_col) +
     xlab("") +
     ylab("Relative biomass") +
     theme(
@@ -141,9 +169,16 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     labs(title = title) +
     guides(fill = FALSE, colour = FALSE) +
     geom_text(
-      data = labs, x = yrs[1] + 0.5, y = 0.88,
+      data = labs, x = yrs[1] + 0.5, y = 0.89,
       aes_string(label = "survey_abbrev"),
-      inherit.aes = FALSE, colour = "grey30", size = 2.75, hjust = 0
+      inherit.aes = FALSE, colour = "grey30", size = 3, hjust = 0
     ) +
-    scale_x_continuous(breaks = seq(0, yrs[2], 10))
+    scale_x_continuous(breaks = seq(0, yrs[2], 10)) +
+    geom_text(data = stats_df, aes_string(label = "cv"),
+      x = yrs[1] + 0.5, y = 0.67,
+      colour = "grey35", size = 2.65, hjust = 0) +
+    geom_text(data = stats_df,
+      aes_string(label = "sets"),
+      x = yrs[1] + 0.5, y = 0.49,
+      colour = "grey35", size = 2.65, hjust = 0)
 }
