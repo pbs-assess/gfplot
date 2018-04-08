@@ -247,9 +247,6 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   assertthat::assert_that(length(unique(.d_tidy$year)) == 1L,
     msg = "fit_survey_sets() only works with a single year of data."
   )
-  assertthat::assert_that(nrow(.d_tidy) > 0,
-    msg = "No data found for the specified survey and years."
-  )
 
   .d_interp <- interp_survey_bathymetry(.d_tidy)
   .d_scaled <- scale_survey_predictors(.d_interp$data)

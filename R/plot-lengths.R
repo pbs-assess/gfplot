@@ -75,6 +75,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       paste("M", survey_col_names)
     ))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    names(fill_col) <- c(survey_col_names, survey_col_names)
     line_col <- col
     dat$sex <- paste(dat$sex, dat$survey_abbrev)
   }

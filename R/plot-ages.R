@@ -86,6 +86,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       paste("M", survey_col_names)
     ))
     # fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    # names(fill_col) <- c(survey_col_names, survey_col_names)
     fill_col <- rep("#FFFFFF10", length(col))
     line_col <- col
     dat$sex <- paste(dat$sex, dat$survey_abbrev)

@@ -114,6 +114,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   )
   dat <- full_join(dat, all, by = c("type", "year"))
   dat$n_plot[is.na(dat$n_plot)] <- 0
+  dat$n_plot[dat$n_plot == 0] <- NA
 
   ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
@@ -133,7 +134,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
     geom_text(aes_string(x = "year", label = "n_text"),
       colour = "white",
-      size = 1.75, alpha = 0.85
+      size = 2.1, alpha = 1
     ) +
     ggplot2::scale_y_discrete(position = "left") +
     ggplot2::ggtitle(title)
