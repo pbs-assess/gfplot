@@ -228,7 +228,6 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       if (survey_ids$SURVEY_SERIES_ID[j] %in% ll) {
         sql_proc <- "proc_catmat_ll_2013"
       }
-      ## }
 
       k <- k + 1
       d_survs[[k]] <- DBI::dbGetQuery(
@@ -270,17 +269,6 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     ) %>%
       left_join(areas, by = c("SURVEY_ID", "GROUPING_CODE"))
   }
-
-  .d <- inner_join(.d,
-    unique(select(
-      fe,
-      FISHING_EVENT_ID,
-      LATITUDE,
-      LONGITUDE,
-      DEPTH_M
-    )),
-    by = "FISHING_EVENT_ID"
-  )
 
   names(.d) <- tolower(names(.d))
   .d <- mutate(.d,
