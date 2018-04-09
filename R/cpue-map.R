@@ -29,7 +29,8 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
                               xlim = c(122, 890),
                               ylim = c(5373, 6027),
                               utm_zone = 9, bath = c(100, 200, 500),
-                              fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
+                              fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
+                              colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "D"),
                               surv_cols = c(
                                 "WCHG" = "#6BAED6",
                                 "HS" = "#74C476",
@@ -40,6 +41,8 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
                               rotation_center = c(500, 5700),
                               fill_lab = "CPUE (kg/hr)") {
   dat <- filter(dat, !is.na(.data$cpue))
+
+  dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
 
   plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
 
@@ -74,7 +77,7 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     g <- ggplot(dat, aes_string("X", "Y")) +
       coord_equal(xlim = xlim, ylim = ylim) +
       stat_summary_hex(
-        aes_string(x = "X", y = "Y", z = "cpue"), # TODO log
+        aes_string(x = "X", y = "Y", z = "cpue"),
         data = dat, binwidth = bin_width,
         fun = function(x) exp(mean(log(x), na.rm = FALSE))
       )
@@ -82,7 +85,11 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     # enact the privacy rule:
     gdat <- ggplot2::ggplot_build(g)$data[[1]]
     gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
-    stopifnot(nrow(gdat) == nrow(gdat_count))
+
+    stopifnot(identical(nrow(gdat), nrow(gdat_count)))
+    # Number of hexagon cells for vessel count and CPUE didn't match.
+    # Stopping because the privacy rule might not remain valid in this case.
+
     gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
 
     if (nrow(gdat) == 0) {
@@ -104,13 +111,7 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
   isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
   coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
 
-  g <- ggplot() + geom_path(
-    data = isobath_utm, aes_string(
-      x = "X", y = "Y",
-      group = "paste(PID, SID)"
-    ),
-    inherit.aes = FALSE, lwd = 0.3, col = "grey40", alpha = 0.3
-  )
+  g <- ggplot()
 
   if (plot_hexagons) {
     public_dat$X <- public_dat$x
@@ -118,14 +119,22 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
     public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
     g <- g + geom_polygon(data = public_dat, aes_string(
       x = "X", y = "Y",
-      fill = "cpue", group = "hex_id"
-    ), inherit.aes = FALSE) + fill_scale
+      fill = "cpue", colour = "cpue", group = "hex_id"
+    ), inherit.aes = FALSE) + fill_scale + colour_scale
   }
+
+  g <- g + geom_path(
+    data = isobath_utm, aes_string(
+      x = "X", y = "Y",
+      group = "paste(PID, SID)"
+    ),
+    inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+  )
 
   g <- g + geom_polygon(
     data = coastline_utm,
     aes_string(x = "X", y = "Y", group = "PID"),
-    inherit.aes = FALSE, lwd = 0.2, fill = "grey90", col = "grey70"
+    inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70"
   ) +
     coord_equal(xlim = xlim, ylim = ylim) +
     theme_pbs() + labs(fill = fill_lab, y = "Northing", x = "Easting")

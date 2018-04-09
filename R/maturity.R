@@ -193,9 +193,9 @@ plot_mat_ogive <- function(object,
   max_x <- min(c(max(labs$value) * x_max, max(nd_fe$age_or_length)))
 
   if (object$type[[1]] == "age") {
-    labs <- mutate(labs, x = max_x * 0.65) # actual x position calculation
+    labs <- mutate(labs, x = max_x * 0.7) # actual x position calculation
   } else {
-    labs <- mutate(labs, x = max_x * 0.15) # actual x position calculation
+    labs <- mutate(labs, x = max_x * 0.05) # actual x position calculation
   }
 
   g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex"))

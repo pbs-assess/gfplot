@@ -68,7 +68,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 
   dat <- dat %>%
     mutate(year_jitter = ifelse(sex == "M",
-      year + sex_gap / 2, year - sex_gap / 2
+      year - sex_gap / 2, year + sex_gap / 2
     )) %>%
     group_by(year, year_jitter, survey_abbrev) %>%
     mutate(n_scaled = proportion / max(proportion)) %>%
@@ -79,19 +79,20 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   age_range <- diff(range(dat$age, na.rm = TRUE))
 
   if (!is.null(survey_cols)) {
-    stop("survey_cols argument is broken!", call. = FALSE)
     survey_col_names <- names(survey_cols)
     col <- stats::setNames(survey_cols, paste("F", survey_col_names))
     col <- c(col, stats::setNames(
       rep("#888888", length(col)),
       paste("M", survey_col_names)
     ))
-    fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    # fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    # names(fill_col) <- c(survey_col_names, survey_col_names)
+    fill_col <- rep("#FFFFFF10", length(col))
     line_col <- col
     dat$sex <- paste(dat$sex, dat$survey_abbrev)
+  } else {
+    fill_col <- paste0(substr(line_col, 1L, 7L), as.character(alpha * 100))
   }
-
-  fill_col <- paste0(substr(line_col, 1L, 7L), as.character(alpha * 100))
 
   if (is.null(year_range)) {
     year_range <- c(min(dat$year, na.rm = TRUE), max(dat$year, na.rm = TRUE))
@@ -107,7 +108,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     age_range <- 1
   }
 
-  dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bubbles shaded on top
+  dat$sex <- factor(dat$sex, levels = rev(sort(unique(dat$sex)))) # to get F bubbles shaded on top
+
   dat <- arrange(dat, year_jitter, survey_abbrev, sex)
 
   g <- ggplot(dat, aes_string("year_jitter", "age")) +

@@ -75,6 +75,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       paste("M", survey_col_names)
     ))
     fill_col <- paste0(substr(col, 1L, 7L), as.character(alpha * 100))
+    names(fill_col) <- c(survey_col_names, survey_col_names)
     line_col <- col
     dat$sex <- paste(dat$sex, dat$survey_abbrev)
   }
@@ -90,7 +91,12 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     mutate(proportion = proportion / max(proportion)) %>%
     ungroup()
 
-  dat$sex <- factor(dat$sex, levels = c("M", "F")) # to get F bars shaded on top
+  is_even <- function(x) {
+    ie <- as.numeric(as.character(x)) %% 2 == 0
+    ifelse(ie, x, "")
+  }
+
+  dat$sex <- factor(dat$sex, levels = rev(sort(unique(dat$sex)))) # to get F bars shaded on top
   dat <- arrange(dat, year, survey_abbrev, sex)
 
   dat <- mutate(dat, proportion = ifelse(total >= min_total, proportion, NA))
@@ -101,7 +107,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       aes_string(colour = "sex", fill = "sex"), size = 0.3,
       position = position_identity()
     ) +
-    facet_grid(forcats::fct_rev(as.character(year)) ~ survey_abbrev) +
+    facet_grid(forcats::fct_rev(as.character(year)) ~ survey_abbrev,
+      labeller = labeller(.rows = is_even)) +
     theme_pbs() +
     scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
     scale_colour_manual(values = line_col, breaks = c("M", "F")) +
