@@ -90,6 +90,7 @@ get_ssids <- function() {
      CASE
        WHEN SURVEY_SERIES_ALT_DESC IS NULL THEN SURVEY_SERIES_TYPE_ALT_DESC
 	     WHEN SURVEY_SERIES_TYPE_ALT_DESC IS NULL THEN SURVEY_SERIES_ALT_DESC
+       WHEN SURVEY_SERIES_TYPE_ALT_DESC = 'OTHER' THEN SURVEY_SERIES_ALT_DESC
        ELSE (SURVEY_SERIES_TYPE_ALT_DESC + ' ' + SURVEY_SERIES_ALT_DESC)
        END AS SURVEY_ABBREV
      FROM SURVEY_SERIES SS
@@ -292,7 +293,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @rdname get
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
-get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
+get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE, discard_keepers = TRUE) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -306,12 +307,9 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-  # TODO: temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
-  .d <- .d %>% mutate(
-    survey_abbrev =
-      ifelse(survey_series_desc ==
-        "Hecate Strait Multispecies Assemblage Bottom Trawl", "HS MSA", survey_abbrev)
-  )
+    if (discard_keepers) {
+    .d <- filter(.d, sampling_desc == 'UNSORTED')
+  }
 
   if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
     warning(
@@ -355,13 +353,10 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
 
   # TODO: Elise test:
-  .d <- mutate(.d,
-    keeper =
-      (species_category_code == 1 & sample_source_code == 2) |
-        (species_category_code == 3 & !sample_source_code == 1)
-  )
+  # .d <- mutate(.d,
+
   if (discard_keepers) {
-    .d <- filter(.d, !keeper)
+    .d <- filter(.d, sampling_desc == 'UNSORTED')
   }
 
   # remove ages from unaccepted ageing methods:
