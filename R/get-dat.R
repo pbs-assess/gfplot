@@ -277,6 +277,13 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     species_common_name = tolower(species_common_name)
   )
 
+  # TODO: temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
+  .d <- .d %>% mutate(
+    survey_abbrev =
+      ifelse(survey_series_desc ==
+          "Hecate Strait Multispecies Assemblage Bottom Trawl", "HS MSA", survey_abbrev)
+  )
+
   stopifnot(all(species_codes %in% .d$species_code))
   as_tibble(.d)
 }
@@ -303,7 +310,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE) {
   .d <- .d %>% mutate(
     survey_abbrev =
       ifelse(survey_series_desc ==
-        "Hecate Strait Multispecies Assemblage Bottom Trawl", "MSA HS", survey_abbrev)
+        "Hecate Strait Multispecies Assemblage Bottom Trawl", "HS MSA", survey_abbrev)
   )
 
   if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
