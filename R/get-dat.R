@@ -479,7 +479,7 @@ get_sara_dat <- function() {
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
   min_cpue_year = 1996) {
-  if (!is_dfo_windows()) {
+  if (!sql_server_accessible()) {
     stop("Not on a PBS windows machine. Cannot access data.")
   }
 

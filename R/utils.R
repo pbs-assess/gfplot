@@ -1,8 +1,22 @@
 db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
-  DBI::dbConnect(odbc::odbc(),
-    driver = "SQL Server",
-    server = server, database = database
-  )
+  if (!sql_server_accessible()) {
+    stop("SQL server not accessible.")
+  }
+
+  pbs_uid <- getOption("pbs.uid")
+  pbs_pwd <- getOption("pbs.pwd")
+  if (!is.null(pbs_uid) && !is.null(pbs_uid)) {
+    DBI::dbConnect(odbc::odbc(),
+      driver = "SQL Server",
+      server = "***REMOVED***", database = database,
+      pwd = pbs_pwd, uid = uid
+    )
+  } else {
+    DBI::dbConnect(odbc::odbc(),
+      driver = "SQL Server",
+      server = server, database = database
+    )
+  }
 }
 
 force_three_letter_species_code <- function(x) {
@@ -97,11 +111,17 @@ is_dfo <- function() {
   grepl("PBS", Sys.info()[["nodename"]])
 }
 
-#' Is this a DFO Windows computer?
+is_ip_valid <- function(ip = "***REMOVED***") {
+  out <- pingr::ping(ip, verbose = FALSE,
+    count = 1L, timeout = 0.5)
+  !is.na(out)
+}
+
+#' Is this a DFO Windows computer or is the server IP accessible?
 #'
 #' @export
-is_dfo_windows <- function() {
-  if (is_windows() & is_dfo()) TRUE else FALSE
+sql_server_accessible <- function() {
+  if ((is_windows() && is_dfo()) || is_ip_valid()) TRUE else FALSE
 }
 
 factor_bin_clean <- function(x, bins, clean = TRUE) {

@@ -47,6 +47,7 @@ Imports:
     tidyr,
     viridis,
     xml2,
+    pingr,
     INLA
 Remotes: github::pbs-software/pbs-data/PBSdata,
     github::seananderson/glmmfields
