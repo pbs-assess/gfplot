@@ -431,6 +431,7 @@ get_age_precision <- function(species) {
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, .q)
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
   as_tibble(.d)
 }
 
