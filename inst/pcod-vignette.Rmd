@@ -572,7 +572,7 @@ cpue_models <- lapply(areas, function(area) {
     depth_bin_quantiles = c(0.02, 0.98),
     lat_bin_quantiles = c(0.01, 0.99)
   )
-  
+
   pos_catch_fleet <- filter(fleet, pos_catch == 1)
   base_month    <- get_most_common_level(pos_catch_fleet$month)
   base_depth    <- get_most_common_level(pos_catch_fleet$depth)
@@ -582,18 +582,18 @@ cpue_models <- lapply(areas, function(area) {
 
   message("Fitting standardization model for area ", area, ".")
   m_cpue <- fit_cpue_index(fleet,
-    formula_binomial = pos_catch ~ year_factor + 
-      f(month, base_month) + 
-      f(vessel, base_vessel) + 
-      f(locality, base_locality) + 
-      f(depth, base_depth) + 
+    formula_binomial = pos_catch ~ year_factor +
+      f(month, base_month) +
+      f(vessel, base_vessel) +
+      f(locality, base_locality) +
+      f(depth, base_depth) +
       f(latitude, base_lat),
     formula_lognormal = log(spp_catch / hours_fished) ~
-      year_factor + 
-      f(month, base_month) + 
-      f(vessel, base_vessel) + 
-      f(locality, base_locality) + 
-      f(depth, base_depth) + 
+      year_factor +
+      f(month, base_month) +
+      f(vessel, base_vessel) +
+      f(locality, base_locality) +
+      f(depth, base_depth) +
       f(latitude, base_lat)
   )
   list(model = m_cpue, fleet = fleet, area = gsub("\\[|\\]|\\+", "", area))
@@ -650,11 +650,11 @@ Sensitivity:
 ```{r jk-cpue-all, message=FALSE, fig.width=8, fig.height=4}
 jks <- lapply(cpue_models, function(x) {
   plot_cpue_index_jk(x$model, terms = c(
-    "f(month, base_month)", 
-    "f(vessel, base_vessel)", 
+    "f(month, base_month)",
+    "f(vessel, base_vessel)",
     "f(locality, base_locality)",
-    "f(depth, base_depth)", 
-    "f(latitude, base_lat)")) + 
+    "f(depth, base_depth)",
+    "f(latitude, base_lat)")) +
       labs(title = x$area)
 })
 ignore <- lapply(jks, print)
