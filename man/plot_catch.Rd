@@ -8,7 +8,7 @@
 tidy_catch(dat, areas = NULL)
 
 plot_catch(dat, ylab = "Landings", units = c(`1000 tons` = 1e+06, tons =
-  1000, kg = 1), unreliable = c(1996, 2006), unreliable_alpha = 0.1)
+  1000, kg = 1), unreliable = c(1996, 2006), unreliable_alpha = 0.05)
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_catch()} should be from

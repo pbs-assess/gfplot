@@ -27,7 +27,8 @@ get_age_methods()
 get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE)
 
-get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE)
+get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
+  discard_keepers = TRUE)
 
 get_comm_samples(species, discard_keepers = TRUE)
 

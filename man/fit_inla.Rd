@@ -7,7 +7,7 @@
 fit_inla(dat, response = "present", n_knots = 50, family = "binomial",
   max_edge = c(3, 10), kmeans = TRUE, plot = FALSE, fit_model = TRUE,
   extend = list(n = 8, offset = -0.1), offset = c(10, 50), cutoff = 1,
-  include_depth = TRUE, verbose = FALSE, debug = FALSE)
+  include_depth = TRUE, verbose = FALSE, debug = FALSE, trials = 10)
 }
 \arguments{
 \item{dat}{TODO}

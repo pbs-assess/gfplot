@@ -9,7 +9,7 @@ tidy_maturity_months(dat, months = seq(1, 12), ssid = NULL)
 
 plot_maturity_months(dat, max_size = 11, sex_gap = 0.2, fill_col = c(M =
   "grey50", F = "#f44256"), line_col = c(M = "grey50", F = "#f44256"),
-  alpha = 0.8, title = "Maturity frequencies", n_label_pos = c(0.6, 0.8))
+  alpha = 0.8, title = "Maturity frequencies", n_label_pos = c(0.7, 1))
 }
 \arguments{
 \item{dat}{TODO}

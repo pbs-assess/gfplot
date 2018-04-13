@@ -4,12 +4,13 @@
 \alias{plot_cpue_spatial}
 \title{Title TODO}
 \usage{
-plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3,
-  xlim_ll = c(-134.1, -123), ylim_ll = c(48.4, 54.25), utm_zone = 9,
-  bath = c(100, 200, 500), fill_scale = viridis::scale_fill_viridis(trans =
-  "sqrt", option = "C"), surv_cols = c(WCHG = "#6BAED6", HS = "#74C476", QCS =
-  "#FB6A4A", WCVI = "#9E9AC8"), rotation_angle = 0, rotation_center = c(500,
-  5700), fill_lab = "CPUE (kg/hr)")
+plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3, xlim = c(122,
+  890), ylim = c(5373, 6027), utm_zone = 9, bath = c(100, 200, 500),
+  fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
+  colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "D"),
+  surv_cols = c(WCHG = "#6BAED6", HS = "#74C476", QCS = "#FB6A4A", WCVI =
+  "#9E9AC8"), rotation_angle = 0, rotation_center = c(500, 5700),
+  fill_lab = "CPUE (kg/hr)")
 }
 \arguments{
 \item{dat}{TODO}
@@ -18,9 +19,9 @@ plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3,
 
 \item{n_minimum_vessels}{TODO}
 
-\item{xlim_ll}{TODO}
+\item{xlim}{TODO in UTM zone 9}
 
-\item{ylim_ll}{TODO}
+\item{ylim}{TODO in UTM zone 9}
 
 \item{utm_zone}{TODO}
 

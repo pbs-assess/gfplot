@@ -13,7 +13,8 @@
 make_prediction_grid(dat, cell_width = 2, survey = NULL,
   cache_folder = "prediction-grids", utm_zone = 9, survey_boundary = NULL)
 
-tidy_survey_sets(dat, survey, years, utm_zone = 9)
+tidy_survey_sets(dat, survey, years, utm_zone = 9,
+  density_column = "density_kgpm2")
 
 interp_survey_bathymetry(dat, utm_zone = 9)
 
@@ -24,10 +25,10 @@ fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
   iter = 1000, chains = 4, adapt_delta = 0.98,
   cores = parallel::detectCores(), ...)
 
-fit_survey_sets(dat, years, survey = NULL, chains = 4, iter = 1000,
-  max_knots = 20, adapt_delta = 0.95, thin = 1,
-  mcmc_posterior_samples = 150, required_obs_percent = 0.05, utm_zone = 9,
-  model = c("glmmfields", "inla"), include_depth = TRUE,
+fit_survey_sets(dat, years, survey = NULL, density_column = "density_kgpm2",
+  chains = 4, iter = 1000, max_knots = 20, adapt_delta = 0.95,
+  thin = 1, mcmc_posterior_samples = 150, required_obs_percent = 0.05,
+  utm_zone = 9, model = c("glmmfields", "inla"), include_depth = TRUE,
   survey_boundary = NULL, ...)
 }
 \arguments{
