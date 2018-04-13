@@ -9,7 +9,7 @@ db_connection <- function(server = "DFBCV9TWVASP001", database = "GFBioSQL") {
     DBI::dbConnect(odbc::odbc(),
       driver = "SQL Server",
       server = "***REMOVED***", database = database,
-      pwd = pbs_pwd, uid = uid
+      pwd = pbs_pwd, uid = pbs_uid
     )
   } else {
     DBI::dbConnect(odbc::odbc(),
