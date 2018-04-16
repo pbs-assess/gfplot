@@ -117,7 +117,7 @@ is_dfo <- function() {
 is_ip_valid <- function(timeout = 1) {
   pbs_ip <- getOption("pbs.ip")
   if (is.null(pbs_ip)) return(FALSE)
-  out <- pingr::ping(ip, verbose = FALSE,
+  out <- pingr::ping(pbs_ip, verbose = FALSE,
     count = 1L, timeout = timeout)
   !is.na(out)
 }
