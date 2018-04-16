@@ -319,7 +319,7 @@ plot_growth <- function(object_female, object_male,
       alpha = pt_alpha, colour = "grey50"
     ) +
       coord_cartesian(
-        xlim = range(xdat),
+        xlim = c(0, max(xdat)),
         ylim = c(0, max(ydat)),
         expand = FALSE
       )

@@ -105,9 +105,10 @@ tidy_catch <- function(dat, areas = NULL) {
 #' @rdname plot_catch
 #' @export
 plot_catch <- function(dat,
-                       ylab = "Landings",
+                       ylab = "Landings", xlim = c(1954, 2017),
                        units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
-                       unreliable = c(1996, 2006), unreliable_alpha = 0.05) {
+                       unreliable = c(1996, 2006), unreliable_alpha = 0.05,
+  blank_plot = FALSE) {
   pal <- c(RColorBrewer::brewer.pal(
     n = length(unique(dat$gear)) - 2,
     "Paired"
@@ -124,8 +125,8 @@ plot_catch <- function(dat,
     }
   }
 
-  yrs <- range(dat$year)
-  g <- ggplot()
+  yrs <- xlim
+  g <- ggplot(data = dat)
 
   g <- g + geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey98") +
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5),
@@ -134,22 +135,23 @@ plot_catch <- function(dat,
   if (!is.na(unreliable[[1]])) {
     for (i in seq_along(unreliable))
       g <- g + ggplot2::annotate("rect",
-        xmin = min(dat$year) - 1, xmax = unreliable[[i]], ymin = 0,
+        xmin = xlim[1] - 1, xmax = unreliable[[i]], ymin = 0,
         ymax = max(dat$value / scale_val) * 1.5, alpha = unreliable_alpha,
         fill = "black"
       )
   }
 
+  if (!blank_plot) {
+    g <- g + geom_col(data = dat,
+      aes_string("year", "value/scale_val", colour = "gear", fill = "gear")
+    )
+  }
   g <- g +
-    geom_col(
-    data = dat,
-    aes_string("year", "value/scale_val", colour = "gear", fill = "gear")
-  ) +
     theme_pbs() +
     scale_fill_manual(values = pal) +
     scale_colour_manual(values = pal) +
     ylim(0, NA) +
-    coord_cartesian(xlim = range(dat$year) + c(-0.5, 0.5), expand = FALSE) +
+    coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
     ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(fill = "", colour = "") +

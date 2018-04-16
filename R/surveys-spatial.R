@@ -416,10 +416,10 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
     )
   }
 
-  if (show_model_predictions) {
+  pred_dat$id <- NA # for circles
+  if (show_model_predictions && !circles) {
     # turn grid into explicit rectangles for possible rotation:
     pred_dat <- lapply(seq_len(nrow(pred_dat)), function(i) {
-      # browser()
       row_dat <- pred_dat[i, , drop = FALSE]
       X <- row_dat$X
       Y <- row_dat$Y
