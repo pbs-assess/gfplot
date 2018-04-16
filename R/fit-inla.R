@@ -175,13 +175,15 @@ predict_inla <- function(obj, pred_grid, samples = 100L,
     array(0, dim = c(nrow(grid_locs), samples))
   proj_matrix <- INLA::inla.spde.make.A(mesh, loc = as.matrix(grid_locs))
 
+
   # do MCMC projections:
   indx <- which(iset$i2D.group == 1)
   for (i in seq_len(samples)) {
+
     if (include_depth) {
       depth_effects <-
-        pred_grid[, "depth_scaled"] * inla.mcmc[[i]]$latent[depth_fe_indx1] +
-        pred_grid[, "depth_scaled2"] * inla.mcmc[[i]]$latent[depth_fe_indx2]
+        pred_grid[, "depth_scaled", drop = TRUE] * inla.mcmc[[i]]$latent[depth_fe_indx1] +
+        pred_grid[, "depth_scaled2", drop = TRUE] * inla.mcmc[[i]]$latent[depth_fe_indx2]
     } else {
       depth_effects <- 0
     }
