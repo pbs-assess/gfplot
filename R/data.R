@@ -36,12 +36,12 @@
 "pop_surv"
 
 
-#' A prediction grid for all surveys currently at 150 resolution
+#' Survey boundaries
 #'
 #' TODO
 #'
 #' @format A data frame
-"survey_grids"
+"survey_boundaries"
 
 #' Strata areas (TEMPORARY TODO)
 #'
