@@ -1,7 +1,4 @@
-.SQL_SERVER_NAME <- "DFBCV9TWVASP001"
-.SQL_SERVER_IP <- "***REMOVED***"
-
-db_connection <- function(server = .SQL_SERVER_NAME,
+db_connection <- function(server = "DFBCV9TWVASP001",
                           database = "GFBioSQL") {
   if (!sql_server_accessible()) {
     stop("SQL server not accessible.")
@@ -9,10 +6,11 @@ db_connection <- function(server = .SQL_SERVER_NAME,
 
   pbs_uid <- getOption("pbs.uid")
   pbs_pwd <- getOption("pbs.pwd")
-  if (!is.null(pbs_uid) && !is.null(pbs_uid)) {
+  pbs_ip <- getOption("pbs.ip")
+  if (!is.null(pbs_uid) && !is.null(pbs_uid) && is.null(pbs_ip)) {
     DBI::dbConnect(odbc::odbc(),
       driver = "SQL Server",
-      server = .SQL_SERVER_IP, database = database,
+      server = pbs_ip, database = database,
       pwd = pbs_pwd, uid = pbs_uid
     )
   } else {
@@ -115,9 +113,11 @@ is_dfo <- function() {
   grepl("PBS", Sys.info()[["nodename"]])
 }
 
-is_ip_valid <- function(ip = .SQL_SERVER_IP) {
+is_ip_valid <- function(timeout = 1) {
+  pbs_ip <- getOption("pbs.ip")
+  if (is.null(pbs_ip)) return(FALSE)
   out <- pingr::ping(ip, verbose = FALSE,
-    count = 1L, timeout = 0.5)
+    count = 1L, timeout = timeout)
   !is.na(out)
 }
 
