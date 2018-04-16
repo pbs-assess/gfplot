@@ -236,6 +236,9 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             model = c("glmmfields", "inla"),
                             include_depth = TRUE,
                             survey_boundary = NULL,
+                            premade_grid = NULL,
+                            inla_knots_pos = 75,
+                            inla_knots_bin = 100,
                             ...) {
   .d_tidy <- tidy_survey_sets(dat, survey = survey,
     years = years, density_column = density_column)
@@ -248,12 +251,25 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     msg = "fit_survey_sets() only works with a single year of data."
   )
 
-  .d_interp <- interp_survey_bathymetry(.d_tidy)
-  .d_scaled <- scale_survey_predictors(.d_interp$data)
-  pg <- make_prediction_grid(.d_scaled,
-    survey = survey,
-    survey_boundary = survey_boundary
-  )$grid
+  if (!survey %in% c("HBLL OUT N", "HBLL OUT S", "HBLL", "HBLL OUT", "IPHC FISS")) {
+    .d_interp <- interp_survey_bathymetry(.d_tidy)
+    .d_scaled <- scale_survey_predictors(.d_interp$data)
+    pg <- make_prediction_grid(.d_scaled,
+      survey = survey,
+      survey_boundary = survey_boundary,
+      draw_boundary = TRUE,
+      premade_grid = premade_grid
+    )$grid
+  } else {
+    .d_interp <- mutate(.d_tidy, akima_depth = .data$depth)
+    .d_scaled <- scale_survey_predictors(.d_interp)
+    pg <- make_prediction_grid(.d_scaled,
+      survey = survey,
+      survey_boundary = survey_boundary,
+      draw_boundary = FALSE,
+      premade_grid = premade_grid
+    )$grid
+  }
 
   if (sum(.d_scaled$present) / nrow(.d_scaled) < required_obs_percent) {
     return(list(
@@ -296,7 +312,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     bin <- fit_inla(.d_scaled,
       response = "present", family = "binomial",
       include_depth = include_depth,
-      n_knots = min(c(nrow(.d_scaled) - 1, 100)),
+      n_knots = min(c(nrow(.d_scaled) - 1, inla_knots_bin)),
       ...
     )
 
@@ -304,7 +320,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     pos <- fit_inla(dpos,
       response = "density", family = "gamma",
       include_depth = include_depth,
-      n_knots = min(c(nrow(dpos) - 1), 75),
+      n_knots = min(c(nrow(dpos) - 1), inla_knots_pos),
       ...
     )
     m <- list()
@@ -390,7 +406,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
                              north_symbol = FALSE,
                              north_symbol_coord = c(130, 5975),
                              north_symbol_length = 30,
-                             cell_size = 2) {
+                             cell_size = 2, circles = FALSE) {
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,
@@ -403,6 +419,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
   if (show_model_predictions) {
     # turn grid into explicit rectangles for possible rotation:
     pred_dat <- lapply(seq_len(nrow(pred_dat)), function(i) {
+      # browser()
       row_dat <- pred_dat[i, , drop = FALSE]
       X <- row_dat$X
       Y <- row_dat$Y
@@ -418,7 +435,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
         combined = row_dat$combined,
         bin = row_dat$bin,
         pos = row_dat$pos,
-        year = row_dat$year,
+        # year = row_dat$year,
         id = i
       )
     }) %>% bind_rows()
@@ -469,14 +486,22 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
 
   g <- ggplot()
 
-  if (show_model_predictions) {
+  if (show_model_predictions && !circles) {
     g <- g + ggplot2::geom_polygon(
       data = pred_dat, aes_string("X", "Y",
         fill = fill_column,
         colour = fill_column, group = "id"
-      ),
+      )
     ) +
       fill_scale + colour_scale
+  }
+  if (show_model_predictions && circles) {
+    g <- g + ggplot2::geom_point(
+      data = pred_dat, aes_string("X", "Y",
+        colour = fill_column, group = "id"
+      ), size = cell_size
+    ) +
+      colour_scale
   }
   if (show_raw_data) {
     g <- g +
