@@ -7,7 +7,7 @@ db_connection <- function(server = "DFBCV9TWVASP001",
   pbs_uid <- getOption("pbs.uid")
   pbs_pwd <- getOption("pbs.pwd")
   pbs_ip <- getOption("pbs.ip")
-  if (!is.null(pbs_uid) && !is.null(pbs_uid) && is.null(pbs_ip)) {
+  if (!is.null(pbs_uid) && !is.null(pbs_uid) && !is.null(pbs_ip)) {
     DBI::dbConnect(odbc::odbc(),
       driver = "SQL Server",
       server = pbs_ip, database = database,
