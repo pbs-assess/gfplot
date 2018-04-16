@@ -11,7 +11,8 @@
 \title{Survey spatial modelling}
 \usage{
 make_prediction_grid(dat, cell_width = 2, survey = NULL,
-  cache_folder = "prediction-grids", utm_zone = 9, survey_boundary = NULL)
+  cache_folder = "prediction-grids", utm_zone = 9, survey_boundary = NULL,
+  draw_boundary = TRUE, premade_grid = NULL)
 
 tidy_survey_sets(dat, survey, years, utm_zone = 9,
   density_column = "density_kgpm2")
@@ -29,7 +30,8 @@ fit_survey_sets(dat, years, survey = NULL, density_column = "density_kgpm2",
   chains = 4, iter = 1000, max_knots = 20, adapt_delta = 0.95,
   thin = 1, mcmc_posterior_samples = 150, required_obs_percent = 0.05,
   utm_zone = 9, model = c("glmmfields", "inla"), include_depth = TRUE,
-  survey_boundary = NULL, ...)
+  survey_boundary = NULL, premade_grid = NULL, inla_knots_pos = 75,
+  inla_knots_bin = 100, ...)
 }
 \arguments{
 \item{dat}{TODO}
