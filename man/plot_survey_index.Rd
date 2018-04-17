@@ -11,7 +11,7 @@ tidy_survey_index(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
 
 plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices", max_cv = 0.4, max_set_fraction = 0.05,
-  survey_cols = NULL)
+  xlim = NULL, survey_cols = NULL)
 }
 \arguments{
 \item{dat}{TODO}

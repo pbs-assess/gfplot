@@ -7,7 +7,8 @@
 fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
   downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
-  est_method = median, min_samples = 50L, ageing_method_codes = NULL, ...)
+  est_method = median, min_samples = 50L, uniform_priors = FALSE,
+  ageing_method_codes = NULL, ...)
 }
 \arguments{
 \item{dat}{TODO}
@@ -29,6 +30,8 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 \item{est_method}{TODO}
 
 \item{min_samples}{TODO}
+
+\item{uniform_priors}{TODO}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Default to \code{NULL}, which brings in all valid ageing codes.
