@@ -1,8 +1,8 @@
 db_connection <- function(server = "DFBCV9TWVASP001",
                           database = "GFBioSQL") {
-  if (!sql_server_accessible()) {
-    stop("SQL server not accessible.")
-  }
+  ## if (!sql_server_accessible()) {
+  ##   stop("SQL server not accessible.")
+  ## }
 
   pbs_uid <- getOption("pbs.uid")
   pbs_pwd <- getOption("pbs.pwd")
@@ -114,7 +114,7 @@ is_dfo <- function() {
   grepl("PBS", Sys.info()[["nodename"]])
 }
 
-is_ip_valid <- function(timeout = 1) {
+is_ip_valid <- function(timeout = 5) {
   pbs_ip <- getOption("pbs.ip")
   if (is.null(pbs_ip)) return(FALSE)
   out <- pingr::ping(pbs_ip, verbose = FALSE,

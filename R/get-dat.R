@@ -356,9 +356,6 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   .d <- mutate(.d, year = lubridate::year(trip_start_date))
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
 
-  # TODO: Elise test:
-  # .d <- mutate(.d,
-
   if (discard_keepers) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
   }
@@ -483,23 +480,26 @@ get_sara_dat <- function() {
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
-  min_cpue_year = 1996, verbose = TRUE) {
+                           min_cpue_year = 1996, discard_keepers = TRUE,
+                           survey_sets = TRUE, verbose = TRUE) {
   if (!sql_server_accessible()) {
     stop("Not on a PBS windows machine. Cannot access data.")
   }
 
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
+  if(survey_sets){
+    d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
 
-  saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
-    compress = compress)
+    saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
+            compress = compress)
+  }
 
   d <- get_survey_samples(species)
   saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"),
     compress = compress)
 
-  d <- get_comm_samples(species, discard_keepers = TRUE)
+  d <- get_comm_samples(species, discard_keepers = discard_keepers)
   saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"),
     compress = compress)
 
