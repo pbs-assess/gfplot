@@ -12,6 +12,7 @@
 #' @param allow_slow_mcmc TODO
 #' @param est_method TODO
 #' @param min_samples TODO
+#' @param uniform_priors TODO
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
@@ -62,6 +63,7 @@ fit_vb <- function(dat,
                    allow_slow_mcmc = FALSE,
                    est_method = median,
                    min_samples = 50L,
+                   uniform_priors = FALSE,
                    ageing_method_codes = NULL,
                    ...) {
   if ("species_common_name" %in% names(dat)) {
@@ -98,7 +100,11 @@ fit_vb <- function(dat,
   }
 
   rstan::rstan_options(auto_write = TRUE)
-  model_file <- system.file("stan", "vb.stan", package = "gfplot")
+  if (uniform_priors) {
+    model_file <- system.file("stan", "vb-nopriors.stan", package = "gfplot")
+  } else {
+    model_file <- system.file("stan", "vb.stan", package = "gfplot")
+  }
 
   mod <- rstan::stan_model(model_file)
 
