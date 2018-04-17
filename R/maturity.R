@@ -39,6 +39,11 @@ fit_mat_ogive <- function(dat,
     dat <- filter(dat, ageing_method %in% ageing_method_codes)
   }
 
+  if (nrow(dat) == 0) {
+    warning("No data")
+    return(NA)
+  }
+
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
   dat <- dat %>%
     select(
@@ -73,6 +78,10 @@ fit_mat_ogive <- function(dat,
       rename(age_or_length = length)
   )
   .d <- mutate(.d, female = ifelse(sex == 2L, 1L, 0L))
+  if (nrow(.d) == 0) {
+    warning("No data")
+    return(NA)
+  }
 
   if (sample_id_re) {
     m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),

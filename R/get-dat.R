@@ -164,7 +164,7 @@ get_survey_ids <- function(ssid) {
 #' @param join_sample_ids TODO
 #' @rdname get
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
-                            join_sample_ids = FALSE) {
+                            join_sample_ids = FALSE, verbose = FALSE) {
   trawl <- run_sql("GFBioSQL", "SELECT
     S.SURVEY_SERIES_ID
     FROM SURVEY_SERIES SS
@@ -231,6 +231,10 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
       }
 
       k <- k + 1
+      if (verbose) {
+        message("extracting data for survey ID ", survey_ids$SURVEY_ID[j],
+          " and species code ", species_codes[i])
+      }
       d_survs[[k]] <- DBI::dbGetQuery(
         db_connection(database = "GFBioSQL"),
         paste0(
@@ -241,6 +245,9 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     }
   }
   .d <- bind_rows(d_survs)
+
+  if (nrow(.d) < 1)
+    stop("No survey set data for selected species.")
 
   .d <- inner_join(.d,
     unique(select(
@@ -278,14 +285,10 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
     species_common_name = tolower(species_common_name)
   )
 
-  # TODO: temporary abbreviation for Hecate Strait Multispecies Assemblage Survey
-  .d <- .d %>% mutate(
-    survey_abbrev =
-      ifelse(survey_series_desc ==
-          "Hecate Strait Multispecies Assemblage Bottom Trawl", "HS MSA", survey_abbrev)
-  )
-
-  stopifnot(all(species_codes %in% .d$species_code))
+  missing_species <- setdiff(species_codes, .d$species_code)
+  if (length(missing_species) > 0)
+    warning("The following species codes do not have survey set data in GFBio.",
+      paste(missing_species, collapse = ", "))
   as_tibble(.d)
 }
 
@@ -293,7 +296,8 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @rdname get
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
-get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE, discard_keepers = TRUE) {
+get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
+  discard_keepers = TRUE) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -479,14 +483,14 @@ get_sara_dat <- function() {
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
-  min_cpue_year = 1996) {
+  min_cpue_year = 1996, verbose = TRUE) {
   if (!sql_server_accessible()) {
     stop("Not on a PBS windows machine. Cannot access data.")
   }
 
   dir.create(path, showWarnings = FALSE)
 
-  d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE)
+  d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
 
   saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
     compress = compress)

@@ -167,6 +167,10 @@ tidy_comps <- function(dat,
   # Filter down data (commercial):
   if (sample_type == "commercial") {
     dat <- filter(dat, species_category_code %in% spp_cat_code)
+    if (nrow(dat) == 0) {
+      warning("No data available.", call. = FALSE)
+      return(NA)
+    }
     dat$survey_abbrev <- "Commercial"
 
     pbs_areas <- gfplot::pbs_areas[grep(
@@ -180,6 +184,10 @@ tidy_comps <- function(dat,
   # Filter down data (survey):
   if (sample_type == "survey") {
     dat <- filter(dat, survey_abbrev %in% survey)
+    if (nrow(dat) == 0) {
+      warning("No data available.", call. = FALSE)
+      return(NA)
+    }
   }
 
   # -------------------------------------------
@@ -190,9 +198,8 @@ tidy_comps <- function(dat,
     }
     dat <- filter(dat, !is.na(age))
     if (nrow(dat) == 0) {
-      warning("No data available after filtering for those ageing codes.",
-        call. = FALSE
-      )
+      warning("No data available.", call. = FALSE)
+      return(NA)
     }
   }
 
@@ -200,6 +207,10 @@ tidy_comps <- function(dat,
   # Filter down data (lengths):
   if (age_length == "length") {
     dat <- filter(dat, !is.na(.data$length))
+    if (nrow(dat) == 0) {
+      warning("No data available.", call. = FALSE)
+      return(NA)
+    }
   }
 
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical
