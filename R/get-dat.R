@@ -297,7 +297,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
-  discard_keepers = TRUE) {
+  unsorted_only = TRUE) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -311,7 +311,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-    if (discard_keepers) {
+    if (unsorted_only) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
   }
 
@@ -344,9 +344,9 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 }
 
 #' @export
-#' @param discard_keepers TODO
+#' @param unsorted_only TODO
 #' @rdname get
-get_comm_samples <- function(species, discard_keepers = TRUE) {
+get_comm_samples <- function(species, unsorted_only = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -356,7 +356,7 @@ get_comm_samples <- function(species, discard_keepers = TRUE) {
   .d <- mutate(.d, year = lubridate::year(trip_start_date))
   assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
 
-  if (discard_keepers) {
+  if (unsorted_only) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
   }
 
@@ -480,7 +480,7 @@ get_sara_dat <- function() {
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
-                           min_cpue_year = 1996, discard_keepers = TRUE,
+                           min_cpue_year = 1996, unsorted_only = TRUE,
                            survey_sets = TRUE, verbose = TRUE) {
   if (!sql_server_accessible()) {
     stop("Not on a PBS windows machine. Cannot access data.")
@@ -499,7 +499,7 @@ cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
   saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"),
     compress = compress)
 
-  d <- get_comm_samples(species, discard_keepers = discard_keepers)
+  d <- get_comm_samples(species, unsorted_only = unsorted_only)
   saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"),
     compress = compress)
 
