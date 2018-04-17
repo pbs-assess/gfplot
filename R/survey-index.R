@@ -96,6 +96,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               title = "Biomass indices",
                               max_cv = 0.4,
                               max_set_fraction = 0.05,
+                              xlim = NULL,
                               survey_cols = NULL) {
   d <- dat %>%
     group_by(survey_abbrev) %>%
@@ -107,7 +108,11 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     ungroup()
 
   labs <- unique(select(d, survey_abbrev))
-  yrs <- range(d$year, na.rm = TRUE)
+  if (is.null(xlim)) {
+    yrs <- range(d$year, na.rm = TRUE)
+  } else {
+    yrs <- xlim
+  }
 
   if (!is.null(survey_cols)) {
     line_col <- survey_cols
@@ -138,7 +143,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
         sets == "") %>%
     filter(uncertain)
 
-  ggplot(d, aes_string("year", "biomass_scaled")) +
+  g <- ggplot(d, aes_string("year", "biomass_scaled")) +
     geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
       ymax = 1.1, inherit.aes = FALSE, fill = "grey96") +
     geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", lwd = 0.3) +
@@ -181,4 +186,6 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       aes_string(label = "sets"),
       x = yrs[1] + 0.5, y = 0.49,
       colour = "grey35", size = 2.65, hjust = 0)
+
+  g
 }

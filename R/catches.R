@@ -109,11 +109,20 @@ plot_catch <- function(dat,
                        units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
                        unreliable = c(1996, 2006), unreliable_alpha = 0.05,
   blank_plot = FALSE) {
+
+  gears <- c("Bottom trawl",
+    "Midwater trawl",
+    "Hook and line",
+    "Trap",
+    "Unknown/trawl",
+    "Discarded")
+
   pal <- c(RColorBrewer::brewer.pal(
-    n = length(unique(dat$gear)) - 2,
+    n = length(gears) - 2,
     "Paired"
   ), "grey60", "grey30")[c(2, 1, 4, 3, 5, 6)]
-  names(pal) <- levels(dat$gear)
+  names(pal) <- gears
+  dat$gear <- factor(dat$gear, levels = gears)
 
   scale_val <- units[[1]]
   ylab_gg <- paste0(ylab, " (", names(units)[1], ")")
@@ -132,11 +141,15 @@ plot_catch <- function(dat,
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5),
       col = "grey95")
 
+  stacked_data <- group_by(dat, area, year) %>%
+    summarise(catch = sum(value/scale_val, na.rm = FALSE))
+
   if (!is.na(unreliable[[1]])) {
     for (i in seq_along(unreliable))
       g <- g + ggplot2::annotate("rect",
         xmin = xlim[1] - 1, xmax = unreliable[[i]], ymin = 0,
-        ymax = max(dat$value / scale_val) * 1.5, alpha = unreliable_alpha,
+        ymax = max(stacked_data$catch, na.rm = TRUE) * 1.09,
+        alpha = unreliable_alpha,
         fill = "black"
       )
   }
@@ -144,13 +157,13 @@ plot_catch <- function(dat,
   if (!blank_plot) {
     g <- g + geom_col(data = dat,
       aes_string("year", "value/scale_val", colour = "gear", fill = "gear")
-    )
+    ) +
+    ylim(0, max(stacked_data$catch, na.rm = TRUE) * 1.05)
   }
   g <- g +
     theme_pbs() +
-    scale_fill_manual(values = pal) +
-    scale_colour_manual(values = pal) +
-    ylim(0, NA) +
+    scale_fill_manual(values = pal, drop = FALSE) +
+    scale_colour_manual(values = pal, drop = FALSE) +
     coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
     ggplot2::theme(legend.position = "bottom") +
