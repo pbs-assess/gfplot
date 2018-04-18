@@ -25,12 +25,12 @@ get_major_areas()
 get_age_methods()
 
 get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
-  join_sample_ids = FALSE)
+  join_sample_ids = FALSE, verbose = FALSE)
 
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
-  discard_keepers = TRUE)
+  unsorted_only = TRUE)
 
-get_comm_samples(species, discard_keepers = TRUE)
+get_comm_samples(species, unsorted_only = TRUE)
 
 get_catch(species)
 
@@ -47,7 +47,8 @@ get_survey_index(species, ssid = NULL)
 get_sara_dat()
 
 cache_pbs_data(species, path = "data-cache", compress = FALSE,
-  min_cpue_year = 1996)
+  min_cpue_year = 1996, unsorted_only = TRUE, survey_sets = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
@@ -67,7 +68,7 @@ series IDs with surveys series descriptions.}
 \item{remove_bad_data}{Remove known bad data, such as unrealistic
 length or weight values.}
 
-\item{discard_keepers}{TODO}
+\item{unsorted_only}{TODO}
 
 \item{gear}{The gear type(s) to include. Will be converted to uppercase.}
 

@@ -1,3 +1,14 @@
+#' Run SQL
+#'
+#' @param database TODO
+#' @param query TODO
+#'
+#' @export
+run_sql <- function(database, query) {
+  query <- paste(query, collapse = "\n")
+  DBI::dbGetQuery(db_connection(database = database), query)
+}
+
 db_connection <- function(server = "DFBCV9TWVASP001",
                           database = "GFBioSQL") {
   ## if (!sql_server_accessible()) {
@@ -67,11 +78,6 @@ inject_filter <- function(sql_precode, species, sql_code,
     collapse_filters(conversion_func(species)), ")"
   )
   sql_code
-}
-
-run_sql <- function(database, query) {
-  query <- paste(query, collapse = "\n")
-  DBI::dbGetQuery(db_connection(database = database), query)
 }
 
 firstup <- function(x) {
