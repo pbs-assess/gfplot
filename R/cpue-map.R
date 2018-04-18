@@ -40,20 +40,20 @@ plot_cpue_spatial <- function(dat, bin_width = 7, n_minimum_vessels = 3,
                               rotation_angle = 0,
                               rotation_center = c(500, 5700),
                               fill_lab = "CPUE (kg/hr)") {
+
   dat <- filter(dat, !is.na(.data$cpue))
-
   dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
-
   plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
 
+  ll_range <- utm2ll(cbind(X = xlim, Y = ylim))
   coastline_utm <- load_coastline(
-    xlim_ll = range(dat$lon, na.rm = TRUE) + c(-5, 5),
-    ylim_ll = range(dat$lat, na.rm = TRUE) + c(-5, 5),
+    xlim_ll = ll_range[,"X"] + c(-5, 5),
+    ylim_ll = ll_range[,"Y"] + c(-5, 5),
     utm_zone = utm_zone
   )
   isobath_utm <- load_isobath(
-    xlim_ll = range(dat$lon, na.rm = TRUE) + c(-5, 5),
-    ylim_ll = range(dat$lat, na.rm = TRUE) + c(-12, 12),
+    xlim_ll = ll_range[,"X"] + c(-5, 5),
+    ylim_ll = ll_range[,"Y"] + c(-12, 12),
     bath = bath, utm_zone = utm_zone
   )
 
@@ -148,6 +148,12 @@ hex_coords <- function(x, y, unitcell_x = 1, unitcell_y = 1) {
     x = hexbin::hexcoords(unitcell_x)$x + x,
     y = hexbin::hexcoords(unitcell_y)$y + y
   )
+}
+
+utm2ll <- function(x, utm_zone = 9) {
+  attr(x, "projection") <- "UTM"
+  attr(x, "zone") <- utm_zone
+  suppressMessages(PBSmapping::convUL(x))
 }
 
 ll2utm <- function(x, utm_zone = 9) {
