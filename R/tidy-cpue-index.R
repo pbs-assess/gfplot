@@ -115,6 +115,11 @@ tidy_cpue_index <- function(dat, species_common,
   # retain the data from our "fleet"
   d_retained <- semi_join(catch, fleet, by = "vessel_name")
 
+  if (nrow(d_retained) == 0) {
+    warning("No vessels passed the fleet conditions.")
+    return(NA)
+  }
+
   lat_range <- stats::quantile(d_retained$latitude,
     probs = c(min(lat_bin_quantiles), max(lat_bin_quantiles))
   )
