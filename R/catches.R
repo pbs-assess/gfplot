@@ -158,10 +158,11 @@ plot_catch <- function(dat,
     ) +
     ylim(0, max(stacked_data$catch, na.rm = TRUE) * 1.05)
   }
+
   g <- g +
     theme_pbs() +
-    scale_fill_manual(values = pal, drop = FALSE) +
-    scale_colour_manual(values = pal, drop = FALSE) +
+    scale_fill_manual(values = pal, drop = FALSE, breaks = gears) +
+    scale_colour_manual(values = pal, drop = FALSE, breaks = gears) +
     coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
     ggplot2::theme(legend.position = "bottom") +
