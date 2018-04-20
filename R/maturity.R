@@ -137,7 +137,8 @@ plot_mat_ogive <- function(object,
                            xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
                            title =
                              if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
-                           rug = TRUE, rug_n = 1500, x_max = 1.75) {
+                           rug = TRUE, rug_n = 1500, x_max = 1.75,
+                           prediction_type = c("all", "male", "female", "none")) {
   nd_re <- object$pred_data
 
   if (object$sample_id_re) {
@@ -148,6 +149,17 @@ plot_mat_ogive <- function(object,
 
   nd_fe <- filter(nd_re, sample_id == nd_re$sample_id[[1L]]) # fake; all same
   nd_fe$glmm_re <- NULL # also may not exist if no random effects
+
+  prediction_type <- match.arg(prediction_type)
+  if (prediction_type == "male") {
+    nd_fe <- filter(nd_fe, female == 0L)
+  }
+  if (prediction_type == "female") {
+    nd_fe <- filter(nd_fe, female == 1L)
+  }
+  # if (prediction_type == "none") {
+  #   nd_fe <- filter(nd_fe, !female %in% c(0L, 1L)) # i.e. nothing
+  # }
 
   logit_perc <- function(a, b, perc = 0.5) {
     -(log((1 / perc) - 1) + a) / b
@@ -183,6 +195,12 @@ plot_mat_ogive <- function(object,
 
 
   labs <- bind_rows(labs_m, labs_f)
+  if (prediction_type == "male") {
+    labs <- filter(labs, sex == "M")
+  }
+  if (prediction_type == "female") {
+    labs <- filter(labs, sex == "F")
+  }
 
   nd_fe <- mutate(nd_fe, sex = ifelse(female == 1L, "F", "M"))
   nd_re <- mutate(nd_re, sex = ifelse(female == 1L, "F", "M"))
@@ -217,20 +235,22 @@ plot_mat_ogive <- function(object,
       ), inherit.aes = FALSE, alpha = 0.05
     )
   }
-  g <- g + geom_vline(
-    data = filter(labs, p == "50"),
-    aes_string(xintercept = "value", colour = "sex", lty = "sex"), lwd = 0.8,
-    alpha = 0.6, show.legend = FALSE) +
-    geom_line(size = 1.0) +
-    scale_colour_manual(values = c("M" = "grey50", "F" = "black")) +
-    xlab(xlab) + ylab("Probability mature") +
-    geom_text(
+
+  if (prediction_type != "none") {
+    g <- g + geom_vline(
+      data = filter(labs, p == "50"),
+      aes_string(xintercept = "value", colour = "sex", lty = "sex"), lwd = 0.8,
+      alpha = 0.6, show.legend = FALSE)
+    g <- g + geom_line(size = 1.0)
+    g <- g + geom_text(
       data = labs, aes_string(
-        x = "x", y = "y",
-        label = "label"
-      ),
+        x = "x", y = "y", label = "label"),
       hjust = 0, show.legend = FALSE, size = 3
-    ) +
+    )
+  }
+
+  g <- g + scale_colour_manual(values = c("M" = "grey50", "F" = "black")) +
+    xlab(xlab) + ylab("Probability mature") +
     theme_pbs() +
     coord_cartesian(
       expand = FALSE, ylim = c(-0.005, 1.005),
