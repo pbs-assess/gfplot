@@ -207,7 +207,7 @@ plot_mat_ogive <- function(object,
     labs <- mutate(labs, x = max_x * 0.05) # actual x position calculation
   }
 
-  g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex"))
+  g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex", lty = "sex"))
   if ("glmm_re" %in% names(nd_re)) {
     g <- g + geom_line(
       data = nd_re,
@@ -218,12 +218,11 @@ plot_mat_ogive <- function(object,
     )
   }
   g <- g + geom_vline(
-    data = labs,
-    aes_string(xintercept = "value", colour = "sex"),
-    lty = 2, show.legend = FALSE
-  ) +
-    geom_line(size = 1.25) +
-    scale_colour_manual(values = c("M" = "grey30", "F" = "#d80d0d")) +
+    data = filter(labs, p == "50"),
+    aes_string(xintercept = "value", colour = "sex", lty = "sex"), lwd = 0.8,
+    alpha = 0.6, show.legend = FALSE) +
+    geom_line(size = 1.0) +
+    scale_colour_manual(values = c("M" = "grey50", "F" = "black")) +
     xlab(xlab) + ylab("Probability mature") +
     geom_text(
       data = labs, aes_string(
@@ -237,27 +236,24 @@ plot_mat_ogive <- function(object,
       expand = FALSE, ylim = c(-0.005, 1.005),
       xlim = c(0, max_x)
     ) +
-    labs(colour = "Sex") +
+    labs(colour = "Sex", lty = "Sex") +
     ggplot2::ggtitle(title)
 
   if (rug) {
     if (nrow(object$data) > rug_n) {
-      temp <- object$data[sample(seq_len(nrow(object$data)), rug_n),
-        ,
-        drop = FALSE
-      ]
+      temp <- object$data[sample(seq_len(nrow(object$data)), rug_n), , drop = FALSE]
     } else {
       temp <- object$data
     }
     position <- if (object$type == "age") "jitter" else "identity"
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 0L),
-      sides = "b", position = position, alpha = 0.6,
+      sides = "b", position = position, alpha = 0.5, lty = 1,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex")
     )
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 1L),
-      sides = "t", position = position, alpha = 0.6,
+      sides = "t", position = position, alpha = 0.5, lty = 1,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex")
     )
   }

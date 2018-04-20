@@ -31,7 +31,6 @@
 #' @examples
 #' library(rstan) # must load first
 #' # with `rstan::optimizing()` for the mode of the posterior density:
-#' pop_samples$ageing_method <- 3 # TODO fix
 #' model_f <- fit_vb(pop_samples, sex = "female")
 #' model_m <- fit_vb(pop_samples, sex = "male")
 #' plot_vb(model_f, model_m)
@@ -63,6 +62,7 @@ fit_vb <- function(dat,
                    allow_slow_mcmc = FALSE,
                    est_method = median,
                    min_samples = 50L,
+                   too_high_quantile = 1.0,
                    uniform_priors = FALSE,
                    ageing_method_codes = NULL,
                    ...) {
@@ -81,6 +81,8 @@ fit_vb <- function(dat,
   }
   dat <- dat[!duplicated(dat), , drop = FALSE] # critical
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
+  ql <- quantile(dat$length, probs = too_high_quantile)
+  dat <- filter(dat, length <= ql)
 
   sex <- match.arg(sex)
   dat <- switch(sex,
@@ -193,6 +195,7 @@ fit_length_weight <- function(dat,
                               downsample = Inf,
                               min_samples = 50L,
                               method = c("rlm", "lm"),
+                              too_high_quantile = 1.0,
                               scale_weight = 1 / 1000) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) != 1L) {
@@ -205,7 +208,11 @@ fit_length_weight <- function(dat,
   }
 
   dat <- dat[!duplicated(dat), , drop = FALSE]
+
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$weight))
+  ql <- quantile(dat$length, probs = too_high_quantile)
+  qw <- quantile(dat$weight, probs = too_high_quantile)
+  dat <- filter(dat, length <= ql, weight <= qw)
 
   dat <- switch(sex[[1]],
     "female" = filter(dat, sex == 2),
@@ -277,11 +284,11 @@ plot_growth <- function(object_female, object_male,
                         xlab = "Age (years)",
                         ylab = "Length (cm)",
                         seed = 42,
-                        lab_x = 0.4,
+                        lab_x = 0.45,
                         lab_y = 0.3,
                         lab_x_gap = 0.3,
                         lab_y_gap = 0.06,
-                        col = c("Female" = "#d80d0d", "Male" = "grey25")) {
+                        col = c("Female" = "black", "Male" = "grey40")) {
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
 
@@ -315,42 +322,48 @@ plot_growth <- function(object_female, object_male,
   }
 
   g <- ggplot() +
-    scale_colour_manual(values = col) +
+    scale_colour_manual(values = col, labels = c("F", "M")) +
+    ggplot2::scale_linetype_manual(values = c(1, 2), labels = c("F", "M")) +
     theme_pbs() + xlab(xlab) + ylab(ylab) +
-    guides(colour = FALSE)
+    ggplot2::labs(colour = "Sex", lty = "Sex")
 
   if (!no_pts) {
+
+    if (!no_lines) {
+      xlim <- c(0, max(line_dat[,xvar]) * 1.03)
+      ylim <- c(0, max(line_dat[,yvar]) * 1.20)
+    } else {
+      xlim <- c(0, max(pt_dat[,xvar]) * 1.03)
+      ylim <- c(0, max(pt_dat[,yvar]) * 1.03)
+    }
+
     g <- g + geom_point(
       data = pt_dat, aes_string(xvar, yvar),
-      alpha = pt_alpha, colour = "grey50"
+      alpha = pt_alpha, colour = "grey70", pch = 21
     ) +
-      coord_cartesian(
-        xlim = c(0, max(xdat)),
-        ylim = c(0, max(ydat)),
-        expand = FALSE
-      )
+      coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
   }
 
   if (!no_lines) {
     g <- g + geom_line(data = line_dat, aes_string(xvar, yvar,
-      colour = "sex"
-    ), size = 1)
+      colour = "sex", lty = "sex"
+    ), size = 1.0)
   }
 
   ann_func <- if (type[[1]] == "vb") ann_vb else ann_lw
   if (!is.na(object_female$pars[[1]])) {
     g <- ann_func(g, object_female$pars, "Females", col[["Female"]],
-      x = lab_x * max(xdat),
-      y = lab_y * max(ydat),
-      gap = lab_y_gap * max(ydat)
+      x = lab_x * max(xlim),
+      y = lab_y * max(ylim),
+      gap = lab_y_gap * max(ylim)
     )
   }
 
   if (!is.na(object_male$pars[[1]])) {
     g <- ann_func(g, object_male$pars, "Males", col[["Male"]],
-      x = (lab_x + lab_x_gap) * max(xdat),
-      y = lab_y * max(ydat),
-      gap = lab_y_gap * max(ydat)
+      x = (lab_x + lab_x_gap) * max(xlim),
+      y = lab_y * max(ylim),
+      gap = lab_y_gap * max(ylim)
     )
   }
 
@@ -371,7 +384,9 @@ plot_vb <- function(..., type = "vb") {
 #' @export
 #' @rdname plot_growth
 plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)",
-                               ylab = "Weight (kg)", lab_x = 0.2, lab_y = 0.9, lab_x_gap = 0.35) {
+                               ylab = "Weight (kg)",
+                               lab_x = 0.1, lab_y = 0.9,
+                               lab_x_gap = 0.35) {
   plot_growth(...,
     type = type, xlab = xlab,
     ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap

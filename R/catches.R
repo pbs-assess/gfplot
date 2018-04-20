@@ -107,7 +107,7 @@ tidy_catch <- function(dat, areas = NULL) {
 plot_catch <- function(dat,
                        ylab = "Landings", xlim = c(1954, 2017),
                        units = c("1000 tons" = 1000000, "tons" = 1000, "kg" = 1),
-                       unreliable = c(1996, 2006), unreliable_alpha = 0.05,
+                       unreliable = c(1996, 2006),
   blank_plot = FALSE) {
 
   gears <- c("Bottom trawl",
@@ -146,12 +146,10 @@ plot_catch <- function(dat,
 
   if (!is.na(unreliable[[1]])) {
     for (i in seq_along(unreliable))
-      g <- g + ggplot2::annotate("rect",
+      g <- g + ggplot2::geom_rect(data = data.frame(x = NA), # fake
         xmin = xlim[1] - 1, xmax = unreliable[[i]], ymin = 0,
-        ymax = max(stacked_data$catch, na.rm = TRUE) * 1.09,
-        alpha = unreliable_alpha,
-        fill = "black"
-      )
+        ymax = max(stacked_data$catch, na.rm = TRUE) * 1.07,
+        fill = "#00000010", inherit.aes = FALSE)
   }
 
   if (!blank_plot) {

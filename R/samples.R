@@ -96,8 +96,8 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @export
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
-                              palette = "Greys") {
-  dat$n_plot <- sqrt(dat$n)
+                              palette = "Greys", trans = sqrt) {
+  dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- paste("#", firstup(as.character(dat$type)))
 
@@ -115,6 +115,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat <- full_join(dat, all, by = c("type", "year"))
   dat$n_plot[is.na(dat$n_plot)] <- 0
   dat$n_plot[dat$n_plot == 0] <- NA
+  dat <- filter(dat, year >= min(year_range), year <= max(year_range))
 
   ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
@@ -122,7 +123,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
     coord_cartesian(expand = FALSE, xlim = year_range + c(-0.5, 0.5)) +
     ggplot2::scale_fill_distiller(
       palette = palette,
-      limits = c(log(1), max(dat$n_plot)), direction = 1
+      limits = c(0, max(dat$n_plot)), direction = 1
     ) +
     ggplot2::scale_x_continuous(
       breaks = seq(round_down_even(year_range[1]), year_range[2], 2)
