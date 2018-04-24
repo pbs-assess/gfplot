@@ -51,7 +51,7 @@ tidy_survey_sets <- function(dat, survey, years, utm_zone = 9,
   density_column = "density_kgpm2") {
 
   # Make sure here are no duplicated fishing events in surveyed tows
-  # Could be there because of the sample ID column being emerged in
+  # Could be there because of the sample ID column being merged in
   dat <- dat[!duplicated(
     select(dat, year, fishing_event_id)
   ), , drop = FALSE]

@@ -50,21 +50,35 @@
 #'
 #' @examples
 #' \dontrun{
+#' ## Import survey catch density and location data by tow or set for plotting
+#' ## Specify single or multiple species by common name or species code and
+#' ## single or multiple survey series id(s).
 #' get_survey_sets(species = "lingcod", ssid = 1)
+#' get_survey_sets(species = c(442, 397), ssid = c(1, 2))
 #'
+#' ## Import survey or commercial biological data for various plots
+#' (eg. length frequency, growth, age frequency, maturity, etc.)
 #' get_survey_samples(species = 442, ssid = c(1,3,4,16))
 #' get_comm_samples(c(442, 397))
 #'
-#' species <- c("lingcod", "pacific cod")
+#' ## Import catch data by species for barcharts of landings by fishing area,
+#' ## geartype, and year.
+#' species <- ("lingcod")
 #' get_catch(species)
 #'
+#' ## Import spatial commercial catch per unit effort data for trawl or longline
+#' ## data by species for plotting along BC coast.
 #' get_cpue_spatial(species)
 #' get_cpue_spatial_ll("yelloweye rockfish")
 #'
-#' get_cpue_index(gear = "bottom trawl", min_year = 2012, max_year = 2017)
+#' ## Import catch and effort data by gear type for modelling commercial trawl
+#' ## cpue index.
+#' get_cpue_index(gear = "bottom trawl", min_year = 2012)
 #'
-#' get_cpue_spatial("pacific cod")
-#' get_cpue_spatial_ll("arrowtooth flounder")
+#' ## Import survey bootstrapped biomass estimates for plotting relative biomass
+#' ## indices by specified survey series.
+#' get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
+#' get_survey_index("arrowtooth flounder")
 #' }
 #'
 #' @param species One or more species common names (e.g. `"pacific ocean
@@ -76,7 +90,7 @@
 #'   species code, then all elements will be assumed to be species common
 #'   names.
 #' @param ssid A numeric vector of survey series IDs. Run
-#' \code{\link{get_ssids}} if you for a look-up table of available survey
+#' \code{\link{get_ssids}} for a look-up table of available survey
 #' series IDs with surveys series descriptions.
 #' @name get
 NULL
@@ -490,7 +504,6 @@ cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
 
   if(survey_sets){
     d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
-
     saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
             compress = compress)
   }
