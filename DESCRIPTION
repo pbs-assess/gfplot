@@ -27,7 +27,6 @@ Imports:
     forcats,
     ggplot2 (>= 2.2.0),
     glmmTMB,
-    glmmfields,
     grid,
     hexbin,
     lubridate,
@@ -49,8 +48,7 @@ Imports:
     xml2,
     pingr,
     INLA
-Remotes: github::pbs-software/pbs-data/PBSdata,
-    github::seananderson/glmmfields
+Remotes: github::pbs-software/pbs-data/PBSdata
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable
 RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
