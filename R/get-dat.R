@@ -411,8 +411,13 @@ get_catch <- function(species) {
 }
 
 #' @export
+#' @param fishing_year Specify whether fishing year should be year (= calendar
+#' year) or fishing_year (= preset by Pacific cod fishing year as calendar year
+#' for <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and
+#' Feb 21-Feb 20 since Feb 2009).
+#' @param end_year Specify the last year or fishing year to be extracted.
 #' @rdname get
-get_cpue_historic <- function(species) {
+get_cpue_historic <- function(species, fishing_year = FALSE, end_year = 'NULL') {
   .q <- read_sql("get-cpue-historic.sql")
   .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
@@ -423,16 +428,27 @@ get_cpue_historic <- function(species) {
   .d$gear <- tolower(.d$gear)
   .d$locality_description <- tolower(.d$locality_description)
 
+  if (fishing_year) {
+    .d <- .d %>% select(-year)
+  } else {
+    .d <- .d %>% select(-fyear)
+    .d <- t %>% rename(fyear = year)
+  }
+
+  if (!is.na(end_year)){
+    .d <- .d %>% filter(fyear <= end_year)
+  }
+
   areas <- c("3[CD]+", "5[AB]+", "5[CDE]+")
-  d$area <- NA
+  .d$area <- NA
   for (i in seq_along(areas)) {
-    d[grepl(areas[[i]], d$major_stat_area_description), "area"] <-
+    .d[grepl(areas[[i]], .d$major_stat_area_description), "area"] <-
       gsub("\\[|\\]|\\+", "", areas[[i]])
   }
   specific_areas <- c("3C", "3D", "5A", "5B", "5C", "5D", "5E")
-  d$specific_area <- NA
+  .d$specific_area <- NA
   for (i in seq_along(specific_areas)) {
-    d[grepl(specific_areas[[i]], d$major_stat_area_description), "specific_area"] <-
+    .d[grepl(specific_areas[[i]], .d$major_stat_area_description), "specific_area"] <-
       specific_areas[[i]]
   }
   as_tibble(.d)
