@@ -420,7 +420,8 @@ get_catch <- function(species) {
 get_cpue_historic <- function(species, fishing_year = FALSE, end_year = 'NULL') {
   .q <- read_sql("get-cpue-historic.sql")
   .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
-  .d <- run_sql("GFFOS", .q)
+  database = c("GFFOS", "GFCatch", "PacHarvest")
+  .d <- run_sql(database = database, .q)
   names(.d) <- tolower(names(.d))
   .d <- rename(.d, total = totcatch_kg, minor_stat_area_code = min)
   .d$hours_fished <- as.numeric(as.character(.d$hours_fished))
@@ -428,6 +429,7 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = 'NULL') 
   .d$gear <- tolower(.d$gear)
   .d$locality_description <- tolower(.d$locality_description)
 
+  # Select appropriate fishing year
   if (fishing_year) {
     .d <- .d %>% select(-year)
   } else {
@@ -435,6 +437,7 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = 'NULL') 
     .d <- .d %>% rename(fyear = year)
   }
 
+    # Filter out fishing records after last year required
   if (!is.na(end_year)){
     .d <- .d %>% filter(fyear <= end_year)
   }

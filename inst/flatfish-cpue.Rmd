@@ -1,0 +1,106 @@
+---
+title: "Exploring CPUE for five species of flatfish"
+author: "Sean Anderson and Elise Keppel"
+output: html_document
+---
+
+
+```{r, knitr-opts, echo=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.asp = 0.618,
+  autodep = TRUE,
+  cache = TRUE,
+  cache.comments = FALSE
+)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(gfplot)
+```
+
+Extract catch and effort data from all databases for species of interest:
+
+```{r, eval=FALSE}
+species <- c("Arrowtooth Flounder", "English Sole", "Dover Sole", "Southern Rock Sole",
+  "Petrale Sole") 
+d <- gfplot::get_cpue_historic(species, fishing_year = FALSE, end_year = 2017)
+saveRDS(d, file = "../data/flatfish-cpue-data.rds", compress = FALSE)
+```
+
+Read the data in, clean up the column names, and create columns for the major statistical areas:
+
+```{r}
+d <- readRDS("data/historic-cpue-data.rds")
+```
+
+Filter down to remove all rows of data with missing hours fished, missing total catch, or when the total catch or hours fished are 0. 
+```{r}
+d <- d %>%
+  filter(!is.na(hours_fished), !is.na(total), total > 0, hours_fished > 0) %>%
+  filter(!is.na(fyear))
+```
+
+Now let's calculate the arithmetic and geometric mean CPUE for each species in each year:
+
+```{r}
+d_sum <- d %>%
+  group_by(area, fyear, species_common_name) %>%
+  summarise(
+    catch = sum(total, na.rm = TRUE),
+    sum_hours_fished = sum(hours_fished, na.rm = TRUE),
+    arith_cpue = sum(total, na.rm = TRUE) / sum(hours_fished, na.rm = TRUE),
+    geo_cpue = exp(mean(log(total / hours_fished), na.rm = TRUE))
+  ) %>%
+  ungroup()
+```
+
+Let's create a version that is scaled by the geometric mean for plotting to mimic past research documents:
+
+```{r}
+d_scaled <- d_sum %>%
+  mutate(arith_cpue = arith_cpue / exp(mean(log(arith_cpue)))) %>%
+  mutate(geo_cpue = geo_cpue / exp(mean(log(geo_cpue))))
+```
+
+Plot of the scaled version with locality/all in different columns:
+
+```{r}
+d_scaled %>%
+  tidyr::gather(cpue_type, cpue_value, arith_cpue:geo_cpue) %>%
+  ggplot(aes(fyear, cpue_value, linetype = cpue_type)) +
+  geom_line() +
+  geom_vline(xintercept = 1996, lty = 3) +
+  facet_grid(area~species_common_name, scales = "free_y") +
+  xlab("") +
+  ylab("CPUE divided by geometric mean") +
+  ylim(0, NA) +
+  theme_pbs() +
+  labs(linetype = "CPUE type")
+```
+
+Plot of the scaled version with CPUE type in different columns:
+
+```{r}
+d_scaled %>%
+  tidyr::gather(cpue_type, cpue_value, arith_cpue:geo_cpue) %>%
+  ggplot(aes(fyear, cpue_value, colour = species_common_name)) +
+  geom_line() +
+  geom_vline(xintercept = 1996, lty = 3) +
+  facet_grid(area~cpue_type, scales = "free_y") +
+  xlab("") +
+  ylab("CPUE divided by geometric mean") +
+  ylim(0, NA) +
+  theme_pbs() +
+  labs(colour = "Species")
+```
+
+Save the unstandardized and unscaled data:
+
+```{r}
+saveRDS(d_sum, file = "../data/flatfish-annual-cpue.rds", compress = FALSE)
+```
