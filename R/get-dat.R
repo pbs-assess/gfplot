@@ -58,7 +58,11 @@
 #'
 #' ## Import survey or commercial biological data for various plots
 #' (eg. length frequency, growth, age frequency, maturity, etc.)
-#' get_survey_samples(species = 442, ssid = c(1,3,4,16))
+#' get_survey_samples(species = 442, ssid = c(1,3,4,16)) %>%
+#'   fit_vb() %>% plot_growth()
+#'
+#'
+#'
 #' get_comm_samples(c(442, 397))
 #'
 #' ## Import catch data by species for barcharts of landings by fishing area,
@@ -73,7 +77,7 @@
 #'
 #' ## Import catch and effort data by gear type for modelling commercial trawl
 #' ## cpue index.
-#' get_cpue_index(gear = "bottom trawl", min_year = 2012)
+#' get_cpue_index(gear = "bottom trawl", min_cpue_year = 2012)
 #'
 #' ## Import survey bootstrapped biomass estimates for plotting relative biomass
 #' ## indices by specified survey series.
@@ -126,6 +130,18 @@ get_major_areas <- function() {
   )
   names(.d) <- tolower(names(.d))
   .d <- unique(.d)
+  as_tibble(.d)
+}
+
+get_gear_types <- function() {
+  .d <- run_sql(
+    "GFFOS",
+    "SELECT GEAR
+    FROM GFFOS.dbo.GF_MERGED_CATCH C
+    GROUP BY GEAR"
+  )
+  names(.d) <- tolower(names(.d))
+  .d$gear <- tolower(.d$gear)
   as_tibble(.d)
 }
 
@@ -358,7 +374,8 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 }
 
 #' @export
-#' @param unsorted_only TODO
+#' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
+#'  and unknown). Default = TRUE.
 #' @rdname get
 get_comm_samples <- function(species, unsorted_only = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
@@ -423,16 +440,18 @@ get_cpue_spatial_ll <- function(species) {
   as_tibble(.d)
 }
 
-#' @param gear The gear type(s) to include. Will be converted to uppercase.
-#' @param min_year Minimum year to return.
+#' @param gear The gear type(s) to include for CPUE. Will be converted to
+#'  uppercase. Run \code{\link{get_gear_types}} for a look-up table of available
+#'  gear types to select from.
+#' @param min_cpue_year Minimum year for the CPUE data.
 #' @export
 #' @rdname get
-get_cpue_index <- function(gear = "bottom trawl", min_year = 1996) {
+get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
   .q <- read_sql("get-cpue-index.sql")
   i <- grep("-- insert filters here", .q)
   .q[i] <- paste0(
     "GEAR IN(", collapse_filters(toupper(gear)),
-    ") AND YEAR(BEST_DATE) >= ", min_year, " AND "
+    ") AND YEAR(BEST_DATE) >= ", min_cpue_year, " AND "
   )
   .d <- run_sql("GFFOS", .q)
   names(.d) <- tolower(names(.d))
@@ -487,10 +506,9 @@ get_sara_dat <- function() {
   as_tibble(.d)
 }
 
-#' @param path The folder where the cached data will be saved
+#' @param path The folder where the cached data will be saved.
 #' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
 #'   reading and writing at the expense of disk space.
-#' @param min_cpue_year Minimum year for the CPUE data.
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
@@ -536,7 +554,7 @@ cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
   saveRDS(d, file = file.path(path, "pbs-age-precision.rds"),
     compress = compress)
 
-  d <- get_cpue_index(gear = "bottom trawl", min_year = min_cpue_year)
+  d <- get_cpue_index(gear = "bottom trawl", min_cpue_year)
   saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"),
     compress = compress)
 

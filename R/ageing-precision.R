@@ -8,7 +8,16 @@
 #' @export
 #'
 #' @family tidy data functions
+#'
+#'
 #' @template ageing-precision-examples
+#' @examples
+#' \dontrun{
+#' species <- "yelloweye rockfish"
+#' get_age_precision(species) %>%
+#'  tidy_age_precision() %>%
+#'  plot_age_precision()
+#'
 tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
   if (!is.null(ageing_method_codes)) {
     dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)

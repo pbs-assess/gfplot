@@ -2,8 +2,11 @@
 #'
 #' For use with data for a single species.
 #'
-#' @param dat TODO
-#' @param sex TODO
+#' @param dat Input data frame. For `tidy_maturity_months()` should be from
+#' [get_survey_samples()] or [get_comm_samples()]. For `plot_maturity_months()`
+#' should be from `tidy_maturity_months()` or be
+#' formatted similarly. See details.
+#' @param sex Either "male" or "female".
 #' @param method TODO
 #' @param downsample TODO
 #' @param chains TODO

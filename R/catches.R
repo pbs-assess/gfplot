@@ -13,6 +13,10 @@
 #' @param dat Input data frame. For `tidy_catch()` should be from
 #' [get_catch()]. For `plot_catch()` should be from `tidy_ages_raw()` or be
 #' formatted similarly. See details.
+#' @param areas Fisheries and Oceans major statistical areas (eg.
+#'  3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
+#'  with descriptions. Enter as, for example, c("5A", "5B") or
+#'  c("5[CDE]+", "5[AB]+").
 #' @param ylab Y axis label.
 #' @param units A named character vector with names referring to text that will
 #'   be pasted into the y-axis label and a value defining the quantity to divide
@@ -26,7 +30,10 @@
 #' @examples
 #' \dontrun{
 #' d <- get_catch("lingcod")
-#' tidy_catch(d) %>%
+#' tidy_catch(d, areas = c("5[CDE]+", "5[AB]+", "3[CD]+")) %>%
+#'   plot_catch()
+#'
+#' tidy_catch(d, areas = c("5A", "5B")) %>%
 #'   plot_catch()
 #' }
 #' @name plot_catch
