@@ -416,6 +416,25 @@ get_cpue_historic <- function(species) {
   .q <- read_sql("get-cpue-historic.sql")
   .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
+  names(.d) <- tolower(names(.d))
+  .d <- rename(.d, total = totcatch_kg, minor_stat_area_code = min)
+  .d$hours_fished <- as.numeric(as.character(.d$hours_fished))
+  .d$database_name <- tolower(.d$database_name)
+  .d$gear <- tolower(.d$gear)
+  .d$locality_description <- tolower(.d$locality_description)
+
+  areas <- c("3[CD]+", "5[AB]+", "5[CDE]+")
+  d$area <- NA
+  for (i in seq_along(areas)) {
+    d[grepl(areas[[i]], d$major_stat_area_description), "area"] <-
+      gsub("\\[|\\]|\\+", "", areas[[i]])
+  }
+  specific_areas <- c("3C", "3D", "5A", "5B", "5C", "5D", "5E")
+  d$specific_area <- NA
+  for (i in seq_along(specific_areas)) {
+    d[grepl(specific_areas[[i]], d$major_stat_area_description), "specific_area"] <-
+      specific_areas[[i]]
+  }
   as_tibble(.d)
 }
 
