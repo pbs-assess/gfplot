@@ -412,6 +412,15 @@ get_catch <- function(species) {
 
 #' @export
 #' @rdname get
+get_cpue_historic <- function(species) {
+  .q <- read_sql("get-cpue-historic.sql")
+  .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFFOS", .q)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get
 get_cpue_spatial <- function(species) {
   .q <- read_sql("get-cpue-spatial.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
