@@ -29,13 +29,13 @@ Extract catch and effort data from all databases for species of interest:
 species <- c("Arrowtooth Flounder", "English Sole", "Dover Sole", "Southern Rock Sole",
   "Petrale Sole") 
 d <- gfplot::get_cpue_historic(species, fishing_year = FALSE, end_year = 2017)
-saveRDS(d, file = "../data/flatfish-cpue-data.rds", compress = FALSE)
+saveRDS(d, file = "data/flatfish-cpue-data.rds", compress = FALSE)
 ```
 
 Read the data in, clean up the column names, and create columns for the major statistical areas:
 
 ```{r}
-d <- readRDS("data/historic-cpue-data.rds")
+d <- readRDS("data/flatfish-cpue-data.rds")
 ```
 
 Filter down to remove all rows of data with missing hours fished, missing total catch, or when the total catch or hours fished are 0. 
@@ -67,10 +67,10 @@ d_scaled <- d_sum %>%
   mutate(geo_cpue = geo_cpue / exp(mean(log(geo_cpue))))
 ```
 
-Plot of the scaled version with locality/all in different columns:
+Plot of the scaled version with species in different columns:
 
 ```{r}
-d_scaled %>%
+p <- d_scaled %>%
   tidyr::gather(cpue_type, cpue_value, arith_cpue:geo_cpue) %>%
   ggplot(aes(fyear, cpue_value, linetype = cpue_type)) +
   geom_line() +
@@ -81,6 +81,7 @@ d_scaled %>%
   ylim(0, NA) +
   theme_pbs() +
   labs(linetype = "CPUE type")
+p
 ```
 
 Plot of the scaled version with CPUE type in different columns:
@@ -103,4 +104,12 @@ Save the unstandardized and unscaled data:
 
 ```{r}
 saveRDS(d_sum, file = "../data/flatfish-annual-cpue.rds", compress = FALSE)
+```
+
+Save the cpue plots:
+
+```{r}
+png("../data/flatfish_cpue.png")
+p
+dev.off()
 ```
