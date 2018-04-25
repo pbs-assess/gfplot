@@ -168,47 +168,50 @@ fit_glmmfields <- function(dat,
                            iter = 1000,
                            chains = 4, adapt_delta = 0.98,
                            cores = parallel::detectCores(), ...) {
-  n_beta <- 2L
-  message("Fitting positive component model...")
-  m1 <- glmmfields::glmmfields(formula_positive,
-    lon = "X", lat = "Y",
-    data = filter(dat, present == 1), iter = iter,
-    prior_gp_theta = glmmfields::half_t(7, 0, 10),
-    prior_gp_sigma = glmmfields::half_t(7, 0, 10),
-    prior_intercept = glmmfields::half_t(7, 0, 10),
-    prior_beta = glmmfields::half_t(500, 0, 2),
-    prior_sigma = glmmfields::half_t(7, 0, 2),
-    nknots = n_knots, cluster = "pam", chains = chains,
-    family = glmmfields::lognormal(link = "log"),
-    covariance = "squared-exponential",
-    init = function() initf(
-        init_b0 = 0,
-        length(unique(dat$year)), n_knots, n_beta
-      ),
-    cores = cores,
-    control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...
-  )
 
-  message("Fitting binary component model...")
-  m2 <- glmmfields::glmmfields(formula_binary,
-    lon = "X", lat = "Y",
-    data = dat, iter = iter,
-    prior_gp_theta = glmmfields::half_t(7, 0, 10),
-    prior_gp_sigma = glmmfields::half_t(7, 0, 10),
-    prior_intercept = glmmfields::half_t(7, 0, 10),
-    prior_beta = glmmfields::half_t(500, 0, 2),
-    prior_sigma = glmmfields::half_t(7, 0, 2),
-    nknots = n_knots, cluster = "pam", chains = chains,
-    family = binomial(link = "logit"), covariance = "squared-exponential",
-    init = function() initf(
-        init_b0 = 0,
-        length(unique(dat$year)), n_knots, n_beta, type = "binomial"
-      ),
-    cores = cores,
-    control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...
-  )
+  stop("Temporarily disabled.")
 
-  list(pos = m1, bin = m2)
+  # n_beta <- 2L
+  # message("Fitting positive component model...")
+  # m1 <- glmmfields::glmmfields(formula_positive,
+  #   lon = "X", lat = "Y",
+  #   data = filter(dat, present == 1), iter = iter,
+  #   prior_gp_theta = glmmfields::half_t(7, 0, 10),
+  #   prior_gp_sigma = glmmfields::half_t(7, 0, 10),
+  #   prior_intercept = glmmfields::half_t(7, 0, 10),
+  #   prior_beta = glmmfields::half_t(500, 0, 2),
+  #   prior_sigma = glmmfields::half_t(7, 0, 2),
+  #   nknots = n_knots, cluster = "pam", chains = chains,
+  #   family = glmmfields::lognormal(link = "log"),
+  #   covariance = "squared-exponential",
+  #   init = function() initf(
+  #       init_b0 = 0,
+  #       length(unique(dat$year)), n_knots, n_beta
+  #     ),
+  #   cores = cores,
+  #   control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...
+  # )
+  #
+  # message("Fitting binary component model...")
+  # m2 <- glmmfields::glmmfields(formula_binary,
+  #   lon = "X", lat = "Y",
+  #   data = dat, iter = iter,
+  #   prior_gp_theta = glmmfields::half_t(7, 0, 10),
+  #   prior_gp_sigma = glmmfields::half_t(7, 0, 10),
+  #   prior_intercept = glmmfields::half_t(7, 0, 10),
+  #   prior_beta = glmmfields::half_t(500, 0, 2),
+  #   prior_sigma = glmmfields::half_t(7, 0, 2),
+  #   nknots = n_knots, cluster = "pam", chains = chains,
+  #   family = binomial(link = "logit"), covariance = "squared-exponential",
+  #   init = function() initf(
+  #       init_b0 = 0,
+  #       length(unique(dat$year)), n_knots, n_beta, type = "binomial"
+  #     ),
+  #   cores = cores,
+  #   control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...
+  # )
+  #
+  # list(pos = m1, bin = m2)
 }
 
 #' Title TODO
@@ -233,13 +236,17 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             mcmc_posterior_samples = 150,
                             required_obs_percent = 0.05,
                             utm_zone = 9,
-                            model = c("glmmfields", "inla"),
+                            model = c("inla", "glmmfields"),
                             include_depth = TRUE,
                             survey_boundary = NULL,
                             premade_grid = NULL,
                             inla_knots_pos = 75,
                             inla_knots_bin = 100,
                             ...) {
+  model <- match.arg(model)
+  if (model == "glmmfields")
+    stop("glmmfields is temporarily disabled.")
+
   .d_tidy <- tidy_survey_sets(dat, survey = survey,
     years = years, density_column = density_column)
 
