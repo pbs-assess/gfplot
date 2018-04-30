@@ -107,7 +107,7 @@ get_ssids <- function() {
     "SELECT SURVEY_SERIES_ID, SURVEY_SERIES_DESC,
      CASE
        WHEN SURVEY_SERIES_ALT_DESC IS NULL THEN SURVEY_SERIES_TYPE_ALT_DESC
-	     WHEN SURVEY_SERIES_TYPE_ALT_DESC IS NULL THEN SURVEY_SERIES_ALT_DESC
+       WHEN SURVEY_SERIES_TYPE_ALT_DESC IS NULL THEN SURVEY_SERIES_ALT_DESC
        WHEN SURVEY_SERIES_TYPE_ALT_DESC = 'OTHER' THEN SURVEY_SERIES_ALT_DESC
        ELSE (SURVEY_SERIES_TYPE_ALT_DESC + ' ' + SURVEY_SERIES_ALT_DESC)
        END AS SURVEY_ABBREV
@@ -414,12 +414,12 @@ get_catch <- function(species) {
 
 #' @export
 #' @param fishing_year Specify whether fishing year should be calendar year
-#' (= FALSE) or by Pacific cod fishing year (=TRUE) as calendar year
+#' (`FALSE`) or by Pacific cod fishing year (`TRUE`) as calendar year
 #' for <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and
 #' Feb 21-Feb 20 since Feb 2009.
 #' @param end_year Specify the last year or fishing year to be extracted.
 #' @rdname get
-get_cpue_historic <- function(species, fishing_year = FALSE, end_year = 'NULL') {
+get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
   .q <- read_sql("get-cpue-historic.sql")
   .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
   database = c("GFFOS", "GFCatch", "PacHarvest")
