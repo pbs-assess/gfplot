@@ -403,6 +403,8 @@ get_catch <- function(species) {
   .q <- read_sql("get-catch.sql")
   .q <- inject_filter("WHERE SP.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFFOS", .q)
+  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+    toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_scientific_name <- tolower(.d$species_scientific_name)
@@ -422,6 +424,8 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = 'NULL') 
   .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
   database = c("GFFOS", "GFCatch", "PacHarvest")
   .d <- run_sql(database = database, .q)
+  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+    toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
   .d <- rename(.d, total = totcatch_kg, minor_stat_area_code = min)
   .d$hours_fished <- as.numeric(as.character(.d$hours_fished))
@@ -501,6 +505,8 @@ get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
     ") AND YEAR(BEST_DATE) >= ", min_cpue_year, " AND "
   )
   .d <- run_sql("GFFOS", .q)
+  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+    toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
   as_tibble(.d)
 }
