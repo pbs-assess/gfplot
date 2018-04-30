@@ -29,7 +29,7 @@ fit_glmmfields(dat, formula_positive = density ~ depth_scaled + depth_scaled2,
 fit_survey_sets(dat, years, survey = NULL, density_column = "density_kgpm2",
   chains = 4, iter = 1000, max_knots = 20, adapt_delta = 0.95,
   thin = 1, mcmc_posterior_samples = 150, required_obs_percent = 0.05,
-  utm_zone = 9, model = c("glmmfields", "inla"), include_depth = TRUE,
+  utm_zone = 9, model = c("inla", "glmmfields"), include_depth = TRUE,
   survey_boundary = NULL, premade_grid = NULL, inla_knots_pos = 75,
   inla_knots_bin = 100, ...)
 }

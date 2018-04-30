@@ -9,6 +9,7 @@
 \alias{get_survey_samples}
 \alias{get_comm_samples}
 \alias{get_catch}
+\alias{get_cpue_historic}
 \alias{get_cpue_spatial}
 \alias{get_cpue_spatial_ll}
 \alias{get_cpue_index}
@@ -34,11 +35,13 @@ get_comm_samples(species, unsorted_only = TRUE)
 
 get_catch(species)
 
+get_cpue_historic(species, fishing_year = FALSE, end_year = NA)
+
 get_cpue_spatial(species)
 
 get_cpue_spatial_ll(species)
 
-get_cpue_index(gear = "bottom trawl", min_year = 1996)
+get_cpue_index(gear = "bottom trawl", min_cpue_year = 1996)
 
 get_age_precision(species)
 
@@ -60,7 +63,7 @@ species code, then all elements will be assumed to be species common
 names.}
 
 \item{ssid}{A numeric vector of survey series IDs. Run
-\code{\link{get_ssids}} if you for a look-up table of available survey
+\code{\link{get_ssids}} for a look-up table of available survey
 series IDs with surveys series descriptions.}
 
 \item{join_sample_ids}{TODO}
@@ -68,18 +71,26 @@ series IDs with surveys series descriptions.}
 \item{remove_bad_data}{Remove known bad data, such as unrealistic
 length or weight values.}
 
-\item{unsorted_only}{TODO}
+\item{unsorted_only}{Remove sorted biological data ('keepers' and 'discards'
+and unknown). Default = TRUE.}
 
-\item{gear}{The gear type(s) to include. Will be converted to uppercase.}
+\item{fishing_year}{Specify whether fishing year should be calendar year
+(\code{FALSE}) or by Pacific cod fishing year (\code{TRUE}) as calendar year
+for <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and
+Feb 21-Feb 20 since Feb 2009.}
 
-\item{min_year}{Minimum year to return.}
+\item{end_year}{Specify the last year or fishing year to be extracted.}
 
-\item{path}{The folder where the cached data will be saved}
+\item{gear}{The gear type(s) to include for CPUE. Will be converted to
+uppercase. Run \code{\link{get_gear_types}} for a look-up table of available
+gear types to select from.}
+
+\item{min_cpue_year}{Minimum year for the CPUE data.}
+
+\item{path}{The folder where the cached data will be saved.}
 
 \item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
 reading and writing at the expense of disk space.}
-
-\item{min_cpue_year}{Minimum year for the CPUE data.}
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific
@@ -134,21 +145,39 @@ the computer is a Windows computer.
 
 \examples{
 \dontrun{
+## Import survey catch density and location data by tow or set for plotting
+## Specify single or multiple species by common name or species code and
+## single or multiple survey series id(s).
 get_survey_sets(species = "lingcod", ssid = 1)
+get_survey_sets(species = c(442, 397), ssid = c(1, 2))
 
-get_survey_samples(species = 442, ssid = c(1,3,4,16))
+## Import survey or commercial biological data for various plots
+(eg. length frequency, growth, age frequency, maturity, etc.)
+get_survey_samples(species = 442, ssid = c(1,3,4,16)) \%>\%
+  fit_vb() \%>\% plot_growth()
+
+
+
 get_comm_samples(c(442, 397))
 
-species <- c("lingcod", "pacific cod")
+## Import catch data by species for barcharts of landings by fishing area,
+## geartype, and year.
+species <- ("lingcod")
 get_catch(species)
 
+## Import spatial commercial catch per unit effort data for trawl or longline
+## data by species for plotting along BC coast.
 get_cpue_spatial(species)
 get_cpue_spatial_ll("yelloweye rockfish")
 
-get_cpue_index(gear = "bottom trawl", min_year = 2012, max_year = 2017)
+## Import catch and effort data by gear type for modelling commercial trawl
+## cpue index.
+get_cpue_index(gear = "bottom trawl", min_cpue_year = 2012)
 
-get_cpue_spatial("pacific cod")
-get_cpue_spatial_ll("arrowtooth flounder")
+## Import survey bootstrapped biomass estimates for plotting relative biomass
+## indices by specified survey series.
+get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
+get_survey_index("arrowtooth flounder")
 }
 
 }

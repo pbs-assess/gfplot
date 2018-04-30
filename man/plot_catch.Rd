@@ -9,12 +9,17 @@ tidy_catch(dat, areas = NULL)
 
 plot_catch(dat, ylab = "Landings", xlim = c(1954, 2017), units = c(`1000
   tons` = 1e+06, tons = 1000, kg = 1), unreliable = c(1996, 2006),
-  unreliable_alpha = 0.05, blank_plot = FALSE)
+  blank_plot = FALSE)
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_catch()} should be from
 \code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_ages_raw()} or be
 formatted similarly. See details.}
+
+\item{areas}{Fisheries and Oceans major statistical areas (eg.
+3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
+with descriptions. Enter as, for example, c("5A", "5B") or
+c("5\link{CDE}+", "5\link{AB}+").}
 
 \item{ylab}{Y axis label.}
 
@@ -44,7 +49,10 @@ or multiple species.
 \examples{
 \dontrun{
 d <- get_catch("lingcod")
-tidy_catch(d) \%>\%
+tidy_catch(d, areas = c("5[CDE]+", "5[AB]+", "3[CD]+")) \%>\%
+  plot_catch()
+
+tidy_catch(d, areas = c("5A", "5B")) \%>\%
   plot_catch()
 }
 }

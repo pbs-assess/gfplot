@@ -17,6 +17,7 @@
 #' get_age_precision(species) %>%
 #'  tidy_age_precision() %>%
 #'  plot_age_precision()
+#' }
 #'
 tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
   if (!is.null(ageing_method_codes)) {

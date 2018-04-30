@@ -5,7 +5,8 @@
 \title{Fit length-weight TODO}
 \usage{
 fit_length_weight(dat, sex = c("female", "male"), downsample = Inf,
-  min_samples = 50L, method = c("rlm", "lm"), scale_weight = 1/1000)
+  min_samples = 50L, method = c("rlm", "lm"), too_high_quantile = 1,
+  scale_weight = 1/1000)
 }
 \arguments{
 \item{dat}{TODO}

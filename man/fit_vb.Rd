@@ -7,13 +7,16 @@
 fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
   downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
-  est_method = median, min_samples = 50L, uniform_priors = FALSE,
-  ageing_method_codes = NULL, ...)
+  est_method = median, min_samples = 50L, too_high_quantile = 1,
+  uniform_priors = FALSE, ageing_method_codes = NULL, ...)
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{Input data frame. For \code{tidy_maturity_months()} should be from
+\code{\link[=get_survey_samples]{get_survey_samples()}} or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_maturity_months()}
+should be from \code{tidy_maturity_months()} or be
+formatted similarly. See details.}
 
-\item{sex}{TODO}
+\item{sex}{Either "male" or "female".}
 
 \item{method}{TODO}
 
@@ -53,7 +56,6 @@ first, you may get the warning:
 \examples{
 library(rstan) # must load first
 # with `rstan::optimizing()` for the mode of the posterior density:
-pop_samples$ageing_method <- 3 # TODO fix
 model_f <- fit_vb(pop_samples, sex = "female")
 model_m <- fit_vb(pop_samples, sex = "male")
 plot_vb(model_f, model_m)
