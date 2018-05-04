@@ -6,7 +6,7 @@ test_that("get_* data functions work at PBS", {
   skip_on_travis()
   skip_on_appveyor()
 
-  if (!is_dfo_windows()) skip("Not a DFO computer")
+  if (!is_dfo() || !is_windows()) skip("Not a DFO computer")
   d <- get_age_precision("lingcod")
   expect_equal(d$species_code[[1L]], "467")
 
