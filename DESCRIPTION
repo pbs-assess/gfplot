@@ -1,7 +1,6 @@
 Package: gfplot
 Title: Data Extraction and Plotting for DFO PBS Groundfish Stocks
 Version: 0.0.0.9000
-Date: 2018-03-19
 Authors@R: c(person("Sean", "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
     person("Elise", "Keppel", role = "aut"))
