@@ -83,9 +83,14 @@ tidy_survey_index <- function(dat,
   )
 }
 
-#' @param col TODO
-#' @param title TODO
-#' @param survey_cols TODO
+#' @param col A vector of two colours for the lines and shading.
+#' @param title Title for the plot.
+#' @param max_cv A coefficient of variation above which a panel will be shaded
+#'   as more uncertain.
+#' @param max_set_fraction A fraction of positive sets above which a panel will
+#' be shaded as more uncertain.
+#' @param survey_cols If not `NULL`, a named character vector of colors for the
+#'   various surveys.
 #'
 #' @export
 #' @family plotting functions

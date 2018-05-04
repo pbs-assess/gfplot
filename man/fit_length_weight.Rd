@@ -27,9 +27,6 @@ lengths. Can be useful for outliers. Defaults to including all data.}
 
 \item{scale_weight}{A value to multiply all weights by. Useful for changing
 units.}
-
-\item{est_method}{If MCMC this defines how to summarize the posterior. Should
-be a function such as \code{mean} or \code{median}.}
 }
 \description{
 For use with data for a single species.

@@ -41,7 +41,9 @@ formatted data frame.}
 
 \item{all_models}{TODO}
 
-\item{terms}{TODO}
+\item{terms}{A character vector of terms to jackknife out.}
+
+\item{return_data}{Logical: should the data be returned?}
 }
 \value{
 A ggplot object

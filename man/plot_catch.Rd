@@ -29,10 +29,6 @@ the \code{value} column by for that unit label.}
 
 \item{unreliable}{An optional numeric vector defining years before which the
 data are less reliable. Leave as \code{NA} to omit.}
-
-\item{unreliable_alpha}{The alpha (transparency) level for the optional
-"unreliable" ranges of years shaded grey. Rectangles get overlaid from
-older years to newer years making earlier ranges darker.}
 }
 \description{
 Functions for plotting catch data over time as a stacked bar plot.

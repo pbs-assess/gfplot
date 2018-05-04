@@ -190,8 +190,6 @@ fit_vb <- function(dat,
 #' @param method `"rlm"` for [MASS::rlm()] or `"lm"` for [stats::lm()].
 #' @param too_high_quantile A quantile above which to discard weights and
 #'   lengths. Can be useful for outliers. Defaults to including all data.
-#' @param est_method If MCMC this defines how to summarize the posterior. Should
-#'   be a function such as `mean` or `median`.
 #' @param scale_weight A value to multiply all weights by. Useful for changing
 #'   units.
 #'

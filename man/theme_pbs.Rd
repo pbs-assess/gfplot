@@ -8,9 +8,13 @@ theme_pbs(base_size = 11, base_family = "", text_col = "grey20",
   panel_border_col = "grey70")
 }
 \arguments{
-\item{base_size}{Base font size}
+\item{base_size}{Base font size.}
 
-\item{base_family}{Base font family}
+\item{base_family}{Base font family.}
+
+\item{text_col}{Color for text.}
+
+\item{panel_border_col}{Color for panel borders.}
 }
 \description{
 A simple theme for ggplot2 that loosely resembles nicely themed plots from

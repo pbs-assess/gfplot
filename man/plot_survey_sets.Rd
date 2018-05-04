@@ -27,6 +27,14 @@ plot_survey_sets(pred_dat, raw_dat, fill_column = "combined",
 
 \item{fill_scale}{TODO}
 
+\item{colour_scale}{TODO}
+
+\item{pos_pt_col}{TODO}
+
+\item{bin_pt_col}{TODO}
+
+\item{pos_pt_fill}{TODO}
+
 \item{pt_size_range}{TODO}
 
 \item{show_legend}{TODO}
@@ -37,15 +45,37 @@ plot_survey_sets(pred_dat, raw_dat, fill_column = "combined",
 
 \item{show_model_predictions}{TODO}
 
+\item{show_raw_data}{TODO}
+
 \item{utm_zone}{TODO}
 
 \item{fill_label}{TODO}
 
 \item{pt_label}{TODO}
 
-\item{pt_col}{TODO}
+\item{rotation_angle}{TODO}
 
-\item{pt_fill}{TODO}
+\item{rotation_center}{TODO}
+
+\item{show_axes}{TODO}
+
+\item{xlim}{TODO}
+
+\item{ylim}{TODO}
+
+\item{x_buffer}{TODO}
+
+\item{y_buffer}{TODO}
+
+\item{north_symbol}{TODO}
+
+\item{north_symbol_coord}{TODO}
+
+\item{north_symbol_length}{TODO}
+
+\item{cell_size}{TODO}
+
+\item{circles}{TODO}
 }
 \description{
 Title TODO

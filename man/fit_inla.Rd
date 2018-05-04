@@ -10,30 +10,43 @@ fit_inla(dat, response = "present", n_knots = 50, family = "binomial",
   include_depth = TRUE, verbose = FALSE, debug = FALSE, trials = 10)
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{A data frame from \code{\link[=scale_survey_predictors]{scale_survey_predictors()}}.}
 
-\item{response}{TODO}
+\item{response}{A character value representing the column name for the
+response variable.}
 
-\item{n_knots}{TODO}
+\item{n_knots}{Number of knots in the mesh. Passed to \code{\link[stats:kmeans]{stats::kmeans()}}.}
 
-\item{family}{TODO}
+\item{family}{Family to pass on to INLA. Like we should be "binomial" or
+"gamma".}
 
-\item{max_edge}{TODO}
+\item{max_edge}{Value to pass on to \code{\link[INLA:inla.mesh.2d]{INLA::inla.mesh.2d()}}.}
 
-\item{kmeans}{TODO}
+\item{kmeans}{Logical for whether to use \code{\link[stats:kmeans]{stats::kmeans()}} to calculate the
+knot locations before generating the mesh with \code{\link[INLA:inla.mesh.create]{INLA::inla.mesh.create()}}
+(if \code{TRUE}) or use \code{\link[INLA:inla.mesh.2d]{INLA::inla.mesh.2d()}} if \code{FALSE}.}
 
-\item{plot}{TODO}
+\item{plot}{Logical for whether the INLA mesh should be plotted.}
 
-\item{fit_model}{TODO}
+\item{fit_model}{Logic for whether the model should be fitted. Useful for
+debugging. Will return \code{NA} in the model component if \code{FALSE}.}
 
-\item{extend}{TODO}
+\item{extend}{Value to pass on to \code{\link[INLA:inla.mesh.create]{INLA::inla.mesh.create()}}.}
 
-\item{offset}{TODO}
+\item{offset}{Value to pass on to \code{\link[INLA:inla.mesh.2d]{INLA::inla.mesh.2d()}}.}
 
-\item{cutoff}{TODO}
+\item{cutoff}{Value to pass on to \code{\link[INLA:inla.mesh.2d]{INLA::inla.mesh.2d()}}.}
 
-\item{include_depth}{TODO}
+\item{include_depth}{Logical for whether to include depth as a predictor.}
+
+\item{verbose}{Logical for verbose output from INLA.}
+
+\item{debug}{Logical for debugging.}
+
+\item{trials}{Number of times to retry the model if it fails to fit.}
 }
 \description{
-Fit a spatial model with INLA
+This function fits a special model using Gaussian random fields with INLA.
+The function is not intended to be used directly by the user. It is called
+internally by \code{\link[=fit_survey_sets]{fit_survey_sets()}}.
 }

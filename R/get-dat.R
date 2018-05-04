@@ -128,6 +128,8 @@ get_major_areas <- function() {
   as_tibble(.d)
 }
 
+#' @export
+#' @rdname get
 get_gear_types <- function() {
   .d <- run_sql(
     "GFFOS",
@@ -487,7 +489,7 @@ get_cpue_spatial_ll <- function(species) {
 }
 
 #' @param gear The gear type(s) to include for CPUE. Will be converted to
-#'  uppercase. Run \code{\link{get_gear_types}} for a look-up table of available
+#'  uppercase. Run [get_gear_types()] for a look-up table of available
 #'  gear types to select from.
 #' @param min_cpue_year Minimum year for the CPUE data.
 #' @export

@@ -35,6 +35,12 @@
 #' @format A data frame
 "pop_surv"
 
+#' TODO
+#'
+#' TODO
+#'
+#' @format Data
+"hbll_grid"
 
 #' Survey boundaries
 #'
@@ -52,22 +58,3 @@
 #'
 #' @format A data frame
 "sample_trip_ids"
-
-# #' Example sample data for redstrip rockfish
-# #'
-# #' @name redstripe_samples
-# #' @format A data frame
-# NULL
-#
-# #' @rdname redstripe_samples
-# "rs_survey_samples"
-#
-# #' @rdname redstripe_samples
-# "rs_catch"
-#
-# #' @rdname redstripe_samples
-# "rs_survey_sets"
-#
-# #' @rdname redstripe_samples
-# "rs_comm_samples"
-#

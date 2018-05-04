@@ -1,17 +1,29 @@
 #' Fit a spatial model with INLA
 #'
-#' @param dat TODO
-#' @param response TODO
-#' @param n_knots TODO
-#' @param family TODO
-#' @param max_edge TODO
-#' @param kmeans TODO
-#' @param plot TODO
-#' @param fit_model TODO
-#' @param extend TODO
-#' @param offset TODO
-#' @param cutoff TODO
-#' @param include_depth TODO
+#' This function fits a special model using Gaussian random fields with INLA.
+#' The function is not intended to be used directly by the user. It is called
+#' internally by [fit_survey_sets()].
+#'
+#' @param dat A data frame from [scale_survey_predictors()].
+#' @param response A character value representing the column name for the
+#'   response variable.
+#' @param n_knots Number of knots in the mesh. Passed to [stats::kmeans()].
+#' @param family Family to pass on to INLA. Like we should be "binomial" or
+#'   "gamma".
+#' @param max_edge Value to pass on to [INLA::inla.mesh.2d()].
+#' @param kmeans Logical for whether to use [stats::kmeans()] to calculate the
+#'   knot locations before generating the mesh with [INLA::inla.mesh.create()]
+#'   (if `TRUE`) or use [INLA::inla.mesh.2d()] if `FALSE`.
+#' @param plot Logical for whether the INLA mesh should be plotted.
+#' @param fit_model Logic for whether the model should be fitted. Useful for
+#'   debugging. Will return `NA` in the model component if `FALSE`.
+#' @param extend Value to pass on to [INLA::inla.mesh.create()].
+#' @param offset Value to pass on to [INLA::inla.mesh.2d()].
+#' @param cutoff Value to pass on to [INLA::inla.mesh.2d()].
+#' @param include_depth Logical for whether to include depth as a predictor.
+#' @param verbose Logical for verbose output from INLA.
+#' @param debug Logical for debugging.
+#' @param trials Number of times to retry the model if it fails to fit.
 #'
 #' @importFrom INLA inla.models inla.reorderings
 

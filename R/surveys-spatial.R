@@ -364,16 +364,31 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @param raw_dat TODO
 #' @param fill_column TODO
 #' @param fill_scale TODO
-#' @param pt_col TODO
-#' @param pt_fill TODO
+#' @param colour_scale TODO
+#' @param pos_pt_col TODO
+#' @param bin_pt_col TODO
+#' @param pos_pt_fill TODO
 #' @param pt_size_range TODO
 #' @param show_legend TODO
 #' @param extrapolate_depth TODO
 #' @param extrapolation_buffer TODO
 #' @param show_model_predictions TODO
+#' @param show_raw_data TODO
 #' @param utm_zone TODO
 #' @param fill_label TODO
 #' @param pt_label TODO
+#' @param rotation_angle TODO
+#' @param rotation_center TODO
+#' @param show_axes TODO
+#' @param xlim TODO
+#' @param ylim TODO
+#' @param x_buffer TODO
+#' @param y_buffer TODO
+#' @param north_symbol TODO
+#' @param north_symbol_coord TODO
+#' @param north_symbol_length TODO
+#' @param cell_size TODO
+#' @param circles TODO
 #'
 #' @export
 #' @family spatial survey modelling functions

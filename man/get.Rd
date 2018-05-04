@@ -4,6 +4,7 @@
 \alias{get}
 \alias{get_ssids}
 \alias{get_major_areas}
+\alias{get_gear_types}
 \alias{get_age_methods}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
@@ -22,6 +23,8 @@
 get_ssids()
 
 get_major_areas()
+
+get_gear_types()
 
 get_age_methods()
 
@@ -82,7 +85,7 @@ and unknown). Default = TRUE.}
 \item{end_year}{Specify the last year or fishing year to be extracted.}
 
 \item{gear}{The gear type(s) to include for CPUE. Will be converted to
-uppercase. Run \code{\link{get_gear_types}} for a look-up table of available
+uppercase. Run \code{\link[=get_gear_types]{get_gear_types()}} for a look-up table of available
 gear types to select from.}
 
 \item{min_cpue_year}{Minimum year for the CPUE data.}

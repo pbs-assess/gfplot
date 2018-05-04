@@ -22,11 +22,18 @@ plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
 
 \item{year_range}{TODO}
 
-\item{col}{TODO}
+\item{col}{A vector of two colours for the lines and shading.}
 
-\item{title}{TODO}
+\item{title}{Title for the plot.}
 
-\item{survey_cols}{TODO}
+\item{max_cv}{A coefficient of variation above which a panel will be shaded
+as more uncertain.}
+
+\item{max_set_fraction}{A fraction of positive sets above which a panel will
+be shaded as more uncertain.}
+
+\item{survey_cols}{If not \code{NULL}, a named character vector of colors for the
+various surveys.}
 }
 \description{
 Plot survey relative biomass mass index

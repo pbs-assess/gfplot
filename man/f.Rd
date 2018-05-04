@@ -12,7 +12,7 @@ get_most_common_level(x)
 \arguments{
 \item{x}{A vector of factor/character values.}
 
-\item{base}{A function to define the base "reference" level or a character
+\item{ref}{A function to define the base "reference" level or a character
 object definining the base level. Defaults to the most common level.}
 }
 \description{

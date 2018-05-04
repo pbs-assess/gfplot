@@ -276,7 +276,8 @@ plot_cpue_index_coefs <- function(object) {
 
 #' @description * `plot_cpue_index_jk()` TODO
 #'
-#' @param terms TODO
+#' @param terms A character vector of terms to jackknife out.
+#' @param return_data Logical: should the data be returned?
 #'
 #' @return TODO
 #' @export
@@ -456,7 +457,7 @@ sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
 #' that depth). This function also sets the base/reference level of the factor.
 #'
 #' @param x A vector of factor/character values.
-#' @param base A function to define the base "reference" level or a character
+#' @param ref A function to define the base "reference" level or a character
 #'   object definining the base level. Defaults to the most common level.
 #'
 #' @export
