@@ -7,9 +7,9 @@
 bind_samples(dat_comm, dat_survey)
 }
 \arguments{
-\item{dat_comm}{TODO}
+\item{dat_comm}{Output from \code{\link[=get_comm_samples]{get_comm_samples()}}}
 
-\item{dat_survey}{TODO}
+\item{dat_survey}{Output from \code{\link[=get_survey_samples]{get_survey_samples()}}}
 }
 \description{
 Join survey and commercial samples

@@ -4,8 +4,8 @@
 #'
 #' @details
 #'
-#' * [tidy_ages_raw()] or [tidy_ages_weighted()] prepare PBS data for `plot_ages()`. These work across one
-#'   or multiple species.
+#' * [tidy_ages_raw()] or [tidy_ages_weighted()] prepare PBS data for `plot_ages()`.
+#'   These work across one or multiple species.
 #' * `plot_ages()` Plots age frequencies for each year for selected surveys for
 #' a single species. Input data frame should come from [tidy_ages_raw()] or
 #' [tidy_ages_weighted()] or follow the following format: The input data frame
@@ -19,18 +19,18 @@
 #' @param ylab Y axis label.
 #' @param year_range If not `NULL`, a the range of years to plot. Defaults to
 #'   all years included in original data.
-#' @param line_col TODO
-#' @param survey_cols TODO
-#' @param alpha TODO
-#' @param grid_col TODO
+#' @param line_col A named character vector of colors for male and females.
+#' @param survey_cols If not `NULL`, a named character vector for different
+#'   colors for the various surveys.
+#' @param alpha Transparency for the fill color.
+#' @param grid_col Colour for the gridlines.
 #'
 #' @family age- and length-frequency functions
 #'
 #' @examples
 #' \dontrun{
 #' # # main age/length data:
-#' # rs_comm_samples <- get_comm_samples("redstripe rockfish",
-#' #   discard_keepers = TRUE)
+#' # rs_comm_samples <- get_comm_samples("redstripe rockfish")
 #' # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #' #
 #' # # for weighting:

@@ -1,10 +1,10 @@
 #' Get PBS data
 #'
 #' Automates fisheries and research survey data extraction from DFO Pacific
-#' groundfish databases. The output datasets feed into other functions (eg.
-#' tidy, plot, modelling) for data visualization, which can be used as
-#' prodcuts themselves or can be fed into automated DFO Pacific groundfish
-#' data synopsis report production.
+#' groundfish databases. The output datasets feed into other functions (`tidy_`,
+#' `plot_`, or `fit_` functions) for data visualization, which can be used as
+#' products themselves or can be fed into automated DFO Pacific groundfish data
+#' synopsis report production.
 #'
 #' @details
 #' * `get_ssids()` produces a lookup table for survey series IDs and
@@ -42,9 +42,7 @@
 #'
 #' @section Note:
 #' `get_*` functions only extract data when performed on a computer connected to
-#' the Pacific Biological Station DFO network. The `get_*` functions attempt to
-#' detect this and will not run unless "PBS" is in `Sys.info()["nodename"]` and
-#' the computer is a Windows computer.
+#' the Pacific Biological Station DFO network.
 #'
 #' @family get data functions
 #'
@@ -60,8 +58,6 @@
 #' (eg. length frequency, growth, age frequency, maturity, etc.)
 #' get_survey_samples(species = 442, ssid = c(1,3,4,16)) %>%
 #'   fit_vb() %>% plot_growth()
-#'
-#'
 #'
 #' get_comm_samples(c(442, 397))
 #'
@@ -93,9 +89,9 @@
 #'   names and species codes should not be mixed. If any element is missing a
 #'   species code, then all elements will be assumed to be species common
 #'   names.
-#' @param ssid A numeric vector of survey series IDs. Run
-#' \code{\link{get_ssids}} for a look-up table of available survey
-#' series IDs with surveys series descriptions.
+#' @param ssid A numeric vector of survey series IDs. Run [get_ssids()] for a
+#'   look-up table of available survey series IDs with surveys series
+#'   descriptions.
 #' @name get
 NULL
 
@@ -115,7 +111,6 @@ get_ssids <- function() {
      INNER JOIN SURVEY_SERIES_TYPE SST ON
       SST.SURVEY_SERIES_TYPE_CODE = SS.SURVEY_SERIES_TYPE_CODE"
   )
-  #names(.d) <- tolower(names(.d))
   .d <- unique(.d)
   as_tibble(.d)
 }
@@ -246,7 +241,8 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   fe <- run_sql("GFBioSQL", "SELECT
     FISHING_EVENT_ID,
     FE_START_LATTITUDE_DEGREE + FE_START_LATTITUDE_MINUTE / 60 AS LATITUDE,
-    -(FE_START_LONGITUDE_DEGREE + FE_START_LONGITUDE_MINUTE / 60) AS LONGITUDE, FE_BEGINNING_BOTTOM_DEPTH AS DEPTH_M
+    -(FE_START_LONGITUDE_DEGREE + FE_START_LONGITUDE_MINUTE / 60) AS
+      LONGITUDE, FE_BEGINNING_BOTTOM_DEPTH AS DEPTH_M
     FROM B21_Samples")
 
   d_survs <- list()
@@ -414,9 +410,9 @@ get_catch <- function(species) {
 
 #' @export
 #' @param fishing_year Specify whether fishing year should be calendar year
-#' (`FALSE`) or by Pacific cod fishing year (`TRUE`) as calendar year
-#' for <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and
-#' Feb 21-Feb 20 since Feb 2009.
+#'   (`FALSE`) or by Pacific Cod fishing year (`TRUE`) as calendar year for
+#'   <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
+#'   21-Feb 20 since Feb 2009.
 #' @param end_year Specify the last year or fishing year to be extracted.
 #' @rdname get
 get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
@@ -438,10 +434,9 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
     .d <- .d %>% select(-year)
   } else {
     .d <- .d %>% select(-fyear)
-    .d <- .d %>% rename(fyear = year)
   }
 
-    # Filter out fishing records after last year required
+  # Filter out fishing records after last year required
   if (!is.na(end_year)){
     .d <- .d %>% filter(fyear <= end_year)
   }

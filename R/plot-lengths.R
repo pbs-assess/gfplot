@@ -1,7 +1,6 @@
 #' Plot length frequency data
 #'
-#' Functions for plotting length frequency data. (Weighting not implimented
-#' yet. TODO)
+#' Functions for plotting length frequency data.
 #'
 #' @details
 #' * [tidy_lengths_raw()] or [tidy_lengths_weighted()] prepares PBS data for
@@ -20,8 +19,9 @@
 #' `"F"` and `"M"` for female and male.
 #' @param line_col Line colours for histograms. A named vector with names
 #' `"F"` and `"M"` for female and male.
-#' @param survey_cols TODO
-#' @param alpha TODO
+#' @param survey_cols An optional named character vector of colors for the
+#'   various surveys.
+#' @param alpha Transparency for the fill color in the histograms.
 #' @param bin_size Bin size. Should match the bin size used with the `tidy_*()`
 #'   function.
 #' @param min_total Minimum number of fish for a given survey and year needed
@@ -33,8 +33,7 @@
 #' @examples
 #' \dontrun{
 #' # # main age/length data:
-#' # rs_comm_samples <- get_comm_samples("redstripe rockfish",
-#' #   discard_keepers = TRUE)
+#' # rs_comm_samples <- get_comm_samples("redstripe rockfish")
 #' # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #' #
 #' # # for weighting:

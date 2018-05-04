@@ -3,8 +3,7 @@
 #' Functions for plotting catch data over time as a stacked bar plot.
 #'
 #' @details
-#'
-#' * `tidy_catch()` Prepares PBS data for `plot_catch()`. Works across one
+#' * `tidy_catch()` Prepares PBS data for `plot_catch()`. This works across one
 #' or multiple species.
 #' * `plot_catch()` Plots catch. The input data frame must come from
 #' `tidy_catch()` or have the columns (in any order): `year`, `gear`, `value`
@@ -15,8 +14,8 @@
 #' formatted similarly. See details.
 #' @param areas Fisheries and Oceans major statistical areas (eg.
 #'  3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
-#'  with descriptions. Enter as, for example, c("5A", "5B") or
-#'  c("5[CDE]+", "5[AB]+").
+#'  with descriptions. Enter as a regular expression. For example, `c("5A", "5B")` or
+#'  `c("5[CDE]+", "5[AB]+")`.
 #' @param ylab Y axis label.
 #' @param units A named character vector with names referring to text that will
 #'   be pasted into the y-axis label and a value defining the quantity to divide

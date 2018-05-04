@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth.R
 \name{fit_vb}
 \alias{fit_vb}
-\title{Fit growth TODO}
+\title{Fit a von Bertalanffy growth model}
 \usage{
 fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
   downsample = Inf, chains = 4L, iter = 1000L,
@@ -11,43 +11,49 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
   uniform_priors = FALSE, ageing_method_codes = NULL, ...)
 }
 \arguments{
-\item{dat}{Input data frame. For \code{tidy_maturity_months()} should be from
-\code{\link[=get_survey_samples]{get_survey_samples()}} or \code{\link[=get_comm_samples]{get_comm_samples()}}. For \code{plot_maturity_months()}
-should be from \code{tidy_maturity_months()} or be
-formatted similarly. See details.}
+\item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
+\code{\link[=get_comm_samples]{get_comm_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 
-\item{method}{TODO}
+\item{method}{\code{"mpd"} for the mode of the posterior distribution (with
+\code{\link[rstan:optimizing]{rstan::optimizing()}}) or \code{"mcmc"} for full MCMC sampling with Stan (with
+\code{\link[rstan:sampling]{rstan::sampling()}}).}
 
-\item{downsample}{TODO}
+\item{downsample}{If not \code{Inf} this represents a number of fish specimens to
+sample prior to model fitting. Can be useful for large data sets that you
+want to fit with MCMC for testing purposes.}
 
-\item{chains}{TODO}
+\item{chains}{Number of Stan chains.}
 
-\item{iter}{TODO}
+\item{iter}{Number of Stan sampling iterations.}
 
-\item{cores}{TODO}
+\item{cores}{Number of cores for Stan.}
 
-\item{allow_slow_mcmc}{TODO}
+\item{allow_slow_mcmc}{Logical. If \code{TRUE} then the function will let you fit
+with MCMC to any number of fish. Defaults to \code{FALSE} to avoid accidentally
+fitting a model to a giant data set (stop if number of fish > 50,000).}
 
-\item{est_method}{TODO}
+\item{est_method}{If MCMC this defines how to summarize the posterior. Should
+be a function such as \code{mean} or \code{median}.}
 
-\item{min_samples}{TODO}
+\item{min_samples}{The minimum number of fish before a model will be fit.}
 
-\item{uniform_priors}{TODO}
+\item{uniform_priors}{Logical. If true then uniform priors will be used.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
-on. Default to \code{NULL}, which brings in all valid ageing codes.
-See \code{\link[=get_age_methods]{get_age_methods()}}.}
+on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
+\code{\link[=get_age_methods]{get_age_methods()}}.}
 
-\item{...}{TODO}
+\item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
+\code{\link[rstan:optimizing]{rstan::optimizing()}}.}
 }
 \description{
 For use with data for a single species.
 }
 \details{
-Note that in some cases you must load the rstan package first
-and you may choose to do so just in case. If the rstan package is not loaded
+Note that in some cases you must load the rstan package first and
+you may choose to do so just in case. If the rstan package is not loaded
 first, you may get the warning:
 
 \code{Error in cpp_object_initializer(.self, .refClassDef, ...) :}

@@ -2,39 +2,40 @@
 % Please edit documentation in R/cpue-map.R
 \name{plot_cpue_spatial}
 \alias{plot_cpue_spatial}
-\title{Title TODO}
+\title{Plot a map of commercial CPUE}
 \usage{
 plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3, xlim = c(122,
   890), ylim = c(5373, 6027), utm_zone = 9, bath = c(100, 200, 500),
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
   colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "D"),
-  surv_cols = c(WCHG = "#6BAED6", HS = "#74C476", QCS = "#FB6A4A", WCVI =
-  "#9E9AC8"), rotation_angle = 0, rotation_center = c(500, 5700),
+  rotation_angle = 0, rotation_center = c(500, 5700),
   fill_lab = "CPUE (kg/hr)")
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
 
-\item{bin_width}{TODO}
+\item{bin_width}{Width of hexagons in km.}
 
-\item{n_minimum_vessels}{TODO}
+\item{n_minimum_vessels}{Minimum number of unique vessels before a hexagon is
+shown. Defaults to 3 to satisfy privacy requirements.}
 
-\item{xlim}{TODO in UTM zone 9}
+\item{xlim}{X axis limits in UTM units.}
 
-\item{ylim}{TODO in UTM zone 9}
+\item{ylim}{Y axis limits in UTM units.}
 
-\item{utm_zone}{TODO}
+\item{utm_zone}{UTM zone.}
 
-\item{bath}{TODO}
+\item{bath}{A numeric vector of depths to show bathymetry countours at.}
 
-\item{fill_scale}{TODO}
+\item{fill_scale}{A ggplot \code{scale_fill_*} function to control colour shading.}
 
-\item{surv_cols}{TODO}
+\item{colour_scale}{A ggplot \code{scale_colour_*} function to control border of
+hexagon colours. This should likely match \code{fill_scale}.}
 
-\item{fill_lab}{TODO}
+\item{fill_lab}{Label for the color legend.}
 }
 \description{
-Title TODO
+Plot a map of commercial CPUE
 }
 \examples{
 ## fake data demo:

@@ -62,9 +62,9 @@ names and species codes should not be mixed. If any element is missing a
 species code, then all elements will be assumed to be species common
 names.}
 
-\item{ssid}{A numeric vector of survey series IDs. Run
-\code{\link{get_ssids}} for a look-up table of available survey
-series IDs with surveys series descriptions.}
+\item{ssid}{A numeric vector of survey series IDs. Run \code{\link[=get_ssids]{get_ssids()}} for a
+look-up table of available survey series IDs with surveys series
+descriptions.}
 
 \item{join_sample_ids}{TODO}
 
@@ -75,9 +75,9 @@ length or weight values.}
 and unknown). Default = TRUE.}
 
 \item{fishing_year}{Specify whether fishing year should be calendar year
-(\code{FALSE}) or by Pacific cod fishing year (\code{TRUE}) as calendar year
-for <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and
-Feb 21-Feb 20 since Feb 2009.}
+(\code{FALSE}) or by Pacific Cod fishing year (\code{TRUE}) as calendar year for
+<1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
+21-Feb 20 since Feb 2009.}
 
 \item{end_year}{Specify the last year or fishing year to be extracted.}
 
@@ -94,10 +94,10 @@ reading and writing at the expense of disk space.}
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific
-groundfish databases. The output datasets feed into other functions (eg.
-tidy, plot, modelling) for data visualization, which can be used as
-prodcuts themselves or can be fed into automated DFO Pacific groundfish
-data synopsis report production.
+groundfish databases. The output datasets feed into other functions (\code{tidy_},
+\code{plot_}, or \code{fit_} functions) for data visualization, which can be used as
+products themselves or can be fed into automated DFO Pacific groundfish data
+synopsis report production.
 }
 \details{
 \itemize{
@@ -138,9 +138,7 @@ and caches extracted data to a given folder
 \section{Note}{
 
 \code{get_*} functions only extract data when performed on a computer connected to
-the Pacific Biological Station DFO network. The \code{get_*} functions attempt to
-detect this and will not run unless "PBS" is in \code{Sys.info()["nodename"]} and
-the computer is a Windows computer.
+the Pacific Biological Station DFO network.
 }
 
 \examples{
@@ -155,8 +153,6 @@ get_survey_sets(species = c(442, 397), ssid = c(1, 2))
 (eg. length frequency, growth, age frequency, maturity, etc.)
 get_survey_samples(species = 442, ssid = c(1,3,4,16)) \%>\%
   fit_vb() \%>\% plot_growth()
-
-
 
 get_comm_samples(c(442, 397))
 

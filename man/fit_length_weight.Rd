@@ -2,37 +2,45 @@
 % Please edit documentation in R/growth.R
 \name{fit_length_weight}
 \alias{fit_length_weight}
-\title{Fit length-weight TODO}
+\title{Fit a length-weight model}
 \usage{
 fit_length_weight(dat, sex = c("female", "male"), downsample = Inf,
   min_samples = 50L, method = c("rlm", "lm"), too_high_quantile = 1,
   scale_weight = 1/1000)
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
+\code{\link[=get_comm_samples]{get_comm_samples()}}.}
 
-\item{sex}{TODO}
+\item{sex}{Either "male" or "female".}
 
-\item{downsample}{TODO}
+\item{downsample}{If not \code{Inf} this represents a number of fish specimens to
+sample prior to model fitting. Can be useful for large data sets that you
+want to fit with MCMC for testing purposes.}
 
-\item{min_samples}{TODO}
+\item{min_samples}{The minimum number of fish before a model will be fit.}
 
-\item{method}{TODO}
+\item{method}{\code{"rlm"} for \code{\link[MASS:rlm]{MASS::rlm()}} or \code{"lm"} for \code{\link[stats:lm]{stats::lm()}}.}
 
-\item{scale_weight}{TODO}
+\item{too_high_quantile}{A quantile above which to discard weights and
+lengths. Can be useful for outliers. Defaults to including all data.}
+
+\item{scale_weight}{A value to multiply all weights by. Useful for changing
+units.}
+
+\item{est_method}{If MCMC this defines how to summarize the posterior. Should
+be a function such as \code{mean} or \code{median}.}
 }
 \description{
 For use with data for a single species.
 }
 \examples{
-model_f <- fit_length_weight(pop_samples)
-model_f$model
-model_f$predictions
-model_f$pars
-model_f$data
-
-model_m <- fit_length_weight(pop_samples, sex = "male")
-plot_length_weight(model_f, model_m)
+\dontrun{
+d <- get_survey_samples("pacific ocean perch")
+model_f <- fit_length_weight(d, sex = "female")
+model_m <- fit_length_weight(d, sex = "male")
+plot_length_weight(object_female = model_f, object_male = model_m)
+}
 }
 \seealso{
 Other growth functions: \code{\link{fit_vb}},

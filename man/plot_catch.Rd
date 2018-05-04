@@ -18,8 +18,8 @@ formatted similarly. See details.}
 
 \item{areas}{Fisheries and Oceans major statistical areas (eg.
 3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
-with descriptions. Enter as, for example, c("5A", "5B") or
-c("5\link{CDE}+", "5\link{AB}+").}
+with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B")} or
+\code{c("5[CDE]+", "5[AB]+")}.}
 
 \item{ylab}{Y axis label.}
 
@@ -39,7 +39,7 @@ Functions for plotting catch data over time as a stacked bar plot.
 }
 \details{
 \itemize{
-\item \code{tidy_catch()} Prepares PBS data for \code{plot_catch()}. Works across one
+\item \code{tidy_catch()} Prepares PBS data for \code{plot_catch()}. This works across one
 or multiple species.
 \item \code{plot_catch()} Plots catch. The input data frame must come from
 \code{tidy_catch()} or have the columns (in any order): \code{year}, \code{gear}, \code{value}

@@ -1,7 +1,7 @@
-#' Tidy PBS samples data for \code{\link{plot_sample_avail}}
+#' Tidy PBS samples data for [plot_sample_avail()]
 #'
-#' @param dat Input data frame from \code{\link{get_survey_samples}}.
-#' @param year_range Either \code{NULL}, in which case all years are returned,
+#' @param dat Input data frame from [get_survey_samples()].
+#' @param year_range Either `NULL`, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
@@ -63,7 +63,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' Plot sample availability
 #'
 #' @param dat An input data frame from, for example,
-#' \code{\link{tidy_sample_avail}}. The input data frame must have the columns:
+#' [tidy_sample_avail()]. The input data frame must have the columns:
 #' \describe{
 #'   \item{\code{year}}{The year.}
 #'   \item{\code{type}}{The types of samples to plot, e.g. "maturity",
@@ -71,9 +71,9 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #'   capitalizing the first letter.}
 #'   \item{\code{n}}{The number of samples available for that sample type.}
 #' }
-#' @param year_range TODO
-#' @param title A title for the plot. Use \code{title = ""} to omit.
-#' @param palette TODO
+#' @param year_range An optional year range.
+#' @param title A title for the plot.
+#' @param palette A palette to pass to [ggplot2::scale_fill_distiller()].
 #'
 #' @examples
 #' d <- expand.grid(year = 1996:2016,

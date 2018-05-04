@@ -2,12 +2,12 @@
 % Please edit documentation in R/samples.R
 \name{tidy_sample_avail}
 \alias{tidy_sample_avail}
-\title{Tidy PBS samples data for \code{\link{plot_sample_avail}}}
+\title{Tidy PBS samples data for \code{\link[=plot_sample_avail]{plot_sample_avail()}}}
 \usage{
 tidy_sample_avail(dat, year_range = NULL, ageing_method_codes = NULL)
 }
 \arguments{
-\item{dat}{Input data frame from \code{\link{get_survey_samples}}.}
+\item{dat}{Input data frame from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
 \item{year_range}{Either \code{NULL}, in which case all years are returned,
 or a numeric vector of length two giving the lower and upper years to
@@ -18,7 +18,7 @@ on. Default to \code{NULL}, which brings in all valid ageing codes.
 See \code{\link[=get_age_methods]{get_age_methods()}}.}
 }
 \description{
-Tidy PBS samples data for \code{\link{plot_sample_avail}}
+Tidy PBS samples data for \code{\link[=plot_sample_avail]{plot_sample_avail()}}
 }
 \examples{
 \dontrun{

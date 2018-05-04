@@ -1,4 +1,4 @@
-#' fit_inla()
+#' Fit a spatial model with INLA
 #'
 #' @param dat TODO
 #' @param response TODO

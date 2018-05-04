@@ -1,31 +1,37 @@
-#' Fit growth TODO
+#' Fit a von Bertalanffy growth model
 #'
 #' For use with data for a single species.
 #'
-#' @param dat Input data frame. For `tidy_maturity_months()` should be from
-#' [get_survey_samples()] or [get_comm_samples()]. For `plot_maturity_months()`
-#' should be from `tidy_maturity_months()` or be
-#' formatted similarly. See details.
+#' @param dat Input data frame. Should be from [get_survey_samples()] or
+#'   [get_comm_samples()].
 #' @param sex Either "male" or "female".
-#' @param method TODO
-#' @param downsample TODO
-#' @param chains TODO
-#' @param iter TODO
-#' @param cores TODO
-#' @param allow_slow_mcmc TODO
-#' @param est_method TODO
-#' @param min_samples TODO
-#' @param uniform_priors TODO
+#' @param method `"mpd"` for the mode of the posterior distribution (with
+#'   [rstan::optimizing()]) or `"mcmc"` for full MCMC sampling with Stan (with
+#'   [rstan::sampling()]).
+#' @param downsample If not `Inf` this represents a number of fish specimens to
+#'   sample prior to model fitting. Can be useful for large data sets that you
+#'   want to fit with MCMC for testing purposes.
+#' @param chains Number of Stan chains.
+#' @param iter Number of Stan sampling iterations.
+#' @param cores Number of cores for Stan.
+#' @param allow_slow_mcmc Logical. If `TRUE` then the function will let you fit
+#'   with MCMC to any number of fish. Defaults to `FALSE` to avoid accidentally
+#'   fitting a model to a giant data set (stop if number of fish > 50,000).
+#' @param est_method If MCMC this defines how to summarize the posterior. Should
+#'   be a function such as `mean` or `median`.
+#' @param min_samples The minimum number of fish before a model will be fit.
+#' @param uniform_priors Logical. If true then uniform priors will be used.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
-#'   on. Default to `NULL`, which brings in all valid ageing codes.
-#'   See [get_age_methods()].
-#' @param ... TODO
+#'   on. Defaults to `NULL`, which brings in all valid ageing codes. See
+#'   [get_age_methods()].
+#' @param ... Any other arguments to pass on to [rstan::sampling()] or
+#'   [rstan::optimizing()].
 #' @family growth functions
 #' @importFrom stats median quantile rlnorm runif median
 #'
-#' @details Note that in some cases you must load the rstan package first
-#' and you may choose to do so just in case. If the rstan package is not loaded
-#' first, you may get the warning:
+#' @details Note that in some cases you must load the rstan package first and
+#'   you may choose to do so just in case. If the rstan package is not loaded
+#'   first, you may get the warning:
 #'
 #' `Error in cpp_object_initializer(.self, .refClassDef, ...) :`
 #' `could not find function "cpp_object_initializer"`
@@ -170,28 +176,34 @@ fit_vb <- function(dat,
   )
 }
 
-#' Fit length-weight TODO
+#' Fit a length-weight model
 #'
 #' For use with data for a single species.
 #'
-#' @param dat TODO
-#' @param sex TODO
-#' @param downsample TODO
-#' @param min_samples TODO
-#' @param method TODO
-#' @param scale_weight TODO
+#' @param dat Input data frame. Should be from [get_survey_samples()] or
+#'   [get_comm_samples()].
+#' @param sex Either "male" or "female".
+#' @param downsample If not `Inf` this represents a number of fish specimens to
+#'   sample prior to model fitting. Can be useful for large data sets that you
+#'   want to fit with MCMC for testing purposes.
+#' @param min_samples The minimum number of fish before a model will be fit.
+#' @param method `"rlm"` for [MASS::rlm()] or `"lm"` for [stats::lm()].
+#' @param too_high_quantile A quantile above which to discard weights and
+#'   lengths. Can be useful for outliers. Defaults to including all data.
+#' @param est_method If MCMC this defines how to summarize the posterior. Should
+#'   be a function such as `mean` or `median`.
+#' @param scale_weight A value to multiply all weights by. Useful for changing
+#'   units.
 #'
 #' @family growth functions
 #' @export
 #' @examples
-#' model_f <- fit_length_weight(pop_samples)
-#' model_f$model
-#' model_f$predictions
-#' model_f$pars
-#' model_f$data
-#'
-#' model_m <- fit_length_weight(pop_samples, sex = "male")
-#' plot_length_weight(model_f, model_m)
+#' \dontrun{
+#' d <- get_survey_samples("pacific ocean perch")
+#' model_f <- fit_length_weight(d, sex = "female")
+#' model_m <- fit_length_weight(d, sex = "male")
+#' plot_length_weight(object_female = model_f, object_male = model_m)
+#' }
 
 fit_length_weight <- function(dat,
                               sex = c("female", "male"),
@@ -249,21 +261,22 @@ fit_length_weight <- function(dat,
   list(predictions = pred, pars = pars, data = as_tibble(dat), model = m)
 }
 
-#' Plot VB or length-weight fits TODO
+#' Plot von Bertalanffy or length-weight fits
 #'
-#' @param object_female TODO
-#' @param object_male TODO
-#' @param type TODO
-#' @param downsample TODO
-#' @param pt_alpha TODO
-#' @param xlab TODO
-#' @param ylab TODO
-#' @param seed TODO
-#' @param lab_x TODO
-#' @param lab_y TODO
-#' @param lab_x_gap TODO
-#' @param lab_y_gap TODO
-#' @param col TODO
+#' @param object_female Output from [fit_length_weight()] or [fit_vb()].
+#' @param object_male Output from [fit_length_weight()] or [fit_vb()].
+#' @param type von Bertalanffy or length-weight fits?
+#' @param downsample Downsample the individual fish to plot down to this number.
+#' @param pt_alpha Transparency for the points.
+#' @param xlab Label for the x axis.
+#' @param ylab Label for the y axis.
+#' @param seed A random seed value that only comes into play for downsampling.
+#' @param lab_x Fraction from left to place text labels.
+#' @param lab_y Fraction from bottom to place text labels.
+#' @param lab_x_gap Horizontal gap between text labels.
+#' @param lab_y_gap The vertical gap between text labels.
+#' @param col A named character vector declaring the colors for female and male
+#'   fish.
 #'
 #' @export
 #' @family growth functions
@@ -271,14 +284,15 @@ fit_length_weight <- function(dat,
 #'
 #' @examples
 #' \dontrun{
-#' model_f <- fit_vb(pop_samples, sex = "female")
-#' model_m <- fit_vb(pop_samples, sex = "male")
-#' plot_vb(model_f, model_m)
-#' }
+#' d <- get_survey_samples("pacific ocean perch")
+#' model_f <- fit_length_weight(d, sex = "female")
+#' model_m <- fit_length_weight(d, sex = "male")
+#' plot_length_weight(object_female = model_f, object_male = model_m)
 #'
-#' model_f <- fit_length_weight(pop_samples, sex = "female")
-#' model_m <- fit_length_weight(pop_samples, sex = "male")
-#' plot_length_weight(model_f, model_m)
+#' model_f <- fit_vb(d, sex = "female")
+#' model_m <- fit_vb(d, sex = "male")
+#' plot_vb(object_female = model_f, object_male = model_m)
+#' }
 
 plot_growth <- function(object_female, object_male,
                         type = c("vb", "length-weight"),
@@ -374,7 +388,7 @@ plot_growth <- function(object_female, object_male,
 }
 
 #' @inheritParams plot_growth
-#' @param ... TODO
+#' @param ... Arguments to pass to [plot_growth()].
 #' @export
 #' @rdname plot_growth
 plot_vb <- function(..., type = "vb") {

@@ -4,7 +4,7 @@
 \alias{plot_growth}
 \alias{plot_vb}
 \alias{plot_length_weight}
-\title{Plot VB or length-weight fits TODO}
+\title{Plot von Bertalanffy or length-weight fits}
 \usage{
 plot_growth(object_female, object_male, type = c("vb", "length-weight"),
   downsample = 2000L, pt_alpha = 0.2, xlab = "Age (years)",
@@ -18,47 +18,49 @@ plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
   ylab = "Weight (kg)", lab_x = 0.1, lab_y = 0.9, lab_x_gap = 0.35)
 }
 \arguments{
-\item{object_female}{TODO}
+\item{object_female}{Output from \code{\link[=fit_length_weight]{fit_length_weight()}} or \code{\link[=fit_vb]{fit_vb()}}.}
 
-\item{object_male}{TODO}
+\item{object_male}{Output from \code{\link[=fit_length_weight]{fit_length_weight()}} or \code{\link[=fit_vb]{fit_vb()}}.}
 
-\item{type}{TODO}
+\item{type}{von Bertalanffy or length-weight fits?}
 
-\item{downsample}{TODO}
+\item{downsample}{Downsample the individual fish to plot down to this number.}
 
-\item{pt_alpha}{TODO}
+\item{pt_alpha}{Transparency for the points.}
 
-\item{xlab}{TODO}
+\item{xlab}{Label for the x axis.}
 
-\item{ylab}{TODO}
+\item{ylab}{Label for the y axis.}
 
-\item{seed}{TODO}
+\item{seed}{A random seed value that only comes into play for downsampling.}
 
-\item{lab_x}{TODO}
+\item{lab_x}{Fraction from left to place text labels.}
 
-\item{lab_y}{TODO}
+\item{lab_y}{Fraction from bottom to place text labels.}
 
-\item{lab_x_gap}{TODO}
+\item{lab_x_gap}{Horizontal gap between text labels.}
 
-\item{lab_y_gap}{TODO}
+\item{lab_y_gap}{The vertical gap between text labels.}
 
-\item{col}{TODO}
+\item{col}{A named character vector declaring the colors for female and male
+fish.}
 
-\item{...}{TODO}
+\item{...}{Arguments to pass to \code{\link[=plot_growth]{plot_growth()}}.}
 }
 \description{
-Plot VB or length-weight fits TODO
+Plot von Bertalanffy or length-weight fits
 }
 \examples{
 \dontrun{
-model_f <- fit_vb(pop_samples, sex = "female")
-model_m <- fit_vb(pop_samples, sex = "male")
-plot_vb(model_f, model_m)
-}
+d <- get_survey_samples("pacific ocean perch")
+model_f <- fit_length_weight(d, sex = "female")
+model_m <- fit_length_weight(d, sex = "male")
+plot_length_weight(object_female = model_f, object_male = model_m)
 
-model_f <- fit_length_weight(pop_samples, sex = "female")
-model_m <- fit_length_weight(pop_samples, sex = "male")
-plot_length_weight(model_f, model_m)
+model_f <- fit_vb(d, sex = "female")
+model_m <- fit_vb(d, sex = "male")
+plot_vb(object_female = model_f, object_male = model_m)
+}
 }
 \seealso{
 Other growth functions: \code{\link{fit_length_weight}},

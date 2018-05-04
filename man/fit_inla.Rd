@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit-inla.R
 \name{fit_inla}
 \alias{fit_inla}
-\title{fit_inla()}
+\title{Fit a spatial model with INLA}
 \usage{
 fit_inla(dat, response = "present", n_knots = 50, family = "binomial",
   max_edge = c(3, 10), kmeans = TRUE, plot = FALSE, fit_model = TRUE,
@@ -35,5 +35,5 @@ fit_inla(dat, response = "present", n_knots = 50, family = "binomial",
 \item{include_depth}{TODO}
 }
 \description{
-fit_inla()
+Fit a spatial model with INLA
 }

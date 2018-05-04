@@ -26,9 +26,10 @@ combination).}
 \item{line_col}{Line colours for histograms. A named vector with names
 \code{"F"} and \code{"M"} for female and male.}
 
-\item{survey_cols}{TODO}
+\item{survey_cols}{An optional named character vector of colors for the
+various surveys.}
 
-\item{alpha}{TODO}
+\item{alpha}{Transparency for the fill color in the histograms.}
 
 \item{bin_size}{Bin size. Should match the bin size used with the \code{tidy_*()}
 function.}
@@ -37,8 +38,7 @@ function.}
 before a histogram is shown.}
 }
 \description{
-Functions for plotting length frequency data. (Weighting not implimented
-yet. TODO)
+Functions for plotting length frequency data.
 }
 \details{
 \itemize{
@@ -51,8 +51,7 @@ surveys for a single species.
 \examples{
 \dontrun{
 # # main age/length data:
-# rs_comm_samples <- get_comm_samples("redstripe rockfish",
-#   discard_keepers = TRUE)
+# rs_comm_samples <- get_comm_samples("redstripe rockfish")
 # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #
 # # for weighting:

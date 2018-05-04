@@ -24,21 +24,22 @@ plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
 \item{year_range}{If not \code{NULL}, a the range of years to plot. Defaults to
 all years included in original data.}
 
-\item{line_col}{TODO}
+\item{line_col}{A named character vector of colors for male and females.}
 
-\item{survey_cols}{TODO}
+\item{survey_cols}{If not \code{NULL}, a named character vector for different
+colors for the various surveys.}
 
-\item{alpha}{TODO}
+\item{alpha}{Transparency for the fill color.}
 
-\item{grid_col}{TODO}
+\item{grid_col}{Colour for the gridlines.}
 }
 \description{
 Functions for plotting age frequency data.
 }
 \details{
 \itemize{
-\item \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or \code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} prepare PBS data for \code{plot_ages()}. These work across one
-or multiple species.
+\item \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or \code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} prepare PBS data for \code{plot_ages()}.
+These work across one or multiple species.
 \item \code{plot_ages()} Plots age frequencies for each year for selected surveys for
 a single species. Input data frame should come from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or
 \code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} or follow the following format: The input data frame
@@ -49,8 +50,7 @@ and \code{"F"}), \code{age}, \code{proportion}, \code{total} (for the total samp
 \examples{
 \dontrun{
 # # main age/length data:
-# rs_comm_samples <- get_comm_samples("redstripe rockfish",
-#   discard_keepers = TRUE)
+# rs_comm_samples <- get_comm_samples("redstripe rockfish")
 # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #
 # # for weighting:

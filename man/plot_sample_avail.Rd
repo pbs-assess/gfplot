@@ -9,7 +9,7 @@ plot_sample_avail(dat, year_range = NULL, title = "Biological samples",
 }
 \arguments{
 \item{dat}{An input data frame from, for example,
-\code{\link{tidy_sample_avail}}. The input data frame must have the columns:
+\code{\link[=tidy_sample_avail]{tidy_sample_avail()}}. The input data frame must have the columns:
 \describe{
 \item{\code{year}}{The year.}
 \item{\code{type}}{The types of samples to plot, e.g. "maturity",
@@ -18,11 +18,11 @@ capitalizing the first letter.}
 \item{\code{n}}{The number of samples available for that sample type.}
 }}
 
-\item{year_range}{TODO}
+\item{year_range}{An optional year range.}
 
-\item{title}{A title for the plot. Use \code{title = ""} to omit.}
+\item{title}{A title for the plot.}
 
-\item{palette}{TODO}
+\item{palette}{A palette to pass to \code{\link[ggplot2:scale_fill_distiller]{ggplot2::scale_fill_distiller()}}.}
 }
 \description{
 Plot sample availability

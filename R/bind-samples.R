@@ -1,7 +1,7 @@
 #' Join survey and commercial samples
 #'
-#' @param dat_comm TODO
-#' @param dat_survey TODO
+#' @param dat_comm Output from [get_comm_samples()]
+#' @param dat_survey Output from [get_survey_samples()]
 #' @export
 #' @examples
 #' \dontrun{
