@@ -32,6 +32,12 @@ shown. Defaults to 3 to satisfy privacy requirements.}
 \item{colour_scale}{A ggplot \code{scale_colour_*} function to control border of
 hexagon colours. This should likely match \code{fill_scale}.}
 
+\item{rotation_angle}{Angle to rotate the entire map. Used in the synopsis
+report to rotate the coast 40 degrees to fit more plots on the page.}
+
+\item{rotation_center}{The center in UTM coordinates around which to rotate
+the coast if it is rotated at all.}
+
 \item{fill_lab}{Label for the color legend.}
 }
 \description{

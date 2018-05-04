@@ -32,6 +32,8 @@ as more uncertain.}
 \item{max_set_fraction}{A fraction of positive sets above which a panel will
 be shaded as more uncertain.}
 
+\item{xlim}{If not \code{NULL}, the x axis limits.}
+
 \item{survey_cols}{If not \code{NULL}, a named character vector of colors for the
 various surveys.}
 }

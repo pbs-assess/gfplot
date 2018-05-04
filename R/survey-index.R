@@ -89,6 +89,7 @@ tidy_survey_index <- function(dat,
 #'   as more uncertain.
 #' @param max_set_fraction A fraction of positive sets above which a panel will
 #' be shaded as more uncertain.
+#' @param xlim If not `NULL`, the x axis limits.
 #' @param survey_cols If not `NULL`, a named character vector of colors for the
 #'   various surveys.
 #'

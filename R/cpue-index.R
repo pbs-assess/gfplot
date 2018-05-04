@@ -274,12 +274,12 @@ plot_cpue_index_coefs <- function(object) {
     labs(y = "", x = "Coefficient value")
 }
 
-#' @description * `plot_cpue_index_jk()` TODO
+#' @description * `plot_cpue_index_jk()` "jackknifes" out terms one by one to
+#'   test the sensitivity of the standardization model to any one term.
 #'
 #' @param terms A character vector of terms to jackknife out.
 #' @param return_data Logical: should the data be returned?
 #'
-#' @return TODO
 #' @export
 #'
 #' @rdname cpue-index

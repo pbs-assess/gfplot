@@ -23,6 +23,9 @@ capitalizing the first letter.}
 \item{title}{A title for the plot.}
 
 \item{palette}{A palette to pass to \code{\link[ggplot2:scale_fill_distiller]{ggplot2::scale_fill_distiller()}}.}
+
+\item{trans}{A function to transform the counts before applying the color
+scale. E.g. \code{sqrt} or \code{log} or \code{I} if you don't want any transformation.}
 }
 \description{
 Plot sample availability

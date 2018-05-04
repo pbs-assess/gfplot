@@ -24,6 +24,9 @@
 #'   colors for the various surveys.
 #' @param alpha Transparency for the fill color.
 #' @param grid_col Colour for the gridlines.
+#' @param diagonal_lines A numeric a vector of years to start diagonal lines at
+#'   to help trace cohorts. Note that these are passed to
+#'   [ggplot2::geom_abline()] as intercepts.
 #'
 #' @family age- and length-frequency functions
 #'

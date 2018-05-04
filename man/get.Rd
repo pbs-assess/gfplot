@@ -71,6 +71,9 @@ descriptions.}
 
 \item{join_sample_ids}{TODO}
 
+\item{verbose}{Logical for whether some extra information should be printed
+during data extraction.}
+
 \item{remove_bad_data}{Remove known bad data, such as unrealistic
 length or weight values.}
 
@@ -94,6 +97,10 @@ gear types to select from.}
 
 \item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
 reading and writing at the expense of disk space.}
+
+\item{survey_sets}{Logical for whether the survey set data should be
+extracted. You might set this to \code{FALSE} if you don't need these data and
+you want to substantially speed up data extraction.}
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific

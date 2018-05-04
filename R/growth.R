@@ -20,6 +20,8 @@
 #' @param est_method If MCMC this defines how to summarize the posterior. Should
 #'   be a function such as `mean` or `median`.
 #' @param min_samples The minimum number of fish before a model will be fit.
+#' @param too_high_quantile A quantile above which to discard weights and
+#'   lengths. Can be useful for outliers. Defaults to including all data.
 #' @param uniform_priors Logical. If true then uniform priors will be used.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes. See

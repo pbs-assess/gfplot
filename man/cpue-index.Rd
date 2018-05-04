@@ -49,8 +49,6 @@ formatted data frame.}
 A ggplot object
 
 A ggplot object
-
-TODO
 }
 \description{
 \itemize{
@@ -79,7 +77,8 @@ standardization model
 }
 
 \itemize{
-\item \code{plot_cpue_index_jk()} TODO
+\item \code{plot_cpue_index_jk()} "jackknifes" out terms one by one to
+test the sensitivity of the standardization model to any one term.
 }
 }
 \details{

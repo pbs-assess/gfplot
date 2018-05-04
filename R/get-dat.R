@@ -559,6 +559,11 @@ get_sara_dat <- function() {
 #' @param path The folder where the cached data will be saved.
 #' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
 #'   reading and writing at the expense of disk space.
+#' @param survey_sets Logical for whether the survey set data should be
+#'   extracted. You might set this to `FALSE` if you don't need these data and
+#'   you want to substantially speed up data extraction.
+#' @param verbose Logical for whether some extra information should be printed
+#'   during data extraction.
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
@@ -570,7 +575,7 @@ cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
 
   dir.create(path, showWarnings = FALSE)
 
-  if(survey_sets){
+  if (survey_sets){
     d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
     saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
             compress = compress)

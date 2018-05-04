@@ -74,6 +74,8 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @param year_range An optional year range.
 #' @param title A title for the plot.
 #' @param palette A palette to pass to [ggplot2::scale_fill_distiller()].
+#' @param trans A function to transform the counts before applying the color
+#'   scale. E.g. `sqrt` or `log` or `I` if you don't want any transformation.
 #'
 #' @examples
 #' d <- expand.grid(year = 1996:2016,

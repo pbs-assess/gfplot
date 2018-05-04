@@ -11,6 +11,10 @@
 #' @param fill_scale A ggplot `scale_fill_*` function to control colour shading.
 #' @param colour_scale A ggplot `scale_colour_*` function to control border of
 #'   hexagon colours. This should likely match `fill_scale`.
+#' @param rotation_angle Angle to rotate the entire map. Used in the synopsis
+#'   report to rotate the coast 40 degrees to fit more plots on the page.
+#' @param rotation_center The center in UTM coordinates around which to rotate
+#'   the coast if it is rotated at all.
 #' @param fill_lab Label for the color legend.
 #'
 #' @export

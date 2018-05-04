@@ -39,6 +39,9 @@ be a function such as \code{mean} or \code{median}.}
 
 \item{min_samples}{The minimum number of fish before a model will be fit.}
 
+\item{too_high_quantile}{A quantile above which to discard weights and
+lengths. Can be useful for outliers. Defaults to including all data.}
+
 \item{uniform_priors}{Logical. If true then uniform priors will be used.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter

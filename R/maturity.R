@@ -120,13 +120,14 @@ fit_mat_ogive <- function(dat,
   )
 }
 
-#' @param object TODO
-#' @param type TODO
-#' @param xlab TODO
-#' @param title TODO
-#' @param rug TODO
-#' @param rug_n TODO
-#' @param x_max TODO as -fold of L or A95.
+#' @param object Output from [fit_mat_ogive()].
+#' @param xlab X axis label.
+#' @param title Title for the plot.
+#' @param rug Logical indicating whether rug lines should be added.
+#' @param rug_n The number of rug lines to sample from the total number of fish.
+#' @param x_max Used in determining the right axis limit.
+#' @param prediction_type The prediction lines to show. Useful if you only want
+#'   to show model fits when you have sufficient data.
 #'
 #' @importFrom stats binomial plogis predict
 #' @export

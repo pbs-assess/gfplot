@@ -16,8 +16,6 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
 \arguments{
 \item{dat}{TODO}
 
-\item{type}{TODO}
-
 \item{sample_id_re}{TODO}
 
 \item{months}{TODO}
@@ -26,17 +24,20 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
 on. Default to \code{NULL}, which brings in all valid ageing codes.
 See \code{\link[=get_age_methods]{get_age_methods()}}.}
 
-\item{object}{TODO}
+\item{object}{Output from \code{\link[=fit_mat_ogive]{fit_mat_ogive()}}.}
 
-\item{xlab}{TODO}
+\item{xlab}{X axis label.}
 
-\item{title}{TODO}
+\item{title}{Title for the plot.}
 
-\item{rug}{TODO}
+\item{rug}{Logical indicating whether rug lines should be added.}
 
-\item{rug_n}{TODO}
+\item{rug_n}{The number of rug lines to sample from the total number of fish.}
 
-\item{x_max}{TODO as -fold of L or A95.}
+\item{x_max}{Used in determining the right axis limit.}
+
+\item{prediction_type}{The prediction lines to show. Useful if you only want
+to show model fits when you have sufficient data.}
 }
 \description{
 Fit and plot maturity ogives

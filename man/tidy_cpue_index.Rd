@@ -12,30 +12,41 @@ tidy_cpue_index(dat, species_common, year_range = c(1996,
   0.99), lat_bin_quantiles = c(0.01, 0.99), gear = "BOTTOM TRAWL")
 }
 \arguments{
-\item{dat}{An input data frame from \code{\link{get_cpue_index}}}
+\item{dat}{An input data frame from \code{\link[=get_cpue_index]{get_cpue_index()}}.}
 
-\item{species_common}{The species common name}
+\item{species_common}{The species common name.}
 
-\item{year_range}{The range of years to include}
+\item{year_range}{The range of years to include.}
 
-\item{min_positive_tows}{The minimum number of positive tows over all years}
+\item{min_positive_tows}{The minimum number of positive tows over all years.}
 
-\item{min_positive_trips}{The minimum number of annual positive trips}
+\item{min_positive_trips}{The minimum number of annual positive trips.}
 
 \item{min_yrs_with_trips}{The number of years in which the
-\code{min_positive_trips} criteria needs to be met}
+\code{min_positive_trips} criteria needs to be met.}
 
 \item{area_grep_pattern}{A regular expression to extract the management areas
-of interest}
+of interest.}
+
+\item{lat_band_width}{The latitude bandwidths in degrees.}
+
+\item{depth_band_width}{The depth band widths in m.}
+
+\item{clean_bins}{Logical. Should the depth and latitude bands be rounded to
+the nearest clearn value as defined by \code{lat_band_width} or
+\code{depth_band_width}? Internally, these use, for example:
+\code{gfplot:::round_down_even(lat_range[1], lat_band_width)}.}
+
+\item{depth_bin_quantiles}{Quantiles for the depth bands. Values above and
+below these quantiles will be discarded.}
+
+\item{lat_bin_quantiles}{Quantiles for the latitude bands. Values above and
+below these quantiles will be discarded.}
 
 \item{gear}{Gear types}
-
-\item{lat_bands}{A sequence of latitude bans}
-
-\item{depth_bands}{A sequence of depth bands}
 }
 \description{
-Tidy commercial PBS CPUE data
+This function determines the qualifying "fleet" for CPUE analyses.
 }
 \examples{
 \dontrun{

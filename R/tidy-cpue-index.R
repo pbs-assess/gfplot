@@ -1,16 +1,26 @@
 #' Tidy commercial PBS CPUE data
 #'
-#' @param dat An input data frame from \code{\link{get_cpue_index}}
-#' @param species_common The species common name
-#' @param year_range The range of years to include
-#' @param min_positive_tows The minimum number of positive tows over all years
-#' @param min_positive_trips The minimum number of annual positive trips
+#' This function determines the qualifying "fleet" for CPUE analyses.
+#'
+#' @param dat An input data frame from [get_cpue_index()].
+#' @param species_common The species common name.
+#' @param year_range The range of years to include.
+#' @param min_positive_tows The minimum number of positive tows over all years.
+#' @param min_positive_trips The minimum number of annual positive trips.
 #' @param min_yrs_with_trips The number of years in which the
-#'   \code{min_positive_trips} criteria needs to be met
+#'   `min_positive_trips` criteria needs to be met.
 #' @param area_grep_pattern A regular expression to extract the management areas
-#'   of interest
-#' @param lat_bands A sequence of latitude bans
-#' @param depth_bands A sequence of depth bands
+#'   of interest.
+#' @param lat_band_width The latitude bandwidths in degrees.
+#' @param depth_band_width The depth band widths in m.
+#' @param clean_bins Logical. Should the depth and latitude bands be rounded to
+#'   the nearest clearn value as defined by `lat_band_width` or
+#'   `depth_band_width`? Internally, these use, for example:
+#'   `gfplot:::round_down_even(lat_range[1], lat_band_width)`.
+#' @param depth_bin_quantiles Quantiles for the depth bands. Values above and
+#'   below these quantiles will be discarded.
+#' @param lat_bin_quantiles Quantiles for the latitude bands. Values above and
+#'   below these quantiles will be discarded.
 #' @param gear Gear types
 #' @family tidy data functions
 #'
@@ -30,8 +40,6 @@ tidy_cpue_index <- function(dat, species_common,
                             min_positive_trips = 4,
                             min_yrs_with_trips = 4,
                             area_grep_pattern = "5[CDE]+",
-                            # lat_bands = seq(48, 59, 0.2),
-                            # depth_bands = seq(50, 450, 25),
                             lat_band_width = 0.2,
                             depth_band_width = 50,
                             clean_bins = TRUE,

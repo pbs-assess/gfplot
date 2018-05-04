@@ -32,6 +32,10 @@ colors for the various surveys.}
 \item{alpha}{Transparency for the fill color.}
 
 \item{grid_col}{Colour for the gridlines.}
+
+\item{diagonal_lines}{A numeric a vector of years to start diagonal lines at
+to help trace cohorts. Note that these are passed to
+\code{\link[ggplot2:geom_abline]{ggplot2::geom_abline()}} as intercepts.}
 }
 \description{
 Functions for plotting age frequency data.
