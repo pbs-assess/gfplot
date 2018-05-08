@@ -74,7 +74,6 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       year - sex_gap / 2, year + sex_gap / 2
     )) %>%
     group_by(year, year_jitter, survey_abbrev) %>%
-    mutate(n_scaled = proportion / max(proportion)) %>%
     ungroup()
 
   counts <- select(dat, total, year, survey_abbrev) %>% unique()
@@ -159,7 +158,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
         angle = 90
       ) +
       geom_point(aes_string(
-        size = "n_scaled", group = "sex", fill = "sex",
+        size = "proportion", group = "sex", fill = "sex",
         colour = "sex"
       ), pch = 21)
   }
