@@ -53,8 +53,6 @@
 #' # rs_catch <- get_catch("redstripe rockfish")
 #' # rs_survey_sets <- get_survey_sets("redstripe rockfish")
 #'
-#' # or use the built-in package data as an example:
-#'
 #' # calculate raw age frequencies for survey data:
 #' tidy_ages_raw(rs_survey_samples,
 #'   sample_type = "survey")
@@ -239,13 +237,9 @@ tidy_comps <- function(dat,
     }
   }
 
-
-
   # -------------------------------------------
-  # Join in survey names if needed:
+  # Assign survey levels:
   if (sample_type == "survey") {
-    # surv <- tibble(survey_abbrev = survey_abbrev, survey = survey)
-    # dat <- inner_join(dat, surv, by = "survey_series_desc")
     dat$survey_abbrev <- factor(dat$survey_abbrev, levels = survey)
   } else {
     dat$survey_abbrev <- "Commercial"

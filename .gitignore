@@ -48,3 +48,4 @@ inst/pcod-cache
 inst/pcod-figs
 inst/pcod-knitr*
 *cache*
+docs/*

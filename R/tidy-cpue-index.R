@@ -47,8 +47,6 @@ tidy_cpue_index <- function(dat, species_common,
                             lat_bin_quantiles = c(0.01, 0.99),
                             gear = "BOTTOM TRAWL") {
 
-  # lat_range <- range(lat_bands)
-
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
     gfplot::pbs_areas$major_stat_area_description

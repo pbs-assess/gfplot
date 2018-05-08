@@ -138,7 +138,7 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
       if (class(model) != "try-error") {
         try_fitting <- FALSE
       } else {
-        if (trial_i > 5) browser()
+        # if (trial_i > 5) browser()
         message("INLA error. Trying again.")
       }
     }
