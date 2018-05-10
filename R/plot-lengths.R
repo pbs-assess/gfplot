@@ -107,7 +107,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       position = position_identity()
     ) +
     facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
-      labeller = labeller(.rows = is_even), drop = FALSE) +
+      labeller = ggplot2::labeller(.rows = is_even), drop = FALSE) +
     theme_pbs() +
     scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
     scale_colour_manual(values = line_col, breaks = c("M", "F")) +

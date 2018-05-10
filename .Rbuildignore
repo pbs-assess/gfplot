@@ -41,3 +41,4 @@
 ^inst/shortraker-*
 ^inst/pcod-knit*
 ^inst/pcod-cache/*
+^docs$

@@ -7,9 +7,8 @@
 \usage{
 tidy_catch(dat, areas = NULL)
 
-plot_catch(dat, ylab = "Landings", xlim = c(1954, 2017), units = c(`1000
-  tons` = 1e+06, tons = 1000, kg = 1), unreliable = c(1996, 2006),
-  blank_plot = FALSE)
+plot_catch(dat, ylab = "Landings", xlim = c(1954, 2017), units = NULL,
+  unreliable = c(1996, 2006), blank_plot = FALSE)
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_catch()} should be from
@@ -27,7 +26,9 @@ with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B
 
 \item{units}{A named character vector with names referring to text that will
 be pasted into the y-axis label and a value defining the quantity to divide
-the \code{value} column by for that unit label.}
+the \code{value} column by for that unit label.
+Defaults to \code{c('1000 tons' = 1000000, 'tons' = 1000, 'kg' = 1)} if
+\code{units = NULL}.}
 
 \item{unreliable}{An optional numeric vector defining years before which the
 data are less reliable. Leave as \code{NA} to omit.}
