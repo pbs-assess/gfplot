@@ -185,10 +185,10 @@ load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
 
 # Rotate coords
 #
-# @param x TODO
-# @param y TODO
-# @param rotation_angle TODO
-# @param rotation_center TODO
+# @param x X coordinates.
+# @param y Y coordinates.
+# @param rotation_angle The rotation angle.
+# @param rotation_center The coordinates about which to rotate.
 #
 # @examples
 # x <- c(1:100, rep(100, 100), 100:1, rep(1, 100))

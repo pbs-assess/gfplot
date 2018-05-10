@@ -155,12 +155,12 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
 }
 
 
-#' predict_inla()
-#'
-#' @param obj TODO
-#' @param pred_grid TODO
-#' @param samples TODO
-#' @param include_depth TODO
+# predict_inla()
+#
+# @param obj A model fit object from INLA.
+# @param pred_grid The grid to project the predictions onto.
+# @param samples The number of posterior samples to draw.
+# @param include_depth Logical for whether to include depth.
 
 predict_inla <- function(obj, pred_grid, samples = 100L,
                          include_depth = TRUE) {

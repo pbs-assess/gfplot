@@ -22,7 +22,6 @@
 #' @param lat_bin_quantiles Quantiles for the latitude bands. Values above and
 #'   below these quantiles will be discarded.
 #' @param gear Gear types
-#' @family tidy data functions
 #'
 #' @export
 #'

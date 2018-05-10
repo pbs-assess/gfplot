@@ -1,7 +1,8 @@
 # @param cell_width Cell width in units of the data (e.g. UTM km).
 # @param region Optional region abbreviation to search for a spatial polygon
-#   file. TODO
-# @param cache_folder TODO
+#   file.
+# @param cache_folder The folder with respect to the local working directory in
+#   which to cache the prediction grid.
 #
 # @export
 # @rdname survey-spatial-modelling

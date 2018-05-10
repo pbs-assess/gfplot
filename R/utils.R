@@ -1,7 +1,7 @@
 #' Run SQL
 #'
-#' @param database TODO
-#' @param query TODO
+#' @param database The name of the database.
+#' @param query The query to run.
 #'
 #' @export
 run_sql <- function(database, query) {

@@ -7,9 +7,7 @@
 plot_age_precision(dat, n = 250, jitter = 0.25, seed = 42)
 }
 \arguments{
-\item{dat}{A properly formatted data frame, for example, from
-\code{\link[=tidy_age_precision]{tidy_age_precision()}}. Should have columns named
-TODO.}
+\item{dat}{A data frame from \code{\link[=tidy_age_precision]{tidy_age_precision()}}.}
 
 \item{n}{Number of fish to randomly sample to plot.}
 

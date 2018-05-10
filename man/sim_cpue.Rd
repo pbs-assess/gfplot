@@ -7,13 +7,15 @@
 sim_cpue(sigma = 0.4, n_samples = 20, n_years = 15, n_vessels = 8)
 }
 \arguments{
-\item{sigma}{TODO}
+\item{sigma}{The residual standard deviation for the positive timeseries on
+a log scale.}
 
-\item{n_samples}{TODO}
+\item{n_samples}{The number of samples or fishing events per vessel per
+year.}
 
-\item{n_years}{TODO}
+\item{n_years}{The number of years.}
 
-\item{n_vessels}{TODO}
+\item{n_vessels}{The number of the vessels.}
 }
 \description{
 Simulate fake commercial CPUE data for examples and testing

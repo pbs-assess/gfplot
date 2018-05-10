@@ -5,23 +5,16 @@
 #' get_survey_index("lingcod") %>%
 #'   tidy_survey_index() %>%
 #'   plot_survey_index()
-#'
-#' # Or without pipes:
-#' d <- get_survey_index("lingcod")
-#' head(d)
-#'
-#' d_tidy <- tidy_survey_index(d)
-#' head(d_tidy)
-#'
-#' plot_survey_index(d_tidy)
 #' }
-
 #' @name plot_survey_index
-#' @param dat TODO
-#' @param survey TODO
-#' @param min_years TODO
-#' @param year_range TODO
-#' @family tidy data functions
+
+#' @param dat For [tidy_survey_index()], data from [get_survey_index()]. For
+#'   [plot_survey_index()], data from [tidy_survey_index()].
+#' @param survey A character vector of survey abbreviations to include.
+#' @param min_years The minimum number of years for a survey before it is
+#'   included.
+#' @param year_range If not `NULL`, a numeric vector of length 2 giving the
+#'   range of years to plot.
 #' @rdname plot_survey_index
 #' @export
 tidy_survey_index <- function(dat,
@@ -94,7 +87,6 @@ tidy_survey_index <- function(dat,
 #'   various surveys.
 #'
 #' @export
-#' @family plotting functions
 #'
 #' @rdname plot_survey_index
 

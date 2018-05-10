@@ -1,10 +1,12 @@
 #' Fit and plot maturity ogives
 #'
-#' @param dat TODO
-#' @param sample_id_re TODO
-#' @param months TODO
+#' @param dat Data from [get_survey_samples()].
+#' @param sample_id_re If `TRUE` then the model will include random intercepts
+#'   for sample ID.
+#' @param months A numeric vector indicating which months to include when
+#'   fitting the maturity ogive. Defaults to all months.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
-#'   on. Default to `NULL`, which brings in all valid ageing codes.
+#'   on. Defaults to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
 #' @rdname plot_mat_ogive
 #' @export

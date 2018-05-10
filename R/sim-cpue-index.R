@@ -1,3 +1,16 @@
+# Simulate a CPUE timeseries
+#
+# This function simulates a CPUE timeseries and fits the model to it to check
+# for accuracy and coverage of confidence intervals. 
+#
+# @param make_plots If `TRUE` then a series of diagnostic plots will be made.
+# @param sigma The residual standard deviation for the positive timeseries on
+# a log scale.
+# @param n_samples The number of samples or fishing events per vessel per
+# year.
+# @param n_years The number of years.
+# @param n_vessels The number of the vessels.
+
 sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   n_years = 20, n_vessels = 10) {
   fake_fleet <- sim_cpue(

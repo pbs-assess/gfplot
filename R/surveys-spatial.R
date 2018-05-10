@@ -1,6 +1,15 @@
-# @param years TODO
+# Title
+#
+# @param dat
+# @param survey
+# @param years
+# @param utm_zone
+# @param density_column
+#
+# @return
 # @export
-# @rdname survey-spatial-modelling
+#
+# @examples
 tidy_survey_sets <- function(dat, survey, years, utm_zone = 9,
   density_column = "density_kgpm2") {
 
@@ -104,14 +113,15 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
   ini
 }
 
-# @param formula_positive TODO
-# @param formula_binary TODO
-# @param n_knots TODO
-# @param iter TODO
-# @param chains TODO
-# @param adapt_delta TODO
-# @param cores TODO
-# @param ... TODO
+# @param formula_positive A formula for the positive model component.
+# @param formula_binary A formula for the binary model component.
+# @param n_knots The number of knots in the spatial approximation.
+# @param iter A number of iterations to pass to Stan.
+# @param chains The number of chains to pass to Stan.
+# @param adapt_delta An argument to pass to Stan. Values closer to 1 will result
+#   in smaller jump distances at the expense of speed.
+# @param cores The number of cores to pass to Stan.
+# @param ... Other arguments to pass to Stan.
 #
 # @export
 # @rdname survey-spatial-modelling
@@ -123,7 +133,7 @@ fit_glmmfields <- function(dat,
                            chains = 4, adapt_delta = 0.98,
                            cores = parallel::detectCores(), ...) {
 
-  stop("Temporarily disabled.")
+  stop("Temporarily disabled until the package is on CRAN.")
 
   # n_beta <- 2L
   # message("Fitting positive component model...")

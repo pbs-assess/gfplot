@@ -400,10 +400,12 @@ plot_cpue_index_jk <- function(object,
 
 #' Simulate fake commercial CPUE data for examples and testing
 #'
-#' @param sigma TODO
-#' @param n_samples TODO
-#' @param n_years TODO
-#' @param n_vessels TODO
+#' @param sigma The residual standard deviation for the positive timeseries on
+#' a log scale.
+#' @param n_samples The number of samples or fishing events per vessel per
+#' year.
+#' @param n_years The number of years.
+#' @param n_vessels The number of the vessels.
 #'
 #' @export
 #' @examples

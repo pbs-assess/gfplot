@@ -14,14 +14,16 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
   prediction_type = c("all", "male", "female", "none"))
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{Data from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
-\item{sample_id_re}{TODO}
+\item{sample_id_re}{If \code{TRUE} then the model will include random intercepts
+for sample ID.}
 
-\item{months}{TODO}
+\item{months}{A numeric vector indicating which months to include when
+fitting the maturity ogive. Defaults to all months.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
-on. Default to \code{NULL}, which brings in all valid ageing codes.
+on. Defaults to \code{NULL}, which brings in all valid ageing codes.
 See \code{\link[=get_age_methods]{get_age_methods()}}.}
 
 \item{object}{Output from \code{\link[=fit_mat_ogive]{fit_mat_ogive()}}.}
@@ -55,8 +57,5 @@ plot_mat_ogive(m)
 ## with random intercepts for sample ID:
 m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
 plot_mat_ogive(m)
-}
-\seealso{
-Other plotting functions: \code{\link{plot_survey_index}}
 }
 \concept{plotting functions}

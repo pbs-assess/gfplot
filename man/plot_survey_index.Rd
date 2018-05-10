@@ -14,13 +14,16 @@ plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   xlim = NULL, survey_cols = NULL)
 }
 \arguments{
-\item{dat}{TODO}
+\item{dat}{For \code{\link[=tidy_survey_index]{tidy_survey_index()}}, data from \code{\link[=get_survey_index]{get_survey_index()}}. For
+\code{\link[=plot_survey_index]{plot_survey_index()}}, data from \code{\link[=tidy_survey_index]{tidy_survey_index()}}.}
 
-\item{survey}{TODO}
+\item{survey}{A character vector of survey abbreviations to include.}
 
-\item{min_years}{TODO}
+\item{min_years}{The minimum number of years for a survey before it is
+included.}
 
-\item{year_range}{TODO}
+\item{year_range}{If not \code{NULL}, a numeric vector of length 2 giving the
+range of years to plot.}
 
 \item{col}{A vector of two colours for the lines and shading.}
 
@@ -45,22 +48,5 @@ Plot survey relative biomass mass index
 get_survey_index("lingcod") \%>\%
   tidy_survey_index() \%>\%
   plot_survey_index()
-
-# Or without pipes:
-d <- get_survey_index("lingcod")
-head(d)
-
-d_tidy <- tidy_survey_index(d)
-head(d_tidy)
-
-plot_survey_index(d_tidy)
 }
 }
-\seealso{
-Other tidy data functions: \code{\link{tidy_age_precision}},
-  \code{\link{tidy_cpue_index}}
-
-Other plotting functions: \code{\link{fit_mat_ogive}}
-}
-\concept{plotting functions}
-\concept{tidy data functions}

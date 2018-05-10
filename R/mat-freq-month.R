@@ -3,15 +3,15 @@
 #' @name plot_maturity_months
 NULL
 
-#' @param months TODO
-#' @param ssid TODO
+#' @param months For [tidy_maturity_months()], data from [get_survey_samples()]
+#'   or [get_comm_samples()] or [bind_samples()]. For [plot_maturity_months()],
+#'   data from [tidy_maturity_months()].
+#' @param months A vector of months to include. Defaults to all.
 #' @export
 #' @rdname plot_maturity_months
-tidy_maturity_months <- function(dat, months = seq(1, 12),
-                                 ssid = NULL) {
+tidy_maturity_months <- function(dat, months = seq(1, 12)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
-  # dat <- filter(dat, maturity_code <= maturity_convention_maxvalue) # TODO: Elise - done in data now?
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
   dat <- dat %>%
     select(
@@ -85,25 +85,27 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
   dat
 }
 
-#' @param dat TODO
-#'
-#' @param max_size  TODO
-#' @param sex_gap  TODO
-#' @param fill_col  TODO
-#' @param line_col  TODO
-#' @param alpha  TODO
-#' @param title  TODO
-#' @param n_label_pos  TODO
+#' @param max_size  The maximum size of the circles.
+#' @param sex_gap  A gap to separate the male and female circles.
+#' @param fill_col  The fill color of the circles.
+#' @param line_col  The line color of the circles.
+#' @param alpha  The transparency of the circles.
+#' @param title  A title to add to the plot.
+#' @param n_label_pos A numeric vector of length 2 that gives the y position of
+#'   the text describing the number of male and female samples within each month
+#'   bin.
 #'
 #' @export
 #' @rdname plot_maturity_months
 #' @examples
+#' # pop_samples <- get_survey_samples("pacific ocean perch")
+#' tidy_maturity_months(pop_samples) %>%
+#'   plot_maturity_months()
 #' \dontrun{
 #' d <- get_survey_samples("lingcod")
 #' tidy_maturity_months(d) %>%
 #'   plot_maturity_months()
 #' }
-
 plot_maturity_months <- function(dat,
                                  max_size = 11,
                                  sex_gap = 0.2,

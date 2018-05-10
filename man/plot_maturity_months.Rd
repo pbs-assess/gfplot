@@ -5,37 +5,42 @@
 \alias{tidy_maturity_months}
 \title{Plot maturity frequency by month}
 \usage{
-tidy_maturity_months(dat, months = seq(1, 12), ssid = NULL)
+tidy_maturity_months(dat, months = seq(1, 12))
 
 plot_maturity_months(dat, max_size = 11, sex_gap = 0.2, fill_col = c(M =
   "grey70", F = "black"), line_col = c(M = "grey70", F = "black"),
   alpha = 0.8, title = "Maturity frequencies", n_label_pos = c(0.7, 1))
 }
 \arguments{
-\item{dat}{TODO}
+\item{months}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}
+or \code{\link[=get_comm_samples]{get_comm_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
+data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 
-\item{months}{TODO}
+\item{max_size}{The maximum size of the circles.}
 
-\item{ssid}{TODO}
+\item{sex_gap}{A gap to separate the male and female circles.}
 
-\item{max_size}{TODO}
+\item{fill_col}{The fill color of the circles.}
 
-\item{sex_gap}{TODO}
+\item{line_col}{The line color of the circles.}
 
-\item{fill_col}{TODO}
+\item{alpha}{The transparency of the circles.}
 
-\item{line_col}{TODO}
+\item{title}{A title to add to the plot.}
 
-\item{alpha}{TODO}
+\item{n_label_pos}{A numeric vector of length 2 that gives the y position of
+the text describing the number of male and female samples within each month
+bin.}
 
-\item{title}{TODO}
-
-\item{n_label_pos}{TODO}
+\item{months}{A vector of months to include. Defaults to all.}
 }
 \description{
 Plot maturity frequency by month
 }
 \examples{
+# pop_samples <- get_survey_samples("pacific ocean perch")
+tidy_maturity_months(pop_samples) \%>\%
+  plot_maturity_months()
 \dontrun{
 d <- get_survey_samples("lingcod")
 tidy_maturity_months(d) \%>\%

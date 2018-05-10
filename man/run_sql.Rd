@@ -7,9 +7,9 @@
 run_sql(database, query)
 }
 \arguments{
-\item{database}{TODO}
+\item{database}{The name of the database.}
 
-\item{query}{TODO}
+\item{query}{The query to run.}
 }
 \description{
 Run SQL

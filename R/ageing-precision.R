@@ -65,9 +65,7 @@ tidy_age_precision <- function(dat, ageing_method_codes = NULL) {
 
 #' Plot ageing precision data
 #'
-#' @param dat A properly formatted data frame, for example, from
-#'   [tidy_age_precision()]. Should have columns named
-#'   TODO.
+#' @param dat A data frame from [tidy_age_precision()].
 #' @param n Number of fish to randomly sample to plot.
 #' @param jitter Amount to randomly jitter ages for visualization. Same jitter
 #'   values are used for the precision and primary ages for the same fish.
