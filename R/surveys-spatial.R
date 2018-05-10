@@ -1,52 +1,6 @@
-#' Survey spatial modelling
-#'
-#' Long description here
-#'
-#' @details
-#'
-#' * `tidy_survey_sets()` does...
-#' * `interp_survey_bathymetry()` does...
-#' ... TODO
-#'
-#' @param dat TODO
-#' @param survey TODO
-#' @param utm_zone TODO
-#'
-#' @family spatial survey modelling functions
-#'
-#' @examples
-#' \dontrun{
-#' ## generally, use the main function:
-#' x <- fit_survey_sets(pop_surv,
-#'   years = 2015,
-#'   survey = "Queen Charlotte Sound Synoptic Survey",
-#'   iter = 600, chains = 1, mcmc_posterior_samples = 100)
-#' names(x)
-#' print(x$models)
-#' plot_survey_sets(x$predictions, x$data, fill_column = "combined")
-#'
-#' ## internally, fit_survey_sets() does something like this:
-#' dat <- tidy_survey_sets(pop_surv,
-#'  survey = "SYN QCS",
-#'  years = 2015)
-#' dat_interp <- interp_survey_bathymetry(dat)
-#' dat_scaled <- scale_survey_predictors(dat_interp$data)
-#' m <- fit_glmmfields(dat_scaled)
-#' pg <- make_prediction_grid(dat_scaled, survey = "SYN QCS")
-#' pos <- predict(m$pos, newdata = data.frame(pg, time = 1),
-#'  type = "response", return_mcmc = TRUE, iter = 100)
-#' bin <- predict(m$bin, newdata = data.frame(pg, time = 1),
-#'  type = "response", return_mcmc = TRUE, iter = 100)
-#' com <- bin * pos
-#' pg$combined <- apply(com, 1, median)
-#' plot_survey_sets(pg, dat, fill_column = "combined")
-#' }
-#' @name survey-spatial-modelling
-NULL
-
-#' @param years TODO
-#' @export
-#' @rdname survey-spatial-modelling
+# @param years TODO
+# @export
+# @rdname survey-spatial-modelling
 tidy_survey_sets <- function(dat, survey, years, utm_zone = 9,
   density_column = "density_kgpm2") {
 
@@ -82,8 +36,8 @@ load_bath <- function(utm_zone = 9) {
   ll2utm(bath, utm_zone = utm_zone)
 }
 
-#' @export
-#' @rdname survey-spatial-modelling
+# @export
+# @rdname survey-spatial-modelling
 interp_survey_bathymetry <- function(dat, utm_zone = 9) {
 
   # reduce size first for speed:
@@ -119,8 +73,8 @@ interp_survey_bathymetry <- function(dat, utm_zone = 9) {
   list(data = dat, bath = bath)
 }
 
-#' @export
-#' @rdname survey-spatial-modelling
+# @export
+# @rdname survey-spatial-modelling
 scale_survey_predictors <- function(dat) {
   if (sum(is.na(dat$depth)) > 0) {
     dat$depth[is.na(dat$depth)] <- dat$akima_depth[is.na(dat$depth)]
@@ -150,17 +104,17 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
   ini
 }
 
-#' @param formula_positive TODO
-#' @param formula_binary TODO
-#' @param n_knots TODO
-#' @param iter TODO
-#' @param chains TODO
-#' @param adapt_delta TODO
-#' @param cores TODO
-#' @param ... TODO
-#'
-#' @export
-#' @rdname survey-spatial-modelling
+# @param formula_positive TODO
+# @param formula_binary TODO
+# @param n_knots TODO
+# @param iter TODO
+# @param chains TODO
+# @param adapt_delta TODO
+# @param cores TODO
+# @param ... TODO
+#
+# @export
+# @rdname survey-spatial-modelling
 fit_glmmfields <- function(dat,
                            formula_positive = density ~ depth_scaled + depth_scaled2,
                            formula_binary = present ~ depth_scaled + depth_scaled2,
@@ -214,18 +168,72 @@ fit_glmmfields <- function(dat,
   # list(pos = m1, bin = m2)
 }
 
-#' Title TODO
+#' Spatial modeling of survey data
 #'
-#' @param prediction_grid_n TODO
-#' @param mcmc_posterior_samples TODO
-#' @param required_obs_percent TODO
-#' @param max_knots TODO
-#' @param thin TODO
+#' Implements geostatistical models of trawl or longline survey data. Uses INLA
+#' or glmmfields (currently disabled) for Bayesian inference.
+#'
+#' @param dat Output from [get_survey_sets()].
+#' @param years The year to include in the model. Should be a single year.
+#' @param survey The survey abbreviation. Should match the contents of the
+#'   column `survey_abbrev` in the data frame returned by [get_survey_sets()].
+#' @param density_column The name of the column that includes the relative
+#'   biomass density to use. E.g. `"density_kgpm2"` for trawl surveys or
+#'   `"density_ppkm2"` for the long line surveys.
+#' @param chains The number of MCMC chains. Only applies to the glmmfields
+#'   model.
+#' @param iter The number of MCMC chains. Only applies to the glmmfields model.
+#' @param max_knots The maximum number of knots to use in the predictive process
+#'   approximation in the glmmfields model. If this number is larger than the
+#'   number of data points then the number of knots is set to the number of data
+#'   points minus 2. Only applies to the glmmfields model.
+#' @param adapt_delta Value to pass to [rstan::sampling()]. Values closer to 1
+#'   make smaller steps in the Hamiltonian MCMC at the expense of speed. Only
+#'   applies to the glmmfields model.
+#' @param thin Value to pass to [rstan::sampling()] to thin the MCMC samples.
+#'   Only applies to the glmmfields model.
+#' @param mcmc_posterior_samples Number of final MCMC samples to return. Applies
+#'   to both glmmfields and INLA.
+#' @param required_obs_percent A required fraction of positive sets before a
+#'   model is fit.
+#' @param utm_zone The UTM zone to perform the modeling in. Defaults to zone 9.
+#' @param model The backend software to fit the model. Options are `"inla"` or
+#'   `"glmmfields"` (currently disabled until on CRAN). INLA implements in
+#'   approximation of the posterior via the integrated nested Laplace
+#'   approximation, but the results are usually quite good and are likely drive
+#'   considerably faster than glmmfields, especially for larger data sets or for
+#'   many knots.
+#' @param include_depth Logical: should depth be included as a predictor? If
+#'   `FALSE` then the model will only have a spatial random field as the
+#'   predictor. Currently only applies to the INLA model.
+#' @param survey_boundary If not `NULL`, a data frame with the survey boundary
+#'   defined in columns `X` and `Y` in longitude and latitude coordinates. If
+#'   `NULL`, the functions will search for a matching element in the included
+#'   the data object `gfplot::survey_boundaries` based on the `survey` argument
+#'   (after removing "SYN" from the name).
+#' @param premade_grid If not `NULL`, a list object with an element `grid` that
+#'   contains a data frame with columns `X`, `Y`, and `depth`, and another
+#'   element `cell_area` the content a single numeric value describing the grid
+#'   size in kilometers. The package includes a survey grid for the HBLL surveys
+#'   in `gfplot::hbll_grid`.
+#' @param inla_knots_pos The number of knots for the positive component model if
+#'   fit with INLA.
+#' @param inla_knots_bin The number of knots for the binary component model if
+#'   fit with INLA.
+#' @param ... Any other arguments to pass on to [fit_inla()].
+#'
+#' @examples
+#' # pop_surv <- get_survey_sets("pacific ocean perch")
+#' # or use built-in data:
+#' fit <- fit_survey_sets(pop_surv,
+#'   years = 2015,
+#'   survey = "SYN QCS")
+#' names(fit)
+#' plot_survey_sets(fit$predictions, fit$data, fill_column = "combined")
 #'
 #' @export
 #'
 #' @rdname survey-spatial-modelling
-
 fit_survey_sets <- function(dat, years, survey = NULL,
                             density_column = "density_kgpm2",
                             chains = 4,
@@ -358,50 +366,89 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   )
 }
 
-#' Title TODO
+#' Plot the output from a geostatistical model of survey data
 #'
-#' @param pred_dat TODO
-#' @param raw_dat TODO
-#' @param fill_column TODO
-#' @param fill_scale TODO
-#' @param colour_scale TODO
-#' @param pos_pt_col TODO
-#' @param bin_pt_col TODO
-#' @param pos_pt_fill TODO
-#' @param pt_size_range TODO
-#' @param show_legend TODO
-#' @param extrapolate_depth TODO
-#' @param extrapolation_buffer TODO
-#' @param show_model_predictions TODO
-#' @param show_raw_data TODO
-#' @param utm_zone TODO
-#' @param fill_label TODO
-#' @param pt_label TODO
-#' @param rotation_angle TODO
-#' @param rotation_center TODO
-#' @param show_axes TODO
-#' @param xlim TODO
-#' @param ylim TODO
-#' @param x_buffer TODO
-#' @param y_buffer TODO
-#' @param north_symbol TODO
-#' @param north_symbol_coord TODO
-#' @param north_symbol_length TODO
-#' @param cell_size TODO
-#' @param circles TODO
+#' Takes the output from [fit_survey_sets()] in creates a map over the model
+#' predictions and/or the raw data. Includes a number of options for customizing
+#' the map including the ability to rotate the map to an arbitrary degree.
+#'
+#' @param pred_dat The `predictions` element of the output from
+#'   [fit_survey_sets()].
+#' @param raw_dat The `data` element of the output from [fit_survey_sets()].
+#' @param fill_column The name of the column to plot. Options are `"combined"`
+#'   for the combined model, `"bin"` for the binary component model, or `"pos"`
+#'   for the positive component model.
+#' @param fill_scale A ggplot `scale_fill_*` object.
+#' @param colour_scale A ggplot `scale_colour_*` object. You likely want this to
+#'   match `fill_scale` less you want the map to look strange.
+#' @param pos_pt_col The color for positive set location points.
+#' @param bin_pt_col The color for binary set location points.
+#' @param pos_pt_fill The fill color for positive set location points.
+#' @param pt_size_range The range of point sizes for positive set location
+#'   points.
+#' @param show_legend Logical for whether or not to show the legend.
+#' @param extrapolate_depth Logical for whether or not to show predictions
+#'   across all depths in the survey domain (the default) or to not extrapolate
+#'   beyond the range of the observed sets in the data set.
+#' @param extrapolation_buffer A buffer to add to the minimum and maximum
+#'   observed depths if `extrapolate_depth = TRUE`.
+#' @param show_model_predictions Logical for whether or not to show the
+#'   geostatistical model predictions.
+#' @param show_raw_data Logical for whether or not to show the raw data.
+#' @param utm_zone The UTM zone to plot in. Should match the zone used in
+#'   [fit_survey_sets()].
+#' @param fill_label A label to use in the legend for the fill color.
+#' @param pt_label A label to use in the legend for the point size.
+#' @param rotation_angle An angle to rotate the entire map. Can be useful to
+#'   make a map of the BC coast take up less. Defaults to not rotating the map.
+#'   The groundfish synopsis report uses `rotation_angle = 40`.
+#' @param rotation_center The coordinates around which to rotate the mouth.
+#'   These should be in UTM coordinates.
+#' @param show_axes Logical for whether or not to show the axes.
+#' @param xlim X axis limits in UTM coordinates. The synopsis report uses
+#'   `c(360, 653)`. Defaults to the range of the data.
+#' @param ylim Y axis limits in UTM coordinates. The synopsis report uses
+#'   `c(5275, 6155)`. Defaults to the range of the data.
+#' @param x_buffer A buffer in UTM coordinates to extend the X axis. Mostly
+#'   useful if the axis limits aren't explicitly specified.
+#' @param y_buffer A buffer in UTM coordinates to extend the Y axis. Mostly
+#'   useful if the axis limits aren't explicitly specified.
+#' @param north_symbol Logical for whether to include a north symbol.
+#' @param north_symbol_coord Coordinates for the north symbol in UTM
+#'   coordinates.
+#' @param north_symbol_length Length of the north assemble arrow.
+#' @param cell_size The size of the grid cells for the model predictions.
+#' @param circles Logical for whether to plot the model predictions in circles.
+#'   This analysis report uses this for the IPHC survey.
+#'
+#' @return
+#' A ggplot object.
 #'
 #' @export
 #' @family spatial survey modelling functions
 #' @examples
-#' \dontrun{
-#' x <- fit_survey_sets(pop_surv,
+#' # pop_surv <- get_survey_sets("pacific ocean perch")
+#' # or use built-in data:
+#' fit <- fit_survey_sets(pop_surv,
 #'   years = 2015,
-#'   survey = "SYN QCS",
-#'   iter = 600, chains = 1) # for speed in this example
-#' plot_survey_sets(x$predictions, x$data)
-#' }
+#'   survey = "SYN QCS")
+#'
+#' # The combined model:
+#' plot_survey_sets(fit$predictions, fit$data, fill_column = "combined")
+#' # The positive component model:
+#' plot_survey_sets(fit$predictions, fit$data, fill_column = "pos")
+#' # Add a custom color scale for the binary model:
+#' plot_survey_sets(fit$predictions, fit$data, fill_column = "bin") +
+#'   scale_fill_gradient2(midpoint = 0.5,
+#'     high = scales::muted("red"),
+#'     mid = "white",
+#'     low = scales::muted("blue"), limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+#'   scale_colour_gradient2(midpoint = 0.5,
+#'     high = scales::muted("red"),
+#'     mid = "white",
+#'     low = scales::muted("blue"), limits = c(0, 1))
 
-plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
+plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin", "pos"),
                              fill_scale =
                                viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
                              colour_scale =
@@ -429,6 +476,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = "combined",
                              north_symbol_coord = c(130, 5975),
                              north_symbol_length = 30,
                              cell_size = 2, circles = FALSE) {
+  fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,

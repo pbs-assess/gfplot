@@ -3,12 +3,13 @@
 \docType{data}
 \name{hbll_grid}
 \alias{hbll_grid}
-\title{TODO}
+\title{A 2km x 2km grid for the HBLL survey}
 \format{Data}
 \usage{
 hbll_grid
 }
 \description{
-TODO
+A grid that extends over the domain of the hard bottom long line (PHMA)
+survey. For use with \code{\link[=plot_survey_sets]{plot_survey_sets()}}.
 }
 \keyword{datasets}

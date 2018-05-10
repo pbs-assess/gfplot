@@ -13,6 +13,6 @@
 pbs_areas
 }
 \description{
-A dataset containing the major statistical area codes and descriptions
+A dataset containing the major statistical area codes and descriptions.
 }
 \keyword{datasets}

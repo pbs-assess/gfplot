@@ -170,10 +170,10 @@ predict_cpue_index <- function(object, center = FALSE) {
 #'   standardization model
 #'
 #' @param predicted_dat Input data frame, for example from [predict_cpue_index()].
-#' @param all_models TODO
+#' @param all_models Logical for whether to plot all models (`TRUE`) or just the
+#'   combined model (`FALSE`).
 #'
 #' @export
-#' @return A ggplot object
 #'
 #' @rdname cpue-index
 
@@ -233,11 +233,11 @@ tidy_cpue_index_coefs <- function(object) {
 #'
 #' @details Note that for coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
-#'   from the base level factor, which would be the first factor level
-#'   alpha-numerically. For example, month 02 represents the estimated
-#'   difference between February and January.
+#'   from the base level factor. For example, if January was the base month,
+#'   month 02 represents the estimated difference between February and January.
+#'   The default setup of the function [gfplot::f()] sets the reference level as
+#'   the most common factor level.
 #'
-#' @return A ggplot object
 #' @export
 #'
 #' @rdname cpue-index

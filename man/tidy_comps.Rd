@@ -89,8 +89,6 @@ bin. E.g. \code{13} with \code{bin_size = 2} would represent a bin from \code{12
 # rs_catch <- get_catch("redstripe rockfish")
 # rs_survey_sets <- get_survey_sets("redstripe rockfish")
 
-# or use the built-in package data as an example:
-
 # calculate raw age frequencies for survey data:
 tidy_ages_raw(rs_survey_samples,
   sample_type = "survey")

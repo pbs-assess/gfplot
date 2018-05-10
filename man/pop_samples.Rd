@@ -3,12 +3,14 @@
 \docType{data}
 \name{pop_samples}
 \alias{pop_samples}
-\title{Example Pacific ocean perch biological samples}
+\title{Example Pacific Ocean Perch biological samples from QCS.}
 \format{A data frame}
 \usage{
 pop_samples
 }
 \description{
-1000 random samples of ages, lengths, weights, and maturities
+Originally retrieved with \code{\get_survey_samples("pacific ocean perch")}. Has
+been filled in various ways to condense the data set for use in examples
+throughout the package.
 }
 \keyword{datasets}

@@ -39,16 +39,12 @@ formatted data frame.}
 
 \item{predicted_dat}{Input data frame, for example from \code{\link[=predict_cpue_index]{predict_cpue_index()}}.}
 
-\item{all_models}{TODO}
+\item{all_models}{Logical for whether to plot all models (\code{TRUE}) or just the
+combined model (\code{FALSE}).}
 
 \item{terms}{A character vector of terms to jackknife out.}
 
 \item{return_data}{Logical: should the data be returned?}
-}
-\value{
-A ggplot object
-
-A ggplot object
 }
 \description{
 \itemize{
@@ -84,9 +80,10 @@ test the sensitivity of the standardization model to any one term.
 \details{
 Note that for coefficients for predictors treated as factors (i.e.
 likely all of the predictors), the coefficients represent the difference
-from the base level factor, which would be the first factor level
-alpha-numerically. For example, month 02 represents the estimated
-difference between February and January.
+from the base level factor. For example, if January was the base month,
+month 02 represents the estimated difference between February and January.
+The default setup of the function \code{\link[gfplot:f]{gfplot::f()}} sets the reference level as
+the most common factor level.
 }
 \examples{
 # A simulated example:

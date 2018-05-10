@@ -1,6 +1,6 @@
 #' PBS groundfish areas
 #'
-#' A dataset containing the major statistical area codes and descriptions
+#' A dataset containing the major statistical area codes and descriptions.
 #'
 #' @format A data frame:
 #' \describe{
@@ -11,7 +11,7 @@
 
 #' PBS groundfish species
 #'
-#' A dataset containing species codes and names
+#' A dataset containing species codes and names. Used in [tidy_cpue_index()].
 #'
 #' @format A data frame:
 #' \describe{
@@ -21,40 +21,34 @@
 #' }
 "pbs_species"
 
-#' Example Pacific ocean perch biological samples
+#' Example Pacific Ocean Perch biological samples from QCS.
 #'
-#' 1000 random samples of ages, lengths, weights, and maturities
+#' Originally retrieved with `\get_survey_samples("pacific ocean perch")`. Has
+#' been filled in various ways to condense the data set for use in examples
+#' throughout the package.
 #'
 #' @format A data frame
 "pop_samples"
 
-#' Example Pacific ocean perch survey data from QCS in 2015
+#' Example Pacific Ocean Perch survey data from QCS in 2015
 #'
-#' TODO
+#' Originally retrieved with `\get_survey_sets("pacific ocean perch")`.
 #'
 #' @format A data frame
 "pop_surv"
 
-#' TODO
+#' A 2km x 2km grid for the HBLL survey
 #'
-#' TODO
+#' A grid that extends over the domain of the hard bottom long line (PHMA)
+#' survey. For use with [plot_survey_sets()].
 #'
 #' @format Data
 "hbll_grid"
 
 #' Survey boundaries
 #'
-#' TODO
+#' Survey domain polygons for the synoptic trawl surveys. For use with
+#' [plot_survey_sets()].
 #'
 #' @format A data frame
 "survey_boundaries"
-
-#' Strata areas (TEMPORARY TODO)
-#'
-#' @format A data frame
-"strata_areas"
-
-#' Sample-Trip IDs for surveys (TEMPORARY TODO)
-#'
-#' @format A data frame
-"sample_trip_ids"

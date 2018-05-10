@@ -3,12 +3,12 @@
 \docType{data}
 \name{pop_surv}
 \alias{pop_surv}
-\title{Example Pacific ocean perch survey data from QCS in 2015}
+\title{Example Pacific Ocean Perch survey data from QCS in 2015}
 \format{A data frame}
 \usage{
 pop_surv
 }
 \description{
-TODO
+Originally retrieved with \code{\get_survey_sets("pacific ocean perch")}.
 }
 \keyword{datasets}

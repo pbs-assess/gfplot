@@ -43,19 +43,18 @@ to show model fits when you have sufficient data.}
 Fit and plot maturity ogives
 }
 \examples{
-\dontrun{
-d <- get_survey_samples("pacific ocean perch", ssid = 1)
+# d <- get_survey_samples("pacific ocean perch", ssid = 1)
+d <- pop_samples
 
-m <- fit_mat_ogive(d, sample_id_re = FALSE, months = 1:6)
+m <- fit_mat_ogive(d, type = "age", sample_id_re = FALSE)
 plot_mat_ogive(m)
 
-m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE, months = 1:6)
+m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE)
 plot_mat_ogive(m)
 
 ## with random intercepts for sample ID:
-m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE, months = 1:6)
+m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
 plot_mat_ogive(m)
-}
 }
 \seealso{
 Other plotting functions: \code{\link{plot_survey_index}}

@@ -9,20 +9,18 @@
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples
-#' \dontrun{
-#' d <- get_survey_samples("pacific ocean perch", ssid = 1)
+#' # d <- get_survey_samples("pacific ocean perch", ssid = 1)
+#' d <- pop_samples
 #'
-#' m <- fit_mat_ogive(d, sample_id_re = FALSE, months = 1:6)
+#' m <- fit_mat_ogive(d, type = "age", sample_id_re = FALSE)
 #' plot_mat_ogive(m)
 #'
-#' m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE, months = 1:6)
+#' m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE)
 #' plot_mat_ogive(m)
 #'
 #' ## with random intercepts for sample ID:
-#' m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE, months = 1:6)
+#' m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
 #' plot_mat_ogive(m)
-#' }
-
 fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,

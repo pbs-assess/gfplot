@@ -2,9 +2,9 @@
 % Please edit documentation in R/surveys-spatial.R
 \name{plot_survey_sets}
 \alias{plot_survey_sets}
-\title{Title TODO}
+\title{Plot the output from a geostatistical model of survey data}
 \usage{
-plot_survey_sets(pred_dat, raw_dat, fill_column = "combined",
+plot_survey_sets(pred_dat, raw_dat, fill_column = c("combined", "bin", "pos"),
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
   colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "C"),
   pos_pt_col = "#FFFFFF60", bin_pt_col = "#FFFFFF40",
@@ -19,77 +19,111 @@ plot_survey_sets(pred_dat, raw_dat, fill_column = "combined",
   north_symbol_length = 30, cell_size = 2, circles = FALSE)
 }
 \arguments{
-\item{pred_dat}{TODO}
+\item{pred_dat}{The \code{predictions} element of the output from
+\code{\link[=fit_survey_sets]{fit_survey_sets()}}.}
 
-\item{raw_dat}{TODO}
+\item{raw_dat}{The \code{data} element of the output from \code{\link[=fit_survey_sets]{fit_survey_sets()}}.}
 
-\item{fill_column}{TODO}
+\item{fill_column}{The name of the column to plot. Options are \code{"combined"}
+for the combined model, \code{"bin"} for the binary component model, or \code{"pos"}
+for the positive component model.}
 
-\item{fill_scale}{TODO}
+\item{fill_scale}{A ggplot \code{scale_fill_*} object.}
 
-\item{colour_scale}{TODO}
+\item{colour_scale}{A ggplot \code{scale_colour_*} object. You likely want this to
+match \code{fill_scale} less you want the map to look strange.}
 
-\item{pos_pt_col}{TODO}
+\item{pos_pt_col}{The color for positive set location points.}
 
-\item{bin_pt_col}{TODO}
+\item{bin_pt_col}{The color for binary set location points.}
 
-\item{pos_pt_fill}{TODO}
+\item{pos_pt_fill}{The fill color for positive set location points.}
 
-\item{pt_size_range}{TODO}
+\item{pt_size_range}{The range of point sizes for positive set location
+points.}
 
-\item{show_legend}{TODO}
+\item{show_legend}{Logical for whether or not to show the legend.}
 
-\item{extrapolate_depth}{TODO}
+\item{extrapolate_depth}{Logical for whether or not to show predictions
+across all depths in the survey domain (the default) or to not extrapolate
+beyond the range of the observed sets in the data set.}
 
-\item{extrapolation_buffer}{TODO}
+\item{extrapolation_buffer}{A buffer to add to the minimum and maximum
+observed depths if \code{extrapolate_depth = TRUE}.}
 
-\item{show_model_predictions}{TODO}
+\item{show_model_predictions}{Logical for whether or not to show the
+geostatistical model predictions.}
 
-\item{show_raw_data}{TODO}
+\item{show_raw_data}{Logical for whether or not to show the raw data.}
 
-\item{utm_zone}{TODO}
+\item{utm_zone}{The UTM zone to plot in. Should match the zone used in
+\code{\link[=fit_survey_sets]{fit_survey_sets()}}.}
 
-\item{fill_label}{TODO}
+\item{fill_label}{A label to use in the legend for the fill color.}
 
-\item{pt_label}{TODO}
+\item{pt_label}{A label to use in the legend for the point size.}
 
-\item{rotation_angle}{TODO}
+\item{rotation_angle}{An angle to rotate the entire map. Can be useful to
+make a map of the BC coast take up less. Defaults to not rotating the map.
+The groundfish synopsis report uses \code{rotation_angle = 40}.}
 
-\item{rotation_center}{TODO}
+\item{rotation_center}{The coordinates around which to rotate the mouth.
+These should be in UTM coordinates.}
 
-\item{show_axes}{TODO}
+\item{show_axes}{Logical for whether or not to show the axes.}
 
-\item{xlim}{TODO}
+\item{xlim}{X axis limits in UTM coordinates. The synopsis report uses
+\code{c(360, 653)}. Defaults to the range of the data.}
 
-\item{ylim}{TODO}
+\item{ylim}{Y axis limits in UTM coordinates. The synopsis report uses
+\code{c(5275, 6155)}. Defaults to the range of the data.}
 
-\item{x_buffer}{TODO}
+\item{x_buffer}{A buffer in UTM coordinates to extend the X axis. Mostly
+useful if the axis limits aren't explicitly specified.}
 
-\item{y_buffer}{TODO}
+\item{y_buffer}{A buffer in UTM coordinates to extend the Y axis. Mostly
+useful if the axis limits aren't explicitly specified.}
 
-\item{north_symbol}{TODO}
+\item{north_symbol}{Logical for whether to include a north symbol.}
 
-\item{north_symbol_coord}{TODO}
+\item{north_symbol_coord}{Coordinates for the north symbol in UTM
+coordinates.}
 
-\item{north_symbol_length}{TODO}
+\item{north_symbol_length}{Length of the north assemble arrow.}
 
-\item{cell_size}{TODO}
+\item{cell_size}{The size of the grid cells for the model predictions.}
 
-\item{circles}{TODO}
+\item{circles}{Logical for whether to plot the model predictions in circles.
+This analysis report uses this for the IPHC survey.}
+}
+\value{
+A ggplot object.
 }
 \description{
-Title TODO
+Takes the output from \code{\link[=fit_survey_sets]{fit_survey_sets()}} in creates a map over the model
+predictions and/or the raw data. Includes a number of options for customizing
+the map including the ability to rotate the map to an arbitrary degree.
 }
 \examples{
-\dontrun{
-x <- fit_survey_sets(pop_surv,
+# pop_surv <- get_survey_sets("pacific ocean perch")
+# or use built-in data:
+fit <- fit_survey_sets(pop_surv,
   years = 2015,
-  survey = "SYN QCS",
-  iter = 600, chains = 1) # for speed in this example
-plot_survey_sets(x$predictions, x$data)
-}
-}
-\seealso{
-Other spatial survey modelling functions: \code{\link{make_prediction_grid}}
+  survey = "SYN QCS")
+
+# The combined model:
+plot_survey_sets(fit$predictions, fit$data, fill_column = "combined")
+# The positive component model:
+plot_survey_sets(fit$predictions, fit$data, fill_column = "pos")
+# Add a custom color scale for the binary model:
+plot_survey_sets(fit$predictions, fit$data, fill_column = "bin") +
+  scale_fill_gradient2(midpoint = 0.5,
+    high = scales::muted("red"),
+    mid = "white",
+    low = scales::muted("blue"), limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_gradient2(midpoint = 0.5,
+    high = scales::muted("red"),
+    mid = "white",
+    low = scales::muted("blue"), limits = c(0, 1))
 }
 \concept{spatial survey modelling functions}

@@ -1,10 +1,10 @@
-#' @param cell_width Cell width in units of the data (e.g. UTM km).
-#' @param region Optional region abbreviation to search for a spatial polygon
-#'   file. TODO
-#' @param cache_folder TODO
-#'
-#' @export
-#' @rdname survey-spatial-modelling
+# @param cell_width Cell width in units of the data (e.g. UTM km).
+# @param region Optional region abbreviation to search for a spatial polygon
+#   file. TODO
+# @param cache_folder TODO
+#
+# @export
+# @rdname survey-spatial-modelling
 make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
   cache_folder = "prediction-grids",
   utm_zone = 9,

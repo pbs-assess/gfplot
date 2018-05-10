@@ -14,6 +14,6 @@
 pbs_species
 }
 \description{
-A dataset containing species codes and names
+A dataset containing species codes and names. Used in \code{\link[=tidy_cpue_index]{tidy_cpue_index()}}.
 }
 \keyword{datasets}

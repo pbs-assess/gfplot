@@ -9,6 +9,7 @@
 survey_boundaries
 }
 \description{
-TODO
+Survey domain polygons for the synoptic trawl surveys. For use with
+\code{\link[=plot_survey_sets]{plot_survey_sets()}}.
 }
 \keyword{datasets}
