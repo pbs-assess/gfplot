@@ -73,7 +73,7 @@ model_f$predictions
 
 # with MCMC via Stan (slower):
 x <- fit_vb(pop_samples, method = "mcmc",
-  chains = 1, iter = 800) # just for a fast example
+  chains = 1, iter = 800, seed = 123) # just for a fast example
 x$pars
 x$predictions
 x$data

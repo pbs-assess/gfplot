@@ -85,6 +85,7 @@ or glmmfields (currently disabled) for Bayesian inference.
 }
 \examples{
 \donttest{
+set.seed(123)
 # pop_surv <- get_survey_sets("pacific ocean perch")
 # or use built-in data:
 fit <- fit_survey_sets(pop_surv,

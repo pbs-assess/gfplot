@@ -281,18 +281,15 @@ This analysis report uses this for the IPHC survey.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
+    <pre class="examples"><div class='input'><span class='fu'>set.seed</span>(<span class='fl'>123</span>)
 <span class='co'># pop_surv &lt;- get_survey_sets("pacific ocean perch")</span>
 <span class='co'># or use built-in data:</span>
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='survey-spatial-modelling.html'>fit_survey_sets</a></span>(<span class='no'>pop_surv</span>,
   <span class='kw'>years</span> <span class='kw'>=</span> <span class='fl'>2015</span>,
-  <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN QCS"</span>)
-
+  <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN QCS"</span>)</div><div class='output co'>#&gt; <span class='message'>Interpolating depth to fill in missing data if needed...</span></div><div class='output co'>#&gt; <span class='message'>Preloading interpolated depth for prediction grid...</span></div><div class='output co'>#&gt; <span class='message'>Predicting density onto grid...</span></div><div class='input'>
 <span class='co'># The combined model:</span>
-<span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"combined"</span>)
-<span class='co'># The positive component model:</span>
-<span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"pos"</span>)
-<span class='co'># Add a custom color scale for the binary model:</span>
+<span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"combined"</span>)</div><div class='img'><img src='plot_survey_sets-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># The positive component model:</span>
+<span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"pos"</span>)</div><div class='img'><img src='plot_survey_sets-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Add a custom color scale for the binary model:</span>
 <span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"bin"</span>) +
   <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/scale_gradient'>scale_fill_gradient2</a></span>(<span class='kw'>midpoint</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
     <span class='kw'>high</span> <span class='kw'>=</span> <span class='kw pkg'>scales</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/scales/topics/muted'>muted</a></span>(<span class='st'>"red"</span>),
@@ -301,8 +298,9 @@ This analysis report uses this for the IPHC survey.</p></td>
   <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/scale_gradient'>scale_colour_gradient2</a></span>(<span class='kw'>midpoint</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
     <span class='kw'>high</span> <span class='kw'>=</span> <span class='kw pkg'>scales</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/scales/topics/muted'>muted</a></span>(<span class='st'>"red"</span>),
     <span class='kw'>mid</span> <span class='kw'>=</span> <span class='st'>"white"</span>,
-    <span class='kw'>low</span> <span class='kw'>=</span> <span class='kw pkg'>scales</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/scales/topics/muted'>muted</a></span>(<span class='st'>"blue"</span>), <span class='kw'>limits</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>1</span>))
-<span class='co'># }</span></pre>
+    <span class='kw'>low</span> <span class='kw'>=</span> <span class='kw pkg'>scales</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/scales/topics/muted'>muted</a></span>(<span class='st'>"blue"</span>), <span class='kw'>limits</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>1</span>))</div><div class='output co'>#&gt; <span class='message'>Scale for 'fill' is already present. Adding another scale for 'fill', which</span>
+#&gt; <span class='message'>will replace the existing scale.</span></div><div class='output co'>#&gt; <span class='message'>Scale for 'colour' is already present. Adding another scale for 'colour',</span>
+#&gt; <span class='message'>which will replace the existing scale.</span></div><div class='img'><img src='plot_survey_sets-3.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

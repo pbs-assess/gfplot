@@ -196,13 +196,13 @@ and <code>"F"</code>), <code>age</code>, <code>proportion</code>, <code>total</c
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># # main age/length data:</span>
-<span class='co'># rs_comm_samples &lt;- get_comm_samples("redstripe rockfish")</span>
-<span class='co'># rs_survey_samples &lt;- get_survey_samples("redstripe rockfish")</span>
+<span class='co'># main age/length data:</span>
+<span class='no'>rs_comm_samples</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_comm_samples</a></span>(<span class='st'>"redstripe rockfish"</span>)
+<span class='no'>rs_survey_samples</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_survey_samples</a></span>(<span class='st'>"redstripe rockfish"</span>)
 <span class='co'>#</span>
-<span class='co'># # for weighting:</span>
-<span class='co'># rs_catch &lt;- get_catch("redstripe rockfish")</span>
-<span class='co'># rs_survey_sets &lt;- get_survey_sets("redstripe rockfish")</span>
+<span class='co'># for weighting:</span>
+<span class='no'>rs_catch</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_catch</a></span>(<span class='st'>"redstripe rockfish"</span>)
+<span class='no'>rs_survey_sets</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_survey_sets</a></span>(<span class='st'>"redstripe rockfish"</span>)
 
 <span class='co'># survey raw age frequencies:</span>
 <span class='fu'><a href='tidy_comps.html'>tidy_ages_raw</a></span>(<span class='no'>rs_survey_samples</span>,

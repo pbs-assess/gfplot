@@ -143,7 +143,7 @@ given species where there is a second ('precision') age reading
 \item \code{get_sara_dat()} scrubs Species At Risk website for up-to-date species
 status and listings
 \item \code{get_survey_index()} extracts survey catch data for given species
-and survey series id's
+and survey series IDs
 \item \code{cache_pbs_data()} runs all 'get' functions in the gfplot package
 and caches extracted data to a given folder
 }
@@ -160,23 +160,20 @@ the Pacific Biological Station DFO network.
 ## Specify single or multiple species by common name or species code and
 ## single or multiple survey series id(s).
 get_survey_sets(species = "lingcod", ssid = 1)
-get_survey_sets(species = c(442, 397), ssid = c(1, 2))
 
 ## Import survey or commercial biological data for various plots
 (eg. length frequency, growth, age frequency, maturity, etc.)
-get_survey_samples(species = 442, ssid = c(1,3,4,16)) \%>\%
-  fit_vb() \%>\% plot_growth()
+get_survey_samples(species = 442, ssid = c(1, 3, 4, 16))
 
 get_comm_samples(c(442, 397))
 
 ## Import catch data by species for barcharts of landings by fishing area,
 ## geartype, and year.
-species <- ("lingcod")
-get_catch(species)
+get_catch("lingcod")
 
 ## Import spatial commercial catch per unit effort data for trawl or longline
 ## data by species for plotting along BC coast.
-get_cpue_spatial(species)
+get_cpue_spatial("lingcod")
 get_cpue_spatial_ll("yelloweye rockfish")
 
 ## Import catch and effort data by gear type for modelling commercial trawl
@@ -186,7 +183,6 @@ get_cpue_index(gear = "bottom trawl", min_cpue_year = 2012)
 ## Import survey bootstrapped biomass estimates for plotting relative biomass
 ## indices by specified survey series.
 get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
-get_survey_index("arrowtooth flounder")
 }
 
 }

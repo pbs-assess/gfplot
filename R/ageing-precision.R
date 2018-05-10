@@ -13,8 +13,7 @@
 #' @template ageing-precision-examples
 #' @examples
 #' \dontrun{
-#' species <- "yelloweye rockfish"
-#' get_age_precision(species) %>%
+#' get_age_precision("yelloweye rockfish") %>%
 #'  tidy_age_precision() %>%
 #'  plot_age_precision()
 #' }

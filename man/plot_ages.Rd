@@ -53,13 +53,13 @@ and \code{"F"}), \code{age}, \code{proportion}, \code{total} (for the total samp
 }
 \examples{
 \dontrun{
-# # main age/length data:
-# rs_comm_samples <- get_comm_samples("redstripe rockfish")
-# rs_survey_samples <- get_survey_samples("redstripe rockfish")
+# main age/length data:
+rs_comm_samples <- get_comm_samples("redstripe rockfish")
+rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #
-# # for weighting:
-# rs_catch <- get_catch("redstripe rockfish")
-# rs_survey_sets <- get_survey_sets("redstripe rockfish")
+# for weighting:
+rs_catch <- get_catch("redstripe rockfish")
+rs_survey_sets <- get_survey_sets("redstripe rockfish")
 
 # survey raw age frequencies:
 tidy_ages_raw(rs_survey_samples,

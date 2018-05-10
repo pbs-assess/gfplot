@@ -50,7 +50,7 @@
 #'
 #' # with MCMC via Stan (slower):
 #' x <- fit_vb(pop_samples, method = "mcmc",
-#'   chains = 1, iter = 800) # just for a fast example
+#'   chains = 1, iter = 800, seed = 123) # just for a fast example
 #' x$pars
 #' x$predictions
 #' x$data
@@ -283,8 +283,9 @@ fit_length_weight <- function(dat,
 #' @rdname plot_growth
 #'
 #' @examples
-#' \dontrun{
-#' d <- get_survey_samples("pacific ocean perch")
+#' \donttest{
+#' # d <- get_survey_samples("pacific ocean perch")
+#' d <- pop_samples
 #' model_f <- fit_length_weight(d, sex = "female")
 #' model_m <- fit_length_weight(d, sex = "male")
 #' plot_length_weight(object_female = model_f, object_male = model_m)

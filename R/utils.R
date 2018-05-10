@@ -129,8 +129,6 @@ is_ip_valid <- function(timeout = 5) {
 }
 
 #' Is this a DFO Windows computer or is the server IP accessible?
-#'
-#' @export
 sql_server_accessible <- function() {
   if ((is_windows() && is_dfo()) || is_ip_valid()) TRUE else FALSE
 }

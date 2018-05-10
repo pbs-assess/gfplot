@@ -31,6 +31,7 @@ scale. E.g. \code{sqrt} or \code{log} or \code{I} if you don't want any transfor
 Plot sample availability
 }
 \examples{
+set.seed(1)
 d <- expand.grid(year = 1996:2016,
   type = c("maturity", "weight", "length", "age"), stringsAsFactors = FALSE)
 d$n <- round(runif(nrow(d), 0, 800))

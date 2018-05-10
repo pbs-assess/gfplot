@@ -78,6 +78,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #'   scale. E.g. `sqrt` or `log` or `I` if you don't want any transformation.
 #'
 #' @examples
+#' set.seed(1)
 #' d <- expand.grid(year = 1996:2016,
 #'   type = c("maturity", "weight", "length", "age"), stringsAsFactors = FALSE)
 #' d$n <- round(runif(nrow(d), 0, 800))

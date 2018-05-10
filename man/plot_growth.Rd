@@ -51,8 +51,9 @@ fish.}
 Plot von Bertalanffy or length-weight fits
 }
 \examples{
-\dontrun{
-d <- get_survey_samples("pacific ocean perch")
+\donttest{
+# d <- get_survey_samples("pacific ocean perch")
+d <- pop_samples
 model_f <- fit_length_weight(d, sex = "female")
 model_m <- fit_length_weight(d, sex = "male")
 plot_length_weight(object_female = model_f, object_male = model_m)

@@ -27,8 +27,7 @@ get_ageing_precision("pacific ocean perch") \%>\%
   plot_ageing_precision(n = 200)
 }
 \dontrun{
-species <- "yelloweye rockfish"
-get_age_precision(species) \%>\%
+get_age_precision("yelloweye rockfish") \%>\%
  tidy_age_precision() \%>\%
  plot_age_precision()
 }
