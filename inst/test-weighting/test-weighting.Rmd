@@ -133,7 +133,7 @@ gplot data first. Elise wrote some SQL to match the criteria used by Rowan when 
 
 ```{r, eval=FALSE}
 sql_query <- readLines("get-comm-samples-rowan.sql")
-com_samples <- gfplot:::run_sql("GFBioSQL", query = sql_query)
+com_samples <- gfplot::run_sql("GFBioSQL", query = sql_query)
 saveRDS(com_samples, "redstripe-comm-samples-rowan.rds")
 ```
 

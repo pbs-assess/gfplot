@@ -1,7 +1,7 @@
 # Simulate a CPUE timeseries
 #
 # This function simulates a CPUE timeseries and fits the model to it to check
-# for accuracy and coverage of confidence intervals. 
+# for accuracy and coverage of confidence intervals.
 #
 # @param make_plots If `TRUE` then a series of diagnostic plots will be made.
 # @param sigma The residual standard deviation for the positive timeseries on
@@ -73,8 +73,8 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   mm1 <- model.matrix(formula_binomial, data = bin_dat)
   mm2 <- model.matrix(formula_lognormal, data = pos_dat)
 
-  mm_pred1 <- gfplot:::make_pred_mm(mm1, years = unique(fake_fleet$year_factor))
-  mm_pred2 <- gfplot:::make_pred_mm(mm2, years = unique(fake_fleet$year_factor))
+  mm_pred1 <- make_pred_mm(mm1, years = unique(fake_fleet$year_factor))
+  mm_pred2 <- make_pred_mm(mm2, years = unique(fake_fleet$year_factor))
 
   b_true_bin <- filter(sm, grepl("Bin", par_name)) %>% pull(true_b)
   b_true_pos <- filter(sm, grepl("Pos", par_name)) %>% pull(true_b)
@@ -93,8 +93,8 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   est$true <- true_index_log
   est$year <- seq_len(nrow(est))
 
-  est$lwr <- est$Estimate + qnorm(0.025) * est$`Std. Error`
-  est$upr <- est$Estimate + qnorm(0.975) * est$`Std. Error`
+  est$lwr <- est$Estimate + stats::qnorm(0.025) * est$`Std. Error`
+  est$upr <- est$Estimate + stats::qnorm(0.975) * est$`Std. Error`
 
   if (make_plots) {
     g <- ggplot(est, aes(year, Estimate, ymin = lwr, ymax = lwr)) +
