@@ -120,7 +120,10 @@ if (getRversion() >= "2.15.1") {
 
     "vessel_effect", "year_effect",
 
-    "sample_source_code", "keeper", "area"
+    "sample_source_code", "keeper", "area",
+
+    "totcatch_kg", "fyear", "SURVEY_ABBREV", "vessel_registration_number",
+    "sampling_desc", "mean_num_pos_sets", "cv", "sets"
 
 
   ))

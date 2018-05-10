@@ -16,6 +16,8 @@ plot_mat_ogive(object, xlab = if (object$type[[1]] == "age") "Age (years)"
 \arguments{
 \item{dat}{Data from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
+\item{type}{Should this be an age or length fit?}
+
 \item{sample_id_re}{If \code{TRUE} then the model will include random intercepts
 for sample ID.}
 
@@ -54,8 +56,10 @@ plot_mat_ogive(m)
 m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE)
 plot_mat_ogive(m)
 
+\dontrun{
 ## with random intercepts for sample ID:
 m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
 plot_mat_ogive(m)
+}
 }
 \concept{plotting functions}

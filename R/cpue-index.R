@@ -15,6 +15,7 @@ load_tmb_cpue <- function() {
 #' @param formula_lognormal Formula for the lognormal model.
 #'
 #' @examples
+#' \donttest{
 #' # A simulated example:
 #' set.seed(1)
 #' d <- sim_cpue()
@@ -31,7 +32,7 @@ load_tmb_cpue <- function() {
 #'   plot_cpue_index()
 #'
 #' plot_cpue_index_jk(m, terms = "f(vessel)")
-#'
+#' }
 #' \dontrun{
 #' # An example with PBS data:
 #' # (the data extraction will be slow)

@@ -52,10 +52,10 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   if (make_plots) {
     g <- sm %>%
       filter(!grepl("Intercept", par_group)) %>%
-      ggplot(aes(true_b, est)) + geom_point() +
-      geom_linerange(aes(ymin = est - 2 * se, ymax = est + 2 * se)) +
+      ggplot(aes_string("true_b", "est")) + geom_point() +
+      ggplot2::geom_linerange(aes_string(ymin = "est - 2 * se", ymax = "est + 2 * se")) +
       facet_wrap(~par_group) +
-      geom_abline(intercept = 0, slope = 1) +
+      ggplot2::geom_abline(intercept = 0, slope = 1) +
       coord_equal()
     print(g)
 
@@ -97,9 +97,9 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   est$upr <- est$Estimate + stats::qnorm(0.975) * est$`Std. Error`
 
   if (make_plots) {
-    g <- ggplot(est, aes(year, Estimate, ymin = lwr, ymax = lwr)) +
-      geom_pointrange() +
-      geom_point(aes(y = true), colour = "red")
+    g <- ggplot(est, aes_string("year", "Estimate", ymin = "lwr", ymax = "lwr")) +
+      ggplot2::geom_pointrange() +
+      geom_point(aes_string(y = "true"), colour = "red")
     print(g)
   }
   est <- mutate(est, covered = true < upr & true > lwr)

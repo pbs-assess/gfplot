@@ -437,6 +437,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @export
 #' @family spatial survey modelling functions
 #' @examples
+#' \dontrun{
 #' # pop_surv <- get_survey_sets("pacific ocean perch")
 #' # or use built-in data:
 #' fit <- fit_survey_sets(pop_surv,
@@ -457,6 +458,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #'     high = scales::muted("red"),
 #'     mid = "white",
 #'     low = scales::muted("blue"), limits = c(0, 1))
+#' }
 
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin", "pos"),
                              fill_scale =

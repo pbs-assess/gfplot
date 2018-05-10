@@ -105,6 +105,7 @@ predictions and/or the raw data. Includes a number of options for customizing
 the map including the ability to rotate the map to an arbitrary degree.
 }
 \examples{
+\dontrun{
 # pop_surv <- get_survey_sets("pacific ocean perch")
 # or use built-in data:
 fit <- fit_survey_sets(pop_surv,
@@ -125,5 +126,6 @@ plot_survey_sets(fit$predictions, fit$data, fill_column = "bin") +
     high = scales::muted("red"),
     mid = "white",
     low = scales::muted("blue"), limits = c(0, 1))
+}
 }
 \concept{spatial survey modelling functions}

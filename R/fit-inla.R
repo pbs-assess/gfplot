@@ -1,10 +1,12 @@
 #' Fit a spatial model with INLA
 #'
 #' This function fits a special model using Gaussian random fields with INLA.
-#' The function is not intended to be used directly by the user. It is called
-#' internally by [fit_survey_sets()].
+#' The function is not intended to be used directly by the user, but
+#' documentation is included so that you can see the argument values that you
+#' might pass from [fit_survey_sets()]. It is called internally by
+#' [fit_survey_sets()].
 #'
-#' @param dat A data frame from [scale_survey_predictors()].
+#' @param dat A data frame from `scale_survey_predictors()`.
 #' @param response A character value representing the column name for the
 #'   response variable.
 #' @param n_knots Number of knots in the mesh. Passed to [stats::kmeans()].
@@ -57,8 +59,8 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
   }
 
   if (plot) {
-    plot(mesh)
-    points(coords)
+    graphics::plot(mesh)
+    graphics::points(coords)
   }
 
   spde <- INLA::inla.spde2.matern(mesh, alpha = 3 / 2)

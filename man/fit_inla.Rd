@@ -10,7 +10,7 @@ fit_inla(dat, response = "present", n_knots = 50, family = "binomial",
   include_depth = TRUE, verbose = FALSE, debug = FALSE, trials = 10)
 }
 \arguments{
-\item{dat}{A data frame from \code{\link[=scale_survey_predictors]{scale_survey_predictors()}}.}
+\item{dat}{A data frame from \code{scale_survey_predictors()}.}
 
 \item{response}{A character value representing the column name for the
 response variable.}
@@ -47,6 +47,8 @@ debugging. Will return \code{NA} in the model component if \code{FALSE}.}
 }
 \description{
 This function fits a special model using Gaussian random fields with INLA.
-The function is not intended to be used directly by the user. It is called
-internally by \code{\link[=fit_survey_sets]{fit_survey_sets()}}.
+The function is not intended to be used directly by the user, but
+documentation is included so that you can see the argument values that you
+might pass from \code{\link[=fit_survey_sets]{fit_survey_sets()}}. It is called internally by
+\code{\link[=fit_survey_sets]{fit_survey_sets()}}.
 }

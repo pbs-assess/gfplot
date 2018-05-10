@@ -114,8 +114,8 @@ plot_catch <-
   function(
              dat,
              ylab = "Landings", xlim = c(1954, 2017),
-             units = c("1000 tons" = 1000000,
-               "tons" = 1000, "kg" = 1),
+             units = c(`1000 tons` = 1000000,
+               `tons` = 1000, `kg` = 1),
              unreliable = c(1996, 2006),
              blank_plot = FALSE) {
     gears <- c(

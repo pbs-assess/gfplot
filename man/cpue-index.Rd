@@ -86,6 +86,7 @@ The default setup of the function \code{\link[gfplot:f]{gfplot::f()}} sets the r
 the most common factor level.
 }
 \examples{
+\donttest{
 # A simulated example:
 set.seed(1)
 d <- sim_cpue()
@@ -102,7 +103,7 @@ predict_cpue_index(m) \%>\%
   plot_cpue_index()
 
 plot_cpue_index_jk(m, terms = "f(vessel)")
-
+}
 \dontrun{
 # An example with PBS data:
 # (the data extraction will be slow)

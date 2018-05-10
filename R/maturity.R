@@ -1,6 +1,7 @@
 #' Fit and plot maturity ogives
 #'
 #' @param dat Data from [get_survey_samples()].
+#' @param type Should this be an age or length fit?
 #' @param sample_id_re If `TRUE` then the model will include random intercepts
 #'   for sample ID.
 #' @param months A numeric vector indicating which months to include when
@@ -20,9 +21,11 @@
 #' m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE)
 #' plot_mat_ogive(m)
 #'
+#' \dontrun{
 #' ## with random intercepts for sample ID:
 #' m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
 #' plot_mat_ogive(m)
+#' }
 fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,
