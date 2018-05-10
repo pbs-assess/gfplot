@@ -38,9 +38,11 @@ bin.}
 Plot maturity frequency by month
 }
 \examples{
+\donttest{
 # pop_samples <- get_survey_samples("pacific ocean perch")
 tidy_maturity_months(pop_samples) \%>\%
   plot_maturity_months()
+}
 \dontrun{
 d <- get_survey_samples("lingcod")
 tidy_maturity_months(d) \%>\%
