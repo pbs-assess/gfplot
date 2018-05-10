@@ -136,7 +136,8 @@ GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
 \item \code{get_cpue_spatial_ll()} extracts catch, effort and spatial data from
 GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 \item \code{get_cpue_index()} extracts catch and effort data from
-GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery
+GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
+\item \code{get_cpue_historic()} extracts historical catch and effort data back into the 1950s.
 \item \code{get_age_precision()} extracts age readings from biological samples for a
 given species where there is a second ('precision') age reading
 \item \code{get_sara_dat()} scrubs Species At Risk website for up-to-date species

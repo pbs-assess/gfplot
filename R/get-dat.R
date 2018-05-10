@@ -30,7 +30,8 @@
 #' * `get_cpue_spatial_ll()` extracts catch, effort and spatial data from
 #'    GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 #' * `get_cpue_index()` extracts catch and effort data from
-#'    GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery
+#'    GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
+#' * `get_cpue_historic()` extracts historical catch and effort data back into the 1950s.
 #' * `get_age_precision()` extracts age readings from biological samples for a
 #'    given species where there is a second ('precision') age reading
 #' * `get_sara_dat()` scrubs Species At Risk website for up-to-date species
