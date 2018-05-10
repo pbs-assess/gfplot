@@ -57,5 +57,5 @@ Suggests:
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-URL: https://github.com/seananderson/gfplot
-BugReports: https://github.com/seananderson/gfplot/issues
+URL: https://github.com/pbs-assess/gfplot
+BugReports: https://github.com/pbs-assess/gfplot/issues
