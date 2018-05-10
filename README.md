@@ -1,5 +1,4 @@
-gfplot: An R package for data extraction (at PBS) and plotting (of any) groundfish data
-=======================================================================================
+# gfplot: An R package for data extraction (at PBS) and plotting (of any) groundfish data
 
 [![Travis-CI Build
 Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot)
@@ -10,8 +9,7 @@ public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus
 Facilitates the creation of an annual groundfish data synopsis report
 with [gfsynopsis](https://github.com/pbs-assess/gfsynopsis).
 
-Installation
-============
+# Installation
 
 The gfplot package is *not* ready for use yet. In particular, the
 documentation is far from complete. However, it can be installed and
@@ -33,11 +31,12 @@ fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
 #>  [1] "get_age_methods"       "get_age_precision"    
 #>  [3] "get_catch"             "get_comm_samples"     
-#>  [5] "get_cpue_index"        "get_cpue_spatial"     
-#>  [7] "get_cpue_spatial_ll"   "get_major_areas"      
-#>  [9] "get_most_common_level" "get_sara_dat"         
-#> [11] "get_ssids"             "get_survey_index"     
-#> [13] "get_survey_samples"    "get_survey_sets"
+#>  [5] "get_cpue_historic"     "get_cpue_index"       
+#>  [7] "get_cpue_spatial"      "get_cpue_spatial_ll"  
+#>  [9] "get_gear_types"        "get_major_areas"      
+#> [11] "get_most_common_level" "get_sara_dat"         
+#> [13] "get_ssids"             "get_survey_index"     
+#> [15] "get_survey_samples"    "get_survey_sets"
 ```
 
 Generic functions for any similarly formatted data:
@@ -50,14 +49,13 @@ sort(fns[grepl("tidy", fns)])
 #>  [7] "tidy_comps_survey"     "tidy_cpue_index"      
 #>  [9] "tidy_cpue_index_coefs" "tidy_lengths_raw"     
 #> [11] "tidy_lengths_weighted" "tidy_maturity_months" 
-#> [13] "tidy_sample_avail"     "tidy_survey_index"    
-#> [15] "tidy_survey_sets"
+#> [13] "tidy_sample_avail"     "tidy_survey_index"
 ```
 
 ``` r
 sort(fns[grepl("fit", fns)])
-#> [1] "fit_cpue_index"    "fit_glmmfields"    "fit_length_weight"
-#> [4] "fit_mat_ogive"     "fit_survey_sets"   "fit_vb"
+#> [1] "fit_cpue_index"    "fit_length_weight" "fit_mat_ogive"    
+#> [4] "fit_survey_sets"   "fit_vb"
 ```
 
 ``` r
