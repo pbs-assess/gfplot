@@ -5,6 +5,7 @@
 #' @param dat An input data frame from [get_cpue_index()].
 #' @param species_common The species common name.
 #' @param year_range The range of years to include.
+#' @param lat_range The range of latitudes to include.
 #' @param min_positive_tows The minimum number of positive tows over all years.
 #' @param min_positive_trips The minimum number of annual positive trips.
 #' @param min_yrs_with_trips The number of years in which the

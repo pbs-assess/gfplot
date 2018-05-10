@@ -18,6 +18,8 @@ tidy_cpue_index(dat, species_common, year_range = c(1996,
 
 \item{year_range}{The range of years to include.}
 
+\item{lat_range}{The range of latitudes to include.}
+
 \item{min_positive_tows}{The minimum number of positive tows over all years.}
 
 \item{min_positive_trips}{The minimum number of annual positive trips.}

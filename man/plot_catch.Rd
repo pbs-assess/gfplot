@@ -23,12 +23,17 @@ with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B
 
 \item{ylab}{Y axis label.}
 
+\item{xlim}{X axis limits in years.}
+
 \item{units}{A named character vector with names referring to text that will
 be pasted into the y-axis label and a value defining the quantity to divide
 the \code{value} column by for that unit label.}
 
 \item{unreliable}{An optional numeric vector defining years before which the
 data are less reliable. Leave as \code{NA} to omit.}
+
+\item{blank_plot}{If \code{TRUE} then a blank plot with appropriate axes will be
+returned. Used in the synopsis report.}
 }
 \description{
 Functions for plotting catch data over time as a stacked bar plot.

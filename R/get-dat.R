@@ -191,8 +191,8 @@ get_survey_ids <- function(ssid) {
 #' @param join_sample_ids If `TRUE` then the sample IDs will be joined in. This
 #'   may result in repeated rows of data if the same sample ID is part of
 #'   different survey stratifications.
-#' @param verbose If `TRUE` then messages will be printed as the various survey
-#'   IDs are extracted. Useful to monitor progress.
+#' @param verbose If `TRUE` then extra messages were reprinted during data
+#'   extraction. Useful to monitor progress.
 #' @rdname get
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
                             join_sample_ids = FALSE, verbose = FALSE) {
@@ -566,8 +566,6 @@ get_sara_dat <- function() {
 #' @param survey_sets Logical for whether the survey set data should be
 #'   extracted. You might set this to `FALSE` if you don't need these data and
 #'   you want to substantially speed up data extraction.
-#' @param verbose Logical for whether some extra information should be printed
-#'   during data extraction.
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,

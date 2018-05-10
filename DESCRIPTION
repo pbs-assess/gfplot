@@ -39,6 +39,7 @@ Imports:
     rlang,
     rstan (>= 2.16.0),
     rvest,
+    scales,
     stringr,
     sp,
     speedglm,

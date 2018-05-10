@@ -17,11 +17,14 @@
 #'  with descriptions. Enter as a regular expression. For example, `c("5A", "5B")` or
 #'  `c("5[CDE]+", "5[AB]+")`.
 #' @param ylab Y axis label.
+#' @param xlim X axis limits in years.
 #' @param units A named character vector with names referring to text that will
 #'   be pasted into the y-axis label and a value defining the quantity to divide
 #'   the `value` column by for that unit label.
 #' @param unreliable An optional numeric vector defining years before which the
 #'   data are less reliable. Leave as `NA` to omit.
+#' @param blank_plot If `TRUE` then a blank plot with appropriate axes will be
+#'   returned. Used in the synopsis report.
 #'
 #' @examples
 #' \dontrun{

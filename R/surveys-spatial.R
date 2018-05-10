@@ -449,11 +449,11 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' plot_survey_sets(fit$predictions, fit$data, fill_column = "pos")
 #' # Add a custom color scale for the binary model:
 #' plot_survey_sets(fit$predictions, fit$data, fill_column = "bin") +
-#'   scale_fill_gradient2(midpoint = 0.5,
+#'   ggplot2::scale_fill_gradient2(midpoint = 0.5,
 #'     high = scales::muted("red"),
 #'     mid = "white",
 #'     low = scales::muted("blue"), limits = c(0, 1), breaks = c(0, 0.5, 1)) +
-#'   scale_colour_gradient2(midpoint = 0.5,
+#'   ggplot2::scale_colour_gradient2(midpoint = 0.5,
 #'     high = scales::muted("red"),
 #'     mid = "white",
 #'     low = scales::muted("blue"), limits = c(0, 1))

@@ -3,7 +3,7 @@
 #' @name plot_maturity_months
 NULL
 
-#' @param months For [tidy_maturity_months()], data from [get_survey_samples()]
+#' @param data For [tidy_maturity_months()], data from [get_survey_samples()]
 #'   or [get_comm_samples()] or [bind_samples()]. For [plot_maturity_months()],
 #'   data from [tidy_maturity_months()].
 #' @param months A vector of months to include. Defaults to all.

@@ -9,6 +9,6 @@
 pop_surv
 }
 \description{
-Originally retrieved with \code{\get_survey_sets("pacific ocean perch")}.
+Originally retrieved with \code{get_survey_sets("pacific ocean perch")}.
 }
 \keyword{datasets}

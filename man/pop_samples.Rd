@@ -9,8 +9,8 @@
 pop_samples
 }
 \description{
-Originally retrieved with \code{\get_survey_samples("pacific ocean perch")}. Has
-been filled in various ways to condense the data set for use in examples
+Originally retrieved with \code{get_survey_samples("pacific ocean perch")}. Has
+been filtered in various ways to condense the data set for use in examples
 throughout the package.
 }
 \keyword{datasets}

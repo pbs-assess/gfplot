@@ -12,9 +12,7 @@ plot_maturity_months(dat, max_size = 11, sex_gap = 0.2, fill_col = c(M =
   alpha = 0.8, title = "Maturity frequencies", n_label_pos = c(0.7, 1))
 }
 \arguments{
-\item{months}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}
-or \code{\link[=get_comm_samples]{get_comm_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
-data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
+\item{months}{A vector of months to include. Defaults to all.}
 
 \item{max_size}{The maximum size of the circles.}
 
@@ -32,7 +30,9 @@ data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 the text describing the number of male and female samples within each month
 bin.}
 
-\item{months}{A vector of months to include. Defaults to all.}
+\item{data}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}
+or \code{\link[=get_comm_samples]{get_comm_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
+data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 }
 \description{
 Plot maturity frequency by month

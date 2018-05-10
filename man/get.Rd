@@ -73,8 +73,8 @@ descriptions.}
 may result in repeated rows of data if the same sample ID is part of
 different survey stratifications.}
 
-\item{verbose}{If \code{TRUE} then messages will be printed as the various survey
-IDs are extracted. Useful to monitor progress.}
+\item{verbose}{If \code{TRUE} then extra messages were reprinted during data
+extraction. Useful to monitor progress.}
 
 \item{remove_bad_data}{Remove known bad data, such as unrealistic
 length or weight values.}
@@ -103,9 +103,6 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
-
-\item{verbose}{Logical for whether some extra information should be printed
-during data extraction.}
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific
