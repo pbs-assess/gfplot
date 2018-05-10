@@ -31,7 +31,7 @@ for the positive component model.}
 \item{fill_scale}{A ggplot \code{scale_fill_*} object.}
 
 \item{colour_scale}{A ggplot \code{scale_colour_*} object. You likely want this to
-match \code{fill_scale} less you want the map to look strange.}
+match \code{fill_scale} unless you want the map to look strange.}
 
 \item{pos_pt_col}{The color for positive set location points.}
 
@@ -100,9 +100,9 @@ This analysis report uses this for the IPHC survey.}
 A ggplot object.
 }
 \description{
-Takes the output from \code{\link[=fit_survey_sets]{fit_survey_sets()}} in creates a map over the model
+Takes the output from \code{\link[=fit_survey_sets]{fit_survey_sets()}} and creates a map of the model
 predictions and/or the raw data. Includes a number of options for customizing
-the map including the ability to rotate the map to an arbitrary degree.
+the map including the ability to rotate the map.
 }
 \examples{
 \donttest{
