@@ -30,11 +30,11 @@
 #' @importFrom INLA inla.models inla.reorderings
 
 fit_inla <- function(dat, response = "present", n_knots = 50,
-                     family = "binomial", max_edge = c(3, 10),
-                     kmeans = TRUE,
+                     family = "binomial", max_edge = c(20, 100),
+                     kmeans = FALSE,
                      plot = FALSE, fit_model = TRUE,
                      extend = list(n = 8, offset = -0.1),
-                     offset = c(10, 50), cutoff = 1,
+                     offset = c(5, 25), cutoff = 10,
                      include_depth = TRUE,
                      verbose = FALSE,
                      debug = FALSE,
@@ -58,6 +58,7 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
     )
   }
 
+  message("INLA max_edge = ", "c(", max_edge[[1]], ", ", max_edge[[2]], ")")
   if (plot) {
     graphics::plot(mesh)
     graphics::points(coords)
