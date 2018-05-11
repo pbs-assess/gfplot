@@ -82,4 +82,3 @@ tidy_ages_raw(rs_comm_samples,
 Other age- and length-frequency functions: \code{\link{plot_lengths}},
   \code{\link{weight_comps}}
 }
-\concept{age- and length-frequency functions}

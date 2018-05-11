@@ -43,4 +43,3 @@ plot_length_weight(object_female = model_f, object_male = model_m)
 Other growth functions: \code{\link{fit_vb}},
   \code{\link{plot_growth}}
 }
-\concept{growth functions}

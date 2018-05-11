@@ -90,4 +90,3 @@ plot_vb(obj, obj)
 Other growth functions: \code{\link{fit_length_weight}},
   \code{\link{plot_growth}}
 }
-\concept{growth functions}

@@ -186,4 +186,3 @@ get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
 }
 
 }
-\concept{get data functions}

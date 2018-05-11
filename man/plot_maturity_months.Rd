@@ -3,6 +3,7 @@
 \name{plot_maturity_months}
 \alias{plot_maturity_months}
 \alias{tidy_maturity_months}
+\alias{plot_maturity_months}
 \title{Plot maturity frequency by month}
 \usage{
 tidy_maturity_months(dat, months = seq(1, 12))

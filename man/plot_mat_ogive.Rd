@@ -62,4 +62,3 @@ m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
 plot_mat_ogive(m)
 }
 }
-\concept{plotting functions}

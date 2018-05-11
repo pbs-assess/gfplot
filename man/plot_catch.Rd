@@ -3,6 +3,7 @@
 \name{plot_catch}
 \alias{plot_catch}
 \alias{tidy_catch}
+\alias{plot_catch}
 \title{Plot catch data over time}
 \usage{
 tidy_catch(dat, areas = NULL)
