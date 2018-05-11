@@ -129,8 +129,8 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
           A = INLA::inla.stack.A(sdat)
         ),
         control.fixed = list(
-          mean = 0, prec = 1 / (4^2),
-          mean.intercept = 0, prec.intercept = 1 / (25^2)
+          mean = 0, prec = 1 / (5^2),
+          mean.intercept = 0, prec.intercept = 1 / (20^2)
         ),
         control.compute = list(config = TRUE),
         verbose = verbose,
