@@ -100,7 +100,7 @@ plot_age_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
     alpha = 0.5,
     colour = "grey30"
     ) +
-    labs(title = "Ageing precision", x = "Primary age", y = "Precision age") +
+    labs(title = "Ageing precision", x = "Primary age", y = "Secondary age") +
     theme_pbs() +
     coord_fixed()
 }
