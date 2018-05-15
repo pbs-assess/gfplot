@@ -1,6 +1,6 @@
 #' Fit a spatial model with INLA
 #'
-#' This function fits a special model using Gaussian random fields with INLA.
+#' This function fits a spatial model using Gaussian random fields with INLA.
 #' The function is not intended to be used directly by the user, but
 #' documentation is included so that you can see the argument values that you
 #' might pass from [fit_survey_sets()]. It is called internally by
