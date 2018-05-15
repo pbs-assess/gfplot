@@ -46,7 +46,7 @@ debugging. Will return \code{NA} in the model component if \code{FALSE}.}
 \item{trials}{Number of times to retry the model if it fails to fit.}
 }
 \description{
-This function fits a special model using Gaussian random fields with INLA.
+This function fits a spatial model using Gaussian random fields with INLA.
 The function is not intended to be used directly by the user, but
 documentation is included so that you can see the argument values that you
 might pass from \code{\link[=fit_survey_sets]{fit_survey_sets()}}. It is called internally by

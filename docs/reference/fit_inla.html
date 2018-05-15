@@ -30,7 +30,7 @@
 
 <meta property="og:title" content="Fit a spatial model with INLA — fit_inla" />
 
-<meta property="og:description" content="This function fits a special model using Gaussian random fields with INLA.
+<meta property="og:description" content="This function fits a spatial model using Gaussian random fields with INLA.
 The function is not intended to be used directly by the user, but
 documentation is included so that you can see the argument values that you
 might pass from fit_survey_sets(). It is called internally by
@@ -117,7 +117,7 @@ fit_survey_sets()." />
 
     <div class="ref-description">
     
-    <p>This function fits a special model using Gaussian random fields with INLA.
+    <p>This function fits a spatial model using Gaussian random fields with INLA.
 The function is not intended to be used directly by the user, but
 documentation is included so that you can see the argument values that you
 might pass from <code><a href='survey-spatial-modelling.html'>fit_survey_sets()</a></code>. It is called internally by
@@ -126,8 +126,8 @@ might pass from <code><a href='survey-spatial-modelling.html'>fit_survey_sets()<
     </div>
 
     <pre class="usage"><span class='fu'>fit_inla</span>(<span class='no'>dat</span>, <span class='kw'>response</span> <span class='kw'>=</span> <span class='st'>"present"</span>, <span class='kw'>n_knots</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='st'>"binomial"</span>,
-  <span class='kw'>max_edge</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>3</span>, <span class='fl'>10</span>), <span class='kw'>kmeans</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fit_model</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>extend</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>offset</span> <span class='kw'>=</span> -<span class='fl'>0.1</span>), <span class='kw'>offset</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>10</span>, <span class='fl'>50</span>), <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>max_edge</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>20</span>, <span class='fl'>100</span>), <span class='kw'>kmeans</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fit_model</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>extend</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>offset</span> <span class='kw'>=</span> -<span class='fl'>0.1</span>), <span class='kw'>offset</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>5</span>, <span class='fl'>25</span>), <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>include_depth</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>debug</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>trials</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
