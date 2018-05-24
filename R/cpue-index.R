@@ -211,8 +211,8 @@ tidy_cpue_index_coefs <- function(object) {
   sm$pars <- pars
 
   sm <- sm %>%
-    rename(se = `Std. Error`) %>%
-    rename(est = Estimate) %>%
+    rename(se = .data$`Std. Error`) %>%
+    rename(est = .data$Estimate) %>%
     filter(!grepl("prediction", pars))
   sm$par_name <- c(
     paste(model_prefixes[[1]], colnames(object$mm_bin)),
