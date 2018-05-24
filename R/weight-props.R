@@ -45,7 +45,6 @@
 #' [Link](http://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2016/2016_009-eng.html)
 #' [PDF](http://waves-vagues.dfo-mpo.gc.ca/Library/363948.pdf)
 #'
-#' @family age- and length-frequency functions
 #' @examples
 #' \dontrun{
 #' species <- "redstripe rockfish"

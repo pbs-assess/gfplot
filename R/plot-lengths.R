@@ -27,7 +27,6 @@
 #' @param min_total Minimum number of fish for a given survey and year needed
 #'   before a histogram is shown.
 #'
-#' @family age- and length-frequency functions
 #' @export
 #'
 #' @examples

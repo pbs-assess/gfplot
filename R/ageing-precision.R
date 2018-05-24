@@ -7,9 +7,6 @@
 #'
 #' @export
 #'
-#' @family tidy data functions
-#'
-#'
 #' @template ageing-precision-examples
 #' @examples
 #' \dontrun{

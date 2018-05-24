@@ -29,12 +29,10 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   )
 
   if (make_plots) {
-    g <- predict_cpue_index(m) %>%
+    g1 <- predict_cpue_index(m) %>%
       plot_cpue_index()
-    print(g)
 
-    g <- plot_cpue_index_jk(m, terms = "f(vessel)")
-    print(g)
+    # g2 <- plot_cpue_index_jk(m, terms = "f(vessel)")
   }
   sm <- tidy_cpue_index_coefs(m)
 
@@ -50,16 +48,19 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   )
 
   if (make_plots) {
-    g <- sm %>%
+
+    dd <- sm %>%
       filter(!grepl("Intercept", par_group)) %>%
-      ggplot(aes_string("true_b", "est")) + geom_point() +
+      mutate(par_group = gsub(", functionx as\\.character\\(x\\)\\[\\[1\\]\\]\\)", "", par_group))
+
+    g3 <- ggplot(dd, aes_string("true_b", "est")) + geom_point() +
       ggplot2::geom_linerange(aes_string(ymin = "est - 2 * se", ymax = "est + 2 * se")) +
       facet_wrap(~par_group) +
       ggplot2::geom_abline(intercept = 0, slope = 1) +
-      coord_equal()
-    print(g)
+      coord_equal() + theme_pbs() +
+      xlab("True value") + ylab("Estimated value")
 
-    print(plot_cpue_index_coefs(m))
+    g4 <- plot_cpue_index_coefs(m)
   }
 
   # coverage!
@@ -97,12 +98,20 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   est$upr <- est$Estimate + stats::qnorm(0.975) * est$`Std. Error`
 
   if (make_plots) {
-    g <- ggplot(est, aes_string("year", "Estimate", ymin = "lwr", ymax = "lwr")) +
-      ggplot2::geom_pointrange() +
-      geom_point(aes_string(y = "true"), colour = "red")
-    print(g)
+    g5 <- ggplot(est, aes_string("year", "exp(Estimate)", ymin = "exp(lwr)",
+      ymax = "exp(upr)")) +
+      geom_line(col = "grey60") +
+      ggplot2::geom_pointrange(pch = 21) +
+      geom_point(aes_string(y = "exp(true)"), colour = "red", pch = 4, size = 3) +
+      theme_pbs() +
+      xlab("Year") + ylab("CPUE") +
+      coord_cartesian(expand = FALSE)
   }
   est <- mutate(est, covered = true < upr & true > lwr)
 
-  invisible(list(covered = est$covered, model_summary = sm))
+  out <- list(covered = est$covered, model_summary = sm)
+  if (make_plots)
+    list(ts = g1, cross_val = g3, coef = g4, ts_check = g5)
+  else
+    invisible(out)
 }

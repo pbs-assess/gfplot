@@ -32,6 +32,3 @@ get_ageing_precision("pacific ocean perch") \%>\%
   plot_ageing_precision(n = 200)
 }
 }
-\seealso{
-Other ageing precision functions: \code{\link{tidy_age_precision}}
-}

@@ -20,7 +20,7 @@ plot_cpue_index(predicted_dat, all_models = TRUE)
 
 tidy_cpue_index_coefs(object)
 
-plot_cpue_index_coefs(object)
+plot_cpue_index_coefs(object, regex = c(", base_[a-z]+", ""))
 
 plot_cpue_index_jk(object, terms = c("f(month)", "f(vessel)", "f(locality)",
   "f(depth)", "f(latitude)"), return_data = FALSE)
@@ -41,6 +41,10 @@ formatted data frame.}
 
 \item{all_models}{Logical for whether to plot all models (\code{TRUE}) or just the
 combined model (\code{FALSE}).}
+
+\item{regex}{A regular expression as a character vector of length 2 to
+transform the coefficient names from something (element 1) to something
+(element 2).}
 
 \item{terms}{A character vector of terms to jackknife out.}
 

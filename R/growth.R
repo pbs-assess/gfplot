@@ -28,7 +28,6 @@
 #'   [get_age_methods()].
 #' @param ... Any other arguments to pass on to [rstan::sampling()] or
 #'   [rstan::optimizing()].
-#' @family growth functions
 #' @importFrom stats median quantile rlnorm runif median
 #'
 #' @details Note that in some cases you must load the rstan package first and
@@ -195,7 +194,6 @@ fit_vb <- function(dat,
 #' @param scale_weight A value to multiply all weights by. Useful for changing
 #'   units.
 #'
-#' @family growth functions
 #' @export
 #' @examples
 #' \dontrun{
@@ -279,7 +277,6 @@ fit_length_weight <- function(dat,
 #'   fish.
 #'
 #' @export
-#' @family growth functions
 #' @rdname plot_growth
 #'
 #' @examples

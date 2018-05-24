@@ -1,4 +1,3 @@
-#' @family ageing precision functions
 #' @examples
 #' \dontrun{
 #' get_ageing_precision("shortraker rockfish") %>%

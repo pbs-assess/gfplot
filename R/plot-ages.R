@@ -28,8 +28,6 @@
 #'   to help trace cohorts. Note that these are passed to
 #'   [ggplot2::geom_abline()] as intercepts.
 #'
-#' @family age- and length-frequency functions
-#'
 #' @examples
 #' \dontrun{
 #' # main age/length data:

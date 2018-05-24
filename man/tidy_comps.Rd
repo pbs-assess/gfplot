@@ -6,7 +6,6 @@
 \alias{tidy_ages_weighted}
 \alias{tidy_lengths_raw}
 \alias{tidy_lengths_weighted}
-\alias{tidy_comps}
 \title{Tidy age or length composition data for plotting or modelling}
 \usage{
 tidy_ages_raw(...)
@@ -30,7 +29,10 @@ tidy_comps(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
 \item{dat}{The input samples data frame from \code{\link[=get_comm_samples]{get_comm_samples()}} or
 \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
-\item{survey}{A character vector of shorter/cleaner survey names to use.}
+\item{survey}{A character vector of survey names to use. These should match
+the survey abbreviations in GFBio. All of the survey listed here will be
+rendered in the final plot in the order that they are specified to this
+argument.}
 
 \item{year_range}{An optional range of years to plot.}
 

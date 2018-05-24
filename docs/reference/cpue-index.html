@@ -184,7 +184,7 @@ test the sensitivity of the standardization model to any one term.</p></li>
 
 <span class='fu'>tidy_cpue_index_coefs</span>(<span class='no'>object</span>)
 
-<span class='fu'>plot_cpue_index_coefs</span>(<span class='no'>object</span>)
+<span class='fu'>plot_cpue_index_coefs</span>(<span class='no'>object</span>, <span class='kw'>regex</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>", base_[a-z]+"</span>, <span class='st'>""</span>))
 
 <span class='fu'>plot_cpue_index_jk</span>(<span class='no'>object</span>, <span class='kw'>terms</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"f(month)"</span>, <span class='st'>"f(vessel)"</span>, <span class='st'>"f(locality)"</span>,
   <span class='st'>"f(depth)"</span>, <span class='st'>"f(latitude)"</span>), <span class='kw'>return_data</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
@@ -221,6 +221,12 @@ formatted data frame.</p></td>
       <th>all_models</th>
       <td><p>Logical for whether to plot all models (<code>TRUE</code>) or just the
 combined model (<code>FALSE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>regex</th>
+      <td><p>A regular expression as a character vector of length 2 to
+transform the coefficient names from something (element 1) to something
+(element 2).</p></td>
     </tr>
     <tr>
       <th>terms</th>
@@ -264,7 +270,8 @@ the most common factor level.</p>
 <span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_cpue_index</span>(<span class='no'>d</span>,
   <span class='kw'>formula_binomial</span> <span class='kw'>=</span> <span class='no'>pos_catch</span> ~ <span class='no'>year_factor</span> + <span class='fu'><a href='f.html'>f</a></span>(<span class='no'>vessel</span>),
   <span class='kw'>formula_lognormal</span> <span class='kw'>=</span> <span class='fu'>log</span>(<span class='no'>spp_catch</span> / <span class='no'>hours_fished</span>) ~ <span class='no'>year_factor</span> + <span class='fu'><a href='f.html'>f</a></span>(<span class='no'>vessel</span>)
-)</div><div class='output co'>#&gt; <span class='message'>Fitting CPUE model ...</span></div><div class='output co'>#&gt; outer mgc:  18.16203
+)</div><div class='output co'>#&gt; Note: Using Makevars in /Users/seananderson/.R/Makevars </div><div class='output co'>#&gt; <span class='message'>Fitting CPUE model ...</span></div><div class='output co'>#&gt; Constructing atomic log_dbinom_robust
+#&gt; outer mgc:  18.16203 
 #&gt; outer mgc:  38.65155 
 #&gt; outer mgc:  40.33367 
 #&gt; outer mgc:  4.263728 

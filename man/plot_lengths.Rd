@@ -78,7 +78,3 @@ tidy_lengths_raw(rs_comm_samples,
   plot_lengths()
 }
 }
-\seealso{
-Other age- and length-frequency functions: \code{\link{plot_ages}},
-  \code{\link{weight_comps}}
-}

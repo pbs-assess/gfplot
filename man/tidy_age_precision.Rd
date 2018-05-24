@@ -33,6 +33,3 @@ get_age_precision("yelloweye rockfish") \%>\%
 }
 
 }
-\seealso{
-Other ageing precision functions: \code{\link{plot_age_precision}}
-}

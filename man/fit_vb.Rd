@@ -86,7 +86,3 @@ hist(posterior$linf)
 obj <- fit_vb(pop_samples[1:2,])
 plot_vb(obj, obj)
 }
-\seealso{
-Other growth functions: \code{\link{fit_length_weight}},
-  \code{\link{plot_growth}}
-}

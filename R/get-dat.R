@@ -45,8 +45,6 @@
 #' `get_*` functions only extract data when performed on a computer connected to
 #' the Pacific Biological Station DFO network.
 #'
-#' @family get data functions
-#'
 #' @examples
 #' \dontrun{
 #' ## Import survey catch density and location data by tow or set for plotting

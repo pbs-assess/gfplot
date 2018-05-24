@@ -7,7 +7,10 @@
 #'
 #' @param dat The input samples data frame from [get_comm_samples()] or
 #'   [get_survey_samples()].
-#' @param survey A character vector of shorter/cleaner survey names to use.
+#' @param survey A character vector of survey names to use. These should match
+#'   the survey abbreviations in GFBio. All of the survey listed here will be
+#'   rendered in the final plot in the order that they are specified to this
+#'   argument.
 #' @param year_range An optional range of years to plot.
 #' @param spp_cat_code A numeric vector of species categorical codes to include
 #'   for the commercial samples. Defaults to `1`, which refers to unsorted

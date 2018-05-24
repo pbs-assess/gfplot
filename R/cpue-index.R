@@ -129,7 +129,7 @@ fit_cpue_index <- function(dat,
 #' @rdname cpue-index
 
 predict_cpue_index <- function(object, center = FALSE) {
-  report_sum <- summary(object$sdreport)
+  report_sum <- TMB::summary.sdreport(object$sdreport)
   ii <- grep(
     "log_prediction|linear_prediction1_i|linear_prediction2_i",
     row.names(report_sum)
@@ -204,15 +204,15 @@ plot_cpue_index <- function(predicted_dat, all_models = TRUE) {
 tidy_cpue_index_coefs <- function(object) {
   model_prefixes <- c("Bin.", "Pos.")
 
-  sm <- summary(object$sdreport)
+  sm <- TMB::summary.sdreport(object$sdreport)
   pars <- row.names(sm)
   row.names(sm) <- seq_len(nrow(sm))
   sm <- as.data.frame(sm)
   sm$pars <- pars
 
   sm <- sm %>%
-    rename(se = .data$`Std. Error`) %>%
-    rename(est = .data$Estimate) %>%
+    rename(se = `Std. Error`) %>%
+    rename(est = Estimate) %>%
     filter(!grepl("prediction", pars))
   sm$par_name <- c(
     paste(model_prefixes[[1]], colnames(object$mm_bin)),
@@ -232,6 +232,10 @@ tidy_cpue_index_coefs <- function(object) {
 #' @description * `plot_cpue_index_coefs()` plots coefficients from a CPUE index
 #'   standardization model
 #'
+#' @param regex A regular expression as a character vector of length 2 to
+#' transform the coefficient names from something (element 1) to something
+#' (element 2).
+#'
 #' @details Note that for coefficients for predictors treated as factors (i.e.
 #'   likely all of the predictors), the coefficients represent the difference
 #'   from the base level factor. For example, if January was the base month,
@@ -243,12 +247,16 @@ tidy_cpue_index_coefs <- function(object) {
 #'
 #' @rdname cpue-index
 
-plot_cpue_index_coefs <- function(object) {
+plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", "")) {
   sm <- tidy_cpue_index_coefs(object)
   model_prefixes <- c("Bin.", "Pos.")
   sm$par_group <- forcats::fct_relevel(sm$par_group, "log_sigma", after = Inf)
   sm <- mutate(sm, se_too_big = se > 10, se = ifelse(se > 10, NA, se))
   sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
+
+  sm <- mutate(sm, par_name = gsub(regex[[1]], regex[[2]], par_name))
+  sm <- mutate(sm, par_group = gsub(regex[[1]], regex[[2]], par_group))
+  sm <- mutate(sm, par_name = gsub("[A-Za-z]+. [a-z]+ ", "", par_name))
 
   sm <- sm %>%
     filter(!grepl("Intercept", par_name)) %>%

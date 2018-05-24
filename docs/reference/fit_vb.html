@@ -204,22 +204,19 @@ first, you may get the warning:</p>
 <p><code>Error in cpp_object_initializer(.self, .refClassDef, ...) :</code>
 <code>could not find function "cpp_object_initializer"</code></p>
     
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other growth functions: <code><a href='fit_length_weight.html'>fit_length_weight</a></code>,
-  <code><a href='plot_growth.html'>plot_growth</a></code></p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>library</span>(<span class='no'>rstan</span>) <span class='co'># must load first</span>
-<span class='co'># with `rstan::optimizing()` for the mode of the posterior density:</span>
-<span class='no'>model_f</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"female"</span>)</div><div class='output co'>#&gt; Initial log joint probability = 2276.95
+    <pre class="examples"><div class='input'><span class='fu'>library</span>(<span class='no'>rstan</span>) <span class='co'># must load first</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: ggplot2</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: StanHeaders</span></div><div class='output co'>#&gt; <span class='message'>rstan (Version 2.17.3, GitRev: 2e1f913d3ca3)</span></div><div class='output co'>#&gt; <span class='message'>For execution on a local, multicore CPU with excess RAM we recommend calling</span>
+#&gt; <span class='message'>options(mc.cores = parallel::detectCores()).</span>
+#&gt; <span class='message'>To avoid recompilation of unchanged Stan programs, we recommend calling</span>
+#&gt; <span class='message'>rstan_options(auto_write = TRUE)</span></div><div class='input'><span class='co'># with `rstan::optimizing()` for the mode of the posterior density:</span>
+<span class='no'>model_f</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"female"</span>)</div><div class='output co'>#&gt; Initial log joint probability = 2676.19
 #&gt; Optimization terminated normally: 
-#&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='no'>model_m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"male"</span>)</div><div class='output co'>#&gt; Initial log joint probability = 3009.6
+#&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='no'>model_m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"male"</span>)</div><div class='output co'>#&gt; Initial log joint probability = 2364.07
 #&gt; Optimization terminated normally: 
 #&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='no'>model_f</span>, <span class='no'>model_m</span>)</div><div class='img'><img src='fit_vb-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>model_f</span>$<span class='no'>model</span></div><div class='output co'>#&gt; $par
 #&gt;           k        linf       sigma          t0 
-#&gt;  0.16292348 43.42801222  0.07106321 -0.63766600
+#&gt;  0.16292483 43.42808269  0.07106166 -0.63758124 
 #&gt; 
 #&gt; $value
 #&gt; [1] 3096.104
@@ -245,8 +242,8 @@ first, you may get the warning:</p>
   <span class='kw'>chains</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>iter</span> <span class='kw'>=</span> <span class='fl'>800</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>) <span class='co'># just for a fast example</span></div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'vb' NOW (CHAIN 1).
 #&gt; 
-#&gt; Gradient evaluation took 0.000527 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 5.27 seconds.
+#&gt; Gradient evaluation took 0.000163 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.63 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -263,9 +260,9 @@ first, you may get the warning:</p>
 #&gt; Iteration: 720 / 800 [ 90%]  (Sampling)
 #&gt; Iteration: 800 / 800 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.708504 seconds (Warm-up)
-#&gt;                0.685537 seconds (Sampling)
-#&gt;                1.39404 seconds (Total)
+#&gt;  Elapsed Time: 0.714332 seconds (Warm-up)
+#&gt;                0.704801 seconds (Sampling)
+#&gt;                1.41913 seconds (Total)
 #&gt; </div><div class='input'><span class='no'>x</span>$<span class='no'>pars</span></div><div class='output co'>#&gt; $k
 #&gt; [1] 0.162283
 #&gt; 
@@ -327,7 +324,7 @@ first, you may get the warning:</p>
 #&gt; t0      -0.66    0.01 0.11   -0.88   -0.73   -0.66   -0.59   -0.45   127 1.02
 #&gt; lp__  3093.29    0.14 1.54 3090.12 3092.49 3093.68 3094.35 3095.12   115 1.01
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Mon May 14 18:25:00 2018.
+#&gt; Samples were drawn using NUTS(diag_e) at Thu May 24 09:32:34 2018.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='no'>posterior</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rstan</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rstan/topics/stanfit-method-extract'>extract</a></span>(<span class='no'>x</span>$<span class='no'>model</span>)
@@ -343,8 +340,6 @@ first, you may get the warning:</p>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#details">Details</a></li>
-
-      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

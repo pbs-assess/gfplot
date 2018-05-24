@@ -135,7 +135,6 @@ fit_mat_ogive <- function(dat,
 #'
 #' @importFrom stats binomial plogis predict
 #' @export
-#' @family plotting functions
 #' @rdname plot_mat_ogive
 
 plot_mat_ogive <- function(object,

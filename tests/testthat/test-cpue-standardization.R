@@ -11,7 +11,7 @@ test_that("cpue index standardization has correct coverage", {
   skip_on_appveyor()
 
   set.seed(1)
-  out <- lapply(seq_len(25), function(x)
+  out <- lapply(seq_len(50), function(x)
     sim_cpue_index(
       make_plots = FALSE, sigma = 0.3, n_samples = 20,
       n_years = 10, n_vessels = 3

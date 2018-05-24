@@ -63,7 +63,3 @@ model_m <- fit_vb(d, sex = "male")
 plot_vb(object_female = model_f, object_male = model_m)
 }
 }
-\seealso{
-Other growth functions: \code{\link{fit_length_weight}},
-  \code{\link{fit_vb}}
-}
