@@ -83,6 +83,11 @@ plot_age_precision <- function(dat, n = 250, jitter = 0.25, seed = 42) {
   jit <- stats::runif(nrow(dat), -jitter, jitter)
   dat$prec_age <- dat$prec_age + jit
   dat$prim_age <- dat$prim_age + jit
+  dat$prim_min_age <- dat$prim_min_age + jit
+  dat$prim_max_age <- dat$prim_max_age + jit
+  dat$prec_min_age <- dat$prec_min_age + jit
+  dat$prec_max_age <- dat$prec_max_age + jit
+
   ggplot(dat, aes_string("prim_age", "prec_age")) +
     geom_point(pch = 21, colour = "grey20", alpha = 0.7) +
     ggplot2::geom_abline(intercept = 0, slope = 1, col = "grey50", lty = 2) +
