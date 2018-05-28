@@ -27,6 +27,8 @@
 #' @param diagonal_lines A numeric a vector of years to start diagonal lines at
 #'   to help trace cohorts. Note that these are passed to
 #'   [ggplot2::geom_abline()] as intercepts.
+#' @param count_label_size The size of the total count labels along the top.
+#'   Passed to [ggplot2::geom_text()].
 #'
 #' @examples
 #' \dontrun{
@@ -60,7 +62,8 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
                       ylab = "Age (years)", year_range = NULL,
                       line_col = c("M" = "#666666", "F" = "#f44256"),
                       survey_cols = NULL, alpha = 0.2, grid_col = "grey95",
-                      diagonal_lines = seq(-2100, -1850, 10)) {
+                      diagonal_lines = seq(-2100, -1850, 10),
+                      count_label_size = 2.25) {
   if (nrow(dat) > 0) {
     age_max <- max(dat$age, na.rm = TRUE)
   } else {
@@ -150,7 +153,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       geom_text(
         data = counts, y = age_max + 0.005 * age_range,
         aes_string(x = "year", label = "total"),
-        inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 1,
+        inherit.aes = FALSE, colour = "grey50", size = count_label_size, hjust = 1,
         angle = 90
       ) +
       geom_point(aes_string(
