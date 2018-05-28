@@ -7,7 +7,7 @@
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
   ylab = "Age (years)", year_range = NULL, line_col = c(M = "#666666", F =
   "#f44256"), survey_cols = NULL, alpha = 0.2, grid_col = "grey95",
-  diagonal_lines = seq(-2100, -1850, 10))
+  diagonal_lines = seq(-2100, -1850, 10), count_label_size = 2.25)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or
@@ -36,6 +36,9 @@ colors for the various surveys.}
 \item{diagonal_lines}{A numeric a vector of years to start diagonal lines at
 to help trace cohorts. Note that these are passed to
 \code{\link[ggplot2:geom_abline]{ggplot2::geom_abline()}} as intercepts.}
+
+\item{count_label_size}{The size of the total count labels along the top.
+Passed to \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}}.}
 }
 \description{
 Functions for plotting age frequency data.
@@ -53,6 +56,11 @@ and \code{"F"}), \code{age}, \code{proportion}, \code{total} (for the total samp
 }
 \examples{
 \dontrun{
+
+pop_samples \%>\%
+  tidy_ages_raw(survey = "SYN QCS") \%>\%
+  plot_ages()
+
 # main age/length data:
 rs_comm_samples <- get_comm_samples("redstripe rockfish")
 rs_survey_samples <- get_survey_samples("redstripe rockfish")
