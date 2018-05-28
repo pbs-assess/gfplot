@@ -60,8 +60,8 @@ fit_inla <- function(dat, response = "present", n_knots = 50,
 
   message("INLA max_edge = ", "c(", max_edge[[1]], ", ", max_edge[[2]], ")")
   if (plot) {
-    graphics::plot(mesh)
-    graphics::points(coords)
+    graphics::plot(mesh, asp = 1)
+    graphics::points(coords, col = "red")
   }
 
   spde <- INLA::inla.spde2.matern(mesh, alpha = 3 / 2)
