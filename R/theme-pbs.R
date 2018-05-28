@@ -22,7 +22,7 @@
 theme_pbs <- function(base_size = 11, base_family = "", text_col = "grey20",
   panel_border_col = "grey70") {
   half_line <- base_size / 2
-  theme_light(base_size = 11, base_family = "") +
+  theme_light(base_size = base_size, base_family = "") +
     theme(
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
