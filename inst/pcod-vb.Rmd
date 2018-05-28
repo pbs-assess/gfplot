@@ -1,0 +1,129 @@
+---
+title: "Pacific Cod von Bertelanffy growth curve fitting"
+author: "Sean Anderson"
+date: '2018-05-25'
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  cache = TRUE,
+  autodep = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.asp = 0.618,
+  fig.align = "center"
+)
+```
+
+Load libraries:
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(gfplot)
+library(rstan)
+library(bayesplot)
+```
+
+```{r, echo=FALSE}
+mod <- rstan::stan_model(system.file("stan", "vb.stan", package = "gfplot")) # will fix
+```
+
+```{r, echo=FALSE}
+d <- readRDS("../../gfsynopsis/report/data-cache2/pbs-survey-samples.rds")
+d <- filter(d, species_common_name == "pacific cod")
+```
+
+Fetch the data:
+
+```{r, eval=FALSE}
+d <- get_survey_samples("pacific cod")
+```
+
+Fit the models by optimizing for the mode of the posterior distribution. I've set the priors to be uniform to match a maximum likelihood set up, but in reality this makes almost no difference here --- the data overwhelm with the weakly informative priors.
+
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+mf <- fit_vb(d, sex = "female", uniform_priors = TRUE)
+mm <- fit_vb(d, sex = "male", uniform_priors = TRUE)
+plot_vb(object_female = mf, object_male = mm)
+```
+
+Fit the models via MCMC:
+
+```{r, message=FALSE}
+mf_mcmc <- fit_vb(d, sex = "female", method = "mcmc", uniform_priors = TRUE)
+mm_mcmc <- fit_vb(d, sex = "male", method = "mcmc", uniform_priors = TRUE)
+plot_vb(object_female = mf_mcmc, object_male = mm_mcmc)
+```
+
+Those parameter values that are shown are based on medians of the marginal posterior distributions. 
+
+Extract posterior samples and plot posterior distributions for the parameters:
+
+```{r}
+posterior <- rstan::extract(mf_mcmc$model)
+pars <- c("k", "linf", "sigma", "t0")
+bayesplot::mcmc_trace(as.array(mf_mcmc$model), pars = pars)
+bayesplot::mcmc_dens_overlay(as.array(mf_mcmc$model), pars = pars)
+bayesplot::mcmc_hist(as.array(mf_mcmc$model), pars = pars)
+```
+
+Look at some posterior predictive checks. I will just focus on the female model. First, generate 11 posterior predictive data sets:
+
+```{r}
+pp <- matrix(nrow = 11, ncol = length(mf_mcmc$data$age))
+for (j in seq_along(mf_mcmc$data$age)) {
+  for (i in seq_len(nrow(pp))) {
+    pp[i, j] <- rlnorm(1, log(posterior$linf[i] * 
+        (1 - exp(-posterior$k[i] * 
+            (mf_mcmc$data$age[j] - posterior$t0[i])))), 
+      posterior$sigma[i])
+  }
+}
+```
+
+Slice and dice the posterior predictive data sets in comparison to the real data set in various ways:
+
+```{r}
+bayesplot::ppc_hist(mf_mcmc$data$length, pp)
+```
+
+Looks pretty good. The real data set might have a slightly shorter right tail an abnormal number of observations at some mid length. Maybe this is due to rounding? 
+
+```{r}
+bayesplot::ppc_dens_overlay(mf_mcmc$data$length, pp)
+```
+
+That was another way of looking at the same thing. Looks a bit worse as density plots but that's often how these things go.
+
+Cumulative distribution looks pretty similar:
+
+```{r}
+bayesplot::ppc_ecdf_overlay(mf_mcmc$data$length, pp)
+```
+
+Might be somewhat underestimating the length of the youngest fish. Ages on the x axis.
+
+```{r}
+bayesplot::ppc_intervals(mf_mcmc$data$length, pp, x = mf_mcmc$data$age)
+```
+
+Another way of showing the same thing. Length is on the x axis now. 
+
+```{r}
+bayesplot::ppc_intervals(mf_mcmc$data$length, pp, x = mf_mcmc$data$length)
+```
+
+Not much to see in the scatterplots other than that the error is definitely increasing in magnitude at larger lengths as a lognormal or Gamma error structure allows.
+
+```{r}
+bayesplot::ppc_scatter(mf_mcmc$data$length, pp)
+```
+
+Perhaps the clearest way to look at the errors in the following plot. Again, looks pretty good to me except for the youngest smallest fish.
+
+```{r}
+bayesplot::ppc_scatter_avg(mf_mcmc$data$length, pp)
+```
