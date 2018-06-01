@@ -100,9 +100,14 @@ gear types to select from.}
 \item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
 reading and writing at the expense of disk space.}
 
+\item{historic_cpue}{Logical for whether historical CPUE should be included.}
+
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
+
+\item{list_format}{Logical for whether the data should be cached as a single named
+list (if \code{TRUE}) or whether each data type should be saved individually.}
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific

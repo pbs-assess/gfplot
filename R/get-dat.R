@@ -563,57 +563,82 @@ get_sara_dat <- function() {
 #' @param path The folder where the cached data will be saved.
 #' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
 #'   reading and writing at the expense of disk space.
+#' @param historic_cpue Logical for whether historical CPUE should be included.
 #' @param survey_sets Logical for whether the survey set data should be
 #'   extracted. You might set this to `FALSE` if you don't need these data and
 #'   you want to substantially speed up data extraction.
+#' @param list_format Logical for whether the data should be cached as a single named
+#'   list (if `TRUE`) or whether each data type should be saved individually.
 #' @export
 #' @rdname get
 cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
-                           min_cpue_year = 1996, unsorted_only = TRUE,
-                           survey_sets = TRUE, verbose = TRUE) {
+                           unsorted_only = TRUE, historic_cpue = FALSE,
+                           survey_sets = TRUE, verbose = TRUE,
+                           list_format = TRUE) {
   if (!sql_server_accessible()) {
-    stop("Not on a PBS windows machine. Cannot access data.")
+    stop("Not on a PBS machine. Cannot access data.")
   }
-
   dir.create(path, showWarnings = FALSE)
 
+  out <- list()
+
   if (survey_sets){
-    d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
-    saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
+    out$survey_sets <- get_survey_sets(species, join_sample_ids = TRUE,
+      verbose = verbose)
+    saveRDS(out$survey_sets, file = file.path(path, "pbs-survey-sets.rds"),
             compress = compress)
   }
 
-  d <- get_survey_samples(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"),
+  out$survey_samples <- get_survey_samples(species)
+  if (!list_format)
+    saveRDS(out$survey_samples, file = file.path(path, "pbs-survey-samples.rds"),
+      compress = compress)
+
+  out$survey_samples <- get_commercial_samples(species, unsorted_only = unsorted_only)
+  if (!list_format)
+  saveRDS(out$survey_samples, file = file.path(path, "pbs-comm-samples.rds"),
     compress = compress)
 
-  d <- get_comm_samples(species, unsorted_only = unsorted_only)
-  saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"),
+  out$catch <- get_catch(species)
+  if (!list_format)
+  saveRDS(out$catch, file = file.path(path, "pbs-catch.rds"),
     compress = compress)
 
-  d <- get_catch(species)
-  saveRDS(d, file = file.path(path, "pbs-catch.rds"),
+  out$cpue_spatial <- get_cpue_spatial(species)
+  if (!list_format)
+  saveRDS(out$cpue_spatial, file = file.path(path, "pbs-cpue-spatial.rds"),
     compress = compress)
 
-  d <- get_cpue_spatial(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"),
+  out$cpue_spatial_ll <- get_cpue_spatial_ll(species)
+  if (!list_format)
+  saveRDS(out$cpue_spatial_ll, file = file.path(path, "pbs-cpue-spatial-ll.rds"),
     compress = compress)
 
-  d <- get_cpue_spatial_ll(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue-spatial-ll.rds"),
+  out$survey_index <- get_survey_index(species)
+  if (!list_format)
+  saveRDS(out$survey_index, file = file.path(path, "pbs-survey-index.rds"),
     compress = compress)
 
-  d <- get_survey_index(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-index.rds"),
+  out$age_precision <- get_age_precision(species)
+  if (!list_format)
+  saveRDS(out$age_precision, file = file.path(path, "pbs-age-precision.rds"),
     compress = compress)
 
-  d <- get_age_precision(species)
-  saveRDS(d, file = file.path(path, "pbs-age-precision.rds"),
+  out$cpue_index <- get_cpue_index(gear = "bottom trawl")
+  if (!list_format)
+  saveRDS(out$cpue_index, file = file.path(path, "pbs-cpue-index.rds"),
     compress = compress)
 
-  d <- get_cpue_index(gear = "bottom trawl", min_cpue_year)
-  saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"),
-    compress = compress)
+  if (historic_cpue) {
+    out$cpue_historic <- get_cpue_historic(species)
+    if (!list_format)
+      saveRDS(out$cpue_historic, file = file.path(path, "pbs-cpue-historic.rds"),
+        compress = compress)
+  }
+
+  if (list_format)
+    saveRDS(out, file = file.path(path, "pbs-cached-data.rds"),
+      compress = compress)
 
   message("All data extracted and saved in the folder `", path, "`.")
 }
