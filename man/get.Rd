@@ -8,7 +8,7 @@
 \alias{get_age_methods}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
-\alias{get_comm_samples}
+\alias{get_commercial_samples}
 \alias{get_catch}
 \alias{get_cpue_historic}
 \alias{get_cpue_spatial}
@@ -34,7 +34,7 @@ get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
   unsorted_only = TRUE)
 
-get_comm_samples(species, unsorted_only = TRUE)
+get_commercial_samples(species, unsorted_only = TRUE)
 
 get_catch(species)
 
@@ -53,8 +53,8 @@ get_survey_index(species, ssid = NULL)
 get_sara_dat()
 
 cache_pbs_data(species, path = "data-cache", compress = FALSE,
-  min_cpue_year = 1996, unsorted_only = TRUE, survey_sets = TRUE,
-  verbose = TRUE)
+  unsorted_only = TRUE, historic_cpue = FALSE, survey_sets = TRUE,
+  verbose = TRUE, list_format = TRUE)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
@@ -127,7 +127,7 @@ survey series ID
 plotting survey catchs on a map of British Columbia.
 \item \code{get_survey_samples()} extracts all biological sample specimen records
 from research surveys for given species and survey series IDs from GFBio
-\item \code{get_comm_samples()} extracts all biological sample specimen records
+\item \code{get_commercial_samples()} extracts all biological sample specimen records
 from commercial data for given species from GFBio
 \item \code{get_catch()} extracts all landing and discard records for a given species
 from GFFOS.GF_MERGED_CATCH
@@ -165,7 +165,7 @@ get_survey_sets(species = "lingcod", ssid = 1)
 (eg. length frequency, growth, age frequency, maturity, etc.)
 get_survey_samples(species = 442, ssid = c(1, 3, 4, 16))
 
-get_comm_samples(c(442, 397))
+get_commercial_samples(c(442, 397))
 
 ## Import catch data by species for barcharts of landings by fishing area,
 ## geartype, and year.

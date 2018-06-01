@@ -25,7 +25,7 @@ Tidy PBS samples data for \code{\link[=plot_sample_avail]{plot_sample_avail()}}
 d <- get_survey_samples("lingcod")
 tidy_sample_avail(d)
 
-d <- get_comm_samples("lingcod")
+d <- get_commercial_samples("lingcod")
 tidy_sample_avail(d)
 }
 }

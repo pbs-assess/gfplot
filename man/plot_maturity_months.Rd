@@ -13,7 +13,7 @@ plot_maturity_months(dat, max_size = 11, sex_gap = 0.2, fill_col = c(M =
 }
 \arguments{
 \item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}
-or \code{\link[=get_comm_samples]{get_comm_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
+or \code{\link[=get_commercial_samples]{get_commercial_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
 data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 
 \item{months}{A vector of months to include. Defaults to all.}

@@ -15,7 +15,7 @@
 #' d <- get_survey_samples("lingcod")
 #' tidy_sample_avail(d)
 #'
-#' d <- get_comm_samples("lingcod")
+#' d <- get_commercial_samples("lingcod")
 #' tidy_sample_avail(d)
 #' }
 
@@ -91,7 +91,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' plot_sample_avail(d, year_range = c(1996, 2016),
 #'   title = "Survey samples")
 #'
-#' d <- get_comm_samples("lingcod")
+#' d <- get_commercial_samples("lingcod")
 #' d <- tidy_sample_avail(d, year_range = c(1996, 2016))
 #' plot_sample_avail(d, year_range = c(1996, 2016),
 #'   title = "Commercial samples")

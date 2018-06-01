@@ -12,7 +12,7 @@ fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
-\code{\link[=get_comm_samples]{get_comm_samples()}}.}
+\code{\link[=get_commercial_samples]{get_commercial_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 

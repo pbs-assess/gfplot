@@ -10,7 +10,7 @@ fit_length_weight(dat, sex = c("female", "male"), downsample = Inf,
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
-\code{\link[=get_comm_samples]{get_comm_samples()}}.}
+\code{\link[=get_commercial_samples]{get_commercial_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 

@@ -1,11 +1,11 @@
 #' Join survey and commercial samples
 #'
-#' @param dat_comm Output from [get_comm_samples()]
+#' @param dat_comm Output from [get_commercial_samples()]
 #' @param dat_survey Output from [get_survey_samples()]
 #' @export
 #' @examples
 #' \dontrun{
-#' dat_comm <- get_comm_samples("lingcod")
+#' dat_comm <- get_commercial_samples("lingcod")
 #' dat_survey <- get_survey_samples("lingcod")
 #' dat <- bind_samples(dat_comm, dat_survey)
 #' }

@@ -13,7 +13,7 @@ tidy_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
 weight_comps(dat)
 }
 \arguments{
-\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_comm_samples]{get_comm_samples()}} for
+\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commercial_samples]{get_commercial_samples()}} for
 commercial data or \code{\link[=get_survey_samples]{get_survey_samples()}} for survey data.}
 
 \item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
@@ -79,7 +79,7 @@ surv_ages
 weight_comps(surv_ages)
 
 ## Commercial:
-# rs_comm_samples <- get_comm_samples(species)
+# rs_comm_samples <- get_commercial_samples(species)
 # rs_catch <- get_catch(species)
 
 com_lengths <- tidy_comps_commercial(rs_comm_samples, rs_catch,

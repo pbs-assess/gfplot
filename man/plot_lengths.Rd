@@ -51,7 +51,7 @@ surveys for a single species.
 \examples{
 \dontrun{
 # # main age/length data:
-# rs_comm_samples <- get_comm_samples("redstripe rockfish")
+# rs_comm_samples <- get_commercial_samples("redstripe rockfish")
 # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #
 # # for weighting:

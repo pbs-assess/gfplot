@@ -3,7 +3,7 @@
 #' For use with data for a single species.
 #'
 #' @param dat Input data frame. Should be from [get_survey_samples()] or
-#'   [get_comm_samples()].
+#'   [get_commercial_samples()].
 #' @param sex Either "male" or "female".
 #' @param method `"mpd"` for the mode of the posterior distribution (with
 #'   [rstan::optimizing()]) or `"mcmc"` for full MCMC sampling with Stan (with
@@ -182,7 +182,7 @@ fit_vb <- function(dat,
 #' For use with data for a single species.
 #'
 #' @param dat Input data frame. Should be from [get_survey_samples()] or
-#'   [get_comm_samples()].
+#'   [get_commercial_samples()].
 #' @param sex Either "male" or "female".
 #' @param downsample If not `Inf` this represents a number of fish specimens to
 #'   sample prior to model fitting. Can be useful for large data sets that you

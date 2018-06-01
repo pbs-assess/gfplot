@@ -30,7 +30,7 @@ Functions specific to PBS:
 fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
 #>  [1] "get_age_methods"       "get_age_precision"    
-#>  [3] "get_catch"             "get_comm_samples"     
+#>  [3] "get_catch"             "get_commercial_samples"     
 #>  [5] "get_cpue_historic"     "get_cpue_index"       
 #>  [7] "get_cpue_spatial"      "get_cpue_spatial_ll"  
 #>  [9] "get_gear_types"        "get_major_areas"      

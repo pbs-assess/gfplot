@@ -8,7 +8,7 @@
 #' samples, respectively, and format it for weighting. `weight_comps()` does the
 #' actual weighting based on the output from the `tidy_*` functions.
 #'
-#' @param specimen_dat Specimen data. E.g. from [get_comm_samples()] for
+#' @param specimen_dat Specimen data. E.g. from [get_commercial_samples()] for
 #' commercial data or [get_survey_samples()] for survey data.
 #' @param catch_dat Catch data. E.g. from [get_catch()].
 #' @param survey_tows Survey tow data. E.g. from [get_survey_samples()].
@@ -64,7 +64,7 @@
 #' weight_comps(surv_ages)
 #'
 #' ## Commercial:
-#' # rs_comm_samples <- get_comm_samples(species)
+#' # rs_comm_samples <- get_commercial_samples(species)
 #' # rs_catch <- get_catch(species)
 #'
 #' com_lengths <- tidy_comps_commercial(rs_comm_samples, rs_catch,

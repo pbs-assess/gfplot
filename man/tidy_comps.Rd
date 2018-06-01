@@ -26,7 +26,7 @@ tidy_comps(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
 \arguments{
 \item{...}{Arguments to pass to \code{tidy_comps()}.}
 
-\item{dat}{The input samples data frame from \code{\link[=get_comm_samples]{get_comm_samples()}} or
+\item{dat}{The input samples data frame from \code{\link[=get_commercial_samples]{get_commercial_samples()}} or
 \code{\link[=get_survey_samples]{get_survey_samples()}}.}
 
 \item{survey}{A character vector of survey names to use. These should match
@@ -84,7 +84,7 @@ bin. E.g. \code{13} with \code{bin_size = 2} would represent a bin from \code{12
 
 # # extract data with get_*() functions:
 # # main age/length data:
-# rs_comm_samples <- get_comm_samples("redstripe rockfish",
+# rs_comm_samples <- get_commercial_samples("redstripe rockfish",
 #   discard_keepers = TRUE)
 # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #

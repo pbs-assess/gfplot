@@ -7,7 +7,7 @@
 bind_samples(dat_comm, dat_survey)
 }
 \arguments{
-\item{dat_comm}{Output from \code{\link[=get_comm_samples]{get_comm_samples()}}}
+\item{dat_comm}{Output from \code{\link[=get_commercial_samples]{get_commercial_samples()}}}
 
 \item{dat_survey}{Output from \code{\link[=get_survey_samples]{get_survey_samples()}}}
 }
@@ -16,7 +16,7 @@ Join survey and commercial samples
 }
 \examples{
 \dontrun{
-dat_comm <- get_comm_samples("lingcod")
+dat_comm <- get_commercial_samples("lingcod")
 dat_survey <- get_survey_samples("lingcod")
 dat <- bind_samples(dat_comm, dat_survey)
 }

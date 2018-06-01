@@ -21,7 +21,7 @@
 #'    plotting survey catchs on a map of British Columbia.
 #' * `get_survey_samples()` extracts all biological sample specimen records
 #'    from research surveys for given species and survey series IDs from GFBio
-#' * `get_comm_samples()` extracts all biological sample specimen records
+#' * `get_commercial_samples()` extracts all biological sample specimen records
 #'    from commercial data for given species from GFBio
 #' * `get_catch()` extracts all landing and discard records for a given species
 #'    from GFFOS.GF_MERGED_CATCH
@@ -56,7 +56,7 @@
 #' (eg. length frequency, growth, age frequency, maturity, etc.)
 #' get_survey_samples(species = 442, ssid = c(1, 3, 4, 16))
 #'
-#' get_comm_samples(c(442, 397))
+#' get_commercial_samples(c(442, 397))
 #'
 #' ## Import catch data by species for barcharts of landings by fishing area,
 #' ## geartype, and year.
@@ -374,7 +374,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 #' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
 #'  and unknown). Default = TRUE.
 #' @rdname get
-get_comm_samples <- function(species, unsorted_only = TRUE) {
+get_commercial_samples <- function(species, unsorted_only = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -392,6 +392,11 @@ get_comm_samples <- function(species, unsorted_only = TRUE) {
   .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
 
   as_tibble(.d)
+}
+
+get_comm_samples <- function(...) {
+  warning("Depreciated: please use get_commercial_samples() instead.")
+  get_commercial_samples(...)
 }
 
 #' @export

@@ -5,7 +5,7 @@
 #' or frequencies in which the samples are weighted. See [weight_comps()] for
 #' details on the weighting procedure.
 #'
-#' @param dat The input samples data frame from [get_comm_samples()] or
+#' @param dat The input samples data frame from [get_commercial_samples()] or
 #'   [get_survey_samples()].
 #' @param survey A character vector of survey names to use. These should match
 #'   the survey abbreviations in GFBio. All of the survey listed here will be
@@ -48,7 +48,7 @@
 #'
 #' # # extract data with get_*() functions:
 #' # # main age/length data:
-#' # rs_comm_samples <- get_comm_samples("redstripe rockfish",
+#' # rs_comm_samples <- get_commercial_samples("redstripe rockfish",
 #' #   discard_keepers = TRUE)
 #' # rs_survey_samples <- get_survey_samples("redstripe rockfish")
 #' #
