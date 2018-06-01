@@ -47,9 +47,11 @@ test_that("firstup() works", {
   expect_equal(firstup("abc"), "Abc")
 })
 
-test_that("round_down_even() works", {
+test_that("round_*_even() works", {
   expect_equal(round_down_even(3), 2)
   expect_equal(round_down_even(4), 4)
+  expect_equal(round_up_even(4), 4)
+  expect_equal(round_up_even(3), 4)
 })
 
 test_that("mround() works", {
@@ -72,4 +74,25 @@ test_that("read_sql works", {
   x <- read_sql("get-catch.sql")
   expect_gte(length(x), 1)
   expect_identical(class(x), "character")
+})
+
+test_that("factor_bin_clean works", {
+  expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 4)))
+  expect_equal(factor_bin_clean(c(1.1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 4)))
+  expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2)), factor(c(0, 2, 2, 2)))
+  expect_equal(factor_bin_clean(c(0, 2, 3), c(0, 2.2)),
+    factor(c("0.0", "0.0", "2.2"), levels = c("0.0", "2.2")))
+})
+
+test_that("ndecimals works", {
+  expect_equal(ndecimals(2.2), 1L)
+  expect_equal(ndecimals(2.57), 2L)
+})
+
+test_that("make_pred_mm works", {
+  expect_equal(make_pred_mm(matrix(1, nrow = 3, ncol = 3), years = 2000:2002),
+    rbind(
+      c(1, 0, 0),
+      c(1, 1, 0),
+      c(1, 0, 1)))
 })

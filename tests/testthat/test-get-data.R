@@ -19,7 +19,7 @@ test_that("get_* data functions work at PBS", {
   d <- get_survey_samples("lingcod", 16)
   expect_type(d$survey_id, "integer")
 
-  d <- get_comm_samples("lingcod")
+  d <- get_commercial_samples("lingcod")
   expect_gte(d$year[[1]], 1900L)
 
   d <- get_cpue_spatial("lingcod")
