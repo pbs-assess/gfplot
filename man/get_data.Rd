@@ -84,7 +84,7 @@ and unknown). Default = TRUE.}
 
 \item{fishing_year}{Specify whether fishing year should be calendar year
 (\code{FALSE}) or by Pacific Cod fishing year (\code{TRUE}) as calendar year for
-<1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
+<1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 21-Feb 20 since Feb 2009.}
 
 \item{end_year}{Specify the last year or fishing year to be extracted.}
