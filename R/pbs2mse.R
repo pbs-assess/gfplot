@@ -140,10 +140,7 @@ tidy_mean_length <- function(dat, unsorted_only = FALSE) {
   if ("sampling_desc" %in% names(dat) && unsorted_only) {
     dat <- filter(dat, sampling_desc == "UNSORTED")
   }
-  dat <- filter(
-    dat, !is.na(sex), !is.na(length),
-    sex %in% 2
-  ) # female only
+  dat <- filter(dat, !is.na(sex), !is.na(length), sex %in% 2) # female only
   group_by(dat, year) %>%
     summarise(n = n(), mean_length = mean(length)) %>%
     ungroup()
@@ -166,10 +163,7 @@ tidy_caa <- function(dat, yrs, unsorted_only = FALSE, interval = 1) {
   if ("sampling_desc" %in% names(dat) && unsorted_only) {
     dat <- filter(dat, sampling_desc == "UNSORTED")
   }
-  dat <- filter(
-    dat, !is.na(sex), !is.na(age),
-    !is.na(weight), sex %in% 2
-  ) # female only
+  dat <- filter(dat, !is.na(sex), !is.na(age), sex %in% 2) # female only
 
   caa <- group_by(dat, year, age) %>%
     summarise(N = n()) %>%
