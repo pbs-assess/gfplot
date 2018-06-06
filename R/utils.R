@@ -186,3 +186,7 @@ make_pred_mm <- function(x, years) {
   }
   mm_pred
 }
+
+logit_perc <- function(a, b, perc = 0.5) {
+  -(log((1 / perc) - 1) + a) / b
+}

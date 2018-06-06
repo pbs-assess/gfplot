@@ -170,10 +170,6 @@ plot_mat_ogive <- function(object,
   #   nd_fe <- filter(nd_fe, !female %in% c(0L, 1L)) # i.e. nothing
   # }
 
-  logit_perc <- function(a, b, perc = 0.5) {
-    -(log((1 / perc) - 1) + a) / b
-  }
-
   m_perc <- data.frame(p0.5 = logit_perc(a = b[[1]], b = b[[2]], perc = 0.5))
   m_perc$p0.95 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.95)
   m_perc$p0.05 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.05)
