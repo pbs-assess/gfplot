@@ -86,7 +86,7 @@ pbs2dlmtool_data <- function(dat, name = "", area = "3[CD]+",
   obj@vbK <- mvb$model$par[["k"]]
   obj@vbLinf <- mvb$model$par[["linf"]]
   obj@vbt0 <- mvb$model$par[["t0"]]
-  obj@LenCV <- mvb$model$par[["sigma"]]
+  obj@LenCV <- sd2cv(mvb$model$par[["sigma"]])
   obj@CV_vbK <- cv[["k"]]
   obj@CV_vbLinf <- cv[["linf"]]
   obj@CV_vbt0 <- cv[["t0"]]
@@ -97,7 +97,7 @@ pbs2dlmtool_data <- function(dat, name = "", area = "3[CD]+",
 
   obj@wla <- exp(stats::coef(mlw$model)[[1L]])
   obj@wlb <- stats::coef(mlw$model)[[2L]]
-  obj@CV_wla <- se[["(Intercept)"]] # log scale
+  obj@CV_wla <- sd2cv(se[["(Intercept)"]]) # log scale
   obj@CV_wlb <- se[["log(length)"]] / stats::coef(mlw$model)[[2L]]
 
   # Mean length timeseries ----------
@@ -204,4 +204,8 @@ delta_method <- function(g, mean, cov) {
   }))
   new.covar <- gdashmu %*% cov %*% t(gdashmu)
   sqrt(diag(new.covar))
+}
+
+sd2cv <- function(.sd) {
+  sqrt(exp(.sd^2) - 1)
 }
