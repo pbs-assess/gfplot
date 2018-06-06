@@ -89,7 +89,7 @@ fit_vb <- function(dat,
   if (!is.null(ageing_method_codes)) {
     dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
   }
-  dat <- dat[!duplicated(dat), , drop = FALSE] # critical
+  dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE]
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
   ql <- quantile(dat$length, probs = too_high_quantile)
   dat <- filter(dat, length <= ql)
@@ -220,7 +220,7 @@ fit_length_weight <- function(dat,
     }
   }
 
-  dat <- dat[!duplicated(dat), , drop = FALSE]
+  dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE]
 
   dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$weight))
   ql <- quantile(dat$length, probs = too_high_quantile)
