@@ -56,7 +56,7 @@ pbs2dlmtool_data <- function(dat, name = "", area = "3[CD]+",
   obj@Year <- catch$year
   obj@t <- length(obj@Cat)
   obj@AvC <- mean(obj@Cat, na.rm = TRUE)
-  obj@CV_Cat <- mean(catch$value, na.rm = TRUE) / sd(catch$value, na.rm = TRUE)
+  obj@CV_Cat <- sd(catch$value, na.rm = TRUE) / mean(catch$value, na.rm = TRUE)
 
   # Index of abundance ----------
   ind <- left_join(all_years, ind, by = "year")
