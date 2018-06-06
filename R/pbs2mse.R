@@ -129,7 +129,7 @@ pbs2dlmtool_data <- function(dat, name = "", area = "3[CD]+",
   obj
 }
 
-# Generate mean the length time series
+# Generate mean-length time series
 #
 # @param dat Commercial or biological samples from [get_commercial_samples()] or
 #   [get_survey_samples()].
@@ -146,7 +146,7 @@ tidy_mean_length <- function(dat, unsorted_only = FALSE) {
     ungroup()
 }
 
-# Generate catch at age or catch at length data
+# Generate catch-at-age or catch-at-length data
 #
 # @param dat Commercial or biological samples from [get_commercial_samples()] or
 #   [get_survey_samples()].
