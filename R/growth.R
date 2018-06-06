@@ -138,7 +138,7 @@ fit_vb <- function(dat,
         N = nrow(dat), age = dat$age, length = dat$length,
         linf_upper_sd = quantile(dat$length, 0.99)[[1]] * 2
       ),
-      init = mpd_init, ...
+      init = mpd_init, hessian = TRUE, ...
     ))
 
     if (m$return_code != 0L) {
