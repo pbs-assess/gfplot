@@ -70,9 +70,12 @@ pbs2dlmtool_data <- function(dat, name = "", area = "3[CD]+",
   )
   m_mat <- fit_mat_ogive(samps, type = "length")
   mat_perc <- extract_maturity_perc(stats::coef(m_mat$model))
+  se_l50 <- delta_method(~ -(log((1/0.5) - 1) + x1 + x3) / (x2 + x4),
+    mean = stats::coef(m_mat$model), cov = stats::vcov(m_mat$model))
 
   obj@L50 <- mat_perc$f.p0.5 # TODO, female only?
   obj@L95 <- mat_perc$f.p0.95
+  obj@CV_L50 <- se_l50 / obj@L50
 
   # VB model ----------
   mvb <- fit_vb(samps, sex = "female")
@@ -187,4 +190,18 @@ tidy_caa <- function(dat, yrs, unsorted_only = FALSE, interval = 1) {
   array(as.numeric(as.matrix(caa)),
     dim = c(1L, nrow(caa), ncol(caa))
   ) # nsim x nyears x MaxAge
+}
+
+delta_method <- function(g, mean, cov) {
+  # simplified from msm::deltamethod
+  cov <- as.matrix(cov)
+  n <- length(mean)
+  g <- list(g)
+  syms <- paste0("x", seq_len(n))
+  for (i in seq_len(n)) assign(syms[i], mean[i])
+  gdashmu <- t(sapply(g, function(form) {
+    as.numeric(attr(eval(deriv(form, syms)), "gradient"))
+  }))
+  new.covar <- gdashmu %*% cov %*% t(gdashmu)
+  sqrt(diag(new.covar))
 }
