@@ -21,6 +21,10 @@ bind_samples <- function(dat_comm, dat_survey) {
 
   dat_comm$data_source <- "commercial"
   dat_survey$data_source <- "survey"
+
+  dat_survey <- dat_survey %>%
+    filter(maturity_code <= maturity_convention_maxvalue)
+
   inter <- intersect(names(dat_comm), names(dat_survey))
   dplyr::bind_rows(
     dat_comm[, inter, drop = FALSE],

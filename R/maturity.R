@@ -32,8 +32,13 @@ fit_mat_ogive <- function(dat,
                           months = seq(1, 12),
                           ageing_method_codes = NULL) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
-  dat <- dat %>% filter(maturity_convention_code != 9) %>%
-    filter(maturity_code <= maturity_convention_maxvalue)
+
+  dat <- dat %>% filter(maturity_convention_code != 9)
+
+  if ("maturity_convention_maxvalue" %in% names(dat)) {
+    dat <- dat %>%
+      filter(maturity_code <= maturity_convention_maxvalue)
+  }
 
   type <- match.arg(type)
   dat <- dat[dat$sex %in% c(1, 2), , drop = FALSE]
