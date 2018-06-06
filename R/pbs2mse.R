@@ -34,7 +34,7 @@ pbs2dlmtool_data <- function(dat, name = "", area = "3[CD]+",
   # Setup ----------
   obj <- methods::new("Data")
   obj@Name <- name
-  obj@Units <- "Tons"
+  obj@Units <- "kg"
 
   dat$commercial_samples <- filter(dat$commercial_samples, year <= max_year)
   dat$survey_samples <- filter(dat$survey_samples, year <= max_year)
