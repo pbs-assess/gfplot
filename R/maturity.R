@@ -285,3 +285,18 @@ plot_mat_ogive <- function(object,
 
   g
 }
+
+extract_maturity_perc <- function(object) {
+  m.p0.5 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.5)
+  m.p0.95 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.95)
+  m.p0.05 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.05)
+
+  f.p0.5 <- logit_perc(a = object[[1]] + object[[3]],
+    b = object[[2]] + object[[4]], perc = 0.5)
+  f.p0.95 <- logit_perc(a = object[[1]] + object[[3]],
+    b = object[[2]] + object[[4]], perc = 0.95)
+  f.p0.05 <- logit_perc(a = object[[1]] + object[[3]],
+    b = object[[2]] + object[[4]], perc = 0.05)
+  list(m.p0.5 = m.p0.5, m.p0.95 = m.p0.95, m.p0.05 = m.p0.05, f.p0.5 = f.p0.5,
+    f.p0.95 = f.p0.95, f.p0.05 = f.p0.05)
+}
