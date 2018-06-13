@@ -9,7 +9,7 @@ plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3, xlim = c(122,
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
   colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "D"),
   rotation_angle = 0, rotation_center = c(500, 5700),
-  fill_lab = "CPUE (kg/hr)")
+  fill_lab = "CPUE (kg/hr)", return_data = FALSE)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
@@ -39,6 +39,8 @@ report to rotate the coast 40 degrees to fit more plots on the page.}
 the coast if it is rotated at all.}
 
 \item{fill_lab}{Label for the color legend.}
+
+\item{return_data}{Logical for whether to return the data instead of the plot.}
 }
 \description{
 Plot a map of commercial CPUE
