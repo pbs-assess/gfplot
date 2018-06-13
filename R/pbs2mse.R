@@ -194,7 +194,7 @@ delta_method <- function(g, mean, cov) {
   syms <- paste0("x", seq_len(n))
   for (i in seq_len(n)) assign(syms[i], mean[i])
   gdashmu <- t(sapply(g, function(form) {
-    as.numeric(attr(eval(deriv(form, syms)), "gradient"))
+    as.numeric(attr(eval(stats::deriv(form, syms)), "gradient"))
   }))
   new.covar <- gdashmu %*% cov %*% t(gdashmu)
   sqrt(diag(new.covar))
