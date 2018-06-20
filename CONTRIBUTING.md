@@ -35,3 +35,19 @@ Some things you can do that will increase the chance that your pull request is a
 * Write tests that pass `devtools::check()`.
 * Follow our [code style guide](http://adv-r.had.co.nz/Style.html).
 * Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+
+## Building the package
+
+Having cloned the repo onto your computer, open R in the `gfplot/` directory and run
+
+   `devtools::build()`
+
+which will (re)build and install the package.
+
+When working on the package (e.g. editing functions) use
+
+   `devtool::load_all()`
+
+which is quicker as it simulates an install but does not put it into your library.
+
+ 
