@@ -147,8 +147,8 @@ details on the weighting procedure.</p>
     </tr>
     <tr>
       <th>dat</th>
-      <td><p>The input samples data frame from <code><a href='get.html'>get_comm_samples()</a></code> or
-<code><a href='get.html'>get_survey_samples()</a></code>.</p></td>
+      <td><p>The input samples data frame from <code><a href='get_data.html'>get_commercial_samples()</a></code> or
+<code><a href='get_data.html'>get_survey_samples()</a></code>.</p></td>
     </tr>
     <tr>
       <th>survey</th>
@@ -177,7 +177,7 @@ area descriptions. The pattern <code>"*"</code> will return all areas. For examp
       <th>ageing_method_codes</th>
       <td><p>A numeric vector of ageing method codes to filter
 on. Default to <code>NULL</code>, which brings in all valid ageing codes.
-See <code><a href='get.html'>get_age_methods()</a></code>.</p></td>
+See <code><a href='get_data.html'>get_age_methods()</a></code>.</p></td>
     </tr>
     <tr>
       <th>bin_size</th>
@@ -198,12 +198,12 @@ value or with weighted samples?</p></td>
     </tr>
     <tr>
       <th>dat_survey_sets</th>
-      <td><p>A data frame from <code><a href='get.html'>get_survey_sets()</a></code>. Needed for
+      <td><p>A data frame from <code><a href='get_data.html'>get_survey_sets()</a></code>. Needed for
 weighted samples if <code>sample_type = "survey"</code>.</p></td>
     </tr>
     <tr>
       <th>dat_catch</th>
-      <td><p>A data frame from <code><a href='get.html'>get_catch()</a></code>. Needed for weighted samples
+      <td><p>A data frame from <code><a href='get_data.html'>get_catch()</a></code>. Needed for weighted samples
 if <code>sample_type = "commercial"</code>.</p></td>
     </tr>
     </table>
@@ -223,7 +223,7 @@ bin. E.g. <code>13</code> with <code>bin_size = 2</code> would represent a bin f
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># # extract data with get_*() functions:</span>
 <span class='co'># # main age/length data:</span>
-<span class='co'># rs_comm_samples &lt;- get_comm_samples("redstripe rockfish",</span>
+<span class='co'># rs_comm_samples &lt;- get_commercial_samples("redstripe rockfish",</span>
 <span class='co'>#   discard_keepers = TRUE)</span>
 <span class='co'># rs_survey_samples &lt;- get_survey_samples("redstripe rockfish")</span>
 <span class='co'>#</span>
