@@ -506,8 +506,6 @@ get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
     ") AND YEAR(BEST_DATE) >= ", min_cpue_year, " AND "
   )
   .d <- run_sql("GFFOS", .q)
-  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
-    toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
   as_tibble(.d)
 }
