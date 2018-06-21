@@ -162,12 +162,12 @@ scale. E.g. <code>sqrt</code> or <code>log</code> or <code>I</code> if you don't
 <span class='no'>d</span>$<span class='no'>n</span>[<span class='fl'>10</span>] <span class='kw'>&lt;-</span> <span class='fl'>0</span> <span class='co'># example zero</span>
 <span class='fu'>plot_sample_avail</span>(<span class='no'>d</span>)</div><div class='img'><img src='plot_sample_avail-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div><span class='co'># NOT RUN {</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
 <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tidy_sample_avail.html'>tidy_sample_avail</a></span>(<span class='no'>d</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1996</span>, <span class='fl'>2016</span>))
 <span class='fu'>plot_sample_avail</span>(<span class='no'>d</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1996</span>, <span class='fl'>2016</span>),
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Survey samples"</span>)
 
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_comm_samples</a></span>(<span class='st'>"lingcod"</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_commercial_samples</a></span>(<span class='st'>"lingcod"</span>)
 <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tidy_sample_avail.html'>tidy_sample_avail</a></span>(<span class='no'>d</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1996</span>, <span class='fl'>2016</span>))
 <span class='fu'>plot_sample_avail</span>(<span class='no'>d</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1996</span>, <span class='fl'>2016</span>),
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Commercial samples"</span>)

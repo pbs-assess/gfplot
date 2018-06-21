@@ -31,14 +31,14 @@ Functions specific to PBS:
 ``` r
 fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
-#>  [1] "get_age_methods"       "get_age_precision"    
-#>  [3] "get_catch"             "get_comm_samples"     
-#>  [5] "get_cpue_historic"     "get_cpue_index"       
-#>  [7] "get_cpue_spatial"      "get_cpue_spatial_ll"  
-#>  [9] "get_gear_types"        "get_major_areas"      
-#> [11] "get_most_common_level" "get_sara_dat"         
-#> [13] "get_ssids"             "get_survey_index"     
-#> [15] "get_survey_samples"    "get_survey_sets"
+#>  [1] "get_age_methods"        "get_age_precision"     
+#>  [3] "get_catch"              "get_commercial_samples"
+#>  [5] "get_cpue_historic"      "get_cpue_index"        
+#>  [7] "get_cpue_spatial"       "get_cpue_spatial_ll"   
+#>  [9] "get_gear_types"         "get_major_areas"       
+#> [11] "get_most_common_level"  "get_sara_dat"          
+#> [13] "get_ssids"              "get_survey_index"      
+#> [15] "get_survey_samples"     "get_survey_sets"
 ```
 
 Generic functions for any similarly formatted data:

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Join survey and commercial samples — bind_samples • gfplot</title>
+<title>Convert groundfish PBS data to a DLMtool data object — pbs2dlmtool_data • gfplot</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -28,9 +28,10 @@
 
 
 
-<meta property="og:title" content="Join survey and commercial samples — bind_samples" />
+<meta property="og:title" content="Convert groundfish PBS data to a DLMtool data object — pbs2dlmtool_data" />
 
-<meta property="og:description" content="Join survey and commercial samples" />
+<meta property="og:description" content="Takes the output from cache_pbs_data() and converts it into a DLMtool data
+object." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -106,45 +107,75 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Join survey and commercial samples</h1>
-    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/bind-samples.R'><code>R/bind-samples.R</code></a></small>
-    <div class="hidden name"><code>bind_samples.Rd</code></div>
+    <h1>Convert groundfish PBS data to a DLMtool data object</h1>
+    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/pbs2mse.R'><code>R/pbs2mse.R</code></a></small>
+    <div class="hidden name"><code>pbs2dlmtool_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Join survey and commercial samples</p>
+    <p>Takes the output from <code><a href='get_data.html'>cache_pbs_data()</a></code> and converts it into a DLMtool data
+object.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>bind_samples</span>(<span class='no'>dat_comm</span>, <span class='no'>dat_survey</span>)</pre>
+    <pre class="usage"><span class='fu'>pbs2dlmtool_data</span>(<span class='no'>dat</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>area</span> <span class='kw'>=</span> <span class='st'>"3[CD]+"</span>, <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN WCVI"</span>,
+  <span class='kw'>max_year</span> <span class='kw'>=</span> <span class='fl'>2017</span>, <span class='kw'>min_mean_length</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>length_bin_interval</span> <span class='kw'>=</span> <span class='fl'>2</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dat_comm</th>
-      <td><p>Output from <code><a href='get_data.html'>get_commercial_samples()</a></code></p></td>
+      <th>dat</th>
+      <td><p>A list object output from <code><a href='get_data.html'>cache_pbs_data()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>dat_survey</th>
-      <td><p>Output from <code><a href='get_data.html'>get_survey_samples()</a></code></p></td>
+      <th>name</th>
+      <td><p>A name for the stock.</p></td>
+    </tr>
+    <tr>
+      <th>area</th>
+      <td><p>The groundfish and statistical area to subset the catch by.</p></td>
+    </tr>
+    <tr>
+      <th>survey</th>
+      <td><p>A survey abbreviation to include as the relative index of
+abundance.</p></td>
+    </tr>
+    <tr>
+      <th>max_year</th>
+      <td><p>The most recent year of data to include.</p></td>
+    </tr>
+    <tr>
+      <th>min_mean_length</th>
+      <td><p>The minimum number of samples to include a mean length
+measurement for a given year.</p></td>
+    </tr>
+    <tr>
+      <th>length_bin_interval</th>
+      <td><p>An interval for the length bins.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>An S4 object of class DLMtool Data.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>dat_comm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_commercial_samples</a></span>(<span class='st'>"lingcod"</span>)
-<span class='no'>dat_survey</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
-<span class='no'>dat</span> <span class='kw'>&lt;-</span> <span class='fu'>bind_samples</span>(<span class='no'>dat_comm</span>, <span class='no'>dat_survey</span>)
+<span class='fu'><a href='get_data.html'>cache_pbs_data</a></span>(<span class='st'>"pacific ocean perch"</span>, <span class='kw'>unsorted_only</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>readRDS</span>(<span class='st'>"pacific-ocean-perch.rds"</span>)
+<span class='fu'>pbs2dlmtool_data</span>(<span class='no'>d</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
+      
+      <li><a href="#value">Value</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

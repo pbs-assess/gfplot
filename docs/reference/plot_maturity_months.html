@@ -128,8 +128,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>dat</th>
-      <td><p>For <code>tidy_maturity_months()</code>, data from <code><a href='get.html'>get_survey_samples()</a></code>
-or <code><a href='get.html'>get_comm_samples()</a></code> or <code><a href='bind_samples.html'>bind_samples()</a></code>. For <code>plot_maturity_months()</code>,
+      <td><p>For <code>tidy_maturity_months()</code>, data from <code><a href='get_data.html'>get_survey_samples()</a></code>
+or <code><a href='get_data.html'>get_commercial_samples()</a></code> or <code><a href='bind_samples.html'>bind_samples()</a></code>. For <code>plot_maturity_months()</code>,
 data from <code>tidy_maturity_months()</code>.</p></td>
     </tr>
     <tr>
@@ -173,7 +173,7 @@ bin.</p></td>
     <pre class="examples"><div class='input'><span class='co'># pop_samples &lt;- get_survey_samples("pacific ocean perch")</span>
 <span class='fu'>tidy_maturity_months</span>(<span class='no'>pop_samples</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>plot_maturity_months</span>()</div><div class='img'><img src='plot_maturity_months-1.png' alt='' width='700' height='433' /></div><span class='co'># NOT RUN {</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
 <span class='fu'>tidy_maturity_months</span>(<span class='no'>d</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>plot_maturity_months</span>()
 <span class='co'># }</span></pre>

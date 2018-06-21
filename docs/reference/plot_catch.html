@@ -128,7 +128,7 @@
     <tr>
       <th>dat</th>
       <td><p>Input data frame. For <code>tidy_catch()</code> should be from
-<code><a href='get.html'>get_catch()</a></code>. For <code>plot_catch()</code> should be from <code><a href='tidy_comps.html'>tidy_ages_raw()</a></code> or be
+<code><a href='get_data.html'>get_catch()</a></code>. For <code>plot_catch()</code> should be from <code><a href='tidy_comps.html'>tidy_ages_raw()</a></code> or be
 formatted similarly. See details.</p></td>
     </tr>
     <tr>
@@ -179,7 +179,7 @@ or multiple species.</p></li>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_catch</a></span>(<span class='st'>"lingcod"</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_catch</a></span>(<span class='st'>"lingcod"</span>)
 <span class='fu'>tidy_catch</span>(<span class='no'>d</span>, <span class='kw'>areas</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"5[CDE]+"</span>, <span class='st'>"5[AB]+"</span>, <span class='st'>"3[CD]+"</span>)) <span class='kw'>%&gt;%</span>
   <span class='fu'>plot_catch</span>()
 
