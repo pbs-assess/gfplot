@@ -50,4 +50,8 @@ When working on the package (e.g. editing functions) use
 
 which is quicker as it simulates an install but does not put it into your library.
 
+First check that the examples work, then to download all the PBS data (as long as you have access to the SQL server) use
+
+   `cache_pbs_data()`
+
  
