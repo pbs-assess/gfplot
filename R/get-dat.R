@@ -21,7 +21,7 @@
 #'    plotting survey catchs on a map of British Columbia.
 #' * `get_survey_samples()` extracts all biological sample specimen records
 #'    from research surveys for given species and survey series IDs from GFBio
-#' * `get_comm_samples()` extracts all biological sample specimen records
+#' * `get_commercial_samples()` extracts all biological sample specimen records
 #'    from commercial data for given species from GFBio
 #' * `get_catch()` extracts all landing and discard records for a given species
 #'    from GFFOS.GF_MERGED_CATCH
@@ -45,8 +45,6 @@
 #' `get_*` functions only extract data when performed on a computer connected to
 #' the Pacific Biological Station DFO network.
 #'
-#' @family get data functions
-#'
 #' @examples
 #' \dontrun{
 #' ## Import survey catch density and location data by tow or set for plotting
@@ -58,7 +56,7 @@
 #' (eg. length frequency, growth, age frequency, maturity, etc.)
 #' get_survey_samples(species = 442, ssid = c(1, 3, 4, 16))
 #'
-#' get_comm_samples(c(442, 397))
+#' get_commercial_samples(c(442, 397))
 #'
 #' ## Import catch data by species for barcharts of landings by fishing area,
 #' ## geartype, and year.
@@ -89,11 +87,11 @@
 #' @param ssid A numeric vector of survey series IDs. Run [get_ssids()] for a
 #'   look-up table of available survey series IDs with surveys series
 #'   descriptions.
-#' @name get
+#' @name get_data
 NULL
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_ssids <- function() {
   .d <- run_sql(
     "GFBioSQL",
@@ -113,7 +111,7 @@ get_ssids <- function() {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_major_areas <- function() {
   .d <- run_sql(
     "GFFOS",
@@ -126,7 +124,7 @@ get_major_areas <- function() {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_gear_types <- function() {
   .d <- run_sql(
     "GFFOS",
@@ -140,7 +138,7 @@ get_gear_types <- function() {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_age_methods <- function() {
   .d <- DBI::dbGetQuery(
     db_connection(database = "GFBioSQL"),
@@ -190,9 +188,9 @@ get_survey_ids <- function(ssid) {
 #'   different survey stratifications.
 #' @param verbose If `TRUE` then extra messages were reprinted during data
 #'   extraction. Useful to monitor progress.
-#' @rdname get
+#' @rdname get_data
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
-                            join_sample_ids = FALSE, verbose = FALSE) {
+  join_sample_ids = FALSE, verbose = FALSE) {
   trawl <- run_sql("GFBioSQL", "SELECT
     S.SURVEY_SERIES_ID
     FROM SURVEY_SERIES SS
@@ -322,7 +320,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
@@ -340,7 +338,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
 
-    if (unsorted_only) {
+  if (unsorted_only) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
   }
 
@@ -359,14 +357,14 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
-      .d$species_common_name == "north pacific spiny dogfish"), ]
+        .d$species_common_name == "north pacific spiny dogfish"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "big skate"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "longnose skate"), ]
     .d <- .d[!(.d$length > 60 & .d$species_common_name == "pacific tomcod"), ]
     .d <- .d[!(.d$length > 50 &
-      .d$species_common_name == "quillback-rockfish"), ]
+        .d$species_common_name == "quillback-rockfish"), ]
     .d <- .d[!(.d$length < 10 & .d$weight / 1000 > 1.0 &
-      .d$species_common_name == "pacific flatnose"), ]
+        .d$species_common_name == "pacific flatnose"), ]
   }
 
   as_tibble(.d)
@@ -375,8 +373,8 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 #' @export
 #' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
 #'  and unknown). Default = TRUE.
-#' @rdname get
-get_comm_samples <- function(species, unsorted_only = TRUE) {
+#' @rdname get_data
+get_commercial_samples <- function(species, unsorted_only = TRUE) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -396,8 +394,13 @@ get_comm_samples <- function(species, unsorted_only = TRUE) {
   as_tibble(.d)
 }
 
+get_comm_samples <- function(...) {
+  warning("Depreciated: please use get_commercial_samples() instead.")
+  get_commercial_samples(...)
+}
+
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_catch <- function(species) {
   .q <- read_sql("get-catch.sql")
   .q <- inject_filter("WHERE SP.SPECIES_CODE IN", species, sql_code = .q)
@@ -414,10 +417,10 @@ get_catch <- function(species) {
 #' @export
 #' @param fishing_year Specify whether fishing year should be calendar year
 #'   (`FALSE`) or by Pacific Cod fishing year (`TRUE`) as calendar year for
-#'   <1997, Apr 1-Mar 31 for Apr 1997- Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
+#'   <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 #'   21-Feb 20 since Feb 2009.
 #' @param end_year Specify the last year or fishing year to be extracted.
-#' @rdname get
+#' @rdname get_data
 get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
   .q <- read_sql("get-cpue-historic.sql")
   .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
@@ -460,7 +463,7 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_cpue_spatial <- function(species) {
   .q <- read_sql("get-cpue-spatial.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
@@ -474,7 +477,7 @@ get_cpue_spatial <- function(species) {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_cpue_spatial_ll <- function(species) {
   .q <- read_sql("get-cpue-spatial-ll.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
@@ -494,7 +497,7 @@ get_cpue_spatial_ll <- function(species) {
 #'  gear types to select from.
 #' @param min_cpue_year Minimum year for the CPUE data.
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
   .q <- read_sql("get-cpue-index.sql")
   i <- grep("-- insert filters here", .q)
@@ -503,12 +506,14 @@ get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
     ") AND YEAR(BEST_DATE) >= ", min_cpue_year, " AND "
   )
   .d <- run_sql("GFFOS", .q)
+  .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
+    toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
   as_tibble(.d)
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_age_precision <- function(species) {
   .q <- read_sql("get-age-precision.sql")
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, .q)
@@ -519,7 +524,7 @@ get_age_precision <- function(species) {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_survey_index <- function(species, ssid = NULL) {
   .q <- read_sql("get-survey-index.sql")
   .q <- inject_filter("WHERE SP.SPECIES_CODE IN", species, .q)
@@ -536,7 +541,7 @@ get_survey_index <- function(species, ssid = NULL) {
 }
 
 #' @export
-#' @rdname get
+#' @rdname get_data
 get_sara_dat <- function() {
   .h <- xml2::read_html(
     "http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm"
@@ -558,57 +563,63 @@ get_sara_dat <- function() {
 #' @param path The folder where the cached data will be saved.
 #' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
 #'   reading and writing at the expense of disk space.
+#' @param historic_cpue Logical for whether historical CPUE should be included.
 #' @param survey_sets Logical for whether the survey set data should be
 #'   extracted. You might set this to `FALSE` if you don't need these data and
 #'   you want to substantially speed up data extraction.
 #' @export
-#' @rdname get
-cache_pbs_data <- function(species, path = "data-cache", compress = FALSE,
-                           min_cpue_year = 1996, unsorted_only = TRUE,
-                           survey_sets = TRUE, verbose = TRUE) {
-  if (!sql_server_accessible()) {
-    stop("Not on a PBS windows machine. Cannot access data.")
-  }
+#' @return The `get_*` functions return a data frame. The [cache_pbs_data()]
+#' function writes an `.rds` file to `path` for each specified species. A data
+#' object for a single species is a named list object with each element
+#' containing a data frame from a `get_*` function. The element name of the list
+#' reflects the function name with the `get_` part removed. For example, the
+#' output from [get_survey_samples()] is in a list element named
+#' `survey_samples()`.
+#' @details
+#' This [cache_pbs_data()] function caches data from
+#' * [get_survey_samples()]
+#' * [get_commercial_samples()]
+#' * [get_catch()]
+#' * [get_cpue_spatial()]
+#' * [get_cpue_spatial_ll()]
+#' * [get_survey_index()]
+#' * [get_age_precision()]
+#' * and optionally from [get_survey_sets()] and [get_cpue_historic()]
 
+#' @rdname get_data
+cache_pbs_data <- function(species, path = ".", compress = FALSE,
+  unsorted_only = TRUE, historic_cpue = FALSE,
+  survey_sets = FALSE, verbose = TRUE) {
+
+  if (!sql_server_accessible()) {
+    stop("Not on a PBS machine. Cannot access data.")
+  }
   dir.create(path, showWarnings = FALSE)
 
-  if (survey_sets){
-    d_survs_df <- get_survey_sets(species, join_sample_ids = TRUE, verbose = verbose)
-    saveRDS(d_survs_df, file = file.path(path, "pbs-survey-sets.rds"),
-            compress = compress)
+  for (sp_i in seq_along(species)) {
+    this_sp <- species[[sp_i]]
+    this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+    message("Extracting data for ", this_sp)
+
+    out <- list()
+    if (survey_sets){
+      out$survey_sets      <- get_survey_sets(this_sp, join_sample_ids = TRUE,
+        verbose = verbose)
+    }
+    if (historic_cpue) {
+      out$cpue_historic    <- get_cpue_historic(this_sp)
+    }
+    out$survey_samples     <- get_survey_samples(this_sp)
+    out$commercial_samples <- get_commercial_samples(this_sp, unsorted_only = unsorted_only)
+    out$catch              <- get_catch(this_sp)
+    out$cpue_spatial       <- get_cpue_spatial(this_sp)
+    out$cpue_spatial_ll    <- get_cpue_spatial_ll(this_sp)
+    out$survey_index       <- get_survey_index(this_sp)
+    out$age_precision      <- get_age_precision(this_sp)
+
+    saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
+      compress = compress)
   }
-
-  d <- get_survey_samples(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-samples.rds"),
-    compress = compress)
-
-  d <- get_comm_samples(species, unsorted_only = unsorted_only)
-  saveRDS(d, file = file.path(path, "pbs-comm-samples.rds"),
-    compress = compress)
-
-  d <- get_catch(species)
-  saveRDS(d, file = file.path(path, "pbs-catch.rds"),
-    compress = compress)
-
-  d <- get_cpue_spatial(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue-spatial.rds"),
-    compress = compress)
-
-  d <- get_cpue_spatial_ll(species)
-  saveRDS(d, file = file.path(path, "pbs-cpue-spatial-ll.rds"),
-    compress = compress)
-
-  d <- get_survey_index(species)
-  saveRDS(d, file = file.path(path, "pbs-survey-index.rds"),
-    compress = compress)
-
-  d <- get_age_precision(species)
-  saveRDS(d, file = file.path(path, "pbs-age-precision.rds"),
-    compress = compress)
-
-  d <- get_cpue_index(gear = "bottom trawl", min_cpue_year)
-  saveRDS(d, file = file.path(path, "pbs-cpue-index.rds"),
-    compress = compress)
 
   message("All data extracted and saved in the folder `", path, "`.")
 }
