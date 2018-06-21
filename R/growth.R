@@ -118,7 +118,8 @@ fit_vb <- function(dat,
     model_file <- system.file("stan", "vb.stan", package = "gfplot")
   }
 
-  mod <- rstan::stan_model(model_file)
+  vb_mod_gfplot <- rstan::stan_model(model_file)
+  assign("vb_mod_gfplot", vb_mod_gfplot, envir = globalenv())
 
   if (nrow(dat) > downsample) {
     dat <- dat[sample(seq_len(nrow(dat)), downsample), , drop = FALSE]
@@ -133,7 +134,7 @@ fit_vb <- function(dat,
       sigma = runif(1, 0.1, 0.2)
     )
 
-    m <- suppressMessages(rstan::optimizing(mod,
+    m <- suppressMessages(rstan::optimizing(vb_mod_gfplot,
       data = list(
         N = nrow(dat), age = dat$age, length = dat$length,
         linf_upper_sd = quantile(dat$length, 0.99)[[1]] * 2
@@ -156,7 +157,7 @@ fit_vb <- function(dat,
       )
     }
 
-    m <- rstan::sampling(mod,
+    m <- rstan::sampling(vb_mod_gfplot,
       data = list(
         N = nrow(dat), age = dat$age, length = dat$length,
         linf_upper_sd = quantile(dat$length, 0.99)[[1]] * 2

@@ -16,6 +16,7 @@
 #' @param rotation_center The center in UTM coordinates around which to rotate
 #'   the coast if it is rotated at all.
 #' @param fill_lab Label for the color legend.
+#' @param return_data Logical for whether to return the data instead of the plot.
 #'
 #' @export
 #' @importFrom utils data
@@ -42,7 +43,8 @@ plot_cpue_spatial <-
              colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "D"),
              rotation_angle = 0,
              rotation_center = c(500, 5700),
-             fill_lab = "CPUE (kg/hr)") {
+             fill_lab = "CPUE (kg/hr)",
+             return_data = FALSE) {
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
     plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
@@ -93,56 +95,59 @@ plot_cpue_spatial <-
       # Stopping because the privacy rule might not remain valid in this case.
 
       gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
-
-      if (nrow(gdat) == 0) {
-        plot_hexagons <- FALSE
+      if (return_data) {
+        return(gdat)
       } else {
-        # compute hexagon x-y coordinates for geom_polygon()
-        dx <- ggplot2::resolution(gdat$x, FALSE)
-        dy <- ggplot2::resolution(gdat$y, FALSE) / 2 * 1.15
-        public_dat <- lapply(seq_len(nrow(gdat)), function(i)
-          data.frame(
-            hex_id = i, cpue = gdat[i, "value"],
-            hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy)
-          )) %>%
-          bind_rows()
+        if (nrow(gdat) == 0) {
+          plot_hexagons <- FALSE
+        } else {
+          # compute hexagon x-y coordinates for geom_polygon()
+          dx <- ggplot2::resolution(gdat$x, FALSE)
+          dy <- ggplot2::resolution(gdat$y, FALSE) / 2 * 1.15
+          public_dat <- lapply(seq_len(nrow(gdat)), function(i)
+            data.frame(
+              hex_id = i, cpue = gdat[i, "value"],
+              hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy)
+            )) %>%
+            bind_rows()
+        }
       }
+
+      # rotate if needed:
+      isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
+      coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
+
+
+      g <- ggplot()
+
+      if (plot_hexagons) {
+        public_dat$X <- public_dat$x
+        public_dat$Y <- public_dat$y
+        public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
+        g <- g + geom_polygon(data = public_dat, aes_string(
+          x = "X", y = "Y",
+          fill = "cpue", colour = "cpue", group = "hex_id"
+        ), inherit.aes = FALSE) + fill_scale + colour_scale
+      }
+
+      g <- g + geom_path(
+        data = isobath_utm, aes_string(
+          x = "X", y = "Y",
+          group = "paste(PID, SID)"
+        ),
+        inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+      )
+
+      g <- g + geom_polygon(
+        data = coastline_utm,
+        aes_string(x = "X", y = "Y", group = "PID"),
+        inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70"
+      ) +
+        coord_equal(xlim = xlim, ylim = ylim) +
+        theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
+
+      g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
     }
-
-    # rotate if needed:
-    isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
-    coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
-
-    g <- ggplot()
-
-    if (plot_hexagons) {
-      public_dat$X <- public_dat$x
-      public_dat$Y <- public_dat$y
-      public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
-      g <- g + geom_polygon(data = public_dat, aes_string(
-        x = "X", y = "Y",
-        fill = "cpue", colour = "cpue", group = "hex_id"
-      ), inherit.aes = FALSE) + fill_scale + colour_scale
-    }
-
-    g <- g + geom_path(
-      data = isobath_utm, aes_string(
-        x = "X", y = "Y",
-        group = "paste(PID, SID)"
-      ),
-      inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
-    )
-
-    g <- g + geom_polygon(
-      data = coastline_utm,
-      aes_string(x = "X", y = "Y", group = "PID"),
-      inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70"
-    ) +
-      coord_equal(xlim = xlim, ylim = ylim) +
-      theme_pbs() + labs(fill = fill_lab, y = "Northing", x = "Easting")
-
-    g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
-    g
   }
 
 hex_coords <- function(x, y, unitcell_x = 1, unitcell_y = 1) {
