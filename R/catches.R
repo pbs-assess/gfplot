@@ -10,7 +10,7 @@
 #' (containing catches or landings).
 #'
 #' @param dat Input data frame. For `tidy_catch()` should be from
-#' [get_catch()]. For `plot_catch()` should be from `tidy_ages_raw()` or be
+#' [get_catch()]. For `plot_catch()` should be from `tidy_catch()` or be
 #' formatted similarly. See details.
 #' @param areas Fisheries and Oceans major statistical areas (eg.
 #'  3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
