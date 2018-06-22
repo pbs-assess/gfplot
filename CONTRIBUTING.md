@@ -38,7 +38,9 @@ Some things you can do that will increase the chance that your pull request is a
 
 ## Building the package
 
-Having cloned the repo onto your computer, open R in the `gfplot/` directory and run
+The best resource on developing R packages is <http://r-pkgs.had.co.nz/>.
+
+Having cloned the repository onto your computer, open R in the `gfplot/` directory (if you open the `gfplot.Rproj` file in RStudio your working directory will be automatically set) and run:
 
 ```r
 devtools::install()
@@ -46,7 +48,7 @@ devtools::install()
 
 which will (re)build and install the package.
 
-When working on the package (e.g. editing functions) use
+When working on the package (e.g. editing functions) use:
 
 
 ```r
@@ -61,7 +63,7 @@ If you've added a new function or edited documentation and then the run
 devtool::document()
 ```
 
-To rebuild the documentation files.
+to rebuild the documentation files.
 
 To also update the [online version of the documentation](https://pbs-assess.github.io/gfplot/index.html), run
 
