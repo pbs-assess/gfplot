@@ -30,16 +30,8 @@
 #'   [rstan::optimizing()].
 #' @importFrom stats median quantile rlnorm runif median
 #'
-#' @details Note that in some cases you must load the rstan package first and
-#'   you may choose to do so just in case. If the rstan package is not loaded
-#'   first, you may get the warning:
-#'
-#' `Error in cpp_object_initializer(.self, .refClassDef, ...) :`
-#' `could not find function "cpp_object_initializer"`
-#'
 #' @export
 #' @examples
-#' library(rstan) # must load first
 #' # with `rstan::optimizing()` for the mode of the posterior density:
 #' model_f <- fit_vb(pop_samples, sex = "female")
 #' model_m <- fit_vb(pop_samples, sex = "male")
