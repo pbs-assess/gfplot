@@ -29,12 +29,16 @@
 #'
 #' @importFrom INLA inla.models inla.reorderings
 
-fit_inla <- function(dat, response = "present", n_knots = 50,
-                     family = "binomial", max_edge = c(20, 100),
+fit_inla <- function(dat, response = "present",
+                     n_knots = 50,
+                     family = "binomial",
+                     max_edge = c(20, 100),
                      kmeans = FALSE,
-                     plot = FALSE, fit_model = TRUE,
+                     plot = FALSE,
+                     fit_model = TRUE,
                      extend = list(n = 8, offset = -0.1),
-                     offset = c(5, 25), cutoff = 10,
+                     offset = c(5, 25),
+                     cutoff = 10,
                      include_depth = TRUE,
                      verbose = FALSE,
                      debug = FALSE,

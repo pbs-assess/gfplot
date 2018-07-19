@@ -47,10 +47,10 @@ survey_boundaries <- out_syn
 usethis::use_data(survey_boundaries, internal = FALSE, overwrite = TRUE)
 
 library(rgdal)
-setwd("inst/extdata/PHMA_MASTER_GRID_2018_UTM9/")
+setwd("inst/extdata/HBLL-N-S/")
 shape <- rgdal::readOGR(
   dsn = ".",
-  layer = "PHMA_MASTER_GRID_2018_UTM9", verbose = FALSE)
+  layer = "PHMA_N_GRID", verbose = FALSE)
 plot(shape)
 head(shape@data)
 
@@ -60,10 +60,23 @@ hbll_grid <- select(shape@data, LONGITUDE, LATITUDE, DEPTH_M) %>%
 hbll_grid <- mutate(hbll_grid, depth = -depth) %>%
   filter(depth > 0)
 setwd("../../../")
+hbll_n_grid <- list(grid = hbll_grid, cell_area = 2.0)
+usethis::use_data(hbll_n_grid, internal = FALSE, overwrite = TRUE)
 
-hbll_grid <- list(grid = hbll_grid, cell_area = 2.0)
+# South:
+setwd("inst/extdata/HBLL-N-S/")
+shape <- rgdal::readOGR(
+  dsn = ".",
+  layer = "PHMA_S_GRID", verbose = FALSE)
+plot(shape)
+hbll_grid <- select(shape@data, LONGITUDE, LATITUDE, DEPTH_M) %>%
+  rename(X = LONGITUDE, Y = LATITUDE, depth = DEPTH_M)
+hbll_grid <- mutate(hbll_grid, depth = -depth) %>%
+  filter(depth > 0)
+setwd("../../../")
+hbll_s_grid <- list(grid = hbll_grid, cell_area = 2.0)
+usethis::use_data(hbll_s_grid, internal = FALSE, overwrite = TRUE)
 
-usethis::use_data(hbll_grid, internal = FALSE, overwrite = TRUE)
 #
 #
 # ####
