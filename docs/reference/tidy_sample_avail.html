@@ -124,7 +124,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>dat</th>
-      <td><p>Input data frame from <code><a href='get.html'>get_survey_samples()</a></code>.</p></td>
+      <td><p>Input data frame from <code><a href='get_data.html'>get_survey_samples()</a></code>.</p></td>
     </tr>
     <tr>
       <th>year_range</th>
@@ -136,17 +136,17 @@ include.</p></td>
       <th>ageing_method_codes</th>
       <td><p>A numeric vector of ageing method codes to filter
 on. Default to <code>NULL</code>, which brings in all valid ageing codes.
-See <code><a href='get.html'>get_age_methods()</a></code>.</p></td>
+See <code><a href='get_data.html'>get_age_methods()</a></code>.</p></td>
     </tr>
     </table>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_survey_samples</a></span>(<span class='st'>"lingcod"</span>)
 <span class='fu'>tidy_sample_avail</span>(<span class='no'>d</span>)
 
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get.html'>get_comm_samples</a></span>(<span class='st'>"lingcod"</span>)
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_commercial_samples</a></span>(<span class='st'>"lingcod"</span>)
 <span class='fu'>tidy_sample_avail</span>(<span class='no'>d</span>)
 <span class='co'># }</span></pre>
   </div>

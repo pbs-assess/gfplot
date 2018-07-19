@@ -7,11 +7,11 @@ agree to abide by our [code of conduct](CONDUCT.md).
 
 * Make sure you have a [GitHub account](https://github.com/signup/free). If you are not familar with git and GitHub, take a look at <http://happygitwithr.com/> to get started.
 * [Submit a post for your issue](https://github.com/pbs-assess/gfplot/issues/), assuming one does not already exist.
-  * Clearly describe your issue, including steps to reproduce when it is a bug, or some justification for a proposed improvement.
+* Clearly describe your issue, including steps to reproduce when it is a bug, or some justification for a proposed improvement.
 * [Fork](https://github.com/pbs-assess/gfplot/#fork-destination-box) the repository on GitHub to make a copy of the repository on your account. Or use this line in your shell terminal:
 
     `git clone git@github.com:your-username/gfplot.git`
-    
+
 ## Making changes
 
 * Edit the files, save often, and make commits of logical units, where each commit indicates one concept
@@ -38,16 +38,43 @@ Some things you can do that will increase the chance that your pull request is a
 
 ## Building the package
 
-Having cloned the repo onto your computer, open R in the `gfplot/` directory and run
+The best resource on developing R packages is <http://r-pkgs.had.co.nz/>.
 
-   `devtools::build()`
+Having cloned the repository onto your computer, open R in the `gfplot/` directory (if you open the `gfplot.Rproj` file in RStudio your working directory will be automatically set) and run:
+
+```r
+devtools::install()
+```
 
 which will (re)build and install the package.
 
-When working on the package (e.g. editing functions) use
+When working on the package (e.g. editing functions) use:
 
-   `devtool::load_all()`
 
-which is quicker as it simulates an install but does not put it into your library.
+```r
+devtool::load_all()
+```
 
- 
+which is quicker as it simulates an install but does not put it into your permanent library.
+
+If you've added a new function or edited documentation and then the run
+
+```r
+devtool::document()
+```
+
+to rebuild the documentation files.
+
+To also update the [online version of the documentation](https://pbs-assess.github.io/gfplot/index.html), run
+
+```r
+pkgdown::build_site()
+```
+
+To download all the PBS data for specific species (as long as you have access to the SQL servers) use
+
+```r
+gfplot::cache_pbs_data("lingcod")
+```
+
+replacing the species with your species of interest.

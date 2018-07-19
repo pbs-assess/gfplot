@@ -91,20 +91,22 @@
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
 <p>The gfplot package is <em>not</em> ready for use yet. In particular, the documentation is far from complete. However, it can be installed and loaded with:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"pbs-assess/gfplot"</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(<span class="st">"gfplot"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># install.packages("remotes")</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">"INLA"</span>, <span class="dt">repos =</span> <span class="kw">c</span>(<span class="kw">getOption</span>(<span class="st">"repos"</span>), </a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="dt">INLA =</span> <span class="st">"https://inla.r-inla-download.org/R/stable"</span>), <span class="dt">dep =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">remotes<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"pbs-assess/gfplot"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(gfplot)</a></code></pre></div>
 <p>Functions specific to PBS:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">fns &lt;-<span class="st"> </span><span class="kw">ls</span>(<span class="st">"package:gfplot"</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">sort</span>(fns[<span class="kw">grepl</span>(<span class="st">"get"</span>, fns)])</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;  [1] "get_age_methods"       "get_age_precision"    </span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;  [3] "get_catch"             "get_comm_samples"     </span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;  [5] "get_cpue_historic"     "get_cpue_index"       </span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;  [7] "get_cpue_spatial"      "get_cpue_spatial_ll"  </span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;  [9] "get_gear_types"        "get_major_areas"      </span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; [11] "get_most_common_level" "get_sara_dat"         </span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; [13] "get_ssids"             "get_survey_index"     </span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; [15] "get_survey_samples"    "get_survey_sets"</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;  [1] "get_age_methods"        "get_age_precision"     </span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;  [3] "get_catch"              "get_commercial_samples"</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;  [5] "get_cpue_historic"      "get_cpue_index"        </span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;  [7] "get_cpue_spatial"       "get_cpue_spatial_ll"   </span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;  [9] "get_gear_types"         "get_major_areas"       </span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; [11] "get_most_common_level"  "get_sara_dat"          </span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; [13] "get_ssids"              "get_survey_index"      </span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; [15] "get_survey_samples"     "get_survey_sets"</span></a></code></pre></div>
 <p>Generic functions for any similarly formatted data:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">sort</span>(fns[<span class="kw">grepl</span>(<span class="st">"tidy"</span>, fns)])</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt;  [1] "tidy_age_precision"    "tidy_ages_raw"        </span></a>

@@ -140,12 +140,12 @@ actual weighting based on the output from the <code>tidy_*</code> functions.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>specimen_dat</th>
-      <td><p>Specimen data. E.g. from <code><a href='get.html'>get_comm_samples()</a></code> for
-commercial data or <code><a href='get.html'>get_survey_samples()</a></code> for survey data.</p></td>
+      <td><p>Specimen data. E.g. from <code><a href='get_data.html'>get_commercial_samples()</a></code> for
+commercial data or <code><a href='get_data.html'>get_survey_samples()</a></code> for survey data.</p></td>
     </tr>
     <tr>
       <th>catch_dat</th>
-      <td><p>Catch data. E.g. from <code><a href='get.html'>get_catch()</a></code>.</p></td>
+      <td><p>Catch data. E.g. from <code><a href='get_data.html'>get_catch()</a></code>.</p></td>
     </tr>
     <tr>
       <th>value</th>
@@ -158,7 +158,7 @@ commercial data or <code><a href='get.html'>get_survey_samples()</a></code> for 
     </tr>
     <tr>
       <th>survey_tows</th>
-      <td><p>Survey tow data. E.g. from <code><a href='get.html'>get_survey_samples()</a></code>.</p></td>
+      <td><p>Survey tow data. E.g. from <code><a href='get_data.html'>get_survey_samples()</a></code>.</p></td>
     </tr>
     <tr>
       <th>dat</th>
@@ -217,7 +217,7 @@ in British Columbia. CSAS Res. Doc. 2016/009.
 <span class='fu'>weight_comps</span>(<span class='no'>surv_ages</span>)
 
 <span class='co'>## Commercial:</span>
-<span class='co'># rs_comm_samples &lt;- get_comm_samples(species)</span>
+<span class='co'># rs_comm_samples &lt;- get_commercial_samples(species)</span>
 <span class='co'># rs_catch &lt;- get_catch(species)</span>
 
 <span class='no'>com_lengths</span> <span class='kw'>&lt;-</span> <span class='fu'>tidy_comps_commercial</span>(<span class='no'>rs_comm_samples</span>, <span class='no'>rs_catch</span>,

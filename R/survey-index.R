@@ -1,3 +1,31 @@
+# calc_bio <- function(dat, i = seq_len(nrow(dat))) {
+#   dat[i, , drop = FALSE] %>%
+#     group_by(year, survey_id, area_km2, grouping_code) %>%
+#     summarise(density = mean(density_kgpm2 * 1e6)) %>%
+#     group_by(year) %>%
+#     summarise(biomass = sum(density * area_km2)) %>%
+#     pull(biomass)
+# }
+#
+# boot_biomass <- function(dat, reps = 100) {
+#   out <- dat %>%
+#     group_by(year, species_common_name, survey_series_desc) %>%
+#     do({
+#       b <- boot::boot(., statistic = calc_bio, strata = .$grouping_code, R = reps)
+#       suppressWarnings(bci <- boot::boot.ci(b, type = "perc"))
+#       tibble::tibble(
+#         mean_boot = mean(b$t),
+#         median_boot = median(b$t),
+#         lwr = bci$percent[[4]],
+#         upr = bci$percent[[5]],
+#         cv = sd(b$t) / mean(b$t),
+#         biomass = calc_bio(.)
+#       )
+#     })
+# }
+# dat <- gfplot::get_survey_sets("lingcod")
+# out <- boot_biomass(dat, reps = 100)
+
 #' Plot survey relative biomass mass index
 #'
 #' @examples

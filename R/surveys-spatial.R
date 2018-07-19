@@ -1,15 +1,12 @@
-# Title
-#
-# @param dat
-# @param survey
-# @param years
-# @param utm_zone
-# @param density_column
-#
-# @return
-# @export
-#
-# @examples
+#' Tidy the survey set data for use in modeling
+#'
+#' @param dat Output from [get_survey_sets()].
+#' @param survey The name of a survey.
+#' @param years The years.
+#' @param utm_zone UTM zone.
+#' @param density_column Name of the density column.
+#'
+#' @export
 tidy_survey_sets <- function(dat, survey, years, utm_zone = 9,
   density_column = "density_kgpm2") {
 

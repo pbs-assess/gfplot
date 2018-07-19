@@ -54,16 +54,7 @@ on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
 \description{
 For use with data for a single species.
 }
-\details{
-Note that in some cases you must load the rstan package first and
-you may choose to do so just in case. If the rstan package is not loaded
-first, you may get the warning:
-
-\code{Error in cpp_object_initializer(.self, .refClassDef, ...) :}
-\code{could not find function "cpp_object_initializer"}
-}
 \examples{
-library(rstan) # must load first
 # with `rstan::optimizing()` for the mode of the posterior density:
 model_f <- fit_vb(pop_samples, sex = "female")
 model_m <- fit_vb(pop_samples, sex = "male")
