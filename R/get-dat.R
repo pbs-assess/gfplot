@@ -437,14 +437,14 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
 
   # Select appropriate fishing year
   if (fishing_year) {
-    .d <- .d %>% select(-year)
+    .d <- .d %>% select(-year) %>% rename(year, fyear)
   } else {
     .d <- .d %>% select(-fyear)
   }
 
   # Filter out fishing records after last year required
   if (!is.na(end_year)){
-    .d <- .d %>% filter(fyear <= end_year)
+    .d <- .d %>% filter(year <= end_year)
   }
 
   areas <- c("3[CD]+", "5[AB]+", "5[CDE]+")
