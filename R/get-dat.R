@@ -416,16 +416,16 @@ get_catch <- function(species) {
 
 #' @export
 #' @param fishing_year Specify whether fishing year should be calendar year
-#'   (`FALSE`) or by fishing year (`TRUE`) for
+#'   (`FALSE`) or by Pacific Cod fishing year (`TRUE`) as calendar year for
 #'   <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 #'   21-Feb 20 since Feb 2009.
 #' @param end_year Specify the last year or fishing year to be extracted.
 #' @rdname get_data
-get_cpue_historic <- function(species = NULL, fishing_year = FALSE, end_year = NULL) {
+get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
   .q <- read_sql("get-cpue-historic.sql")
   if (!is.null(species))
     .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
-  .d <- run_sql(database = c("GFFOS", "GFCatch", "PacHarvest"), .q)
+    .d <- run_sql(database = c("GFFOS", "GFCatch", "PacHarvest"), .q)
   .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
@@ -437,15 +437,14 @@ get_cpue_historic <- function(species = NULL, fishing_year = FALSE, end_year = N
 
   # Select appropriate fishing year
   if (fishing_year) {
-    .d <- .d %>% select(-year) %>%
-      rename(year = fyear)
+    .d <- .d %>% select(-year)
   } else {
     .d <- .d %>% select(-fyear)
   }
 
   # Filter out fishing records after last year required
-  if (!is.null(end_year)){
-    .d <- .d %>% filter(year <= end_year)
+  if (!is.na(end_year)){
+    .d <- .d %>% filter(fyear <= end_year)
   }
 
   areas <- c("3[CD]+", "5[AB]+", "5[CDE]+")
