@@ -115,7 +115,7 @@ tidy_catch <- function(dat, areas = NULL) {
 plot_catch <-
   function(
              dat,
-             ylab = "Landings", xlim = c(1954, 2017),
+             ylab = "Catch", xlim = c(1954, 2017),
              units = NULL,
              unreliable = c(1996, 2006),
              blank_plot = FALSE) {
