@@ -65,6 +65,23 @@ common2codes <- function(common) {
   .d$SPECIES_CODE
 }
 
+codes2common <- function(spp_code) {
+  species <- DBI::dbGetQuery(
+    db_connection(database = "GFBioSQL"),
+    "SELECT * FROM SPECIES"
+  )
+  code_df <- data.frame(
+    SPECIES_CODE = spp_code,
+    order_by = seq_along(spp_code), stringsAsFactors = FALSE
+  )
+  .d <- filter(species, SPECIES_CODE %in% spp_code)
+  # Remove erroneous species codes for basking shark and lingcod:
+  .d <- filter(.d, !SPECIES_CODE %in% c("033", "465")) %>%
+    left_join(common_df, by = "SPECIES_COMMON_NAME") %>%
+    arrange(.data$order_by)
+  .d$SPECIES_COMMON_NAME
+}
+
 collapse_filters <- function(x) {
   paste0("'", paste(x, collapse = "','"), "'")
 }
