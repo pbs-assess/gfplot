@@ -119,6 +119,10 @@ fit_vb <- function(dat,
 
   if (method[[1]] == "mpd") {
     vb_starts <- FSA::vbStarts(length ~ age, data = dat)
+
+    if (is.na(vb_starts$K))    vb_starts$K <- 0.1 # wild guess
+    if (is.na(vb_starts$Linf)) vb_starts$Linf <- 40 # wild guess
+    if (is.na(vb_starts$t0))   vb_starts$t0 <- -5 # wild guess
     mpd_init <- list(
       k = rlnorm(1, log(vb_starts$K), 0.01),
       linf = rlnorm(1, log(vb_starts$Linf), 0.01),
