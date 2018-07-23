@@ -191,7 +191,8 @@ get_survey_ids <- function(ssid) {
 #' @rdname get_data
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE, verbose = FALSE) {
-  trawl <- run_sql("GFBioSQL", "SELECT
+# Just to pull out up to date list of ssids associated with trawl/ll gear type.
+trawl <- run_sql("GFBioSQL", "SELECT
     S.SURVEY_SERIES_ID
     FROM SURVEY_SERIES SS
     LEFT JOIN SURVEY S ON S.SURVEY_SERIES_ID = SS.SURVEY_SERIES_ID
@@ -324,7 +325,7 @@ get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE) {
+  unsorted_only = TRUE, usability  = NULL) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -340,6 +341,10 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 
   if (unsorted_only) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
+  }
+
+  if (!is.null(usability)) {
+    .d <- filter(.d, usability_code %in% usability)
   }
 
   if (length(.d$specimen_id) > length(unique(.d$specimen_id))) {
@@ -374,7 +379,8 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 #' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
 #'  and unknown). Default = TRUE.
 #' @rdname get_data
-get_commercial_samples <- function(species, unsorted_only = TRUE) {
+get_commercial_samples <- function(species, unsorted_only = TRUE,
+  usability = NULL) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -386,6 +392,10 @@ get_commercial_samples <- function(species, unsorted_only = TRUE) {
 
   if (unsorted_only) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
+  }
+
+  if (!is.null(usability)) {
+    .d <- filter(.d, usability_code %in% usability)
   }
 
   # remove ages from unaccepted ageing methods:
