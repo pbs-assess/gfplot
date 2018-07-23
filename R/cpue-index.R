@@ -225,6 +225,7 @@ tidy_cpue_index_coefs <- function(object) {
   sm$par_name <- sub("([0-9.]+$)", " \\1", sm$par_name)
   sm$par_name <- sub("\\(", "", sm$par_name)
   sm$par_group <- sub("[0-9. ]+$", "", sm$par_name)
+  sm$par_group <- sub("-[a-zA-Z]+$", "", sm$par_group)
 
   sm
 }
