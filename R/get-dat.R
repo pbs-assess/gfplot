@@ -591,8 +591,6 @@ get_survey_index <- function(species, ssid = NULL) {
   as_tibble(.d)
 }
 
-#' Title
-#'
 #' @param fishery The fishery_id code(s) (see lookup table get_fishery_ids)
 #'   for fisheries to include in data extraction
 #' @param area The fishery area(s) (see lookup table get_management_areas)
@@ -603,7 +601,11 @@ get_survey_index <- function(species, ssid = NULL) {
 get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL) {
   .q <- read_sql("get-management.sql")
-  .q <- inject_filter("AND SGG.Species_Code IN", species, .q)
+  if (!is.null(species)) {
+    .q <- inject_filter("AND M.Species_Code IN", species, .q,
+      search_flag = "-- insert species here", conversion_func = common2codes
+    )
+  }
   if (!is.null(fishery)) {
     .q <- inject_filter("AND F.Fishery_Id IN", fishery, .q,
       search_flag = "-- insert fishery here", conversion_func = I

@@ -5,6 +5,8 @@
 \alias{get_ssids}
 \alias{get_major_areas}
 \alias{get_management_areas}
+\alias{get_fishery_ids}
+\alias{get_species_groups}
 \alias{get_gear_types}
 \alias{get_age_methods}
 \alias{get_survey_sets}
@@ -27,6 +29,10 @@ get_ssids()
 get_major_areas()
 
 get_management_areas()
+
+get_fishery_ids()
+
+get_species_groups()
 
 get_gear_types()
 
@@ -54,8 +60,8 @@ get_age_precision(species)
 
 get_survey_index(species, ssid = NULL)
 
-get_management(species = NULL, fishery = NULL, area = NULL,
-  start_year = NULL)
+get_management(species = NULL, species_group = NULL, fishery = NULL,
+  area = NULL, start_year = NULL)
 
 get_sara_dat()
 
@@ -102,11 +108,11 @@ gear types to select from.}
 
 \item{min_cpue_year}{Minimum year for the CPUE data.}
 
-\item{fishery}{The fishery_id code(s) (see lookup table TO DO) for fisheries
-to include in data extraction}
+\item{fishery}{The fishery_id code(s) (see lookup table get_fishery_ids)
+for fisheries to include in data extraction}
 
-\item{area}{The fishery area(s) (see lookup table TO DO) to include in data
-extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).}
+\item{area}{The fishery area(s) (see lookup table get_management_areas)
+to include in data extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).}
 
 \item{start_year}{The minimum year to include management actions for.}
 
@@ -136,8 +142,6 @@ groundfish databases. The output datasets feed into other functions (\code{tidy_
 \code{plot_}, or \code{fit_} functions) for data visualization, which can be used as
 products themselves or can be fed into automated DFO Pacific groundfish data
 synopsis report production.
-
-Title
 }
 \details{
 \itemize{
