@@ -4,6 +4,7 @@
 \alias{get_data}
 \alias{get_ssids}
 \alias{get_major_areas}
+\alias{get_management_areas}
 \alias{get_gear_types}
 \alias{get_age_methods}
 \alias{get_survey_sets}
@@ -16,6 +17,7 @@
 \alias{get_cpue_index}
 \alias{get_age_precision}
 \alias{get_survey_index}
+\alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
 \title{Get PBS data}
@@ -23,6 +25,8 @@
 get_ssids()
 
 get_major_areas()
+
+get_management_areas()
 
 get_gear_types()
 
@@ -38,7 +42,7 @@ get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
 get_catch(species)
 
-get_cpue_historic(species, fishing_year = FALSE, end_year = NA)
+get_cpue_historic(species, pcod_fishing_year = FALSE, end_year = NA)
 
 get_cpue_spatial(species)
 
@@ -49,6 +53,9 @@ get_cpue_index(gear = "bottom trawl", min_cpue_year = 1996)
 get_age_precision(species)
 
 get_survey_index(species, ssid = NULL)
+
+get_management(species = NULL, fishery = NULL, area = NULL,
+  start_year = NULL)
 
 get_sara_dat()
 
@@ -82,7 +89,7 @@ length or weight values.}
 \item{unsorted_only}{Remove sorted biological data ('keepers' and 'discards'
 and unknown). Default = TRUE.}
 
-\item{fishing_year}{Specify whether fishing year should be calendar year
+\item{pcod_fishing_year}{Specify whether fishing year should be calendar year
 (\code{FALSE}) or by Pacific Cod fishing year (\code{TRUE}) as calendar year for
 <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 21-Feb 20 since Feb 2009.}
@@ -94,6 +101,14 @@ uppercase. Run \code{\link[=get_gear_types]{get_gear_types()}} for a look-up tab
 gear types to select from.}
 
 \item{min_cpue_year}{Minimum year for the CPUE data.}
+
+\item{fishery}{The fishery_id code(s) (see lookup table TO DO) for fisheries
+to include in data extraction}
+
+\item{area}{The fishery area(s) (see lookup table TO DO) to include in data
+extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).}
+
+\item{start_year}{The minimum year to include management actions for.}
 
 \item{path}{The folder where the cached data will be saved.}
 
@@ -121,6 +136,8 @@ groundfish databases. The output datasets feed into other functions (\code{tidy_
 \code{plot_}, or \code{fit_} functions) for data visualization, which can be used as
 products themselves or can be fed into automated DFO Pacific groundfish data
 synopsis report production.
+
+Title
 }
 \details{
 \itemize{

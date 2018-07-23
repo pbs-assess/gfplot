@@ -10,8 +10,8 @@ SELECT M.Mgmt_Id,
 	A.Action_Description,
 	Action_Value,
 	AU.Action_Unit_Description,
-	Action_Start_Date,
 	YEAR(Action_Start_Date) AS Start_Year,
+	Action_Start_Date,
 	Action_End_Date,
 	Action_Comment
 FROM PacManagement.dbo.Management M
@@ -25,3 +25,7 @@ FROM PacManagement.dbo.Management M
 WHERE M.Mgmt_Id IS NOT NULL
 -- insert species here
 -- insert fishery here
+-- insert species group here
+-- insert area here
+-- insert start year here
+ORDER BY Species_Group_Code, Species_Common_Name, Action_Start_Date

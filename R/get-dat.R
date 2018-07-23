@@ -125,6 +125,48 @@ get_major_areas <- function() {
 
 #' @export
 #' @rdname get_data
+get_management_areas <- function() {
+  .d <- run_sql(
+    "PacManagement",
+    "SELECT Area_Code, Area_Description
+    FROM Area"
+  )
+  names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
+get_fishery_ids <- function() {
+  .d <- run_sql(
+    "PacManagement",
+    "SELECT Fishery_Id, Fishery_Description
+    FROM Fishery"
+  )
+  names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
+get_species_groups <- function() {
+  .d <- run_sql(
+    "PacManagement",
+    "SELECT SG.Species_Group_Code, Species_Group_Description, Species_Code,
+      Species_Common_Name
+    FROM Species_Group SG
+      INNER JOIN Species_Group_Species SGS ON
+        SG.Species_Group_Code = SGS.Species_Group_Code"
+  )
+  names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
 get_gear_types <- function() {
   .d <- run_sql(
     "GFFOS",
@@ -425,13 +467,13 @@ get_catch <- function(species) {
 }
 
 #' @export
-#' @param fishing_year Specify whether fishing year should be calendar year
+#' @param pcod_fishing_year Specify whether fishing year should be calendar year
 #'   (`FALSE`) or by Pacific Cod fishing year (`TRUE`) as calendar year for
 #'   <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 #'   21-Feb 20 since Feb 2009.
 #' @param end_year Specify the last year or fishing year to be extracted.
 #' @rdname get_data
-get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
+get_cpue_historic <- function(species, pcod_fishing_year = FALSE, end_year = NA) {
   .q <- read_sql("get-cpue-historic.sql")
   if (!is.null(species))
     .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
@@ -446,7 +488,7 @@ get_cpue_historic <- function(species, fishing_year = FALSE, end_year = NA) {
   .d$locality_description <- tolower(.d$locality_description)
 
   # Select appropriate fishing year
-  if (fishing_year) {
+  if (pcod_fishing_year) {
     .d <- .d %>% select(-year) %>%
       rename(year, fyear)
   } else {
@@ -549,7 +591,17 @@ get_survey_index <- function(species, ssid = NULL) {
   as_tibble(.d)
 }
 
-get_management <- function(species = NULL, fishery = NULL) {
+#' Title
+#'
+#' @param fishery The fishery_id code(s) (see lookup table get_fishery_ids)
+#'   for fisheries to include in data extraction
+#' @param area The fishery area(s) (see lookup table get_management_areas)
+#'   to include in data extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).
+#' @param start_year The minimum year to include management actions for.
+#' @export
+#' @rdname get_data
+get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
+  area = NULL, start_year = NULL) {
   .q <- read_sql("get-management.sql")
   .q <- inject_filter("AND SGG.Species_Code IN", species, .q)
   if (!is.null(fishery)) {
@@ -557,12 +609,26 @@ get_management <- function(species = NULL, fishery = NULL) {
       search_flag = "-- insert fishery here", conversion_func = I
     )
   }
+  if (!is.null(species_group)) {
+    .q <- inject_filter("AND M.Species_Group_Code IN", species_group, .q,
+      search_flag = "-- insert species group here", conversion_func = I
+    )
+  }
+  if (!is.null(area)) {
+    .q <- inject_filter("AND MA.Area_Code IN", area, .q,
+      search_flag = "-- insert area here", conversion_func = I
+    )
+  }
+  if (!is.null(start_year)) {
+    .q <- inject_filter("AND YEAR(Action_Start_Date) >=", start_year, .q,
+      search_flag = "-- insert start year here", conversion_func = I
+    )
+  }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   as_tibble(.d)
 }
-#, area = NULL, year = NULL
 
 #' @export
 #' @rdname get_data
@@ -639,6 +705,7 @@ cache_pbs_data <- function(species, path = ".", compress = FALSE,
     out$cpue_spatial       <- get_cpue_spatial(this_sp)
     out$cpue_spatial_ll    <- get_cpue_spatial_ll(this_sp)
     out$survey_index       <- get_survey_index(this_sp)
+    out$management         <- get_management(this_sp)
     out$age_precision      <- get_age_precision(this_sp)
 
     saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
