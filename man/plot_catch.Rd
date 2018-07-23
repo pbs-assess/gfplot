@@ -3,16 +3,17 @@
 \name{plot_catch}
 \alias{plot_catch}
 \alias{tidy_catch}
+\alias{plot_catch}
 \title{Plot catch data over time}
 \usage{
 tidy_catch(dat, areas = NULL)
 
-plot_catch(dat, ylab = "Landings", xlim = c(1954, 2017), units = NULL,
+plot_catch(dat, ylab = "Catch", xlim = c(1954, 2017), units = NULL,
   unreliable = c(1996, 2006), blank_plot = FALSE)
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_catch()} should be from
-\code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_ages_raw()} or be
+\code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_catch()} or be
 formatted similarly. See details.}
 
 \item{areas}{Fisheries and Oceans major statistical areas (eg.

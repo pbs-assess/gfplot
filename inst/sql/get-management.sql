@@ -11,6 +11,7 @@ SELECT M.Mgmt_Id,
 	Action_Value,
 	AU.Action_Unit_Description,
 	Action_Start_Date,
+	YEAR(Action_Start_Date) AS Start_Year,
 	Action_End_Date,
 	Action_Comment
 FROM PacManagement.dbo.Management M
@@ -21,3 +22,6 @@ FROM PacManagement.dbo.Management M
 	INNER JOIN PacManagement.dbo.Action_Unit AU ON AU.Action_Unit_Code = M.Action_Unit_Code
 	INNER JOIN PacManagement.dbo.Management_Area MA ON MA.Mgmt_Id = M.Mgmt_Id
 	INNER JOIN PacManagement.dbo.Area ON Area.Area_Code = MA.Area_Code
+WHERE M.Mgmt_Id IS NOT NULL
+-- insert species here
+-- insert fishery here

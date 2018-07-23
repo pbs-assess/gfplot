@@ -124,7 +124,10 @@ if (getRversion() >= "2.15.1") {
 
     "totcatch_kg", "fyear", "SURVEY_ABBREV", "vessel_registration_number",
     "sampling_desc", "mean_num_pos_sets", "cv", "sets",
-    "true_b", "true", "mean_num_sets"
+    "true_b", "true", "mean_num_sets",
+
+    # other
+    "usability_code"
 
 
   ))

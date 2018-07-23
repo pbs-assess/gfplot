@@ -4,6 +4,7 @@
 \alias{weight_comps}
 \alias{tidy_comps_commercial}
 \alias{tidy_comps_survey}
+\alias{weight_comps}
 \title{Age and length frequency weighting}
 \usage{
 tidy_comps_commercial(specimen_dat, catch_dat, value, bin_size = NULL)

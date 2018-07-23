@@ -32,9 +32,9 @@ get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE, verbose = FALSE)
 
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE)
+  unsorted_only = TRUE, usability = NULL)
 
-get_commercial_samples(species, unsorted_only = TRUE)
+get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
 get_catch(species)
 

@@ -549,6 +549,21 @@ get_survey_index <- function(species, ssid = NULL) {
   as_tibble(.d)
 }
 
+get_management <- function(species = NULL, fishery = NULL) {
+  .q <- read_sql("get-management.sql")
+  .q <- inject_filter("AND SGG.Species_Code IN", species, .q)
+  if (!is.null(fishery)) {
+    .q <- inject_filter("AND F.Fishery_Id IN", fishery, .q,
+      search_flag = "-- insert fishery here", conversion_func = I
+    )
+  }
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  as_tibble(.d)
+}
+#, area = NULL, year = NULL
+
 #' @export
 #' @rdname get_data
 get_sara_dat <- function() {

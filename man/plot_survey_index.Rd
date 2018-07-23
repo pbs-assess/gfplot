@@ -3,6 +3,7 @@
 \name{plot_survey_index}
 \alias{plot_survey_index}
 \alias{tidy_survey_index}
+\alias{plot_survey_index}
 \title{Plot survey relative biomass mass index}
 \usage{
 tidy_survey_index(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
