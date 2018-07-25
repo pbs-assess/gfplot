@@ -90,11 +90,8 @@ fit_cpue_index <- function(dat,
     parameters = list(
       b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
       b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
-      # b1_j = rnorm(ncol(mm_pred1), 0, 0.2),
-      # b2_j = rnorm(ncol(mm_pred2), 0, 0.2),
       log_sigma = log(summary(m_pos)$sigma) + rnorm(1, 0, 0.001)
     ),
-    # log_sigma = rnorm(1, 0, 0.2)),
     DLL = "deltalognormal"
   )
 
@@ -107,7 +104,7 @@ fit_cpue_index <- function(dat,
     )
   )
 
-  message("Getting sdreport ...")
+  message("Getting sdreport...")
   r <- TMB::sdreport(obj)
 
   list(
@@ -201,7 +198,7 @@ plot_cpue_index <- function(predicted_dat, all_models = TRUE) {
 #' @export
 #' @rdname cpue-index
 
-tidy_cpue_index_coefs <- function(object) {
+tidy_cpue_index_coefs <- function(object, remove = NULL) {
   model_prefixes <- c("Bin.", "Pos.")
 
   sm <- TMB::summary.sdreport(object$sdreport)
@@ -209,6 +206,10 @@ tidy_cpue_index_coefs <- function(object) {
   row.names(sm) <- seq_len(nrow(sm))
   sm <- as.data.frame(sm)
   sm$pars <- pars
+
+  if (!is.null(remove)) {
+    sm <- filter(sm, !pars %in% c(remove))
+  }
 
   sm <- sm %>%
     rename(se = .data$`Std. Error`) %>%
@@ -347,6 +348,7 @@ plot_cpue_index_jk <- function(object,
         formula(m_pos),
         as.formula(paste0(". ~ . -", drop_term))
       )
+
       mm1 <- model.matrix(f1, data = object$data)
       mm2 <- model.matrix(f2, data = pos_dat)
       mm1 <- make_pred_mm(mm1, years = object$years)
@@ -370,8 +372,9 @@ plot_cpue_index_jk <- function(object,
 
   temp <- bind_rows(none, full)
 
+
   if (!is.null(terms)) {
-    temp <- bind_rows(temp, out)
+    out <- bind_rows(temp, out)
   } else {
     out <- temp
   }
@@ -383,17 +386,23 @@ plot_cpue_index_jk <- function(object,
   out$term <- sub("f\\(", "", out$term)
   out$term <- sub("\\)", "", out$term)
   out$term <- paste("Without", out$term)
-
-  all <- filter(out, .data$term == "Without all") %>% select(-.data$term)
   out$term <- sub("Without none", "Unstandardized", out$term)
+  out$term <- sub("Without all", "Standardized", out$term)
 
-  ggplot(
-    filter(out, term != "Without all"),
+  all <- filter(out, .data$term == "Standardized") %>% select(-.data$term)
+  out_without_all <- filter(out, .data$term != "Standardized")
+
+  all_facets <- do.call("rbind",
+    replicate(length(unique(out_without_all$term)), all, simplify = FALSE))
+  all_facets$term <- rep(unique(out_without_all$term), each = length(unique(all_facets$year)))
+
+  g <- ggplot(
+    out_without_all,
     aes_string("year", "pred", colour = "term")
   ) +
     geom_line(
-      data = all, lty = "31", lwd = 1.0,
-      aes_string("year", "pred"), colour = "grey70", inherit.aes = FALSE
+      data = all_facets, lty = "31", lwd = 1.0,
+      colour = "grey70"
     ) +
     geom_line(lwd = 1.0) +
     theme_pbs() + guides(size = FALSE, colour = FALSE) +
@@ -401,10 +410,9 @@ plot_cpue_index_jk <- function(object,
     facet_wrap(~term)
 
   if (return_data) {
-    bind_rows(out, data.frame(all,
-      term = "Standardized",
-      stringsAsFactors = FALSE
-    ))
+    return(out)
+  } else {
+    return(g)
   }
 }
 
