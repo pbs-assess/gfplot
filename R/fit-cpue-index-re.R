@@ -20,7 +20,7 @@ parse_formula <- function(f) {
   re <- terms_[grepl("1 \\|", terms_)]
   re <- gsub("1 \\| ", "", re)
   fe <- terms_[!grepl("1 \\|", terms_)]
-  response <- all.vars(terms(formula_binomial))[1]
+  response <- all.vars(terms(f))[1]
   fe <- as.formula(paste(response, "~", paste(fe, collapse = " + ")))
   list(response = response, fe = fe, re = re)
 }
@@ -54,7 +54,7 @@ fit_cpue_index_re <- function(dat,
   if (!is.null(re2)) {
     bin_re_id_g <- fct_to_tmb_num(dat[[re2]])
     pos_re_id_g <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[re2]])
-}
+  }
   mm1 <- model.matrix(f_bin$fe, data = dat)
   mm2 <- model.matrix(f_pos$fe, data = pos_dat)
   mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
@@ -136,10 +136,24 @@ fit_cpue_index_re <- function(dat,
   message("Getting TMB::sdreport()")
   r <- TMB::sdreport(obj)
 
-  list(
+  out <- list(
     model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)),
     years = sort(unique(dat$year)), mm_bin = mm1, mm_pos = mm2,
     f_bin = formula_binomial, f_pos = formula_lognormal,
-    data = dat
+    data = dat, parameters = parameters, random = random,
+    DLL = DLL, re1_bin = NA, re1_pos = NA, re2_bin = NA, re2_pos = NA,
+    re1 = NA, re2 = NA
   )
+  if (!is.null(re1)) {
+    out$re1_bin <- dat[[re1]]
+    out$re1_pos <- dat[[re1]]
+    out$re1 <- re1
+  }
+  if (!is.null(re2)) {
+    out$re2_bin <- dat[[re2]]
+    out$re2_pos <- dat[[re2]]
+    out$re2 <- re2
+  }
+
+  out
 }
