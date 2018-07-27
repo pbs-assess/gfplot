@@ -112,42 +112,40 @@ plot_cpue_spatial <-
             bind_rows()
         }
       }
-
-      # rotate if needed:
-      isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
-      coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
-
-
-      g <- ggplot()
-
-      if (plot_hexagons) {
-        public_dat$X <- public_dat$x
-        public_dat$Y <- public_dat$y
-        public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
-        g <- g + geom_polygon(data = public_dat, aes_string(
-          x = "X", y = "Y",
-          fill = "cpue", colour = "cpue", group = "hex_id"
-        ), inherit.aes = FALSE) + fill_scale + colour_scale
-      }
-
-      g <- g + geom_path(
-        data = isobath_utm, aes_string(
-          x = "X", y = "Y",
-          group = "paste(PID, SID)"
-        ),
-        inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
-      )
-
-      g <- g + geom_polygon(
-        data = coastline_utm,
-        aes_string(x = "X", y = "Y", group = "PID"),
-        inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70"
-      ) +
-        coord_equal(xlim = xlim, ylim = ylim) +
-        theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
-
-      g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
     }
+    # rotate if needed:
+    isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
+    coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
+
+    g <- ggplot()
+
+    if (plot_hexagons) {
+      public_dat$X <- public_dat$x
+      public_dat$Y <- public_dat$y
+      public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
+      g <- g + geom_polygon(data = public_dat, aes_string(
+        x = "X", y = "Y",
+        fill = "cpue", colour = "cpue", group = "hex_id"
+      ), inherit.aes = FALSE) + fill_scale + colour_scale
+    }
+
+    g <- g + geom_path(
+      data = isobath_utm, aes_string(
+        x = "X", y = "Y",
+        group = "paste(PID, SID)"
+      ),
+      inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+    )
+
+    g <- g + geom_polygon(
+      data = coastline_utm,
+      aes_string(x = "X", y = "Y", group = "PID"),
+      inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70"
+    ) +
+      coord_equal(xlim = xlim, ylim = ylim) +
+      theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
+
+    g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
   }
 
 hex_coords <- function(x, y, unitcell_x = 1, unitcell_y = 1) {
