@@ -13,8 +13,8 @@
 #'   measurement for a given year.
 #' @param length_bin_interval An interval for the length bins.
 #'
-#' @importClassesFrom DLMtool Data
-#' @return An S4 object of class DLMtool Data.
+# @importClassesFrom DLMtool Data
+# @return An S4 object of class DLMtool Data.
 #' @export
 #'
 #' @examples

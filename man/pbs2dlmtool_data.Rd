@@ -24,9 +24,6 @@ measurement for a given year.}
 
 \item{length_bin_interval}{An interval for the length bins.}
 }
-\value{
-An S4 object of class DLMtool Data.
-}
 \description{
 Takes the output from \code{\link[=cache_pbs_data]{cache_pbs_data()}} and converts it into a DLMtool data
 object.
