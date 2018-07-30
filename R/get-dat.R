@@ -225,6 +225,17 @@ get_survey_ids <- function(ssid) {
 }
 
 #' @export
+#' @rdname get_data
+get_other_surveys <- function() {
+  .q <- read_sql("get-other-surveys.sql")
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d <- .d %>% filter(count_surveys_since_2008 >1) %>%
+    select(survey_series_desc, count_surveys_since_2008)
+  .d
+  }
+
+#' @export
 #' @param join_sample_ids If `TRUE` then the sample IDs will be joined in. This
 #'   may result in repeated rows of data if the same sample ID is part of
 #'   different survey stratifications.
@@ -472,12 +483,14 @@ get_catch <- function(species) {
 #'   <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 #'   21-Feb 20 since Feb 2009.
 #' @param end_year Specify the last year or fishing year to be extracted.
+#' @param  year_start_date month-day
 #' @rdname get_data
-get_cpue_historic <- function(species, pcod_fishing_year = FALSE, end_year = NA) {
+get_cpue_historic <- function(species, pcod_fishing_year = FALSE,
+  end_year = NULL, year_start_date = "01-01") {
   .q <- read_sql("get-cpue-historic.sql")
   if (!is.null(species))
     .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
-    .d <- run_sql(database = c("GFFOS", "GFCatch", "PacHarvest"), .q)
+  .d <- run_sql(database = c("GFFOS", "GFCatch", "PacHarvest"), .q)
   .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
   names(.d) <- tolower(names(.d))
@@ -487,13 +500,8 @@ get_cpue_historic <- function(species, pcod_fishing_year = FALSE, end_year = NA)
   .d$gear <- tolower(.d$gear)
   .d$locality_description <- tolower(.d$locality_description)
 
-  # Select appropriate fishing year
-  if (pcod_fishing_year) {
-    .d <- .d %>% select(-year) %>%
-      rename(year, fyear)
-  } else {
-    .d <- .d %>% select(-fyear)
-  }
+  # Select appropriate start date
+
 
   # Filter out fishing records after last year required
   if (!is.null(end_year)){
@@ -602,12 +610,12 @@ get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL) {
   .q <- read_sql("get-management.sql")
   if (!is.null(species)) {
-    .q <- inject_filter("AND M.Species_Code IN", species, .q,
+    .q <- inject_filter("AND Species_Code IN", species, .q,
       search_flag = "-- insert species here", conversion_func = common2codes
     )
   }
   if (!is.null(fishery)) {
-    .q <- inject_filter("AND F.Fishery_Id IN", fishery, .q,
+    .q <- inject_filter("AND M.Fishery_Id IN", fishery, .q,
       search_flag = "-- insert fishery here", conversion_func = I
     )
   }
@@ -630,6 +638,9 @@ get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   as_tibble(.d)
+  .d <- .d %>% arrange(desc(action_start_date))
+  .d[1:4,]
+
 }
 
 #' @export
