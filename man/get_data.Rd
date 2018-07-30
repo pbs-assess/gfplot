@@ -9,6 +9,7 @@
 \alias{get_species_groups}
 \alias{get_gear_types}
 \alias{get_age_methods}
+\alias{get_other_surveys}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
 \alias{get_commercial_samples}
@@ -38,6 +39,8 @@ get_gear_types()
 
 get_age_methods()
 
+get_other_surveys()
+
 get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE, verbose = FALSE)
 
@@ -48,7 +51,8 @@ get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
 get_catch(species)
 
-get_cpue_historic(species, pcod_fishing_year = FALSE, end_year = NA)
+get_cpue_historic(species, alt_year_start_date = "04-01",
+  areas = c("3[CD]+", "5[AB]+", "5[CDE]+"), end_year = NULL)
 
 get_cpue_spatial(species)
 
@@ -95,10 +99,10 @@ length or weight values.}
 \item{unsorted_only}{Remove sorted biological data ('keepers' and 'discards'
 and unknown). Default = TRUE.}
 
-\item{pcod_fishing_year}{Specify whether fishing year should be calendar year
-(\code{FALSE}) or by Pacific Cod fishing year (\code{TRUE}) as calendar year for
-<1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
-21-Feb 20 since Feb 2009.}
+\item{alt_year_start_date}{Alternative year starting date specified as a
+month-day combination. E.g. "03-01" for March 1st.}
+
+\item{areas}{Area groupings as a vector of regular expressions.}
 
 \item{end_year}{Specify the last year or fishing year to be extracted.}
 
@@ -126,6 +130,11 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
+
+\item{pcod_fishing_year}{Specify whether fishing year should be calendar year
+(\code{FALSE}) or by Pacific Cod fishing year (\code{TRUE}) as calendar year for
+<1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
+21-Feb 20 since Feb 2009.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}

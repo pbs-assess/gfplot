@@ -18,7 +18,7 @@ predict_cpue_index(object, center = FALSE)
 
 plot_cpue_index(predicted_dat, all_models = TRUE)
 
-tidy_cpue_index_coefs(object)
+tidy_cpue_index_coefs(object, remove = NULL)
 
 plot_cpue_index_coefs(object, regex = c(", base_[a-z]+", ""))
 

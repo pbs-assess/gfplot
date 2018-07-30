@@ -129,3 +129,4 @@ plot_survey_sets(fit$predictions, fit$data, fill_column = "bin") +
     low = scales::muted("blue"), limits = c(0, 1))
 }
 }
+\concept{spatial survey modelling functions}

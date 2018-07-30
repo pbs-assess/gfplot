@@ -6,7 +6,6 @@
 \alias{tidy_ages_weighted}
 \alias{tidy_lengths_raw}
 \alias{tidy_lengths_weighted}
-\alias{tidy_comps}
 \title{Tidy age or length composition data for plotting or modelling}
 \usage{
 tidy_ages_raw(...)
