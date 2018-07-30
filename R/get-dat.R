@@ -482,11 +482,14 @@ get_catch <- function(species) {
 #'   (`FALSE`) or by Pacific Cod fishing year (`TRUE`) as calendar year for
 #'   <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
 #'   21-Feb 20 since Feb 2009.
+#' @param alt_year_start_date Alternative year starting date specified as a
+#'   month-day combination. E.g. "03-01" for March 1st.
+#' @param areas Area groupings as a vector of regular expressions.
 #' @param end_year Specify the last year or fishing year to be extracted.
-#' @param  year_start_date month-day
 #' @rdname get_data
-get_cpue_historic <- function(species, pcod_fishing_year = FALSE,
-  end_year = NULL, year_start_date = "01-01") {
+get_cpue_historic <- function(species,
+  alt_year_start_date = "04-01", areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
+  end_year = NULL) {
   .q <- read_sql("get-cpue-historic.sql")
   if (!is.null(species))
     .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
@@ -500,15 +503,19 @@ get_cpue_historic <- function(species, pcod_fishing_year = FALSE,
   .d$gear <- tolower(.d$gear)
   .d$locality_description <- tolower(.d$locality_description)
 
-  # Select appropriate start date
-
+  # Create possibly alternate starting date:
+  .d <- dplyr::mutate(.d, best_date = lubridate::ymd_hms(best_date))
+  .d <- dplyr::mutate(.d, .year_start_date =
+      lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+  .d <- dplyr::mutate(.d, .time_diff = best_date - .year_start_date)
+  .d <- dplyr::mutate(.d, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+  .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
 
   # Filter out fishing records after last year required
   if (!is.null(end_year)){
     .d <- .d %>% filter(year <= end_year)
   }
 
-  areas <- c("3[CD]+", "5[AB]+", "5[CDE]+")
   .d$area <- NA
   for (i in seq_along(areas)) {
     .d[grepl(areas[[i]], .d$major_stat_area_description), "area"] <-
