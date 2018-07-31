@@ -12,12 +12,12 @@
 #'   rendered in the final plot in the order that they are specified to this
 #'   argument.
 #' @param year_range An optional range of years to plot.
-#' @param spp_cat_code A numeric vector of species categorical codes to include
+#' @param spp_cat_code A numeric vector of species category codes to include
 #'   for the commercial samples. Defaults to `1`, which refers to unsorted
 #'   samples.
 #' @param area_grep_pattern A [grep()] pattern to match the major statistical
 #'   area descriptions. The pattern `"*"` will return all areas. For example,
-#'   `"5[CDE]+"` would return areas 5C, 5D, and 5E.
+#'   `"5[CDE]+"` would return areas 5C, 5D, and 5E. See [base::regex()].
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
@@ -36,7 +36,7 @@
 #'
 #' The function `tidy_comps()` is the main workhorse function, but as a user you
 #' can use the helper functions `tidy_ages_raw()`, `tidy_ages_weighted()`,
-#' `tidy_lengths_raw()`, and `tidy_lengths_weighted()`. These helper functions
+#' `tidy_lengths_raw()`, and `tidy_lengths_weighted()`. These functions
 #' simply call `tidy_comps()` with appropriate argument values for `age_length`
 #' and `frequency_type`.
 #'
