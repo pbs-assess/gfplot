@@ -702,7 +702,7 @@ cache_pbs_data <- function(species, path = ".", compress = FALSE,
   unsorted_only = TRUE, historic_cpue = FALSE,
   survey_sets = FALSE, verbose = TRUE) {
 
-  if (sql_server_accessible()) {
+  if (!sql_server_accessible()) {
     stop("SQL server is not accessible. Either you are not on the DFO network or your",
          " Rprofile file does not contain the required variables options pbs.ip,",
          " pbs.uid, and pbs.pwd. On Windows, this file is located at",
