@@ -487,7 +487,7 @@ get_catch <- function(species) {
 #' @param areas Area groupings as a vector of regular expressions.
 #' @param end_year Specify the last year or fishing year to be extracted.
 #' @rdname get_data
-get_cpue_historic <- function(species,
+get_cpue_historic <- function(species = NULL,
   alt_year_start_date = "04-01", areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
   end_year = NULL) {
   .q <- read_sql("get-cpue-historic.sql")
