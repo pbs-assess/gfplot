@@ -504,30 +504,30 @@ get_cpue_historic <- function(species,
   .d$locality_description <- tolower(.d$locality_description)
 
 
-  # # Filter out fishing records after last year required
-  # if (!is.null(end_year)){
-  #   .d <- .d %>% filter(year <= end_year)
-  # }
-  #
-  # # Create possibly alternate starting date:
-  # .d <- dplyr::mutate(.d, best_date = lubridate::ymd_hms(best_date))
-  # .d <- dplyr::mutate(.d, .year_start_date =
-  #     lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
-  # .d <- dplyr::mutate(.d, .time_diff = best_date - .year_start_date)
-  # .d <- dplyr::mutate(.d, alt_year = ifelse(.time_diff > 0, year, year - 1L))
-  # .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
-  #
-  # .d$area <- NA
-  # for (i in seq_along(areas)) {
-  #   .d[grepl(areas[[i]], .d$major_stat_area_description), "area"] <-
-  #     gsub("\\[|\\]|\\+", "", areas[[i]])
-  # }
-  # specific_areas <- c("3C", "3D", "5A", "5B", "5C", "5D", "5E")
-  # .d$specific_area <- NA
-  # for (i in seq_along(specific_areas)) {
-  #   .d[grepl(specific_areas[[i]], .d$major_stat_area_description), "specific_area"] <-
-  #     specific_areas[[i]]
-  # }
+  # Filter out fishing records after last year required
+  if (!is.null(end_year)){
+    .d <- .d %>% filter(year <= end_year)
+  }
+
+  # Create possibly alternate starting date:
+  .d <- dplyr::mutate(.d, best_date = lubridate::ymd_hms(best_date))
+  .d <- dplyr::mutate(.d, .year_start_date =
+      lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+  .d <- dplyr::mutate(.d, .time_diff = best_date - .year_start_date)
+  .d <- dplyr::mutate(.d, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+  .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
+
+  .d$area <- NA
+  for (i in seq_along(areas)) {
+    .d[grepl(areas[[i]], .d$major_stat_area_description), "area"] <-
+      gsub("\\[|\\]|\\+", "", areas[[i]])
+  }
+  specific_areas <- c("3C", "3D", "5A", "5B", "5C", "5D", "5E")
+  .d$specific_area <- NA
+  for (i in seq_along(specific_areas)) {
+    .d[grepl(specific_areas[[i]], .d$major_stat_area_description), "specific_area"] <-
+      specific_areas[[i]]
+  }
   as_tibble(.d)
 }
 
