@@ -36,13 +36,13 @@ argument.}
 
 \item{year_range}{An optional range of years to plot.}
 
-\item{spp_cat_code}{A numeric vector of species categorical codes to include
+\item{spp_cat_code}{A numeric vector of species category codes to include
 for the commercial samples. Defaults to \code{1}, which refers to unsorted
 samples.}
 
 \item{area_grep_pattern}{A \code{\link[=grep]{grep()}} pattern to match the major statistical
 area descriptions. The pattern \code{"*"} will return all areas. For example,
-\code{"5[CDE]+"} would return areas 5C, 5D, and 5E.}
+\code{"5[CDE]+"} would return areas 5C, 5D, and 5E. See \code{\link[base:regex]{base::regex()}}.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Default to \code{NULL}, which brings in all valid ageing codes.
@@ -72,7 +72,7 @@ details on the weighting procedure.
 \details{
 The function \code{tidy_comps()} is the main workhorse function, but as a user you
 can use the helper functions \code{tidy_ages_raw()}, \code{tidy_ages_weighted()},
-\code{tidy_lengths_raw()}, and \code{tidy_lengths_weighted()}. These helper functions
+\code{tidy_lengths_raw()}, and \code{tidy_lengths_weighted()}. These functions
 simply call \code{tidy_comps()} with appropriate argument values for \code{age_length}
 and \code{frequency_type}.
 

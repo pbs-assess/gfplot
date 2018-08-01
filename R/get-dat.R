@@ -31,7 +31,8 @@
 #'    GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 #' * `get_cpue_index()` extracts catch and effort data from
 #'    GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
-#' * `get_cpue_historic()` extracts historical catch and effort data back into the 1950s.
+#' * [get_cpue_historic()] extracts historical catch and effort data back into
+#'    the 1950s. It's help file is on a separate page; see the link.
 #' * `get_age_precision()` extracts age readings from biological samples for a
 #'    given species where there is a second ('precision') age reading
 #' * `get_sara_dat()` scrubs Species At Risk website for up-to-date species
@@ -477,16 +478,24 @@ get_catch <- function(species) {
   as_tibble(.d)
 }
 
-#' @export
-#' @param pcod_fishing_year Specify whether fishing year should be calendar year
-#'   (`FALSE`) or by Pacific Cod fishing year (`TRUE`) as calendar year for
-#'   <1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
-#'   21-Feb 20 since Feb 2009.
+#' Get all fishing catch and effort to calculate historic commercial CPUE
+#'
+#' @param species Species to filter for positive fishing events. Leave as `NULL`
+#'   to include all fishing events. One or more species common names (e.g.
+#'   `"pacific ocean perch"`) or one or more species codes (e.g. `396`). Species
+#'   codes can be specified as numeric vectors `c(396, 442`) or characters
+#'   `c("396", "442")`. Numeric values shorter than 3 digits will be expanded to
+#'   3 digits and converted to character objects (`1` turns into `"001"`).
+#'   Species common names and species codes should not be mixed. If any element
+#'   is missing a species code, then all elements will be assumed to be species
+#'   common names.
 #' @param alt_year_start_date Alternative year starting date specified as a
-#'   month-day combination. E.g. "03-01" for March 1st.
+#'   month-day combination. E.g. "03-01" for March 1st. Can be used to create
+#'   'fishing years'.
 #' @param areas Area groupings as a vector of regular expressions.
-#' @param end_year Specify the last year or fishing year to be extracted.
-#' @rdname get_data
+#'   See [base::regex()].
+#' @param end_year Specify the last calendar year to be extracted.
+#' @export
 get_cpue_historic <- function(species = NULL,
   alt_year_start_date = "04-01", areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
   end_year = NULL) {
@@ -511,11 +520,14 @@ get_cpue_historic <- function(species = NULL,
 
   # Create possibly alternate starting date:
   .d <- dplyr::mutate(.d, best_date = lubridate::ymd_hms(best_date))
-  .d <- dplyr::mutate(.d, .year_start_date =
-      lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
-  .d <- dplyr::mutate(.d, .time_diff = best_date - .year_start_date)
-  .d <- dplyr::mutate(.d, alt_year = ifelse(.time_diff > 0, year, year - 1L))
-  .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
+
+  if (alt_year_start_date != "01-01") {
+    .d <- dplyr::mutate(.d, .year_start_date =
+        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+    .d <- dplyr::mutate(.d, .time_diff = best_date - .year_start_date)
+    .d <- dplyr::mutate(.d, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+    .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
+  }
 
   .d$area <- NA
   for (i in seq_along(areas)) {

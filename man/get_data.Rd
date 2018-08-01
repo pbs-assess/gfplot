@@ -14,7 +14,6 @@
 \alias{get_survey_samples}
 \alias{get_commercial_samples}
 \alias{get_catch}
-\alias{get_cpue_historic}
 \alias{get_cpue_spatial}
 \alias{get_cpue_spatial_ll}
 \alias{get_cpue_index}
@@ -50,9 +49,6 @@ get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
 get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
 get_catch(species)
-
-get_cpue_historic(species, alt_year_start_date = "04-01",
-  areas = c("3[CD]+", "5[AB]+", "5[CDE]+"), end_year = NULL)
 
 get_cpue_spatial(species)
 
@@ -99,13 +95,6 @@ length or weight values.}
 \item{unsorted_only}{Remove sorted biological data ('keepers' and 'discards'
 and unknown). Default = TRUE.}
 
-\item{alt_year_start_date}{Alternative year starting date specified as a
-month-day combination. E.g. "03-01" for March 1st.}
-
-\item{areas}{Area groupings as a vector of regular expressions.}
-
-\item{end_year}{Specify the last year or fishing year to be extracted.}
-
 \item{gear}{The gear type(s) to include for CPUE. Will be converted to
 uppercase. Run \code{\link[=get_gear_types]{get_gear_types()}} for a look-up table of available
 gear types to select from.}
@@ -130,11 +119,6 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
-
-\item{pcod_fishing_year}{Specify whether fishing year should be calendar year
-(\code{FALSE}) or by Pacific Cod fishing year (\code{TRUE}) as calendar year for
-<1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
-21-Feb 20 since Feb 2009.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
@@ -178,7 +162,8 @@ GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
 GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 \item \code{get_cpue_index()} extracts catch and effort data from
 GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
-\item \code{get_cpue_historic()} extracts historical catch and effort data back into the 1950s.
+\item \code{\link[=get_cpue_historic]{get_cpue_historic()}} extracts historical catch and effort data back into
+the 1950s. It's help file is on a separate page; see the link.
 \item \code{get_age_precision()} extracts age readings from biological samples for a
 given species where there is a second ('precision') age reading
 \item \code{get_sara_dat()} scrubs Species At Risk website for up-to-date species
