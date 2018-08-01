@@ -53,7 +53,7 @@ Remotes: github::pbs-software/pbs-data/PBSdata
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
-Suggests: 
+Suggests:
     knitr,
     rmarkdown,
     testthat
