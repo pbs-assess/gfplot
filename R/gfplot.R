@@ -126,8 +126,12 @@ if (getRversion() >= "2.15.1") {
     "true_b", "true", "mean_num_sets",
 
     # other
-    "usability_code"
+    "usability_code",
 
-
+    ".time_diff",
+    ".year_start_date",
+    "action_start_date",
+    "common_df",
+    "count_surveys_since_2008"
   ))
 }

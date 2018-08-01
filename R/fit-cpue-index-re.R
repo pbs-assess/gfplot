@@ -20,7 +20,7 @@ parse_formula <- function(f) {
   re <- terms_[grepl("1 \\|", terms_)]
   re <- gsub("1 \\| ", "", re)
   fe <- terms_[!grepl("1 \\|", terms_)]
-  response <- all.vars(terms(f))[1]
+  response <- all.vars(stats::terms(f))[1]
   fe <- as.formula(paste(response, "~", paste(fe, collapse = " + ")))
   list(response = response, fe = fe, re = re)
 }

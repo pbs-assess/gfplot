@@ -658,9 +658,7 @@ get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   as_tibble(.d)
-  .d <- .d %>% arrange(desc(action_start_date))
-  .d[1:4,]
-
+  .d %>% arrange(dplyr::desc(action_start_date))
 }
 
 #' @export

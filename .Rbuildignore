@@ -43,3 +43,5 @@
 ^inst/pcod-cache/*
 ^docs$
 ^_pkgdown\.yml$
+^CONDUCT.md$
+^CONTRIBUTING.md$
