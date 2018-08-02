@@ -13,12 +13,6 @@ clean_localities <- function(x) {
 #' @param year_range A range of years to include. Can go up to current year but
 #'   note the management changes, particularly in 1996.
 #' @param area A major statistical area as a regular expression.
-#' @param depth_band_width The width of depth bands to bin the depths in for the
-#'   index standardization data set.
-#' @param clean_bins Logical. Should the depth and latitude bands be rounded to
-#'   the nearest clean value as defined by `lat_band_width` or
-#'   `depth_band_width`? Internally, these use, for example:
-#'   `gfplot:::round_down_even(lat_range[1], lat_band_width)`.
 #' @param use_alt_year Should the alternate year (e.g. fishing year) column
 #'   `alt_year` be used? If `FALSE` then the calendar year will be used. If this
 #'   is set to `TRUE` then the `year` column will be replaced with the
@@ -46,8 +40,7 @@ tidy_cpue_historic <- function(dat,
                             species_common,
                             year_range = c(1956, 1996),
                             area = "5[CDE]+",
-                            depth_band_width = 25,
-                            clean_bins = TRUE,
+                            depth_bins = seq(0, 350, 25),
                             use_alt_year = FALSE,
                             depth_bin_quantiles = c(0, 1),
                             type = c("trip-level-data", "arithmetic-cpue")) {
@@ -91,36 +84,19 @@ tidy_cpue_historic <- function(dat,
 
   if (type == "trip-level-data") {
     trip_dat <- fe_dat %>%
-      group_by(year, area, trip_id) %>%
+      group_by(year, area, trip_id, locality) %>%
       summarise(
         spp_catch = sum(spp_catch),
         hours_fished = sum(hours_fished),
         mean_depth = mean(depth),
         geo_mean_depth = exp(mean(log(depth))),
-        month = month[[1]],
-        locality = locality[[1]],
-        n_locality = length(unique(locality))
+        month = month[[1]]
       ) %>%
       ungroup()
-
-    if (max(trip_dat$n_locality) > 1) {
-      warning(
-        "Some trips had multiple localities. ",
-        "The derived locality column is therefore suspect."
-      )
-    }
-    trip_dat$n_locality <- NULL
 
     depth_range <- stats::quantile(trip_dat$mean_depth,
       probs = c(min(depth_bin_quantiles), max(depth_bin_quantiles))
     )
-
-    if (clean_bins) {
-      depth_range[1] <- round_down_even(depth_range[1], depth_band_width)
-      depth_range[2] <- round_up_even(depth_range[2], depth_band_width)
-    }
-
-    depth_bands <- seq(depth_range[[1]], depth_range[[2]], depth_band_width)
 
     trip_dat <- trip_dat %>%
       filter(mean_depth >= min(depth_bands) & mean_depth <= max(depth_bands)) %>%
