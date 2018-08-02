@@ -9,16 +9,14 @@
 \alias{plot_cpue_index_jk}
 \title{Commercial CPUE index standardization}
 \usage{
-fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor + f(month) +
-  f(vessel) + f(locality) + f(depth) + f(latitude),
-  formula_lognormal = log(spp_catch/hours_fished) ~ year_factor + f(month) +
-  f(vessel) + f(locality) + f(depth) + f(latitude))
+fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor,
+  formula_gamma = spp_catch/hours_fished ~ year_factor)
 
 predict_cpue_index(object, center = FALSE)
 
 plot_cpue_index(predicted_dat, all_models = TRUE)
 
-tidy_cpue_index_coefs(object, remove = NULL)
+tidy_cpue_index_coefs(object, include_scale_pars = FALSE)
 
 plot_cpue_index_coefs(object, regex = c(", base_[a-z]+", ""))
 
@@ -29,9 +27,10 @@ plot_cpue_index_jk(object, terms = c("f(month)", "f(vessel)", "f(locality)",
 \item{dat}{A data frame from \code{\link[=tidy_cpue_index]{tidy_cpue_index()}}, or a similarly
 formatted data frame.}
 
-\item{formula_binomial}{Formula for the binomial model.}
+\item{formula_binomial}{Formula for the binomial (presence-absence) model.
+See details.}
 
-\item{formula_lognormal}{Formula for the lognormal model.}
+\item{formula_gamma}{Formula for the Gamma (positive) model. See details.}
 
 \item{object}{Model output from \code{\link[=fit_cpue_index]{fit_cpue_index()}}.}
 
@@ -41,6 +40,9 @@ formatted data frame.}
 
 \item{all_models}{Logical for whether to plot all models (\code{TRUE}) or just the
 combined model (\code{FALSE}).}
+
+\item{include_scale_pars}{Logical: include observation CV and random effect
+like standard deviations in parameter plot?}
 
 \item{regex}{A regular expression as a character vector of length 2 to
 transform the coefficient names from something (element 1) to something
@@ -52,17 +54,17 @@ transform the coefficient names from something (element 1) to something
 }
 \description{
 \itemize{
-\item \code{fit_cpue_index()} fits a delta-lognormal commercial CPUE
+\item \code{fit_cpue_index()} fits a delta-Gamma commercial CPUE
 standardization model
 }
 
 \itemize{
-\item \code{predict_cpue_index()} predicts from a delta-lognormal
+\item \code{predict_cpue_index()} predicts from a delta-Gamma
 commercial CPUE standardization model
 }
 
 \itemize{
-\item \code{plot_cpue_index()} plots a delta-lognormal commercial CPUE
+\item \code{plot_cpue_index()} plots a delta-Gamma commercial CPUE
 standardization model
 }
 
@@ -82,12 +84,27 @@ test the sensitivity of the standardization model to any one term.
 }
 }
 \details{
-Note that for coefficients for predictors treated as factors (i.e.
-likely all of the predictors), the coefficients represent the difference
-from the base level factor. For example, if January was the base month,
-month 02 represents the estimated difference between February and January.
-The default setup of the function \code{\link[gfplot:f]{gfplot::f()}} sets the reference level as
-the most common factor level.
+Formulas should be specified in the way a GLM formula would be specified in R
+or as a GLMM with \strong{up to 2 random intercepts} would be specified in
+\code{\link[lme4:lmer]{lme4::lmer()}}. E.g. \code{pos_catch ~ year_factor + (1 | vessel)} or \code{spp_catch / hours_fished ~ year_factor + (1 | vessel) + (1 | locality)}. Your formula
+\strong{must} have a predictor named \code{year_factor} for the other functions in this
+package to interact with the output properly. The fixed effect components of
+the binomial and Gamma components do not need to be the same, but the random
+effect components must be the same.
+
+You may want to take advantage of the function \code{\link[gfplot:f]{gfplot::f()}} for conveniently
+turning predictors into factors with their base level set to the most common
+factor level and their factor names with consistent name lengths (e.g. '001',
+'020').
+
+The model is internally filled with TMB. As a result, you will have to have a
+C++ compiler installed to compile the models. On Windows, search for Rtools.
+
+Note that for coefficients for predictors treated as factors, the
+coefficients represent the difference from the base level factor. For
+example, if January was the base month, month 02 represents the estimated
+difference between February and January. The default setup of the function
+\code{\link[gfplot:f]{gfplot::f()}} sets the reference level as the most common factor level.
 }
 \examples{
 \donttest{
@@ -98,7 +115,7 @@ d
 
 m <- fit_cpue_index(d,
   formula_binomial = pos_catch ~ year_factor + f(vessel),
-  formula_lognormal = log(spp_catch / hours_fished) ~ year_factor + f(vessel)
+  formula_gamma = spp_catch / hours_fished ~ year_factor + f(vessel)
 )
 
 plot_cpue_index_coefs(m)
@@ -108,7 +125,7 @@ predict_cpue_index(m) \%>\%
 
 plot_cpue_index_jk(m, terms = "f(vessel)")
 }
-\dontrun{
+\donttest{
 # An example with PBS data:
 # (the data extraction will be slow)
 

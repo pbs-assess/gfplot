@@ -4,17 +4,17 @@
 # for accuracy and coverage of confidence intervals.
 #
 # @param make_plots If `TRUE` then a series of diagnostic plots will be made.
-# @param sigma The residual standard deviation for the positive timeseries on
-# a log scale.
+# @param cv The cv parameter for the Gamma distribution for the
+#   positive timeseries.
 # @param n_samples The number of samples or fishing events per vessel per
 # year.
 # @param n_years The number of years.
 # @param n_vessels The number of the vessels.
 
-sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
+sim_cpue_index <- function(make_plots = TRUE, cv = 0.3, n_samples = 10,
   n_years = 20, n_vessels = 10) {
   fake_fleet <- sim_cpue(
-    sigma = sigma, n_samples = n_samples,
+    cv = cv, n_samples = n_samples,
     n_years = n_years, n_vessels = n_vessels
   )
 
@@ -24,7 +24,7 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   m <- fit_cpue_index(fake_fleet,
     formula_binomial = pos_catch ~
       year_factor + f(vessel, function(x) as.character(x)[[1]]),
-    formula_lognormal = log(spp_catch / hours_fished) ~
+    formula_gamma = spp_catch / hours_fished ~
       year_factor + f(vessel, function(x) as.character(x)[[1]])
   )
 
@@ -44,7 +44,7 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
     intercept,
     year_effects$year_effect[-1] - year_effects$year_effect[1],
     vessel_effects$vessel_effect[-1] - vessel_effects$vessel_effect[1],
-    log(sigma)
+    cv
   )
 
   if (make_plots) {
@@ -69,10 +69,10 @@ sim_cpue_index <- function(make_plots = TRUE, sigma = 0.35, n_samples = 10,
   bin_dat <- fake_fleet
 
   formula_binomial <- pos_catch ~ year_factor + f(vessel)
-  formula_lognormal <- log(spp_catch / hours_fished) ~ year_factor + f(vessel)
+  formula_gamma <- spp_catch / hours_fished ~ year_factor + f(vessel)
 
   mm1 <- model.matrix(formula_binomial, data = bin_dat)
-  mm2 <- model.matrix(formula_lognormal, data = pos_dat)
+  mm2 <- model.matrix(formula_gamma, data = pos_dat)
 
   mm_pred1 <- make_pred_mm(mm1, years = unique(fake_fleet$year_factor))
   mm_pred2 <- make_pred_mm(mm2, years = unique(fake_fleet$year_factor))

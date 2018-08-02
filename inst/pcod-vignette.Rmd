@@ -434,14 +434,14 @@ length(unique(pcod_fleet$vessel_name))
 
 We can fit the CPUE in the index standardization model with whatever formulas we want for the binomial and lognormal components:
 
-`f()` in the next chunk is a custom helper function to generate sequential factor values that can be safely passed to TMB. Anything that should be treated as a factor (except year) should be wrapped in it. It also lets you control what the 'base' or 'reference' level is for the factor. This affects the final CPUE index slightly because the binomial and log-normal models are combined on the natural scale, not the link scale. The default is to take the most common factor level (e.g. most common month or most common depth bin).
+`f()` in the next chunk is a custom helper function to generate sequential factor values that can be safely passed to TMB. Anything that should be treated as a factor (except year) should be wrapped in it. It also lets you control what the 'base' or 'reference' level is for the factor. This affects the final CPUE index slightly because the binomial and Gamma models are combined on the natural scale, not the link scale. The default is to take the most common factor level (e.g. most common month or most common depth bin).
 
 ```{r fit-cpue, message=FALSE, warning=FALSE,  results='hide', cache=TRUE}
 m_cpue <- fit_cpue_index(pcod_fleet,
   formula_binomial =
     pos_catch ~ year_factor + f(month) + f(vessel) +
       f(locality) + f(depth) + f(latitude),
-  formula_lognormal =
+  formula_gamma =
     log(spp_catch / hours_fished) ~ year_factor + f(month) +
       f(vessel) + f(locality) + f(depth) + f(latitude)
 )
@@ -461,7 +461,7 @@ predict_cpue_index(m_cpue) %>%
   plot_cpue_index()
 ```
 
-Or we can center them so that the combined and lognormal indices have a geometric mean of 1 and the binomial model has a mean of 0 in logit link space (i.e. centered on 0.5 in probability space):
+Or we can center them so that the combined and Gamma indices have a geometric mean of 1 and the binomial model has a mean of 0 in logit link space (i.e. centered on 0.5 in probability space):
 
 ```{r, fig.width=9, fig.height=3}
 predict_cpue_index(m_cpue, center = TRUE) %>%

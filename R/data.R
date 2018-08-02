@@ -45,6 +45,16 @@
 #' @format Data
 "hbll_grid"
 
+#' A 2km x 2km grid for the HBLL North survey
+#'
+#' @format Data
+"hbll_n_grid"
+
+#' A 2km x 2km grid for the HBLL South survey
+#'
+#' @format Data
+"hbll_s_grid"
+
 #' Survey boundaries
 #'
 #' Survey domain polygons for the synoptic trawl surveys. For use with

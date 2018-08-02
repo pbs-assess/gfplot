@@ -403,7 +403,7 @@ ggsave(file.path(figs, "cpue-spatial-ll.pdf"), width = 6, height = 4.75)
 
 # Commercial CPUE indexed standardization
 
-We can fit an index standardization delta-lognormal GLM to the commercial trawl CPUE data.
+We can fit an index standardization delta-gamma GLM to the commercial trawl CPUE data.
 
 ```{r, eval=FALSE}
 d_cpue_index <- get_cpue_index(gear = "bottom trawl")
@@ -440,7 +440,7 @@ m_cpue <- fit_cpue_index(pcod_fleet,
   formula_binomial =
     pos_catch ~ year_factor + f(month) + f(vessel) +
       f(locality) + f(depth) + f(latitude),
-  formula_lognormal =
+  formula_gamma =
     log(spp_catch / hours_fished) ~ year_factor + f(month) +
       f(vessel) + f(locality) + f(depth) + f(latitude)
 )

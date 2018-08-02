@@ -378,8 +378,9 @@ trawl <- run_sql("GFBioSQL", "SELECT
 #' @rdname get_data
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
+#' @param usability A vector of usability codes to include. Defaults to all.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE, usability  = NULL) {
+  unsorted_only = TRUE, usability = NULL) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -619,11 +620,14 @@ get_survey_index <- function(species, ssid = NULL) {
   as_tibble(.d)
 }
 
-#' @param fishery The fishery_id code(s) (see lookup table get_fishery_ids)
-#'   for fisheries to include in data extraction
-#' @param area The fishery area(s) (see lookup table get_management_areas)
+#' @param species_group Species group code(s) to include (see lookup table
+#'   [get_species_groups()]). Defaults to all.
+#' @param fishery The fishery_id code(s) (see lookup table [get_fishery_ids()])
+#'   for fisheries to include in data extraction. Defaults to all.
+#' @param area The fishery area(s) (see lookup table [get_management_areas()])
 #'   to include in data extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).
-#' @param start_year The minimum year to include management actions for.
+#' @param start_year The minimum year to include management actions.
+#'   Defaults to all.
 #' @export
 #' @rdname get_data
 get_management <- function(species = NULL, species_group = NULL, fishery = NULL,

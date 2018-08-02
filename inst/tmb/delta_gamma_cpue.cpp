@@ -8,7 +8,7 @@ Type objective_function<Type>::operator() ()
   DATA_MATRIX(X2_ij);
   PARAMETER_VECTOR(b1_j);
   PARAMETER_VECTOR(b2_j);
-  PARAMETER(log_shape);
+  PARAMETER(log_cv);
 
   DATA_MATRIX(X1_pred_ij);
   DATA_MATRIX(X2_pred_ij);
@@ -27,9 +27,13 @@ Type objective_function<Type>::operator() ()
   for(int i = 0; i < n1; i++){
     jnll -= dbinom_robust(y1_i(i), size, linear_predictor1_i(i), true);
   }
-  Type shape = exp(log_shape);
+  Type shape = 1.0 / (pow(exp(log_cv), 2.0)); // i.e. shape = 1/CV^2
   for(int i = 0; i < n2; i++){
-    jnll -= dgamma(y2_i(i), shape, exp(linear_predictor2_i(i)) / shape, true);
+    jnll -= dgamma(
+      y2_i(i),
+      shape,
+      exp(linear_predictor2_i(i)) / shape, // scale
+      true);
   }
 
   vector<Type> linear_prediction1_i(n1);
@@ -50,10 +54,6 @@ Type objective_function<Type>::operator() ()
 
   REPORT(linear_prediction2_i);
   ADREPORT(linear_prediction2_i);
-
-  Type cv = sqrt(1.0 / shape);
-  REPORT(cv);
-  ADREPORT(cv);
 
   return jnll;
 }

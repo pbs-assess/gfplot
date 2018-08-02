@@ -4,11 +4,10 @@
 \alias{sim_cpue}
 \title{Simulate fake commercial CPUE data for examples and testing}
 \usage{
-sim_cpue(sigma = 0.4, n_samples = 20, n_years = 15, n_vessels = 8)
+sim_cpue(cv = 0.3, n_samples = 20, n_years = 15, n_vessels = 8)
 }
 \arguments{
-\item{sigma}{The residual standard deviation for the positive timeseries on
-a log scale.}
+\item{cv}{The CV for the positive timeseries.}
 
 \item{n_samples}{The number of samples or fishing events per vessel per
 year.}

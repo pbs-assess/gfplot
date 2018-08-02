@@ -1,18 +1,130 @@
+# fit_cpue_index <- function(dat,
+#                            formula_binomial = pos_catch ~ year_factor + f(month)
+#                              + f(vessel) + f(locality) + f(depth) + f(latitude),
+#                            formula_gamma = log(spp_catch / hours_fished) ~
+#                            year_factor + f(month) + f(vessel) +
+#                              f(locality) + f(depth) + f(latitude)) {
+#   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
+#
+#   mm1 <- model.matrix(formula_binomial, data = dat)
+#   mm2 <- model.matrix(formula_gamma, data = pos_dat)
+#   mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
+#   mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
+#
+#   # get some close starting values:
+#   # m_bin <- speedglm::speedglm(formula_binomial,
+#   #   data = dat,
+#   #   family = binomial(link = "logit")
+#   # )
+#   # m_pos <- lm(formula_gamma, data = pos_dat)
+#
+#   dlls <- getLoadedDLLs()
+#   if (!any(vapply(dlls, function(x)
+#     x[["name"]] == "delta_gamma_cpue", FUN.VALUE = TRUE))) {
+#     load_tmb_cpue()
+#   }
+#
+#   message("Fitting CPUE model ...")
+#   obj <- TMB::MakeADFun(
+#     data = list(
+#       X1_ij = mm1, y1_i = dat$pos_catch,
+#       X2_ij = mm2,
+#       y2_i = pos_dat$spp_catch / pos_dat$hours_fished, # TODO take from formula
+#       X1_pred_ij = mm_pred1, X2_pred_ij = mm_pred2
+#     ),
+#     parameters = list(
+#       b1_j = rnorm(ncol(mm1), 0, 0.2),
+#       b2_j = rnorm(ncol(mm2), 0, 0.2),
+#       log_cv = log(0.3)
+#     ),
+#     DLL = "delta_gamma_cpue"
+#   )
+#
+#   opt <- stats::nlminb(
+#     start = obj$par,
+#     objective = obj$fn,
+#     gradient = obj$gr, control = list(
+#       iter.max = 2000L,
+#       eval.max = 2000L
+#     )
+#   )
+#
+#   message("Getting sdreport...")
+#   r <- TMB::sdreport(obj)
+#
+#   list(
+#     model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)),
+#     years = sort(unique(dat$year)), mm_bin = mm1, mm_pos = mm2,
+#     f_bin = formula_binomial, f_pos = formula_gamma,
+#     data = dat
+#   )
+# }
+
 load_tmb_cpue <- function() {
-  tmb_cpp <- system.file("tmb", "deltalognormal.cpp", package = "gfplot")
+  tmb_cpp <- system.file("tmb", "delta_gamma_cpue.cpp", package = "gfplot")
   TMB::compile(tmb_cpp)
   dyn.load(TMB::dynlib(sub("\\.cpp", "", tmb_cpp)))
 }
 
+load_tmb_2re_cpue <- function() {
+  tmb_cpp_2re <- system.file("tmb", "delta_gamma_cpue_2re.cpp", package = "gfplot")
+  TMB::compile(tmb_cpp_2re)
+  dyn.load(TMB::dynlib(sub("\\.cpp", "", tmb_cpp_2re)))
+}
+
+load_tmb_1re_cpue <- function() {
+  tmb_cpp_1re <- system.file("tmb", "delta_gamma_cpue_1re.cpp", package = "gfplot")
+  TMB::compile(tmb_cpp_1re)
+  dyn.load(TMB::dynlib(sub("\\.cpp", "", tmb_cpp_1re)))
+}
+
+# Random effect indices in C++:
+fct_to_tmb_num <- function(x) {
+  as.numeric(as.factor(as.character(x))) - 1
+}
+
+parse_formula <- function(f) {
+  terms_ <- attributes(stats::terms(f))$term.labels
+  re <- terms_[grepl("1 \\|", terms_)]
+  re <- gsub("1 \\| ", "", re)
+  fe <- terms_[!grepl("1 \\|", terms_)]
+  response <- all.vars(stats::terms(f))[1]
+  fe <- as.formula(paste(response, "~", paste(fe, collapse = " + ")))
+  list(response = response, fe = fe, re = re)
+}
+
+get_response <- function(f, dat) {
+  mf <- stats::model.frame(f, dat)
+  stats::model.response(mf, "numeric")
+}
+
 #' Commercial CPUE index standardization
 #'
-#' @description * `fit_cpue_index()` fits a delta-lognormal commercial CPUE
+#' @description * `fit_cpue_index()` fits a delta-Gamma commercial CPUE
 #'   standardization model
 #'
 #' @param dat A data frame from [tidy_cpue_index()], or a similarly
 #'   formatted data frame.
-#' @param formula_binomial Formula for the binomial model.
-#' @param formula_lognormal Formula for the lognormal model.
+#' @param formula_binomial Formula for the binomial (presence-absence) model.
+#'   See details.
+#' @param formula_gamma Formula for the Gamma (positive) model. See details.
+#' @details
+#' Formulas should be specified in the way a GLM formula would be specified in R
+#' or as a GLMM with **up to 2 random intercepts** would be specified in
+#' [lme4::lmer()]. E.g. `pos_catch ~ year_factor + (1 | vessel)` or `spp_catch /
+#' hours_fished ~ year_factor + (1 | vessel) + (1 | locality)`. Your formula
+#' **must** have a predictor named `year_factor` for the other functions in this
+#' package to interact with the output properly. The fixed effect components of
+#' the binomial and Gamma components do not need to be the same, but the random
+#' effect components must be the same.
+#'
+#' You may want to take advantage of the function [gfplot::f()] for conveniently
+#' turning predictors into factors with their base level set to the most common
+#' factor level and their factor names with consistent name lengths (e.g. '001',
+#' '020').
+#'
+#' The model is internally filled with TMB. As a result, you will have to have a
+#' C++ compiler installed to compile the models. On Windows, search for Rtools.
 #'
 #' @examples
 #' \donttest{
@@ -23,7 +135,7 @@ load_tmb_cpue <- function() {
 #'
 #' m <- fit_cpue_index(d,
 #'   formula_binomial = pos_catch ~ year_factor + f(vessel),
-#'   formula_lognormal = log(spp_catch / hours_fished) ~ year_factor + f(vessel)
+#'   formula_gamma = spp_catch / hours_fished ~ year_factor + f(vessel)
 #' )
 #'
 #' plot_cpue_index_coefs(m)
@@ -33,7 +145,7 @@ load_tmb_cpue <- function() {
 #'
 #' plot_cpue_index_jk(m, terms = "f(vessel)")
 #' }
-#' \dontrun{
+#' \donttest{
 #' # An example with PBS data:
 #' # (the data extraction will be slow)
 #'
@@ -50,72 +162,141 @@ load_tmb_cpue <- function() {
 #'
 #' plot_cpue_index_jk(m)
 #' }
-#' @export
 #' @rdname cpue-index
-
+#' @export
 fit_cpue_index <- function(dat,
-                           formula_binomial = pos_catch ~ year_factor + f(month)
-                             + f(vessel) + f(locality) + f(depth) + f(latitude),
-                           formula_lognormal = log(spp_catch / hours_fished) ~
-                           year_factor + f(month) + f(vessel) +
-                             f(locality) + f(depth) + f(latitude)) {
+  formula_binomial = pos_catch ~ year_factor,
+  formula_gamma = spp_catch / hours_fished ~ year_factor) {
+
+  f_bin <- parse_formula(formula_binomial)
+  f_pos <- parse_formula(formula_gamma)
+
+  if (!identical(f_bin$re, f_pos$re))
+    stop("Random effects for the binomial and positive components must be identical.")
+
+  re1 <- NULL
+  re2 <- NULL
+  if (length(f_bin$re) == 1L) {
+    re1 <- f_bin$re[[1]]
+  }
+  if (length(f_bin$re) == 2L) {
+    re1 <- f_bin$re[[1]]
+    re2 <- f_bin$re[[2]]
+  }
+
   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
 
-  mm1 <- model.matrix(formula_binomial, data = dat)
-  mm2 <- model.matrix(formula_lognormal, data = pos_dat)
-  mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
+  if (!is.null(re1)) {
+    bin_re_id_k <- fct_to_tmb_num(dat[[re1]])
+    pos_re_id_k <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[re1]])
+  }
+  if (!is.null(re2)) {
+    bin_re_id_g <- fct_to_tmb_num(dat[[re2]])
+    pos_re_id_g <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[re2]])
+  }
+  mm1 <- model.matrix(f_bin$fe, data = dat)
+  mm2 <- model.matrix(f_pos$fe, data = pos_dat)
   mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
-
-  # get some close starting values:
-  m_bin <- speedglm::speedglm(formula_binomial,
-    data = dat,
-    family = binomial(link = "logit")
-  )
-  m_pos <- lm(formula_lognormal, data = pos_dat)
+  mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
 
   dlls <- getLoadedDLLs()
-  if (!any(vapply(dlls, function(x)
-    x[["name"]] == "deltalognormal", FUN.VALUE = TRUE))) {
+  if (!is.null(re1) && !is.null(re2) && !any(vapply(dlls, function(x)
+    x[["name"]] == "delta_gamma_cpue_2re", FUN.VALUE = TRUE))) {
+    load_tmb_2re_cpue()
+  }
+  if (!is.null(re1) && is.null(re2) && !any(vapply(dlls, function(x)
+    x[["name"]] == "delta_gamma_cpue_1re", FUN.VALUE = TRUE))) {
+    load_tmb_1re_cpue()
+  }
+  if (is.null(re1) && is.null(re2) && !any(vapply(dlls, function(x)
+    x[["name"]] == "delta_gamma_cpue", FUN.VALUE = TRUE))) {
     load_tmb_cpue()
   }
 
-  message("Fitting CPUE model ...")
+  # defaults if no random effects:
+  random <- NULL
+  DLL <- "delta_gamma_cpue"
+
+  parameters <- list(
+    b1_j = stats::rnorm(ncol(mm1), 0, 0.2),
+    b2_j = stats::rnorm(ncol(mm2), 0, 0.2),
+    log_cv = log(1.0))
+
+  data <- list(
+    X1_ij = mm1,
+    y1_i = get_response(f_bin$fe, dat),
+    X2_ij = mm2,
+    y2_i = get_response(f_pos$fe, pos_dat),
+    X1_pred_ij = mm_pred1,
+    X2_pred_ij = mm_pred2
+  )
+
+  if (!is.null(re1)) {
+    data$factor1k_i <- bin_re_id_k
+    data$factor2k_i <- pos_re_id_k
+    data$nk1 <- length(unique(bin_re_id_k))
+    data$nk2 <- length(unique(pos_re_id_k))
+    random <- c("z1_k", "z2_k")
+    DLL <- "delta_gamma_cpue_1re"
+    parameters$z1_k <- stats::rnorm(length(unique(bin_re_id_k)), 0, 0.2)
+    parameters$z2_k <- stats::rnorm(length(unique(pos_re_id_k)), 0, 0.2)
+    parameters$log_sigma_zk1 <- log(0.2)
+    parameters$log_sigma_zk2 <- log(0.2)
+  }
+
+  if (!is.null(re2)) {
+    data$factor1g_i <- bin_re_id_g
+    data$factor2g_i <- pos_re_id_g
+    data$ng1 <- length(unique(bin_re_id_g))
+    data$ng2 <- length(unique(pos_re_id_g))
+    random <- c(random, "z1_g", "z2_g")
+    DLL <- "delta_gamma_cpue_2re"
+    parameters$z1_g <- stats::rnorm(length(unique(bin_re_id_g)), 0, 0.2)
+    parameters$z2_g <- stats::rnorm(length(unique(pos_re_id_g)), 0, 0.2)
+    parameters$log_sigma_zg1 <- log(0.2)
+    parameters$log_sigma_zg2 <- log(0.2)
+  }
+
   obj <- TMB::MakeADFun(
-    data = list(
-      X1_ij = mm1, y1_i = dat$pos_catch,
-      X2_ij = mm2,
-      y2_i = log(pos_dat$spp_catch / pos_dat$hours_fished), # TODO take from formula
-      X1_pred_ij = mm_pred1, X2_pred_ij = mm_pred2
-    ),
-    parameters = list(
-      b1_j = coef(m_bin) + rnorm(length(coef(m_bin)), 0, 0.001),
-      b2_j = coef(m_pos) + rnorm(length(coef(m_pos)), 0, 0.001),
-      log_sigma = log(summary(m_pos)$sigma) + rnorm(1, 0, 0.001)
-    ),
-    DLL = "deltalognormal"
+    data = data,
+    parameters = parameters,
+    random = random,
+    DLL = DLL,
+    checkParameterOrder = FALSE
   )
 
   opt <- stats::nlminb(
     start = obj$par,
     objective = obj$fn,
-    gradient = obj$gr, control = list(
-      iter.max = 1000L,
-      eval.max = 1000L
-    )
+    gradient = obj$gr,
+    control = list(iter.max = 2000L, eval.max = 2000L)
   )
 
-  message("Getting sdreport...")
+  message("Getting TMB::sdreport()")
   r <- TMB::sdreport(obj)
 
-  list(
+  out <- list(
     model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)),
     years = sort(unique(dat$year)), mm_bin = mm1, mm_pos = mm2,
-    f_bin = formula_binomial, f_pos = formula_lognormal,
-    data = dat
+    f_bin = formula_binomial, f_pos = formula_gamma,
+    data = dat, parameters = parameters, random = random,
+    DLL = DLL, re1_bin = NA, re1_pos = NA, re2_bin = NA, re2_pos = NA,
+    re1 = NA, re2 = NA
   )
+  if (!is.null(re1)) {
+    out$re1_bin <- dat[[re1]]
+    out$re1_pos <- dat[[re1]]
+    out$re1 <- re1
+  }
+  if (!is.null(re2)) {
+    out$re2_bin <- dat[[re2]]
+    out$re2_pos <- dat[[re2]]
+    out$re2 <- re2
+  }
+  out
 }
 
-#' @description * `predict_cpue_index()` predicts from a delta-lognormal
+#' @description * `predict_cpue_index()` predicts from a delta-Gamma
 #'   commercial CPUE standardization model
 #'
 #' @param object Model output from [fit_cpue_index()].
@@ -134,8 +315,8 @@ predict_cpue_index <- function(object, center = FALSE) {
   row.names(report_sum) <- NULL
   df <- as.data.frame(report_sum[ii, , drop = FALSE])
   df$year <- rep(object$years, 3L)
-  df$model <- rep(c("Combined", "Binomial", "Lognormal"), each = nrow(df) / 3L)
-  df$model <- factor(df$model, levels = c("Combined", "Binomial", "Lognormal"))
+  df$model <- rep(c("Combined", "Binomial", "Gamma"), each = nrow(df) / 3L)
+  df$model <- factor(df$model, levels = c("Combined", "Binomial", "Gamma"))
 
   if (center) {
     df <- df %>%
@@ -164,7 +345,7 @@ predict_cpue_index <- function(object, center = FALSE) {
     select(year, model, est_link, se_link, est, lwr, upr)
 }
 
-#' @description * `plot_cpue_index()` plots a delta-lognormal commercial CPUE
+#' @description * `plot_cpue_index()` plots a delta-Gamma commercial CPUE
 #'   standardization model
 #'
 #' @param predicted_dat Input data frame, for example from [predict_cpue_index()].
@@ -194,12 +375,14 @@ plot_cpue_index <- function(predicted_dat, all_models = TRUE) {
 
 #' @description * `tidy_cpue_index_coefs()` extracts coefficients from a CPUE
 #'   index standardization model
+#' @param include_scale_pars Logical: include observation CV and random effect
+#'   like standard deviations in parameter plot?
 #'
 #' @export
 #' @rdname cpue-index
 
-tidy_cpue_index_coefs <- function(object, remove = NULL) {
-  model_prefixes <- c("Bin.", "Pos.")
+tidy_cpue_index_coefs <- function(object, include_scale_pars = FALSE) {
+  model_prefixes <- c("Binomial", "Gamma")
 
   sm <- TMB::summary.sdreport(object$sdreport)
   pars <- row.names(sm)
@@ -207,26 +390,50 @@ tidy_cpue_index_coefs <- function(object, remove = NULL) {
   sm <- as.data.frame(sm)
   sm$pars <- pars
 
-  if (!is.null(remove)) {
-    sm <- filter(sm, !pars %in% c(remove))
-  }
-
   sm <- sm %>%
     rename(se = .data$`Std. Error`) %>%
     rename(est = .data$Estimate) %>%
     filter(!grepl("prediction", pars))
-  sm$par_name <- c(
-    paste(model_prefixes[[1]], colnames(object$mm_bin)),
-    paste(model_prefixes[[2]], colnames(object$mm_pos)),
-    "log_sigma"
-  )
+
+  sm$par_name <- sm$pars
+  sm$par_name[seq(1, ncol(object$mm_bin) + ncol(object$mm_pos))] <-
+    c(paste(model_prefixes[[1]], colnames(object$mm_bin)),
+      paste(model_prefixes[[2]], colnames(object$mm_pos)))
 
   sm$par_name <- sub("f\\(", "", sm$par_name)
   sm$par_name <- sub("\\)", "", sm$par_name)
   sm$par_name <- sub("([0-9.]+$)", " \\1", sm$par_name)
   sm$par_name <- sub("\\(", "", sm$par_name)
+
+  # label REs:
+  sm$par_name[grep("^z1_k$", sm$par_name)] <-
+    paste(model_prefixes[[1]], object$re1, levels(object$re1_bin))
+  sm$par_name[grep("^z2_k$", sm$par_name)] <-
+    paste(model_prefixes[[2]], object$re1, levels(object$re1_pos))
+
+  sm$par_name[grep("^z1_g$", sm$par_name)] <-
+    paste(model_prefixes[[1]], object$re2, levels(object$re2_bin))
+  sm$par_name[grep("^z2_g$", sm$par_name)] <-
+    paste(model_prefixes[[2]], object$re2, levels(object$re2_pos))
+
+  if (!include_scale_pars) {
+    sm <- filter(sm, !grepl("sigma", .data$par_name))
+    sm <- filter(sm, !grepl("log_cv", .data$par_name))
+  }
+  # sm$par_name <- gsub("log_sigma_zk 1", paste("log_sigma", object$re1, model_prefixes[1]), sm$par_name)
+  # sm$par_name <- gsub("log_sigma_zk 2", paste("log_sigma", object$re1, model_prefixes[2]), sm$par_name)
+  #
+  # sm$par_name <- gsub("log_sigma_zg 1", paste("log_sigma", object$re2, model_prefixes[1]), sm$par_name)
+  # sm$par_name <- gsub("log_sigma_zg 2", paste("log_sigma", object$re2, model_prefixes[2]), sm$par_name)
+
   sm$par_group <- sub("[0-9. ]+$", "", sm$par_name)
   sm$par_group <- sub("-[a-zA-Z]+$", "", sm$par_group)
+
+  sm$par_name <- gsub(model_prefixes[[1]], "", sm$par_name)
+  sm$par_name <- gsub(model_prefixes[[2]], "", sm$par_name)
+
+  # sm$par_group <- gsub("log_sigma_zk", paste("log_sigma", object$re1), sm$par_group)
+  # sm$par_group <- gsub("log_sigma_zg", paste("log_sigma", object$re2), sm$par_group)
 
   sm
 }
@@ -238,12 +445,11 @@ tidy_cpue_index_coefs <- function(object, remove = NULL) {
 #' transform the coefficient names from something (element 1) to something
 #' (element 2).
 #'
-#' @details Note that for coefficients for predictors treated as factors (i.e.
-#'   likely all of the predictors), the coefficients represent the difference
-#'   from the base level factor. For example, if January was the base month,
-#'   month 02 represents the estimated difference between February and January.
-#'   The default setup of the function [gfplot::f()] sets the reference level as
-#'   the most common factor level.
+#' @details Note that for coefficients for predictors treated as factors, the
+#'   coefficients represent the difference from the base level factor. For
+#'   example, if January was the base month, month 02 represents the estimated
+#'   difference between February and January. The default setup of the function
+#'   [gfplot::f()] sets the reference level as the most common factor level.
 #'
 #' @export
 #'
@@ -252,7 +458,8 @@ tidy_cpue_index_coefs <- function(object, remove = NULL) {
 plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", "")) {
   sm <- tidy_cpue_index_coefs(object)
   model_prefixes <- c("Bin.", "Pos.")
-  sm$par_group <- forcats::fct_relevel(sm$par_group, "log_sigma", after = Inf)
+
+  # sm$par_group <- forcats::fct_relevel(sm$par_group, "log_cv", after = Inf)
   sm <- mutate(sm, se_too_big = se > 10, se = ifelse(se > 10, NA, se))
   sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
 
@@ -282,7 +489,7 @@ plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", "")) {
     scale_colour_manual(values = c("TRUE" = "grey30", "FALSE" = cols[[3]])) +
     facet_wrap(~par_group, scales = "free") +
     theme_pbs() + guides(shape = FALSE, colour = FALSE) +
-    labs(y = "", x = "Coefficient value")
+    labs(y = "", x = "Coefficient value (logit or log space)")
 }
 
 #' @description * `plot_cpue_index_jk()` "jackknifes" out terms one by one to
@@ -418,8 +625,7 @@ plot_cpue_index_jk <- function(object,
 
 #' Simulate fake commercial CPUE data for examples and testing
 #'
-#' @param sigma The residual standard deviation for the positive timeseries on
-#' a log scale.
+#' @param cv The CV for the positive timeseries.
 #' @param n_samples The number of samples or fishing events per vessel per
 #' year.
 #' @param n_years The number of years.
@@ -428,7 +634,7 @@ plot_cpue_index_jk <- function(object,
 #' @export
 #' @examples
 #' sim_cpue()
-sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
+sim_cpue <- function(cv = 0.3, n_samples = 20, n_years = 15,
                      n_vessels = 8) {
   fake_fleet <- expand.grid(
     year_factor = as.factor(seq(1996, 1996 + (n_years - 1))),
@@ -456,11 +662,9 @@ sim_cpue <- function(sigma = 0.4, n_samples = 20, n_years = 15,
       prob = stats::plogis(vessel_effect + year_effect)
     ),
     spp_catch = ifelse(pos_catch == 1,
-      rlnorm(nrow(fake_fleet),
-        meanlog = vessel_effect + year_effect,
-        sdlog = 0.3
-      ), 0
-    ),
+      stats::rgamma(nrow(fake_fleet),
+        shape = 1/(cv^2),
+        scale = exp(vessel_effect + year_effect) / (1/cv^2)), 0),
     hours_fished = 1
   )
 
