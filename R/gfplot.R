@@ -132,6 +132,10 @@ if (getRversion() >= "2.15.1") {
     ".year_start_date",
     "action_start_date",
     "common_df",
-    "count_surveys_since_2008"
+    "count_surveys_since_2008",
+
+    # historical CPUE tidy
+    "best_depth_m", "locality", "locality_description", "mean_depth"
+
   ))
 }

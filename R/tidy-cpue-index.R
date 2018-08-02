@@ -15,7 +15,7 @@
 #' @param lat_band_width The latitude bandwidths in degrees.
 #' @param depth_band_width The depth band widths in m.
 #' @param clean_bins Logical. Should the depth and latitude bands be rounded to
-#'   the nearest clearn value as defined by `lat_band_width` or
+#'   the nearest clean value as defined by `lat_band_width` or
 #'   `depth_band_width`? Internally, these use, for example:
 #'   `gfplot:::round_down_even(lat_range[1], lat_band_width)`.
 #' @param depth_bin_quantiles Quantiles for the depth bands. Values above and
@@ -43,8 +43,8 @@ tidy_cpue_index <- function(dat, species_common,
                             lat_band_width = 0.2,
                             depth_band_width = 50,
                             clean_bins = TRUE,
-                            depth_bin_quantiles = c(0.01, 0.99),
-                            lat_bin_quantiles = c(0.01, 0.99),
+                            depth_bin_quantiles = c(0.005, 0.995),
+                            lat_bin_quantiles = c(0.005, 0.995),
                             gear = "BOTTOM TRAWL") {
 
   pbs_areas <- gfplot::pbs_areas[grep(

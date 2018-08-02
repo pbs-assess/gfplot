@@ -103,7 +103,7 @@ make_glmerControl <- function(...) {
 }
 
 get_response <- function(form, data) {
-  model.response(model.frame(form, data = data))
+  stats::model.response(stats::model.frame(form, data = data))
 }
 
 # https://github.com/stan-dev/rstanarm/blob/master/R/stan_glmer.R

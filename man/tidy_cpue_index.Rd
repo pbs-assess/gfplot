@@ -8,8 +8,8 @@ tidy_cpue_index(dat, species_common, year_range = c(1996,
   as.numeric(format(Sys.Date(), "\%Y")) - 1), lat_range = c(48, Inf),
   min_positive_tows = 100, min_positive_trips = 4, min_yrs_with_trips = 4,
   area_grep_pattern = "5[CDE]+", lat_band_width = 0.2,
-  depth_band_width = 50, clean_bins = TRUE, depth_bin_quantiles = c(0.01,
-  0.99), lat_bin_quantiles = c(0.01, 0.99), gear = "BOTTOM TRAWL")
+  depth_band_width = 50, clean_bins = TRUE, depth_bin_quantiles = c(0.005,
+  0.995), lat_bin_quantiles = c(0.005, 0.995), gear = "BOTTOM TRAWL")
 }
 \arguments{
 \item{dat}{An input data frame from \code{\link[=get_cpue_index]{get_cpue_index()}}.}
@@ -35,7 +35,7 @@ of interest.}
 \item{depth_band_width}{The depth band widths in m.}
 
 \item{clean_bins}{Logical. Should the depth and latitude bands be rounded to
-the nearest clearn value as defined by \code{lat_band_width} or
+the nearest clean value as defined by \code{lat_band_width} or
 \code{depth_band_width}? Internally, these use, for example:
 \code{gfplot:::round_down_even(lat_range[1], lat_band_width)}.}
 
