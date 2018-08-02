@@ -11,7 +11,7 @@ tidy_survey_index(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
 
 plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   title = "Biomass indices", max_cv = 0.4, max_set_fraction = 0.05,
-  xlim = NULL, survey_cols = NULL)
+  xlim = NULL, survey_cols = NULL, scale = TRUE, hide_y_axis = FALSE)
 }
 \arguments{
 \item{dat}{For \code{\link[=tidy_survey_index]{tidy_survey_index()}}, data from \code{\link[=get_survey_index]{get_survey_index()}}. For
@@ -39,6 +39,10 @@ be shaded as more uncertain.}
 
 \item{survey_cols}{If not \code{NULL}, a named character vector of colors for the
 various surveys.}
+
+\item{scale}{Logical: scale the biomass by the maximum?}
+
+\item{hide_y_axis}{Logical: hide the y axis ticks and labels?}
 }
 \description{
 Plot survey relative biomass mass index

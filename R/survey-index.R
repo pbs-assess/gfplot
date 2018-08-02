@@ -113,6 +113,8 @@ tidy_survey_index <- function(dat,
 #' @param xlim If not `NULL`, the x axis limits.
 #' @param survey_cols If not `NULL`, a named character vector of colors for the
 #'   various surveys.
+#' @param scale Logical: scale the biomass by the maximum?
+#' @param hide_y_axis Logical: hide the y axis ticks and labels?
 #'
 #' @export
 #'
@@ -123,7 +125,11 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               max_cv = 0.4,
                               max_set_fraction = 0.05,
                               xlim = NULL,
-                              survey_cols = NULL) {
+                              survey_cols = NULL,
+                              scale = TRUE,
+                              hide_y_axis = FALSE) {
+
+  if (scale) {
   d <- dat %>%
     group_by(survey_abbrev) %>%
     mutate(
@@ -132,6 +138,14 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       upperci_scaled = upperci / max(upperci)
     ) %>%
     ungroup()
+  } else {
+    d <- dat %>%
+      mutate(
+        biomass_scaled = biomass,
+        lowerci_scaled = lowerci,
+        upperci_scaled = upperci
+      )
+  }
 
   labs <- unique(select(d, survey_abbrev))
   if (is.null(xlim)) {
@@ -192,8 +206,6 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     xlab("") +
     ylab("Relative biomass") +
     theme(
-      axis.text.y = element_text(colour = "white"),
-      axis.ticks.y = element_line(colour = "white"),
       strip.background = element_blank(),
       strip.text.x = element_blank()
     ) +
@@ -212,6 +224,10 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       aes_string(label = "sets"),
       x = yrs[1] + 0.5, y = 0.49,
       colour = "grey35", size = 2.65, hjust = 0)
+
+  if (hide_y_axis)
+    g <- g + theme(axis.text.y = element_text(colour = "white"),
+      axis.ticks.y = element_line(colour = "white"))
 
   g
 }
