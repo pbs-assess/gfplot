@@ -1,13 +1,13 @@
 Package: gfplot
 Title: Data Extraction and Plotting for DFO PBS Groundfish Stocks
-Version: 0.0.0.9000
+Version: 0.0.1.9000
 Authors@R: c(person("Sean", "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
     person("Elise", "Keppel", role = "aut"))
 Description: Facilitates groundfish data extraction at the Canadian Department
     of Fisheries and Oceans (DFO) Pacific Biological Station (PBS), data
     tidying, model fitting, and plotting.
-Depends: R (>= 3.3.0),
+Depends: R (>= 3.4.0),
     Rcpp (>= 0.12.0)
 License: GPL (>=2)
 Encoding: UTF-8
@@ -24,10 +24,11 @@ Imports:
     assertthat,
     dplyr (>= 0.7.0),
     forcats,
-    ggplot2 (>= 2.2.0),
+    ggplot2 (>= 3.0.0),
     glmmTMB,
     grid,
     hexbin,
+    lme4,
     lubridate,
     magrittr,
     methods,
@@ -37,7 +38,7 @@ Imports:
     reshape2,
     rgdal,
     rlang,
-    rstan (>= 2.16.0),
+    rstan (>= 2.17.0),
     rvest,
     scales,
     stringr,
@@ -48,8 +49,7 @@ Imports:
     xml2,
     pingr,
     INLA,
-    DLMtool,
-    lme4
+    DLMtool
 Remotes: github::pbs-software/pbs-data/PBSdata
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.0.1.9000
@@ -57,8 +57,7 @@ Roxygen: list(markdown = TRUE)
 Suggests:
     knitr,
     rmarkdown,
-    testthat,
-    glmmTMB
+    testthat
 VignetteBuilder: knitr
 URL: https://github.com/pbs-assess/gfplot
 BugReports: https://github.com/pbs-assess/gfplot/issues
