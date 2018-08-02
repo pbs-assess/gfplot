@@ -211,7 +211,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     scale_x_continuous(breaks = seq(0, yrs[2], year_increment))
 
   if (scale) {
-    g < g +
+    g <- g +
       geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
         ymax = max(d$upperci_scaled) * 1.1, inherit.aes = FALSE, fill = "grey96") +
       geom_text(
