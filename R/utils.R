@@ -163,6 +163,25 @@ factor_bin_clean <- function(x, bins, clean = TRUE) {
   as.factor(out)
 }
 
+#' Assign areas
+#'
+#' @param major_stat_area_description A vector of major statistical area
+#'   descriptions.
+#' @param area_regex A vector of regular expressions describing the areas group.
+#' @export
+#' @examples
+#' x <- c("5D: NORTHERN HECATE STRAIT", "3C: S.W. VANCOUVER ISLAND", "3D: N.W. VANCOUVER ISLAND")
+#' assign_areas(x)
+assign_areas <- function(major_stat_area_description,
+  area_regex = c("3[CD]+", "5[AB]+", "5[CDE]+")) {
+  out <- major_stat_area_description
+  for (i in seq_along(area_regex)) {
+    out[grepl(area_regex[i], major_stat_area_description)] <-
+      gsub("\\^|\\[|\\]|\\+", "", area_regex[i])
+  }
+  out
+}
+
 factor_clean <- function(x) {
   max_char <- max(nchar(x))
   ndec <- ndecimals(x)
