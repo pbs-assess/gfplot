@@ -44,13 +44,8 @@ NULL
 #' @export
 tidy_catch <- function(dat, areas = NULL) {
   if (!is.null(areas)) {
-    dat$major_stat_area_description <- NULL # in case
-    dat <- dplyr::inner_join(dat, gfplot::pbs_areas, by = "major_stat_area_code")
-    dat$area <- NA
-    for (i in seq_along(areas)) {
-      dat[grepl(areas[[i]], dat$major_stat_area_description), "area"] <-
-        gsub("\\[|\\]|\\+", "", areas[[i]])
-    }
+    dat <- mutate(dat, area = assign_areas(major_stat_area_name,
+                                           areas))
     dat <- dat[!is.na(dat$area), , drop = FALSE]
   } else {
     dat$area <- "Coastwide"

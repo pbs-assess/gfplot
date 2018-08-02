@@ -174,7 +174,7 @@ factor_bin_clean <- function(x, bins, clean = TRUE) {
 #' assign_areas(x)
 assign_areas <- function(major_stat_area_description,
   area_regex = c("3[CD]+", "5[AB]+", "5[CDE]+")) {
-  out <- major_stat_area_description
+  out <- rep(NA, length(major_stat_area_description))
   for (i in seq_along(area_regex)) {
     out[grepl(area_regex[i], major_stat_area_description)] <-
       gsub("\\^|\\[|\\]|\\+", "", area_regex[i])
