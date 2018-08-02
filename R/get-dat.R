@@ -530,17 +530,10 @@ get_cpue_historic <- function(species = NULL,
     .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
   }
 
-  .d$area <- NA
-  for (i in seq_along(areas)) {
-    .d[grepl(areas[[i]], .d$major_stat_area_description), "area"] <-
-      gsub("\\[|\\]|\\+", "", areas[[i]])
-  }
-  specific_areas <- c("3C", "3D", "5A", "5B", "5C", "5D", "5E")
-  .d$specific_area <- NA
-  for (i in seq_along(specific_areas)) {
-    .d[grepl(specific_areas[[i]], .d$major_stat_area_description), "specific_area"] <-
-      specific_areas[[i]]
-  }
+  .d <- mutate(.d, area = assign_areas(major_stat_area_description, area_regex = areas))
+  .d <- mutate(.d, specific_area = assign_areas(major_stat_area_description,
+    area_regex = c("3C", "3D", "5A", "5B", "5C", "5D", "5E")))
+
   as_tibble(.d)
 }
 
