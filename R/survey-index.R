@@ -105,7 +105,6 @@ tidy_survey_index <- function(dat,
 }
 
 #' @param col A vector of two colours for the lines and shading.
-#' @param title Title for the plot.
 #' @param max_cv A coefficient of variation above which a panel will be shaded
 #'   as more uncertain.
 #' @param max_set_fraction A fraction of positive sets above which a panel will
@@ -114,6 +113,7 @@ tidy_survey_index <- function(dat,
 #' @param survey_cols If not `NULL`, a named character vector of colors for the
 #'   various surveys.
 #' @param scale Logical: scale the biomass by the maximum?
+#' @param year_increment Increment for the year x axis.
 #' @param hide_y_axis Logical: hide the y axis ticks and labels?
 #'
 #' @export
@@ -121,12 +121,12 @@ tidy_survey_index <- function(dat,
 #' @rdname plot_survey_index
 
 plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
-                              title = "Biomass indices",
                               max_cv = 0.4,
                               max_set_fraction = 0.05,
                               xlim = NULL,
                               survey_cols = NULL,
                               scale = TRUE,
+                              year_increment = 5,
                               hide_y_axis = FALSE) {
 
   if (scale) {
@@ -184,22 +184,20 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     filter(uncertain)
 
   g <- ggplot(d, aes_string("year", "biomass_scaled")) +
-    geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
-      ymax = 1.1, inherit.aes = FALSE, fill = "grey96") +
     geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", lwd = 0.3) +
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93") +
     geom_ribbon(aes_string(
       ymin = "lowerci_scaled", ymax = "upperci_scaled",
       fill = "survey_abbrev"
-    ), colour = NA, alpha = 0.3) +
+    ), colour = NA, alpha = 0.5) +
     geom_line(col = "#00000050", size = 1) +
     geom_point(aes_string(colour = "survey_abbrev"),
       pch = 21, fill = "grey95", size = 1.4, stroke = 1
     ) +
-    facet_wrap(~survey_abbrev, ncol = 2) +
+    facet_wrap(~survey_abbrev, ncol = 2, scales = "fixed") +
     theme_pbs() +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    ylim(-0.005, 1.05) +
+    ylim(-0.005, NA) +
     coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5)) +
     scale_fill_manual(values = fill_col) +
     scale_colour_manual(values = line_col) +
@@ -209,21 +207,30 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       strip.background = element_blank(),
       strip.text.x = element_blank()
     ) +
-    labs(title = title) +
     guides(fill = FALSE, colour = FALSE) +
-    geom_text(
+    scale_x_continuous(breaks = seq(0, yrs[2], year_increment))
+
+  if (scale) {
+    g < g +
+      geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
+        ymax = max(d$upperci_scaled) * 1.1, inherit.aes = FALSE, fill = "grey96") +
+      geom_text(
       data = labs, x = yrs[1] + 0.5, y = 0.89,
       aes_string(label = "survey_abbrev"),
       inherit.aes = FALSE, colour = "grey30", size = 3, hjust = 0
     ) +
-    scale_x_continuous(breaks = seq(0, yrs[2], 10)) +
-    geom_text(data = stats_df, aes_string(label = "cv"),
-      x = yrs[1] + 0.5, y = 0.67,
-      colour = "grey35", size = 2.65, hjust = 0) +
-    geom_text(data = stats_df,
-      aes_string(label = "sets"),
-      x = yrs[1] + 0.5, y = 0.49,
-      colour = "grey35", size = 2.65, hjust = 0)
+      geom_text(data = stats_df, aes_string(label = "cv"),
+        x = yrs[1] + 0.5, y = 0.67,
+        colour = "grey35", size = 2.65, hjust = 0) +
+      geom_text(data = stats_df,
+        aes_string(label = "sets"),
+        x = yrs[1] + 0.5, y = 0.49,
+        colour = "grey35", size = 2.65, hjust = 0)
+  } else {
+    g <- g + theme(
+      strip.text.x = element_text(colour = "grey30")
+    )
+  }
 
   if (hide_y_axis)
     g <- g + theme(axis.text.y = element_text(colour = "white"),
