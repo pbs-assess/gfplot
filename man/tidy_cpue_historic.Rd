@@ -5,9 +5,9 @@
 \title{Tidy historical CPUE data}
 \usage{
 tidy_cpue_historic(dat, species_common, year_range = c(1956, 1996),
-  area = "5[CDE]+", depth_bins = seq(0, 350, 25), use_alt_year = FALSE,
-  depth_bin_quantiles = c(0, 1), type = c("trip-level-data",
-  "arithmetic-cpue"))
+  area = c("3[CD]+", "5[ABCDE]+"), depth_bins = seq(0, 350, 25),
+  use_alt_year = FALSE, depth_bin_quantiles = c(0, 1),
+  type = c("trip-level-data", "arithmetic-cpue"), max_fe_hours = 5)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_historic]{get_cpue_historic()}}.}
@@ -30,6 +30,11 @@ below these quantiles will be discarded.}
 \item{type}{Should the trip-level data be returned (for possible future index
 standardization) or should the arithmetic CPUE be returned (species
 specific catch and all effort is summed each year and then divided.)}
+
+\item{max_fe_hours}{The maximum number of allowable hours per fishing event
+(e.g. per trawl). Fishing events that are longer than this will be removed.
+This can be used to remove erroneous fishing events. Only affects data in
+1991 and after when the data are recorded as fishing events.}
 }
 \value{
 A (tibble) data frame.

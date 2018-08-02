@@ -22,6 +22,10 @@ clean_localities <- function(x) {
 #' @param type Should the trip-level data be returned (for possible future index
 #'   standardization) or should the arithmetic CPUE be returned (species
 #'   specific catch and all effort is summed each year and then divided.)
+#' @param max_fe_hours The maximum number of allowable hours per fishing event
+#'   (e.g. per trawl). Fishing events that are longer than this will be removed.
+#'   This can be used to remove erroneous fishing events. Only affects data in
+#'   1991 and after when the data are recorded as fishing events.
 #'
 #' @details
 #' Note that fishing events prior to 1991 are 'rolled up' in the databases to
@@ -29,31 +33,23 @@ clean_localities <- function(x) {
 #' trips in 1991 and after to create a consistent form of data.
 #' @return
 #' A (tibble) data frame.
-#' @export
 #'
 #' @examples
 #' \donttest{
 #' get_cpue_historic(end_year = 2016) %>%
 #'   tidy_cpue_historic(species_common = "pacific cod", area = "5[CD]+")
 #' }
+#' @export
 tidy_cpue_historic <- function(dat,
                             species_common,
                             year_range = c(1956, 1996),
-                            area = "5[CDE]+",
+                            area = c("3[CD]+", "5[ABCDE]+"),
                             depth_bins = seq(0, 350, 25),
                             use_alt_year = FALSE,
                             depth_bin_quantiles = c(0, 1),
-                            type = c("trip-level-data", "arithmetic-cpue")) {
+                            type = c("trip-level-data", "arithmetic-cpue"),
+                            max_fe_hours = 5) {
   type <- match.arg(type)
-
-  dat <- dat[grepl(area, dat$specific_area), , drop = FALSE]
-  dat$area <- gsub("\\[|\\]|\\+", "", area)
-
-  if (use_alt_year) {
-    dat$year <- NULL
-    dat$year <- dat$alt_year
-    dat$alt_year <- NULL
-  }
 
   # basic filtering:
   dat <- dat %>% filter(
@@ -63,22 +59,35 @@ tidy_cpue_historic <- function(dat,
     year >= year_range[[1]], year <= year_range[[2]]
   )
 
+  dat$area <- assign_areas(dat$major_stat_area_description, area)
+  dat <- dat[!is.na(dat$area), , drop = FALSE]
+
+  if (use_alt_year) {
+    dat$year <- NULL
+    dat$year <- dat$alt_year
+    dat$alt_year <- NULL
+  }
+
   fe_dat <- dat %>%
     group_by(year, area, trip_id, fishing_event_id) %>%
     summarise(
-      spp_catch = sum(ifelse(species_common_name == species_common, total, 0)),
-      hours_fished = mean(hours_fished), # should be 1
-      depth = mean(best_depth_m), # should be 1
+      spp_catch = sum(ifelse(tolower(species_common_name) == tolower(species_common), total, 0)),
+      hours_fished = mean(hours_fished, na.rm = TRUE), # should be 1
+      depth = mean(best_depth_m, na.rm = TRUE), # should be 1
       month = month[[1]], # should be 1
       # - is for formatting for easy coefficient plotting:
       locality = paste0("-", clean_localities(locality_description[[1]]))
     ) %>%
     ungroup()
 
+  fe_dat <- fe_dat[fe_dat$year < 1991 |
+      (fe_dat$year >= 1991 & fe_dat$hours_fished <= max_fe_hours), , drop = FALSE]
+
   # arith. cpue for target spp:
   cpue_arith <- fe_dat %>%
     group_by(area, year) %>%
-    summarise(spp_catch = sum(spp_catch), hours_fished = sum(hours_fished)) %>%
+    summarise(spp_catch = sum(spp_catch, na.rm = TRUE),
+      hours_fished = sum(hours_fished, na.rm = TRUE)) %>%
     mutate(cpue_arith = spp_catch / hours_fished) %>%
     ungroup()
 
@@ -86,10 +95,10 @@ tidy_cpue_historic <- function(dat,
     trip_dat <- fe_dat %>%
       group_by(year, area, trip_id, locality) %>%
       summarise(
-        spp_catch = sum(spp_catch),
-        hours_fished = sum(hours_fished),
-        mean_depth = mean(depth),
-        geo_mean_depth = exp(mean(log(depth))),
+        spp_catch = sum(spp_catch, na.rm = TRUE),
+        hours_fished = sum(hours_fished, na.rm = TRUE),
+        mean_depth = mean(depth, na.rm = TRUE),
+        geo_mean_depth = exp(mean(log(depth), na.rm = TRUE)),
         month = month[[1]]
       ) %>%
       ungroup()
@@ -101,7 +110,7 @@ tidy_cpue_historic <- function(dat,
     trip_dat <- trip_dat %>%
       filter(mean_depth >= min(depth_bands) & mean_depth <= max(depth_bands)) %>%
       mutate(
-        mean_depth = factor_bin_clean(mean_depth, depth_bands),
+        depth_bin = factor_bin_clean(mean_depth, depth_bands),
         locality = as.factor(locality),
         year_factor = factor_clean(year),
         month = factor_clean(month)
