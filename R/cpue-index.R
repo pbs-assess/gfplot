@@ -93,9 +93,33 @@ parse_formula <- function(f) {
   list(response = response, fe = fe, re = re)
 }
 
-get_response <- function(f, dat) {
-  mf <- stats::model.frame(f, dat)
-  stats::model.response(mf, "numeric")
+# https://github.com/stan-dev/rstanarm/blob/55c91fefe8f39f00a68d37944357b96aef1de9f8/R/misc.R
+make_glmerControl <- function(...) {
+  lme4::glmerControl(check.nlev.gtreq.5 = "ignore",
+    check.nlev.gtr.1 = "stop",
+    check.nobs.vs.rankZ = "ignore",
+    check.nobs.vs.nlev = "ignore",
+    check.nobs.vs.nRE = "ignore", ...)
+}
+
+get_response <- function(form, data) {
+  model.response(model.frame(form, data = data))
+}
+
+# https://github.com/stan-dev/rstanarm/blob/master/R/stan_glmer.R
+get_response_lme4 <- function(formula, data) {
+  call <- match.call(expand.dots = TRUE)
+  mc <- match.call(expand.dots = FALSE)
+  data <- data
+  mc[[1]] <- quote(lme4::glFormula)
+  mc$control <- make_glmerControl()
+  mc$data <- data
+  glmod <- eval(mc, parent.frame())
+  X <- glmod$X
+  y <- glmod$fr[, as.character(glmod$formula[2L])]
+  if (is.matrix(y) && ncol(y) == 1L)
+    y <- as.vector(y)
+  y
 }
 
 #' Commercial CPUE index standardization
@@ -222,11 +246,19 @@ fit_cpue_index <- function(dat,
     b2_j = stats::rnorm(ncol(mm2), 0, 0.2),
     log_cv = log(1.0))
 
+  if (!is.null(re1)) {
+    y1_i <- get_response_lme4(formula_binomial, dat)
+    y2_i <- get_response_lme4(formula_gamma, pos_dat)
+  } else {
+    y1_i <- get_response(formula_binomial, dat)
+    y2_i <- get_response(formula_gamma, pos_dat)
+  }
+
   data <- list(
     X1_ij = mm1,
-    y1_i = get_response(f_bin$fe, dat),
+    y1_i = y1_i,
     X2_ij = mm2,
-    y2_i = get_response(f_pos$fe, pos_dat),
+    y2_i = y2_i,
     X1_pred_ij = mm_pred1,
     X2_pred_ij = mm_pred2
   )
@@ -262,7 +294,7 @@ fit_cpue_index <- function(dat,
     parameters = parameters,
     random = random,
     DLL = DLL,
-    checkParameterOrder = FALSE
+    checkParameterOrder = TRUE
   )
 
   opt <- stats::nlminb(
@@ -429,8 +461,8 @@ tidy_cpue_index_coefs <- function(object, include_scale_pars = FALSE) {
   sm$par_group <- sub("[0-9. ]+$", "", sm$par_name)
   sm$par_group <- sub("-[a-zA-Z]+$", "", sm$par_group)
 
-  sm$par_name <- gsub(model_prefixes[[1]], "", sm$par_name)
-  sm$par_name <- gsub(model_prefixes[[2]], "", sm$par_name)
+  # sm$par_name <- gsub(model_prefixes[[1]], "", sm$par_name)
+  # sm$par_name <- gsub(model_prefixes[[2]], "", sm$par_name)
 
   # sm$par_group <- gsub("log_sigma_zk", paste("log_sigma", object$re1), sm$par_group)
   # sm$par_group <- gsub("log_sigma_zg", paste("log_sigma", object$re2), sm$par_group)

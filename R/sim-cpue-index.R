@@ -34,7 +34,7 @@ sim_cpue_index <- function(make_plots = TRUE, cv = 0.3, n_samples = 10,
 
     # g2 <- plot_cpue_index_jk(m, terms = "f(vessel)")
   }
-  sm <- tidy_cpue_index_coefs(m)
+  sm <- tidy_cpue_index_coefs(m, include_scale_pars = TRUE)
 
   intercept <- year_effects$year_effect[1] + vessel_effects$vessel_effect[1]
   sm$true_b <- c(
@@ -78,7 +78,7 @@ sim_cpue_index <- function(make_plots = TRUE, cv = 0.3, n_samples = 10,
   mm_pred2 <- make_pred_mm(mm2, years = unique(fake_fleet$year_factor))
 
   b_true_bin <- filter(sm, grepl("Bin", par_name)) %>% pull(true_b)
-  b_true_pos <- filter(sm, grepl("Pos", par_name)) %>% pull(true_b)
+  b_true_pos <- filter(sm, grepl("Gamma", par_name)) %>% pull(true_b)
 
   true_bin <- mm_pred1 %*% b_true_bin %>% as.numeric()
   true_pos <- mm_pred2 %*% b_true_pos %>% as.numeric()
