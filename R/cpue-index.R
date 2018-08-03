@@ -211,12 +211,12 @@ fit_cpue_index <- function(dat,
   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
 
   if (!is.null(re1)) {
-    bin_re_id_k <- fct_to_tmb_num(dat[[re1]])
-    pos_re_id_k <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[re1]])
+    bin_re_id_k <- fct_to_tmb_num(dat[[as.character(re1)]])
+    pos_re_id_k <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[as.character(re1)]])
   }
   if (!is.null(re2)) {
-    bin_re_id_g <- fct_to_tmb_num(dat[[re2]])
-    pos_re_id_g <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[re2]])
+    bin_re_id_g <- fct_to_tmb_num(dat[[as.character(re2)]])
+    pos_re_id_g <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[as.character(re2)]])
   }
   mm1 <- model.matrix(f_bin$fe, data = dat)
   mm2 <- model.matrix(f_pos$fe, data = pos_dat)
@@ -316,13 +316,13 @@ fit_cpue_index <- function(dat,
     re1 = NA, re2 = NA
   )
   if (!is.null(re1)) {
-    out$re1_bin <- dat[[re1]]
-    out$re1_pos <- dat[[re1]]
+    out$re1_bin <- as.factor(as.character(dat[[re1]]))
+    out$re1_pos <- as.factor(as.character(dat[[re1]]))
     out$re1 <- re1
   }
   if (!is.null(re2)) {
-    out$re2_bin <- dat[[re2]]
-    out$re2_pos <- dat[[re2]]
+    out$re2_bin <- as.factor(as.character(dat[[re2]]))
+    out$re2_pos <- as.factor(as.character(dat[[re2]]))
     out$re2 <- re2
   }
   out
@@ -491,7 +491,6 @@ plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", "")) {
   sm <- tidy_cpue_index_coefs(object)
   model_prefixes <- c("Bin.", "Pos.")
 
-  # sm$par_group <- forcats::fct_relevel(sm$par_group, "log_cv", after = Inf)
   sm <- mutate(sm, se_too_big = se > 10, se = ifelse(se > 10, NA, se))
   sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
 
