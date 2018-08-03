@@ -5,6 +5,13 @@
 #' @param dat An input data frame from [get_cpue_index()].
 #' @param species_common The species common name.
 #' @param year_range The range of years to include.
+#' @param alt_year_start_date Alternative year starting date specified as a
+#'   month-day combination. E.g. "03-01" for March 1st. Can be used to create
+#'   'fishing years'.
+#' @param use_alt_year Should the alternate year (e.g. fishing year) column
+#'   `alt_year` be used? If `FALSE` then the calendar year will be used. If this
+#'   is set to `TRUE` then the `year` column will be replaced with the
+#'   `alt_year` column.
 #' @param lat_range The range of latitudes to include.
 #' @param min_positive_tows The minimum number of positive tows over all years.
 #' @param min_positive_trips The minimum number of annual positive trips.
@@ -35,6 +42,8 @@
 
 tidy_cpue_index <- function(dat, species_common,
                             year_range = c(1996, as.numeric(format(Sys.Date(), "%Y")) - 1),
+                            alt_year_start_date = "04-01",
+                            use_alt_year = FALSE,
                             lat_range = c(48, Inf),
                             min_positive_tows = 100,
                             min_positive_trips = 4,
@@ -54,10 +63,26 @@ tidy_cpue_index <- function(dat, species_common,
   names(dat) <- tolower(names(dat))
   dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
 
+  dat <- dat %>% mutate(year = lubridate::year(best_date))
+
+  # create possibly alternate starting date:
+  if (alt_year_start_date != "01-01") {
+    dat <- dplyr::mutate(dat, .year_start_date =
+        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+    dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
+    dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+    dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
+  }
+
+  if (use_alt_year) {
+    dat$year <- NULL
+    dat$year <- dat$alt_year
+    dat$alt_year <- NULL
+  }
+
   # basic filtering:
   catch <- dat %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
-    mutate(year = lubridate::year(best_date)) %>%
     filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
     filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
     filter(!is.na(latitude), !is.na(longitude), !is.na(best_depth)) %>%

@@ -13,6 +13,7 @@ clean_localities <- function(x) {
 #' @param year_range A range of years to include. Can go up to current year but
 #'   note the management changes, particularly in 1996.
 #' @param area A major statistical area as a regular expression.
+#' @param depth_bins A vector of depth bins to be in the depth into.
 #' @param use_alt_year Should the alternate year (e.g. fishing year) column
 #'   `alt_year` be used? If `FALSE` then the calendar year will be used. If this
 #'   is set to `TRUE` then the `year` column will be replaced with the
@@ -108,9 +109,9 @@ tidy_cpue_historic <- function(dat,
     )
 
     trip_dat <- trip_dat %>%
-      filter(mean_depth >= min(depth_bands) & mean_depth <= max(depth_bands)) %>%
+      filter(mean_depth >= min(depth_bins) & mean_depth <= max(depth_bins)) %>%
       mutate(
-        depth_bin = factor_bin_clean(mean_depth, depth_bands),
+        depth_bin = factor_bin_clean(mean_depth, depth_bins),
         locality = as.factor(locality),
         year_factor = factor_clean(year),
         month = factor_clean(month)

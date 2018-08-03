@@ -44,8 +44,7 @@ NULL
 #' @export
 tidy_catch <- function(dat, areas = NULL) {
   if (!is.null(areas)) {
-    dat <- mutate(dat, area = assign_areas(major_stat_area_name,
-                                           areas))
+    dat$area <- assign_areas(dat$major_stat_area_name, areas))
     dat <- dat[!is.na(dat$area), , drop = FALSE]
   } else {
     dat$area <- "Coastwide"

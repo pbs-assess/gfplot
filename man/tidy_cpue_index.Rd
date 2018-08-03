@@ -5,8 +5,9 @@
 \title{Tidy commercial PBS CPUE data}
 \usage{
 tidy_cpue_index(dat, species_common, year_range = c(1996,
-  as.numeric(format(Sys.Date(), "\%Y")) - 1), lat_range = c(48, Inf),
-  min_positive_tows = 100, min_positive_trips = 4, min_yrs_with_trips = 4,
+  as.numeric(format(Sys.Date(), "\%Y")) - 1), alt_year_start_date = "04-01",
+  use_alt_year = FALSE, lat_range = c(48, Inf), min_positive_tows = 100,
+  min_positive_trips = 4, min_yrs_with_trips = 4,
   area_grep_pattern = "5[CDE]+", lat_band_width = 0.2,
   depth_band_width = 50, clean_bins = TRUE, depth_bin_quantiles = c(0.005,
   0.995), lat_bin_quantiles = c(0.005, 0.995), gear = "BOTTOM TRAWL")
@@ -17,6 +18,15 @@ tidy_cpue_index(dat, species_common, year_range = c(1996,
 \item{species_common}{The species common name.}
 
 \item{year_range}{The range of years to include.}
+
+\item{alt_year_start_date}{Alternative year starting date specified as a
+month-day combination. E.g. "03-01" for March 1st. Can be used to create
+'fishing years'.}
+
+\item{use_alt_year}{Should the alternate year (e.g. fishing year) column
+\code{alt_year} be used? If \code{FALSE} then the calendar year will be used. If this
+is set to \code{TRUE} then the \code{year} column will be replaced with the
+\code{alt_year} column.}
 
 \item{lat_range}{The range of latitudes to include.}
 
