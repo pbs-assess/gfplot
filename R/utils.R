@@ -151,7 +151,7 @@ sql_server_accessible <- function() {
 }
 
 factor_bin_clean <- function(x, bins, clean = TRUE) {
-  out <- bins[findInterval(x, bins)]
+  out <- bins[findInterval(x, bins, rightmost.closed = TRUE)]
   max_char <- max(nchar(out))
   ndec <- ndecimals(out)
   if (clean & ndec == 0) {
