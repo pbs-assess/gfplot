@@ -152,29 +152,6 @@ fit_cpue_index <- function(dat,
   }
   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
 
-  # Get some reasonable starting values for speed:
-  m_bin <- tryCatch({speedglm::speedglm(f_bin$fe,
-    data = dat,
-    family = binomial(link = "logit"))}, error = function(e) NA)
-
-  m_pos <- tryCatch({stats::glm(f_pos$fe,
-    data = pos_dat,
-    family = Gamma(link = "log"))}, error = function(e) NA)
-
-  if (!is.na(m_bin)) {
-    b1_j_start <- coef(m_bin) + stats::rnorm(ncol(mm1), 0, 0.02)
-  } else {
-    b1_j_start <- stats::rnorm(ncol(mm1), 0, 0.1)
-  }
-  if (!is.na(m_pos)) {
-    b2_j_start <- coef(m_pos) + stats::rnorm(ncol(mm2), 0, 0.02)
-    # CV = sqrt(1/gamma_shape):
-    log_cv_start <-  log(1/sqrt(summary(m_pos)$dispersion))
-  } else {
-    b2_j_start <- stats::rnorm(ncol(mm2), 0, 0.1)
-    log_cv_start <- log(1)
-  }
-
   if (!is.null(re1)) {
     bin_re_id_k <- fct_to_tmb_num(dat[[as.character(re1)]])
     pos_re_id_k <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[as.character(re1)]])
@@ -189,6 +166,7 @@ fit_cpue_index <- function(dat,
   mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
 
   dlls <- getLoadedDLLs()
+
   if (!is.null(re1) && !is.null(re2) && !any(vapply(dlls, function(x)
     x[["name"]] == "delta_gamma_cpue_2re", FUN.VALUE = TRUE))) {
     load_tmb_2re_cpue()
@@ -205,6 +183,28 @@ fit_cpue_index <- function(dat,
   # defaults if no random effects:
   random <- NULL
   DLL <- "delta_gamma_cpue"
+
+  # Get some reasonable starting values for speed:
+  m_bin <- tryCatch({speedglm::speedglm(f_bin$fe,
+    data = dat,
+    family = binomial(link = "logit"))}, error = function(e) NA)
+
+  m_pos <- tryCatch({stats::glm(f_pos$fe,
+    data = pos_dat,
+    family = Gamma(link = "log"))}, error = function(e) NA)
+  if (!is.na(m_bin)[[1]]) {
+    b1_j_start <- coef(m_bin) + stats::rnorm(ncol(mm1), 0, 0.02)
+  } else {
+    b1_j_start <- stats::rnorm(ncol(mm1), 0, 0.1)
+  }
+  if (!is.na(m_pos)[[1]]) {
+    b2_j_start <- coef(m_pos) + stats::rnorm(ncol(mm2), 0, 0.02)
+    # CV = sqrt(1/gamma_shape):
+    log_cv_start <-  log(1/sqrt(summary(m_pos)$dispersion))
+  } else {
+    b2_j_start <- stats::rnorm(ncol(mm2), 0, 0.1)
+    log_cv_start <- log(1)
+  }
 
   parameters <- list(
     b1_j = b1_j_start,
