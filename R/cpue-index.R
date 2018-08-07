@@ -191,7 +191,8 @@ fit_cpue_index <- function(dat,
 
   m_pos <- tryCatch({stats::glm(f_pos$fe,
     data = pos_dat,
-    family = Gamma(link = "log"))}, error = function(e) NA)
+    family = Gamma(link = "log"), control = list(maxit = 100))},
+    error = function(e) NA)
   if (!is.na(m_bin)[[1]]) {
     b1_j_start <- coef(m_bin) + stats::rnorm(ncol(mm1), 0, 0.02)
   } else {
