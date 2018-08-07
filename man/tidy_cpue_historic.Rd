@@ -19,6 +19,8 @@ note the management changes, particularly in 1996.}
 
 \item{area}{A major statistical area as a regular expression.}
 
+\item{depth_bins}{A vector of depth bins to be in the depth into.}
+
 \item{use_alt_year}{Should the alternate year (e.g. fishing year) column
 \code{alt_year} be used? If \code{FALSE} then the calendar year will be used. If this
 is set to \code{TRUE} then the \code{year} column will be replaced with the

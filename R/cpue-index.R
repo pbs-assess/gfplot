@@ -1,65 +1,3 @@
-# fit_cpue_index <- function(dat,
-#                            formula_binomial = pos_catch ~ year_factor + f(month)
-#                              + f(vessel) + f(locality) + f(depth) + f(latitude),
-#                            formula_gamma = log(spp_catch / hours_fished) ~
-#                            year_factor + f(month) + f(vessel) +
-#                              f(locality) + f(depth) + f(latitude)) {
-#   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
-#
-#   mm1 <- model.matrix(formula_binomial, data = dat)
-#   mm2 <- model.matrix(formula_gamma, data = pos_dat)
-#   mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
-#   mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
-#
-#   # get some close starting values:
-#   # m_bin <- speedglm::speedglm(formula_binomial,
-#   #   data = dat,
-#   #   family = binomial(link = "logit")
-#   # )
-#   # m_pos <- lm(formula_gamma, data = pos_dat)
-#
-#   dlls <- getLoadedDLLs()
-#   if (!any(vapply(dlls, function(x)
-#     x[["name"]] == "delta_gamma_cpue", FUN.VALUE = TRUE))) {
-#     load_tmb_cpue()
-#   }
-#
-#   message("Fitting CPUE model ...")
-#   obj <- TMB::MakeADFun(
-#     data = list(
-#       X1_ij = mm1, y1_i = dat$pos_catch,
-#       X2_ij = mm2,
-#       y2_i = pos_dat$spp_catch / pos_dat$hours_fished, # TODO take from formula
-#       X1_pred_ij = mm_pred1, X2_pred_ij = mm_pred2
-#     ),
-#     parameters = list(
-#       b1_j = rnorm(ncol(mm1), 0, 0.2),
-#       b2_j = rnorm(ncol(mm2), 0, 0.2),
-#       log_cv = log(0.3)
-#     ),
-#     DLL = "delta_gamma_cpue"
-#   )
-#
-#   opt <- stats::nlminb(
-#     start = obj$par,
-#     objective = obj$fn,
-#     gradient = obj$gr, control = list(
-#       iter.max = 2000L,
-#       eval.max = 2000L
-#     )
-#   )
-#
-#   message("Getting sdreport...")
-#   r <- TMB::sdreport(obj)
-#
-#   list(
-#     model = opt, sdreport = r, max_gradient = max(obj$gr(opt$par)),
-#     years = sort(unique(dat$year)), mm_bin = mm1, mm_pos = mm2,
-#     f_bin = formula_binomial, f_pos = formula_gamma,
-#     data = dat
-#   )
-# }
-
 load_tmb_cpue <- function() {
   tmb_cpp <- system.file("tmb", "delta_gamma_cpue.cpp", package = "gfplot")
   TMB::compile(tmb_cpp)
@@ -135,12 +73,17 @@ get_response_lme4 <- function(formula, data) {
 #' @details
 #' Formulas should be specified in the way a GLM formula would be specified in R
 #' or as a GLMM with **up to 2 random intercepts** would be specified in
-#' [lme4::lmer()]. E.g. `pos_catch ~ year_factor + (1 | vessel)` or `spp_catch /
-#' hours_fished ~ year_factor + (1 | vessel) + (1 | locality)`. Your formula
+#' [lme4::lmer()]. E.g. `pos_catch ~ year_factor + (1 | vessel)` or
+#' `cpue ~ year_factor + (1 | vessel) + (1 | locality)`. Your formula
 #' **must** have a predictor named `year_factor` for the other functions in this
 #' package to interact with the output properly. The fixed effect components of
 #' the binomial and Gamma components do not need to be the same, but the random
 #' effect components must be the same.
+#'
+#' Because of how the formula parsing is performed, you **cannot** include any
+#' operations in the response variable. For example, you can't use `catch/effort
+#' ~ year_factor`. Instead you must create a new column, e.g. `cpue` and use
+#' that as the response: `cpue ~ year_factor`.
 #'
 #' You may want to take advantage of the function [gfplot::f()] for conveniently
 #' turning predictors into factors with their base level set to the most common
@@ -207,8 +150,30 @@ fit_cpue_index <- function(dat,
     re1 <- f_bin$re[[1]]
     re2 <- f_bin$re[[2]]
   }
-
   pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
+
+  # Get some reasonable starting values for speed:
+  m_bin <- tryCatch({speedglm::speedglm(f_bin$fe,
+    data = dat,
+    family = binomial(link = "logit"))}, error = function(e) NA)
+
+  m_pos <- tryCatch({stats::glm(f_pos$fe,
+    data = pos_dat,
+    family = Gamma(link = "log"))}, error = function(e) NA)
+
+  if (!is.na(m_bin)) {
+    b1_j_start <- coef(m_bin) + stats::rnorm(ncol(mm1), 0, 0.02)
+  } else {
+    b1_j_start <- stats::rnorm(ncol(mm1), 0, 0.1)
+  }
+  if (!is.na(m_pos)) {
+    b2_j_start <- coef(m_pos) + stats::rnorm(ncol(mm2), 0, 0.02)
+    # CV = sqrt(1/gamma_shape):
+    log_cv_start <-  log(1/sqrt(summary(m_pos)$dispersion))
+  } else {
+    b2_j_start <- stats::rnorm(ncol(mm2), 0, 0.1)
+    log_cv_start <- log(1)
+  }
 
   if (!is.null(re1)) {
     bin_re_id_k <- fct_to_tmb_num(dat[[as.character(re1)]])
@@ -242,9 +207,9 @@ fit_cpue_index <- function(dat,
   DLL <- "delta_gamma_cpue"
 
   parameters <- list(
-    b1_j = stats::rnorm(ncol(mm1), 0, 0.2),
-    b2_j = stats::rnorm(ncol(mm2), 0, 0.2),
-    log_cv = log(1.0))
+    b1_j = b1_j_start,
+    b2_j = b2_j_start,
+    log_cv = log_cv_start)
 
   if (!is.null(re1)) {
     y1_i <- get_response_lme4(formula_binomial, dat)

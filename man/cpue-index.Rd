@@ -86,11 +86,16 @@ test the sensitivity of the standardization model to any one term.
 \details{
 Formulas should be specified in the way a GLM formula would be specified in R
 or as a GLMM with \strong{up to 2 random intercepts} would be specified in
-\code{\link[lme4:lmer]{lme4::lmer()}}. E.g. \code{pos_catch ~ year_factor + (1 | vessel)} or \code{spp_catch / hours_fished ~ year_factor + (1 | vessel) + (1 | locality)}. Your formula
+\code{\link[lme4:lmer]{lme4::lmer()}}. E.g. \code{pos_catch ~ year_factor + (1 | vessel)} or
+\code{cpue ~ year_factor + (1 | vessel) + (1 | locality)}. Your formula
 \strong{must} have a predictor named \code{year_factor} for the other functions in this
 package to interact with the output properly. The fixed effect components of
 the binomial and Gamma components do not need to be the same, but the random
 effect components must be the same.
+
+Because of how the formula parsing is performed, you \strong{cannot} include any
+operations in the response variable. For example, you can't use \code{catch/effort ~ year_factor}. Instead you must create a new column, e.g. \code{cpue} and use
+that as the response: \code{cpue ~ year_factor}.
 
 You may want to take advantage of the function \code{\link[gfplot:f]{gfplot::f()}} for conveniently
 turning predictors into factors with their base level set to the most common
