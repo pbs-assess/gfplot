@@ -491,13 +491,20 @@ tidy_cpue_index_coefs <- function(object, include_scale_pars = FALSE) {
 #'
 #' @rdname cpue-index
 
-plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", "")) {
-  sm <- tidy_cpue_index_coefs(object)
-  model_prefixes <- c("Bin.", "Pos.")
+plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", ""),
+  type = c("delta", "tweedie"), ...) {
+
+  type <- match.arg(type)
+  if (type == "delta") {
+    sm <- tidy_cpue_index_coefs(object, ...)
+    model_prefixes <- c("Bin.", "Pos.")
+    sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
+  } else {
+    sm <- tidy_cpue_index_coefs_tweedie(object, ...)
+    sm <- mutate(sm, type = TRUE)
+  }
 
   sm <- mutate(sm, se_too_big = se > 10, se = ifelse(se > 10, NA, se))
-  sm <- mutate(sm, type = grepl(model_prefixes[[1]], par_group))
-
   sm <- mutate(sm, par_name = gsub(regex[[1]], regex[[2]], par_name))
   sm <- mutate(sm, par_group = gsub(regex[[1]], regex[[2]], par_group))
   sm <- mutate(sm, par_name = gsub("[A-Za-z]+. [a-z]+ ", "", par_name))
@@ -524,7 +531,8 @@ plot_cpue_index_coefs <- function(object, regex = c(", base_[a-z]+", "")) {
     scale_colour_manual(values = c("TRUE" = "grey30", "FALSE" = cols[[3]])) +
     facet_wrap(~par_group, scales = "free") +
     theme_pbs() + guides(shape = FALSE, colour = FALSE) +
-    labs(y = "", x = "Coefficient value (logit or log space)")
+    labs(y = "",
+      x = if (type == "delta") "Coefficient value (logit or log space)" else "Coefficient value (log space)")
 }
 
 #' @description * `plot_cpue_index_jk()` "jackknifes" out terms one by one to
@@ -703,6 +711,8 @@ sim_cpue <- function(cv = 0.3, n_samples = 20, n_years = 15,
     hours_fished = 1
   )
 
+
+  fake_fleet$cpue <- fake_fleet$spp_catch / fake_fleet$hours_fished
   fake_fleet$year <- as.numeric(as.character(fake_fleet$year_factor))
 
   dplyr::as.tbl(fake_fleet)

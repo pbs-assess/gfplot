@@ -18,7 +18,8 @@ plot_cpue_index(predicted_dat, all_models = TRUE)
 
 tidy_cpue_index_coefs(object, include_scale_pars = FALSE)
 
-plot_cpue_index_coefs(object, regex = c(", base_[a-z]+", ""))
+plot_cpue_index_coefs(object, regex = c(", base_[a-z]+", ""),
+  type = c("delta", "tweedie"), ...)
 
 plot_cpue_index_jk(object, terms = c("f(month)", "f(vessel)", "f(locality)",
   "f(depth)", "f(latitude)"), return_data = FALSE)

@@ -11,16 +11,22 @@ load_tmb <- function(file = "tweedie_cpue.cpp") {
 #'
 #' @export
 #' @examples
-#' \donttest{
 #' set.seed(1)
 #' d <- sim_cpue()
-#' d$cpue <- d$spp_catch / d$hours_fished
-#' d$vessel <- f(d$vessel)
-#'
+#' # assign factor levels with base as most common level:
+#' d$vessel <- gfplot::f(d$vessel)
 #' m1 <- fit_cpue_index_tweedie(d, cpue ~ year_factor + vessel)
-#' m2 <- fit_cpue_index_tweedie(d, cpue ~ year_factor + (1 | vessel))
+#' plot_cpue_index_coefs(m1, type = "tweedie")
 #'
-#' }
+#' # Random intercepts for vessel:
+#' m2 <- fit_cpue_index_tweedie(d, cpue ~ year_factor + (1 | vessel))
+#' plot_cpue_index_coefs(m2, type = "tweedie", re_name = c("vessel", NA))
+#'
+#' predict_cpue_index_tweedie(m2)
+#'
+#' predict_cpue_index_tweedie(m2, center = FALSE) %>%
+#'   plot_cpue_index()
+#' @rdname cpue-tweedie
 
 fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
 
@@ -134,6 +140,8 @@ fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
   out
 }
 
+#' @export
+#' @rdname cpue-tweedie
 predict_cpue_index_tweedie <- function(object, center = FALSE) {
   report_sum <- TMB::summary.sdreport(object$sdreport)
   ii <- grep(
@@ -170,4 +178,65 @@ predict_cpue_index_tweedie <- function(object, center = FALSE) {
       )
     ) %>%
     select(year, model, est_link, se_link, est, lwr, upr)
+}
+
+#' @description * `tidy_cpue_index_coefs_tweedie()` extracts coefficients from a CPUE
+#'   index standardization model
+#' @param include_scale_pars Logical: include observation CV and random effect
+#'   like standard deviations in parameter plot?
+#'
+#' @export
+#' @rdname cpue-tweedie
+
+tidy_cpue_index_coefs_tweedie <- function(object, include_scale_pars = FALSE,
+  re_name = c("RE 1", "RE 2")) {
+
+  sm <- TMB::summary.sdreport(object$sdreport)
+  pars <- row.names(sm)
+  row.names(sm) <- seq_len(nrow(sm))
+  sm <- as.data.frame(sm)
+  sm$pars <- pars
+
+  sm <- sm %>%
+    rename(se = .data$`Std. Error`) %>%
+    rename(est = .data$Estimate) %>%
+    filter(!grepl("prediction", pars))
+
+  sm$par_name <- sm$pars
+  sm$par_name[seq(1, ncol(object$mm_bin))] <- c(colnames(object$mm_bin))
+
+  sm$par_name <- sub("f\\(", "", sm$par_name)
+  sm$par_name <- sub("\\)", "", sm$par_name)
+  sm$par_name <- sub("([0-9.]+$)", " \\1", sm$par_name)
+  sm$par_name <- sub("\\(", "", sm$par_name)
+
+  # label REs:
+  sm$par_name[grep("^z1_k$", sm$par_name)] <-
+    paste(re_name[1], levels(object$re1))
+
+  sm$par_name[grep("^z1_g$", sm$par_name)] <-
+    paste(re_name[2], levels(object$re2))
+
+  if (!include_scale_pars) {
+    sm <- filter(sm, !grepl("sigma", .data$par_name))
+    sm <- filter(sm, !grepl("log_cv", .data$par_name))
+    sm <- filter(sm, !grepl("logit_p", .data$par_name))
+    sm <- filter(sm, !grepl("log_phi", .data$par_name))
+  }
+  # sm$par_name <- gsub("log_sigma_zk 1", paste("log_sigma", object$re1, model_prefixes[1]), sm$par_name)
+  # sm$par_name <- gsub("log_sigma_zk 2", paste("log_sigma", object$re1, model_prefixes[2]), sm$par_name)
+  #
+  # sm$par_name <- gsub("log_sigma_zg 1", paste("log_sigma", object$re2, model_prefixes[1]), sm$par_name)
+  # sm$par_name <- gsub("log_sigma_zg 2", paste("log_sigma", object$re2, model_prefixes[2]), sm$par_name)
+
+  sm$par_group <- sub("[0-9. ]+$", "", sm$par_name)
+  sm$par_group <- sub("-[a-zA-Z]+$", "", sm$par_group)
+
+  # sm$par_name <- gsub(model_prefixes[[1]], "", sm$par_name)
+  # sm$par_name <- gsub(model_prefixes[[2]], "", sm$par_name)
+
+  # sm$par_group <- gsub("log_sigma_zk", paste("log_sigma", object$re1), sm$par_group)
+  # sm$par_group <- gsub("log_sigma_zg", paste("log_sigma", object$re2), sm$par_group)
+
+  sm
 }
