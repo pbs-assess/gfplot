@@ -35,7 +35,6 @@ fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
     re1 <- f_tw$re[[1]]
     re2 <- f_tw$re[[2]]
   }
-  pos_dat <- dat[dat$pos_catch == 1, , drop = FALSE]
 
   if (!is.null(re1)) {
     re_id_k <- fct_to_tmb_num(dat[[as.character(re1)]])
