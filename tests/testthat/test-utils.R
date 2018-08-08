@@ -77,9 +77,9 @@ test_that("read_sql works", {
 })
 
 test_that("factor_bin_clean works", {
-  expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 4)))
-  expect_equal(factor_bin_clean(c(1.1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 4)))
-  expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2)), factor(c(0, 2, 2, 2)))
+  expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 2)))
+  expect_equal(factor_bin_clean(c(1.1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 2)))
+  expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2)), factor(c(0, 0, 2, 2)))
   expect_equal(factor_bin_clean(c(0, 2, 3), c(0, 2.2)),
     factor(c("0.0", "0.0", "2.2"), levels = c("0.0", "2.2")))
 })
