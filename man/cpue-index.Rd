@@ -9,7 +9,7 @@
 \alias{plot_cpue_index_jk}
 \title{Commercial CPUE index standardization}
 \usage{
-fit_cpue_index(dat, formula_binomial = pos_catch ~ year_factor,
+fit_cpue_index(dat, formula_binomial = cpue ~ year_factor,
   formula_gamma = spp_catch/hours_fished ~ year_factor)
 
 predict_cpue_index(object, center = FALSE)
@@ -102,7 +102,7 @@ turning predictors into factors with their base level set to the most common
 factor level and their factor names with consistent name lengths (e.g. '001',
 '020').
 
-The model is internally filled with TMB. As a result, you will have to have a
+The model is internally fitted with TMB. As a result, you will have to have a
 C++ compiler installed to compile the models. On Windows, search for Rtools.
 
 Note that for coefficients for predictors treated as factors, the
@@ -116,11 +116,12 @@ difference between February and January. The default setup of the function
 # A simulated example:
 set.seed(1)
 d <- sim_cpue()
-d
+d$cpue <- d$spp_catch / d$hours_fished
+d$vessel <- f(d$vessel)
 
 m <- fit_cpue_index(d,
-  formula_binomial = pos_catch ~ year_factor + f(vessel),
-  formula_gamma = spp_catch / hours_fished ~ year_factor + f(vessel)
+  formula_binomial = pos_catch ~ year_factor + vessel,
+  formula_gamma = cpue ~ year_factor + vessel
 )
 
 plot_cpue_index_coefs(m)

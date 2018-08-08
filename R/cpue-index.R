@@ -90,7 +90,7 @@ get_response_lme4 <- function(formula, data) {
 #' factor level and their factor names with consistent name lengths (e.g. '001',
 #' '020').
 #'
-#' The model is internally filled with TMB. As a result, you will have to have a
+#' The model is internally fitted with TMB. As a result, you will have to have a
 #' C++ compiler installed to compile the models. On Windows, search for Rtools.
 #'
 #' @examples
@@ -98,11 +98,12 @@ get_response_lme4 <- function(formula, data) {
 #' # A simulated example:
 #' set.seed(1)
 #' d <- sim_cpue()
-#' d
+#' d$cpue <- d$spp_catch / d$hours_fished
+#' d$vessel <- f(d$vessel)
 #'
 #' m <- fit_cpue_index(d,
-#'   formula_binomial = pos_catch ~ year_factor + f(vessel),
-#'   formula_gamma = spp_catch / hours_fished ~ year_factor + f(vessel)
+#'   formula_binomial = pos_catch ~ year_factor + vessel,
+#'   formula_gamma = cpue ~ year_factor + vessel
 #' )
 #'
 #' plot_cpue_index_coefs(m)
@@ -132,7 +133,7 @@ get_response_lme4 <- function(formula, data) {
 #' @rdname cpue-index
 #' @export
 fit_cpue_index <- function(dat,
-  formula_binomial = pos_catch ~ year_factor,
+  formula_binomial = cpue ~ year_factor,
   formula_gamma = spp_catch / hours_fished ~ year_factor) {
 
   f_bin <- parse_formula(formula_binomial)
@@ -160,10 +161,11 @@ fit_cpue_index <- function(dat,
     bin_re_id_g <- fct_to_tmb_num(dat[[as.character(re2)]])
     pos_re_id_g <- fct_to_tmb_num(filter(dat, pos_catch == 1)[[as.character(re2)]])
   }
+
   mm1 <- model.matrix(f_bin$fe, data = dat)
   mm2 <- model.matrix(f_pos$fe, data = pos_dat)
-  mm_pred1 <- make_pred_mm(mm1, years = unique(pos_dat$year_factor))
-  mm_pred2 <- make_pred_mm(mm2, years = unique(dat$year_factor))
+  mm_pred1 <- make_pred_mm(mm1, years = unique(dat$year_factor))
+  mm_pred2 <- make_pred_mm(mm2, years = unique(pos_dat$year_factor))
 
   dlls <- getLoadedDLLs()
 
@@ -183,6 +185,7 @@ fit_cpue_index <- function(dat,
   # defaults if no random effects:
   random <- NULL
   DLL <- "delta_gamma_cpue"
+  DLL <- "tweedie_cpue"
 
   # Get some reasonable starting values for speed:
   m_bin <- tryCatch({speedglm::speedglm(f_bin$fe,
@@ -206,6 +209,41 @@ fit_cpue_index <- function(dat,
     b2_j_start <- stats::rnorm(ncol(mm2), 0, 0.1)
     log_cv_start <- log(1)
   }
+
+  # ---------------------------
+  parameters <- list(
+    b1_j = b1_j_start,
+    p = 1.5,
+    log_phi = 0)
+
+  data <- list(
+    X1_ij = mm1,
+    y1_i = dat$cpue,
+    X1_pred_ij = mm_pred1
+  )
+
+  obj <- TMB::MakeADFun(
+    data = data,
+    parameters = parameters,
+    random = random,
+    DLL = DLL,
+    checkParameterOrder = TRUE
+  )
+
+  lower = rep(-Inf, length(obj$par))
+  upper = rep(Inf, length(obj$par))
+  lower[names(obj$par) == "p"] <- 1
+  upper[names(obj$par) == "p"] <- 2
+  opt <- stats::nlminb(
+    start = obj$par,
+    objective = obj$fn,
+    gradient = obj$gr,
+    lower = lower,
+    upper = upper,
+    control = list(iter.max = 2000L, eval.max = 2000L)
+  )
+  # -----------------------------
+
 
   parameters <- list(
     b1_j = b1_j_start,
