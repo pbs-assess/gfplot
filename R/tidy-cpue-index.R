@@ -46,14 +46,15 @@ tidy_cpue_index <- function(dat, species_common,
                             use_alt_year = FALSE,
                             lat_range = c(48, Inf),
                             min_positive_tows = 100,
-                            min_positive_trips = 4,
-                            min_yrs_with_trips = 4,
+                            min_positive_trips = 5,
+                            min_yrs_with_trips = 5,
                             area_grep_pattern = "5[CDE]+",
-                            lat_band_width = 0.2,
-                            depth_band_width = 50,
+                            lat_band_width = 0.1,
+                            depth_band_width = 25,
                             clean_bins = TRUE,
-                            depth_bin_quantiles = c(0.005, 0.995),
-                            lat_bin_quantiles = c(0.005, 0.995),
+                            depth_bin_quantiles = c(0.001, 0.999),
+                            min_bin_perc = 0.001,
+                            lat_bin_quantiles = c(0, 1),
                             gear = "BOTTOM TRAWL") {
 
   pbs_areas <- gfplot::pbs_areas[grep(
@@ -154,15 +155,16 @@ tidy_cpue_index <- function(dat, species_common,
   lat_range <- stats::quantile(d_retained$latitude,
     probs = c(min(lat_bin_quantiles), max(lat_bin_quantiles))
   )
-  depth_range <- stats::quantile(d_retained$best_depth,
-    probs = c(min(depth_bin_quantiles), max(depth_bin_quantiles))
-  )
+  # depth_range <- stats::quantile(d_retained$best_depth,
+  #   probs = c(min(depth_bin_quantiles), max(depth_bin_quantiles))
+  # )
+  depth_range <- vector(mode = "numeric", length = 2L)
 
   if (clean_bins) {
     lat_range[1] <- round_down_even(lat_range[1], lat_band_width)
     lat_range[2] <- round_up_even(lat_range[2], lat_band_width)
-    depth_range[1] <- round_down_even(depth_range[1], depth_band_width)
-    depth_range[2] <- round_up_even(depth_range[2], depth_band_width)
+    depth_range[1] <- 0
+    depth_range[2] <- 10000
   }
 
   d_retained <- filter(
@@ -195,6 +197,48 @@ tidy_cpue_index <- function(dat, species_common,
   d_retained <- left_join(d_retained, vessel_df, by = "vessel") %>%
     select(-vessel) %>%
     rename(vessel = scrambled_vessel)
+
+  pos_catch_fleet <- filter(d_retained, .data$pos_catch == 1)
+
+  # retain depth bins with enough data:
+  tb <- table(pos_catch_fleet$depth)
+  too_deep <- names(tb)[cumsum(tb)/sum(tb) > depth_bin_quantiles[2]]
+  too_shallow <- names(tb)[cumsum(tb)/sum(tb) < depth_bin_quantiles[1]]
+  d_retained <- filter(d_retained,
+    !.data$depth %in% union(too_deep, too_shallow))
+
+  too_few <- function(x) {
+    tb <- table(pos_catch_fleet[[x]])
+    names(tb)[tb/sum(tb) < min_bin_perc]
+  }
+
+  # not enough pos. data in bins?
+  d_retained <- filter(d_retained, !.data$latitude %in% too_few("latitude"))
+  d_retained <- filter(d_retained, !.data$month %in% too_few("month"))
+  d_retained <- filter(d_retained, !.data$depth %in% too_few("depth"))
+  d_retained <- filter(d_retained, !.data$locality %in% too_few("locality"))
+  # vessel already known
+
+  base_month      <- get_most_common_level(pos_catch_fleet$month)
+  base_depth      <- get_most_common_level(pos_catch_fleet$depth)
+  base_lat        <- get_most_common_level(pos_catch_fleet$latitude)
+  base_vessel     <- get_most_common_level(pos_catch_fleet$vessel)
+  base_locality   <- get_most_common_level(pos_catch_fleet$locality)
+
+  d_retained$locality  <- relevel(as.factor(d_retained$locality),
+    ref = base_locality)
+  d_retained$depth     <- relevel(as.factor(d_retained$depth),
+    ref = base_depth)
+  d_retained$latitude  <- relevel(as.factor(d_retained$latitude),
+    ref = base_lat)
+  d_retained$vessel    <- relevel(as.factor(d_retained$vessel),
+    ref = base_vessel)
+  d_retained$month     <- relevel(as.factor(d_retained$month),
+    ref = base_month)
+
+  d_retained <- droplevels(d_retained)
+
+  d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$hours_fished)
 
   arrange(d_retained, .data$year, .data$vessel) %>%
     dplyr::as_tibble()
