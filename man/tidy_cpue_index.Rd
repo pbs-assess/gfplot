@@ -5,12 +5,14 @@
 \title{Tidy commercial PBS CPUE data}
 \usage{
 tidy_cpue_index(dat, species_common, year_range = c(1996,
-  as.numeric(format(Sys.Date(), "\%Y")) - 1), alt_year_start_date = "04-01",
-  use_alt_year = FALSE, lat_range = c(48, Inf), min_positive_tows = 100,
-  min_positive_trips = 4, min_yrs_with_trips = 4,
-  area_grep_pattern = "5[CDE]+", lat_band_width = 0.2,
-  depth_band_width = 50, clean_bins = TRUE, depth_bin_quantiles = c(0.005,
-  0.995), lat_bin_quantiles = c(0.005, 0.995), gear = "BOTTOM TRAWL")
+  as.numeric(format(Sys.Date(), "\%Y")) - 1),
+  alt_year_start_date = "04-01", use_alt_year = FALSE,
+  lat_range = c(48, Inf), min_positive_tows = 100,
+  min_positive_trips = 5, min_yrs_with_trips = 5,
+  area_grep_pattern = "5[CDE]+", lat_band_width = 0.1,
+  depth_band_width = 25, clean_bins = TRUE,
+  depth_bin_quantiles = c(0.001, 0.999), min_bin_prop = 0.001,
+  lat_bin_quantiles = c(0, 1), gear = "bottom trawl")
 }
 \arguments{
 \item{dat}{An input data frame from \code{\link[=get_cpue_index]{get_cpue_index()}}.}
@@ -49,16 +51,22 @@ the nearest clean value as defined by \code{lat_band_width} or
 \code{depth_band_width}? Internally, these use, for example:
 \code{gfplot:::round_down_even(lat_range[1], lat_band_width)}.}
 
-\item{depth_bin_quantiles}{Quantiles for the depth bands. Values above and
-below these quantiles will be discarded.}
+\item{depth_bin_quantiles}{Quantiles for the depth bands. If the cumulative
+proportion of positive fishing events within a given depth bin is less then
+the lower amount or greater than the upper amount then that depth bin will
+be dropped.}
+
+\item{min_bin_prop}{If the proportion of fishing events for any given factor
+level is less than this value then that factor level will be dropped.}
 
 \item{lat_bin_quantiles}{Quantiles for the latitude bands. Values above and
 below these quantiles will be discarded.}
 
-\item{gear}{Gear types}
+\item{gear}{One or more gear types as a character vector.}
 }
 \description{
-This function determines the qualifying "fleet" for CPUE analyses.
+This function determines the qualifying "fleet" for CPUE analyses. It is
+meant to be used with modern data available at the fishing event level.
 }
 \examples{
 \dontrun{

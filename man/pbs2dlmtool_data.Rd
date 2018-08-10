@@ -4,8 +4,9 @@
 \alias{pbs2dlmtool_data}
 \title{Convert groundfish PBS data to a DLMtool data object}
 \usage{
-pbs2dlmtool_data(dat, name = "", area = "3[CD]+", survey = "SYN WCVI",
-  max_year = 2017, min_mean_length = 10, length_bin_interval = 2)
+pbs2dlmtool_data(dat, name = "", area = "3[CD]+",
+  survey = "SYN WCVI", max_year = 2017, min_mean_length = 10,
+  length_bin_interval = 2)
 }
 \arguments{
 \item{dat}{A list object output from \code{\link[=cache_pbs_data]{cache_pbs_data()}}.}

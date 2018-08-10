@@ -1,6 +1,7 @@
 #' Tidy commercial PBS CPUE data
 #'
-#' This function determines the qualifying "fleet" for CPUE analyses.
+#' This function determines the qualifying "fleet" for CPUE analyses. It is
+#' meant to be used with modern data available at the fishing event level.
 #'
 #' @param dat An input data frame from [get_cpue_index()].
 #' @param species_common The species common name.
@@ -25,11 +26,15 @@
 #'   the nearest clean value as defined by `lat_band_width` or
 #'   `depth_band_width`? Internally, these use, for example:
 #'   `gfplot:::round_down_even(lat_range[1], lat_band_width)`.
-#' @param depth_bin_quantiles Quantiles for the depth bands. Values above and
-#'   below these quantiles will be discarded.
+#' @param depth_bin_quantiles Quantiles for the depth bands. If the cumulative
+#'   proportion of positive fishing events within a given depth bin is less then
+#'   the lower amount or greater than the upper amount then that depth bin will
+#'   be dropped.
+#' @param min_bin_prop If the proportion of fishing events for any given factor
+#'   level is less than this value then that factor level will be dropped.
 #' @param lat_bin_quantiles Quantiles for the latitude bands. Values above and
 #'   below these quantiles will be discarded.
-#' @param gear Gear types
+#' @param gear One or more gear types as a character vector.
 #'
 #' @export
 #'
@@ -53,9 +58,9 @@ tidy_cpue_index <- function(dat, species_common,
                             depth_band_width = 25,
                             clean_bins = TRUE,
                             depth_bin_quantiles = c(0.001, 0.999),
-                            min_bin_perc = 0.001,
+                            min_bin_prop = 0.001,
                             lat_bin_quantiles = c(0, 1),
-                            gear = "BOTTOM TRAWL") {
+                            gear = "bottom trawl") {
 
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
@@ -209,7 +214,7 @@ tidy_cpue_index <- function(dat, species_common,
 
   too_few <- function(x) {
     tb <- table(pos_catch_fleet[[x]])
-    names(tb)[tb/sum(tb) < min_bin_perc]
+    names(tb)[tb/sum(tb) < min_bin_prop]
   }
 
   # not enough pos. data in bins?
@@ -225,20 +230,24 @@ tidy_cpue_index <- function(dat, species_common,
   base_vessel     <- get_most_common_level(pos_catch_fleet$vessel)
   base_locality   <- get_most_common_level(pos_catch_fleet$locality)
 
-  d_retained$locality  <- relevel(as.factor(d_retained$locality),
+  d_retained$locality  <- stats::relevel(as.factor(d_retained$locality),
     ref = base_locality)
-  d_retained$depth     <- relevel(as.factor(d_retained$depth),
+  d_retained$depth     <- stats::relevel(as.factor(d_retained$depth),
     ref = base_depth)
-  d_retained$latitude  <- relevel(as.factor(d_retained$latitude),
+  d_retained$latitude  <- stats::relevel(as.factor(d_retained$latitude),
     ref = base_lat)
-  d_retained$vessel    <- relevel(as.factor(d_retained$vessel),
+  d_retained$vessel    <- stats::relevel(as.factor(d_retained$vessel),
     ref = base_vessel)
-  d_retained$month     <- relevel(as.factor(d_retained$month),
+  d_retained$month     <- stats::relevel(as.factor(d_retained$month),
     ref = base_month)
 
   d_retained <- droplevels(d_retained)
 
   d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$hours_fished)
+
+  # make sure unique:
+  d_retained <- mutate(d_retained,
+    fishing_event_id = paste(year, trip_id, fishing_event_id, sep = "-"))
 
   arrange(d_retained, .data$year, .data$vessel) %>%
     dplyr::as_tibble()

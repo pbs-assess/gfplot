@@ -52,7 +52,7 @@ Imports:
     DLMtool
 Remotes: github::pbs-software/pbs-data/PBSdata
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
 Suggests:
     knitr,

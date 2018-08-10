@@ -6,8 +6,11 @@ load_tmb <- function(file = "tweedie_cpue.cpp") {
 
 #' Commercial CPUE index standardization (Tweedie version)
 #'
-#' @param dat Data TODO
-#' @param formula Formula TODO
+#' @param dat A data frame to fit. Might be from [tidy_cpue_index()] or
+#'   [tidy_cpue_historic()].
+#' @param formula Formula A formula with up to 2 random intercepts in lme4
+#'   syntax. Must contain a predictor named `year_factor` that contains the year
+#'   as a factor.
 #'
 #' @export
 #' @examples
@@ -141,6 +144,10 @@ fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
   out
 }
 
+#' @param object Output from [fit_cpue_index_tweedie()].
+#' @param center Should the predictions be centered by dividing by the geometric
+#'   mean?
+#'
 #' @export
 #' @rdname cpue-tweedie
 predict_cpue_index_tweedie <- function(object, center = FALSE) {
@@ -185,6 +192,8 @@ predict_cpue_index_tweedie <- function(object, center = FALSE) {
 #'   index standardization model
 #' @param include_scale_pars Logical: include observation CV and random effect
 #'   like standard deviations in parameter plot?
+#' @param re_name Names for the possible random intercepts. Should start with
+#'   `RE`.
 #'
 #' @export
 #' @rdname cpue-tweedie

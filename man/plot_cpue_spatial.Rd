@@ -4,11 +4,12 @@
 \alias{plot_cpue_spatial}
 \title{Plot a map of commercial CPUE}
 \usage{
-plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3, xlim = c(122,
-  890), ylim = c(5373, 6027), utm_zone = 9, bath = c(100, 200, 500),
+plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3,
+  xlim = c(122, 890), ylim = c(5373, 6027), utm_zone = 9,
+  bath = c(100, 200, 500),
   fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option = "D"),
-  colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option = "D"),
-  rotation_angle = 0, rotation_center = c(500, 5700),
+  colour_scale = viridis::scale_colour_viridis(trans = "sqrt", option =
+  "D"), rotation_angle = 0, rotation_center = c(500, 5700),
   fill_lab = "CPUE (kg/hr)", return_data = FALSE)
 }
 \arguments{

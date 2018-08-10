@@ -14,12 +14,23 @@ tidy_cpue_index_coefs_tweedie(object, include_scale_pars = FALSE,
   re_name = c("RE 1", "RE 2"))
 }
 \arguments{
-\item{dat}{Data TODO}
+\item{dat}{A data frame to fit. Might be from \code{\link[=tidy_cpue_index]{tidy_cpue_index()}} or
+\code{\link[=tidy_cpue_historic]{tidy_cpue_historic()}}.}
 
-\item{formula}{Formula TODO}
+\item{formula}{Formula A formula with up to 2 random intercepts in lme4
+syntax. Must contain a predictor named \code{year_factor} that contains the year
+as a factor.}
+
+\item{object}{Output from \code{\link[=fit_cpue_index_tweedie]{fit_cpue_index_tweedie()}}.}
+
+\item{center}{Should the predictions be centered by dividing by the geometric
+mean?}
 
 \item{include_scale_pars}{Logical: include observation CV and random effect
 like standard deviations in parameter plot?}
+
+\item{re_name}{Names for the possible random intercepts. Should start with
+\code{RE}.}
 }
 \description{
 \itemize{

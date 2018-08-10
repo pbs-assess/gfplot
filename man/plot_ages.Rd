@@ -5,9 +5,10 @@
 \title{Plot age frequency data}
 \usage{
 plot_ages(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
-  ylab = "Age (years)", year_range = NULL, line_col = c(M = "#666666", F =
-  "#f44256"), survey_cols = NULL, alpha = 0.2, grid_col = "grey95",
-  diagonal_lines = seq(-2100, -1850, 10), count_label_size = 2.25)
+  ylab = "Age (years)", year_range = NULL, line_col = c(M =
+  "#666666", F = "#f44256"), survey_cols = NULL, alpha = 0.2,
+  grid_col = "grey95", diagonal_lines = seq(-2100, -1850, 10),
+  count_label_size = 2.25)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or

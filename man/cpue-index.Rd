@@ -21,8 +21,8 @@ tidy_cpue_index_coefs(object, include_scale_pars = FALSE)
 plot_cpue_index_coefs(object, regex = c(", base_[a-z]+", ""),
   type = c("delta", "tweedie"), ...)
 
-plot_cpue_index_jk(object, terms = c("f(month)", "f(vessel)", "f(locality)",
-  "f(depth)", "f(latitude)"), return_data = FALSE)
+plot_cpue_index_jk(object, terms = c("f(month)", "f(vessel)",
+  "f(locality)", "f(depth)", "f(latitude)"), return_data = FALSE)
 }
 \arguments{
 \item{dat}{A data frame from \code{\link[=tidy_cpue_index]{tidy_cpue_index()}}, or a similarly
@@ -48,6 +48,10 @@ like standard deviations in parameter plot?}
 \item{regex}{A regular expression as a character vector of length 2 to
 transform the coefficient names from something (element 1) to something
 (element 2).}
+
+\item{type}{Delta or Tweedie?}
+
+\item{...}{Other arguments to pass to the tidy function.}
 
 \item{terms}{A character vector of terms to jackknife out.}
 

@@ -480,6 +480,8 @@ tidy_cpue_index_coefs <- function(object, include_scale_pars = FALSE) {
 #' @param regex A regular expression as a character vector of length 2 to
 #' transform the coefficient names from something (element 1) to something
 #' (element 2).
+#' @param type Delta or Tweedie?
+#' @param ... Other arguments to pass to the tidy function.
 #'
 #' @details Note that for coefficients for predictors treated as factors, the
 #'   coefficients represent the difference from the base level factor. For
