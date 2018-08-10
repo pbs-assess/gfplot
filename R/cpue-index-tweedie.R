@@ -73,8 +73,9 @@ fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
 
   parameters <- list(
     b1_j = rep(0, ncol(mm1)),
-    logit_p = 0,
-    log_phi = 0)
+    log_phi = 0,
+    logit_p = 0
+  )
 
   if (!is.null(re1)) {
     y1_i <- get_response_lme4(formula, dat)
