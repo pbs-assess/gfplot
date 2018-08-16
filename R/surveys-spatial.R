@@ -1,7 +1,7 @@
 #' Tidy the survey set data for use in modeling
 #'
 #' @param dat Output from [get_survey_sets()].
-#' @param survey The name of a survey.
+#' @param survey The name of a survey (see get_ssids()).
 #' @param years The years.
 #' @param utm_zone UTM zone.
 #' @param density_column Name of the density column.
