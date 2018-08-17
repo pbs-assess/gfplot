@@ -4,6 +4,21 @@ load_tmb <- function(file = "tweedie_cpue.cpp") {
   dyn.load(TMB::dynlib(sub("\\.cpp", "", tmb_cpp)))
 }
 
+#' Fit CPUE with glmmTMB
+#'
+#' @param dat Data
+#' @param formula Formula
+#' @param ... Other arguments to [glmmTMB::glmmTMB()]
+#'
+#' @export
+fit_cpue_index_glmmtmb <- function(dat, formula = cpue ~ year_factor, ...) {
+  glmmTMB::glmmTMB(as.formula(formula), data = dat, family = glmmTMB::tweedie(link = "log"),
+    verbose = TRUE,
+    control = glmmTMB::glmmTMBControl(
+      optCtrl = list(iter.max = 2000, eval.max = 2000),
+      profile = TRUE, collect = FALSE), ...)
+}
+
 #' Commercial CPUE index standardization (Tweedie version)
 #'
 #' @param dat A data frame to fit. Might be from [tidy_cpue_index()] or
@@ -151,15 +166,34 @@ fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
 #' @export
 #' @rdname cpue-tweedie
 predict_cpue_index_tweedie <- function(object, center = FALSE) {
-  report_sum <- TMB::summary.sdreport(object$sdreport)
-  ii <- grep(
-    "log_prediction",
-    row.names(report_sum)
-  )
-  row.names(report_sum) <- NULL
-  df <- as.data.frame(report_sum[ii, , drop = FALSE])
-  df$year <- object$years
-  df$model <- rep("Combined", nrow(df))
+  if (class(object) == "glmmTMB") {
+    sdr <- object$sdr
+    yrs <- sort(unique(object$frame$year_factor))
+
+    b <- data.frame(par = names(sdr$par.fixed), est = sdr$par.fixed, se = sqrt(diag(sdr$cov.fixed)))
+    b <- b[grepl("^beta$", b$par), , drop = FALSE]
+    b <- b[seq_along(yrs), , drop = FALSE]
+    b$year <- as.numeric(as.character(yrs))
+    b$par <- NULL
+    b$se_year <- NA
+    b$se_year[1] <- b$se[1]
+    b$est_year[1] <- b$est[1]
+    # b$se_year[seq(2, nrow(b))] <- sqrt(b$se[2:nrow(b)]^2 - b$se[1]^2)
+    # b$est_year[seq(2, nrow(b))] <- b$est[2:nrow(b)] + b$est[1]
+    df <- data.frame(year = b$year, Estimate = b$est,
+      `Std. Error` = b$se, model = "Combined", stringsAsFactors = FALSE)
+    names(df) <- gsub("Std..Error", "Std. Error", names(df))
+  } else {
+    report_sum <- TMB::summary.sdreport(object$sdreport)
+    ii <- grep(
+      "log_prediction",
+      row.names(report_sum)
+    )
+    row.names(report_sum) <- NULL
+    df <- as.data.frame(report_sum[ii, , drop = FALSE])
+    df$year <- object$years
+    df$model <- rep("Combined", nrow(df))
+  }
 
   if (center) {
     df <- df %>%
