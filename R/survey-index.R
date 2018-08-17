@@ -183,7 +183,15 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
         sets == "") %>%
     filter(uncertain)
 
-  g <- ggplot(d, aes_string("year", "biomass_scaled")) +
+  g <- ggplot(d, aes_string("year", "biomass_scaled"))
+
+  if (scale) {
+    g <- g + geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
+        ymax = max(d$upperci_scaled, na.rm = TRUE) * 1.1,
+        inherit.aes = FALSE, fill = "grey96")
+  }
+
+  g <- g +
     geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", lwd = 0.3) +
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93") +
     geom_ribbon(aes_string(
@@ -211,10 +219,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     scale_x_continuous(breaks = seq(0, yrs[2], year_increment))
 
   if (scale) {
-    g <- g +
-      geom_rect(data = uncertain, xmin = 1800, xmax = 2050, ymin = -0.02,
-        ymax = max(d$upperci_scaled) * 1.1, inherit.aes = FALSE, fill = "grey96") +
-      geom_text(
+  g <- g + geom_text(
       data = labs, x = yrs[1] + 0.5, y = 0.89,
       aes_string(label = "survey_abbrev"),
       inherit.aes = FALSE, colour = "grey30", size = 3, hjust = 0
