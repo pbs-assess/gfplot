@@ -4,10 +4,11 @@
 \alias{tidy_cpue_historic}
 \title{Tidy historical CPUE data}
 \usage{
-tidy_cpue_historic(dat, species_common, year_range = c(1956, 1996),
-  area = c("3[CD]+", "5[ABCDE]+"), depth_bins = seq(0, 350, 25),
-  use_alt_year = FALSE, depth_bin_quantiles = c(0, 1),
-  type = c("trip-level-data", "arithmetic-cpue"), max_fe_hours = 5)
+tidy_cpue_historic(dat, species_common, year_range = c(1956, 1995),
+  area_grep_pattern = c("3[CD]+", "5[ABCDE]+"), use_alt_year = FALSE,
+  depth_band_width = 25, depth_bin_quantiles = c(0.001, 0.999),
+  min_bin_prop = 0.001, type = c("trip-level-data", "arithmetic-cpue"),
+  max_fe_hours = 5)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_historic]{get_cpue_historic()}}.}
@@ -17,17 +18,22 @@ tidy_cpue_historic(dat, species_common, year_range = c(1956, 1996),
 \item{year_range}{A range of years to include. Can go up to current year but
 note the management changes, particularly in 1996.}
 
-\item{area}{A major statistical area as a regular expression.}
-
-\item{depth_bins}{A vector of depth bins to be in the depth into.}
+\item{area_grep_pattern}{A major statistical area as a regular expression.}
 
 \item{use_alt_year}{Should the alternate year (e.g. fishing year) column
 \code{alt_year} be used? If \code{FALSE} then the calendar year will be used. If this
 is set to \code{TRUE} then the \code{year} column will be replaced with the
 \code{alt_year} column.}
 
-\item{depth_bin_quantiles}{Quantiles for the depth bands. Values above and
-below these quantiles will be discarded.}
+\item{depth_band_width}{The depth band widths in m.}
+
+\item{depth_bin_quantiles}{Quantiles for the depth bands. If the cumulative
+proportion of positive fishing events within a given depth bin is less then
+the lower amount or greater than the upper amount then that depth bin will
+be dropped.}
+
+\item{min_bin_prop}{If the proportion of fishing events for any given factor
+level is less than this value then that factor level will be dropped.}
 
 \item{type}{Should the trip-level data be returned (for possible future index
 standardization) or should the arithmetic CPUE be returned (species
@@ -54,6 +60,6 @@ trips in 1991 and after to create a consistent form of data.
 \examples{
 \donttest{
 get_cpue_historic(end_year = 2016) \%>\%
-  tidy_cpue_historic(species_common = "pacific cod", area = "5[CD]+")
+  tidy_cpue_historic(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 }
 }
