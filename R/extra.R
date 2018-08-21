@@ -17,7 +17,7 @@ plot_cpue_predictions <- function(dat, model_version = "Combined", scale = FALSE
       .data$upr_unstandardized)
 
   temp <- dat %>%
-    filter(ormula_version != "Unstandardized") %>%
+    filter(formula_version != "Unstandardized") %>%
     left_join(unstandardized, by = c("area", "year", "model")) %>%
     filter(model == model_version) %>%
     mutate(formula_version = gsub("\\+ ", " ", .data$formula_version)) %>%
