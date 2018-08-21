@@ -13,7 +13,6 @@ load_tmb <- function(file = "tweedie_cpue.cpp") {
 #' @export
 fit_cpue_index_glmmtmb <- function(dat, formula = cpue ~ year_factor, ...) {
   glmmTMB::glmmTMB(as.formula(formula), data = dat, family = glmmTMB::tweedie(link = "log"),
-    verbose = TRUE,
     control = glmmTMB::glmmTMBControl(
       optCtrl = list(iter.max = 2000, eval.max = 2000),
       profile = TRUE, collect = FALSE), ...)
