@@ -57,6 +57,12 @@ tidy_cpue_historic <- function(dat,
                             max_fe_hours = 5) {
   type <- match.arg(type)
 
+  if (use_alt_year) {
+    dat$year <- NULL
+    dat$year <- dat$alt_year
+    dat$alt_year <- NULL
+  }
+
   # basic filtering:
   dat <- dat %>% filter(
     !is.na(hours_fished),
@@ -67,12 +73,6 @@ tidy_cpue_historic <- function(dat,
 
   dat$area <- assign_areas(dat$major_stat_area_description, area_grep_pattern)
   dat <- dat[!is.na(dat$area), , drop = FALSE]
-
-  if (use_alt_year) {
-    dat$year <- NULL
-    dat$year <- dat$alt_year
-    dat$alt_year <- NULL
-  }
 
   fe_dat <- dat %>%
     group_by(year, area, trip_id, fishing_event_id) %>%
