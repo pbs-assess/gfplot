@@ -520,6 +520,7 @@ get_cpue_historic <- function(species = NULL,
   }
 
   # Create possibly alternate starting date:
+  browser()
   .d <- dplyr::mutate(.d, best_date = lubridate::ymd_hms(best_date))
 
   if (alt_year_start_date != "01-01") {
