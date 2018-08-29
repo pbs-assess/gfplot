@@ -10,7 +10,8 @@ fit_survey_sets(dat, years, survey = NULL,
   mcmc_posterior_samples = 150, required_obs_percent = 0.05,
   utm_zone = 9, model = c("inla", "glmmfields"),
   include_depth = TRUE, survey_boundary = NULL, premade_grid = NULL,
-  inla_knots_pos = 75, inla_knots_bin = 100, ...)
+  inla_knots_pos = 75, inla_knots_bin = 100, gamma_scaling = 1000,
+  ...)
 }
 \arguments{
 \item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}
@@ -77,6 +78,12 @@ fit with INLA.}
 
 \item{inla_knots_bin}{The number of knots for the binary component model if
 fit with INLA.}
+
+\item{gamma_scaling}{A value to multiply the positive densities by internally
+before fitting the Gamma GLMM. The predictions are then divided by this
+value internally to render a prediction on the original scale. The reason
+for this is that values to are too small can create computational problems
+for INLA.}
 
 \item{...}{Any other arguments to pass on to \code{\link[=fit_inla]{fit_inla()}}.}
 }
