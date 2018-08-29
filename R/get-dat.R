@@ -520,7 +520,6 @@ get_cpue_historic <- function(species = NULL,
   }
 
   # Create possibly alternate starting date:
-  .d <- dplyr::mutate(.d, best_date = lubridate::ymd_hms(best_date))
 
   if (alt_year_start_date != "01-01") {
     .d <- dplyr::mutate(.d, .year_start_date =
@@ -530,7 +529,7 @@ get_cpue_historic <- function(species = NULL,
     .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
   }
 
-  .d$area <- assign_areas(.d$major_stat_area_description, area)
+  .d$area <- assign_areas(.d$major_stat_area_description, areas)
   .d$specific_area <- assign_areas(.d$major_stat_area_description,
     area_regex = c("3C", "3D", "5A", "5B", "5C", "5D", "5E"))
 
