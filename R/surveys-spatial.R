@@ -373,7 +373,11 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 
   com <- bin * pos
   pg$combined <- apply(com, 1, median)
+  pg$combined0.05 <- apply(com, 1, quantile, probs = 0.05)
+  pg$combined0.95 <- apply(com, 1, quantile, probs = 0.95)
   pg$bin <- apply(bin, 1, median)
+  pg$bin0.05 <- apply(bin, 1, quantile, probs = 0.05)
+  pg$bin0.95 <- apply(bin, 1, quantile, probs = 0.95)
   pg$pos <- apply(pos, 1, median)
 
   list(
