@@ -22,7 +22,7 @@ tidy_comps(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
   ageing_method_codes = NULL, bin_size = 2, age_length = c("age",
   "length"), sample_type = c("survey", "commercial"),
   frequency_type = c("raw", "weighted"), dat_survey_sets = NULL,
-  dat_catch = NULL)
+  dat_catch = NULL, remove_unsexed = TRUE)
 }
 \arguments{
 \item{...}{Arguments to pass to \code{tidy_comps()}.}
@@ -63,6 +63,8 @@ weighted samples if \code{sample_type = "survey"}.}
 
 \item{dat_catch}{A data frame from \code{\link[=get_catch]{get_catch()}}. Needed for weighted samples
 if \code{sample_type = "commercial"}.}
+
+\item{remove_unsexed}{Logical}
 }
 \description{
 These functions tidy, filter, and calculate frequencies for ages or lengths
