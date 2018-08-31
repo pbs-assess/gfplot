@@ -49,7 +49,8 @@ Imports:
     xml2,
     pingr,
     INLA,
-    DLMtool
+    DLMtool,
+    tweedie
 Remotes: github::pbs-software/pbs-data/PBSdata
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.1.0
