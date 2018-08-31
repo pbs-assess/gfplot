@@ -17,7 +17,6 @@
 qres_tweedie <- function (obj, response) {
   mu <- stats::fitted(obj)
   y <- obj$frame[[response]]
-  df <- stats::df.residual(obj)
   w <- 1 # weights
   p <- stats::plogis(obj$fit$par[["thetaf"]]) + 1
   dispersion <- exp(obj$fit$par[["betad"]])
@@ -28,6 +27,43 @@ qres_tweedie <- function (obj, response) {
   u <- stats::qnorm(u)
   u <- u[is.finite(u)]
   u
+}
+
+#' @rdname qres_tweedie
+#' #' @export
+qres_binomial <- function (obj, response) {
+  p <- stats::fitted(obj)
+  y <- obj$frame[[response]]
+  n <- rep(1, length(y))
+  a <- stats::pbinom(y - 1, n, p)
+  b <- stats::pbinom(y, n, p)
+  u <- stats::runif(n = length(y), min = a, max = b)
+  qnorm(u)
+}
+
+#' @rdname qres_tweedie
+#' #' @export
+qres_gamma <- function (obj, response) {
+  mu <- stats::fitted(obj)
+  y <- obj$frame[[response]]
+  df <- stats::df.residual(obj)
+  w <- 1
+  # dispersion <- sum(w * ((y - mu)/mu)^2)/df
+  dispersion <- 1/exp(obj$fit$par[["betad"]])
+  logp <- stats::pgamma((w * y)/mu/dispersion, w/dispersion, log.p = TRUE)
+  stats::qnorm(logp, log.p = TRUE)
+}
+#' @rdname qres_tweedie
+#' #' @export
+qres_gaussian <- function (obj, response) {
+  mu <- stats::fitted(obj)
+  y <- obj$frame[[response]]
+  df <- stats::df.residual(obj)
+  w <- 1
+  # dispersion <- sum(w * ((y - mu)/mu)^2)/df
+  dispersion <- 1/exp(obj$fit$par[["betad"]])
+  logp <- pgamma((w * y)/mu/dispersion, w/dispersion, log.p = TRUE)
+  qnorm(logp, log.p = TRUE)
 }
 
 #' @param qr A vector of quantile residuals from [qres_tweedie()].
