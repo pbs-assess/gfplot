@@ -89,11 +89,6 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     mutate(proportion = proportion / max(proportion)) %>%
     ungroup()
 
-  is_even <- function(x) {
-    ie <- as.numeric(as.character(x)) %% 2 == 0
-    ifelse(ie, x, "")
-  }
-
   dat$sex <- factor(dat$sex, levels = rev(sort(unique(dat$sex)))) # to get F bars shaded on top
   dat <- arrange(dat, year, survey_abbrev, sex)
 
@@ -134,4 +129,9 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   }
 
   g
+}
+
+is_even <- function(x) {
+  ie <- as.numeric(as.character(x)) %% 2 == 0
+  ifelse(ie, x, "")
 }
