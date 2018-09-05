@@ -129,7 +129,7 @@ fit_mat_ogive <- function(dat,
 
   list(
     data = .d, pred_data = nd, model = m, sample_id_re = sample_id_re,
-    type = type, mat_perc = mat_perc, se_50 = se_50
+    type = type, mat_perc = mat_perc, se_50 = se_l50
   )
 }
 
