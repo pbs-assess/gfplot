@@ -2,11 +2,20 @@
 % Please edit documentation in R/quantile-residuals.R
 \name{qres_tweedie}
 \alias{qres_tweedie}
+\alias{qres_binomial}
+\alias{qres_gamma}
+\alias{qres_gaussian}
 \alias{plot_qres_qq}
 \alias{plot_qres_histogram}
 \title{Quantile residuals for a Tweedie GLMM fit with glmmTMB}
 \usage{
 qres_tweedie(obj, response)
+
+qres_binomial(obj, response)
+
+qres_gamma(obj, response)
+
+qres_gaussian(obj, response)
 
 plot_qres_qq(qr, nmax = 10000)
 

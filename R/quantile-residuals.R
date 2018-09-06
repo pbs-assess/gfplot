@@ -4,6 +4,7 @@
 #' @param response The name of the response column in the data. E.g. `"cpue"`.
 #'
 #' @export
+#' @importFrom stats pgamma qnorm
 #'
 #' @examples
 #' m <- glmmTMB::glmmTMB(cpue ~ 1,
@@ -30,7 +31,7 @@ qres_tweedie <- function (obj, response) {
 }
 
 #' @rdname qres_tweedie
-#' #' @export
+#' @export
 qres_binomial <- function (obj, response) {
   p <- stats::fitted(obj)
   y <- obj$frame[[response]]
@@ -42,7 +43,7 @@ qres_binomial <- function (obj, response) {
 }
 
 #' @rdname qres_tweedie
-#' #' @export
+#' @export
 qres_gamma <- function (obj, response) {
   mu <- stats::fitted(obj)
   y <- obj$frame[[response]]
@@ -53,8 +54,9 @@ qres_gamma <- function (obj, response) {
   logp <- stats::pgamma((w * y)/mu/dispersion, w/dispersion, log.p = TRUE)
   stats::qnorm(logp, log.p = TRUE)
 }
+
 #' @rdname qres_tweedie
-#' #' @export
+#' @export
 qres_gaussian <- function (obj, response) {
   mu <- stats::fitted(obj)
   y <- obj$frame[[response]]
