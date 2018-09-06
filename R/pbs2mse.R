@@ -158,12 +158,13 @@ tidy_mean_length <- function(dat, unsorted_only = FALSE) {
 #
 # @return A catch at age or catch at length matrix as an array.
 #   1 x nyears x nage/nlength
-tidy_caa <- function(dat, yrs, unsorted_only = FALSE, interval = 1) {
+tidy_caa <- function(dat, yrs, unsorted_only = FALSE, interval = 1,
+  sex = c(1, 2)) {
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE]
   if ("sampling_desc" %in% names(dat) && unsorted_only) {
     dat <- filter(dat, sampling_desc == "UNSORTED")
   }
-  dat <- filter(dat, !is.na(sex), !is.na(age), sex %in% 2) # female only
+  dat <- filter(dat, !is.na(sex), !is.na(age), .data$sex %in% sex)
 
   caa <- group_by(dat, year, age) %>%
     summarise(N = n()) %>%
