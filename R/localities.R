@@ -75,7 +75,7 @@ plot_dfo_localities <- function(localities = "all",
       data = x_utm,
       ggplot2::aes_string("X", "Y", label = "name"),
       size = 2.8, colour = "grey30",
-      point.padding = unit(1, "lines"),
+      # point.padding = unit(1, "lines"),
       max.iter = 6e3, segment.size = 0.5)
   }
   g
