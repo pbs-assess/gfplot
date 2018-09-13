@@ -29,8 +29,19 @@ plot_dfo_localities <- function(localities = "all",
   x <- attributes(locality)$PolyData
   x$name_lower <- tolower(x$name)
 
-  if (localities[[1]] != "all")
-    x <- filter(x, .data$name_lower %in% tolower(localities))
+  x$unique_locality_code <- paste(x$major, x$minor,
+    x$locality, sep = "-")
+
+  localities <- gsub("^0", "", localities)
+  localities <- gsub("^([0-9]+-)0", "\\1", localities)
+
+  if (localities[[1]] != "all") {
+    if (any(!localities %in% x$unique_locality_code)) {
+      message("Missing:")
+      message(paste(sort(localities[!localities %in% x$unique_locality_code]), collapse = ", "))
+    }
+    x <- filter(x, .data$unique_locality_code %in% tolower(localities))
+  }
 
   ll_range <- cbind(X = xlim, Y = ylim)
   utm_range <- ll2utm(ll_range, utm_zone = 9)
@@ -55,13 +66,17 @@ plot_dfo_localities <- function(localities = "all",
     ggplot2::aes_string(x = "X", y = "Y", group = "PID"),
     inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70") +
     ggplot2::coord_equal(xlim = utm_range$X, ylim = utm_range$Y) +
-    ggrepel::geom_text_repel(
-      data = x_utm,
-      ggplot2::aes_string("X", "Y", label = "name"),
-      size = 2.8, colour = "grey30",
-      point.padding = unit(1, "lines"), max.iter = 6e3, segment.size = 0.5) +
     ggplot2::scale_fill_manual(na.value = "white", values = rep("grey60", 1e3)) +
     theme_pbs() + ggplot2::guides(fill = FALSE, colour = FALSE) +
     ggplot2::labs(y = "Northing", x = "Easting")
+
+  if (localities[[1]] != "all") {
+    g <- g + ggrepel::geom_text_repel(
+      data = x_utm,
+      ggplot2::aes_string("X", "Y", label = "name"),
+      size = 2.8, colour = "grey30",
+      point.padding = unit(1, "lines"),
+      max.iter = 6e3, segment.size = 0.5)
+  }
   g
 }
