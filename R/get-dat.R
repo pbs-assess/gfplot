@@ -430,6 +430,19 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   as_tibble(.d)
 }
 
+get_iphc_sets <- function(species, usability = NULL) {
+  .q <- read_sql("IPHC_set_level.sql")
+  .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFBioSQL", .q)
+  .d$species <- tolower(.d$species)
+#
+#    if (!is.null(usability)) {
+#     .d <- filter(.d, usability_code %in% usability)
+#   }
+
+  as_tibble(.d)
+}
+
 #' @export
 #' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
 #'  and unknown). Default = TRUE.
