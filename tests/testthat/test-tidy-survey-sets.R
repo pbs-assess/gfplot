@@ -6,9 +6,11 @@ test_that("get_* data functions work at PBS", {
 
   if (!is_dfo() || !is_windows()) skip("Not a DFO computer")
   d <- get_survey_sets("lingcod", 3)
-  d <- tidy_survey_sets("lingcod", 3, 2012:2017)
   expect_type(d$year, "integer")
 
+  dd <- tidy_survey_sets(d, 3, 2012:2017)
+  expect_type(dd$year, "integer")
+
   d <- load_bath()
-  expect_type(d$X, "numerical")
+  expect_type(d$X, "double")
 })
