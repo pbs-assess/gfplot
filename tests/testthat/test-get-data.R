@@ -29,7 +29,7 @@ test_that("get_* data functions work at PBS", {
   d <- get_cpue_spatial_ll("lingcod")
   expect_type(d$fishing_event_id, "integer")
 
-  d <- get_cpue_index("bottom trawl", min_year = 2015)
+  d <- get_cpue_index("bottom trawl", min_cpue_year = 2015)
   expect_true(!is.null(d$fe_start_date))
 
   # Why doesn't this work? Error says that best_date is of
@@ -41,7 +41,7 @@ test_that("get_* data functions work at PBS", {
   expect_type(d$num_pos_sets, "integer")
 
   d <- get_ssids()
-  expect_type(d$survey_series_desc, "character")
+  expect_type(d$SURVEY_SERIES_DESC, "character")
 
   d <- get_age_methods()
   expect_true(!is.null(d$ageing_method_desc))
