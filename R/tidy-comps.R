@@ -30,6 +30,7 @@
 #'   weighted samples if `sample_type = "survey"`.
 #' @param dat_catch A data frame from [get_catch()]. Needed for weighted samples
 #'   if `sample_type = "commercial"`.
+#' @param remove_unsexed Logical
 #'
 #' @export
 #' @details
@@ -129,7 +130,8 @@ tidy_comps <- function(dat,
                        sample_type = c("survey", "commercial"),
                        frequency_type = c("raw", "weighted"),
                        dat_survey_sets = NULL,
-                       dat_catch = NULL) {
+                       dat_catch = NULL,
+                       remove_unsexed = TRUE) {
   age_length <- match.arg(age_length)
   sample_type <- match.arg(sample_type)
   frequency_type <- match.arg(frequency_type)
@@ -153,12 +155,14 @@ tidy_comps <- function(dat,
 
   # -------------------------------------------
   # Filter down data (basics):
-  dat <- filter(dat, sex %in% c(1, 2))
+  if (remove_unsexed) {
+    dat <- filter(dat, sex %in% c(1, 2))
+  }
   dat <- filter(dat, !is.na(year))
   dat$sex <- dplyr::case_when(
     dat$sex == 1 ~ "M",
     dat$sex == 2 ~ "F",
-    TRUE ~ ""
+    TRUE ~ "U"
   )
 
   if (is.null(year_range)) year_range <- c(min(dat$year), max(dat$year))

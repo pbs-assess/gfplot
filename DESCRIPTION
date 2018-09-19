@@ -1,9 +1,9 @@
 Package: gfplot
 Title: Data Extraction and Plotting for DFO PBS Groundfish Stocks
-Version: 0.1.0.9000
-Authors@R: c(person("Sean", "Anderson",
+Version: 0.1.1
+Authors@R: c(person(c("Sean", "C."), "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
-    person("Elise", "Keppel", role = "aut"))
+    person(c("Elise", "A."), "Keppel", role = "aut"))
 Description: Facilitates groundfish data extraction at the Canadian Department
     of Fisheries and Oceans (DFO) Pacific Biological Station (PBS), data
     tidying, model fitting, and plotting.
@@ -49,7 +49,8 @@ Imports:
     xml2,
     pingr,
     INLA,
-    DLMtool
+    DLMtool,
+    tweedie
 Remotes: github::pbs-software/pbs-data/PBSdata
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.1.0

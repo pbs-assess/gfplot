@@ -227,6 +227,11 @@ fit_glmmfields <- function(dat,
 #'   fit with INLA.
 #' @param inla_knots_bin The number of knots for the binary component model if
 #'   fit with INLA.
+#' @param gamma_scaling A value to multiply the positive densities by internally
+#'   before fitting the Gamma GLMM. The predictions are then divided by this
+#'   value internally to render a prediction on the original scale. The reason
+#'   for this is that values to are too small can create computational problems
+#'   for INLA.
 #' @param ... Any other arguments to pass on to [fit_inla()].
 #'
 #' @examples
@@ -259,6 +264,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             premade_grid = NULL,
                             inla_knots_pos = 75,
                             inla_knots_bin = 100,
+                            gamma_scaling = 1000,
                             ...) {
   model <- match.arg(model)
   if (model == "glmmfields")
@@ -341,6 +347,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     )
 
     dpos <- filter(.d_scaled, present == 1)
+    dpos$density <- dpos$density * gamma_scaling # note scaling for computational reasons
     pos <- fit_inla(dpos,
       response = "density", family = "gamma",
       include_depth = include_depth,
@@ -361,12 +368,16 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     )
 
     bin <- stats::plogis(p_bin)
-    pos <- exp(p_pos)
+    pos <- exp(p_pos) / gamma_scaling # note scaling for computational reasons
   }
 
   com <- bin * pos
   pg$combined <- apply(com, 1, median)
+  pg$combined0.05 <- apply(com, 1, quantile, probs = 0.05)
+  pg$combined0.95 <- apply(com, 1, quantile, probs = 0.95)
   pg$bin <- apply(bin, 1, median)
+  pg$bin0.05 <- apply(bin, 1, quantile, probs = 0.05)
+  pg$bin0.95 <- apply(bin, 1, quantile, probs = 0.95)
   pg$pos <- apply(pos, 1, median)
 
   list(

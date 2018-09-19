@@ -86,6 +86,9 @@ tidy_cpue_index <- function(dat, species_common,
     dat$alt_year <- NULL
   }
 
+  dat$locality_code <- paste(dat$major_stat_area_code,
+    dat$minor_stat_area_code, dat$locality_code, sep = "-")
+
   # basic filtering:
   catch <- dat %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
@@ -188,7 +191,7 @@ tidy_cpue_index <- function(dat, species_common,
       depth = factor_bin_clean(best_depth, depth_bands),
       vessel = as.factor(vessel_name),
       latitude = factor_bin_clean(latitude, lat_bands),
-      locality = factor_clean(locality_code),
+      locality = as.factor(locality_code),
       year_factor = factor_clean(year),
       month = factor_clean(month)
     ) %>%
