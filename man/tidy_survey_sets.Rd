@@ -10,7 +10,7 @@ tidy_survey_sets(dat, survey, years, utm_zone = 9,
 \arguments{
 \item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}
 
-\item{survey}{The name of a survey.}
+\item{survey}{The name of a survey (see get_ssids()).}
 
 \item{years}{The years.}
 

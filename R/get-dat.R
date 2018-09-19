@@ -39,6 +39,7 @@
 #'    status and listings
 #' * `get_survey_index()` extracts survey catch data for given species
 #'    and survey series IDs
+#' * `get_iphc_sets()` extracts IPHC survey data at the set level for given species
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    and caches extracted data to a given folder
 #'
@@ -430,6 +431,11 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   as_tibble(.d)
 }
 
+
+#' @export
+#' @rdname get_data
+#' @param usability Vector of usability codes to include. Defaults to all.
+#'        IPHC codes may be different to other surveys.
 get_iphc_sets <- function(species, usability = NULL) {
   .q <- read_sql("get-iphc-set-level.sql")
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)

@@ -12,6 +12,7 @@
 \alias{get_other_surveys}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
+\alias{get_iphc_sets}
 \alias{get_commercial_samples}
 \alias{get_catch}
 \alias{get_cpue_spatial}
@@ -45,6 +46,8 @@ get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
   unsorted_only = TRUE, usability = NULL)
+
+get_iphc_sets(species, usability = NULL)
 
 get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
@@ -125,6 +128,9 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
+
+\item{usability}{Vector of usability codes to include. Defaults to all.
+IPHC codes may be different to other surveys.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
@@ -176,6 +182,7 @@ given species where there is a second ('precision') age reading
 status and listings
 \item \code{get_survey_index()} extracts survey catch data for given species
 and survey series IDs
+\item \code{get_iphc_sets()} extracts IPHC survey data at the set level for given species
 \item \code{cache_pbs_data()} runs all 'get' functions in the gfplot package
 and caches extracted data to a given folder
 }
