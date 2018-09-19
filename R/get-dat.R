@@ -431,7 +431,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 }
 
 get_iphc_sets <- function(species, usability = NULL) {
-  .q <- read_sql("IPHC_set_level.sql")
+  .q <- read_sql("get-iphc-set-level.sql")
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
   .d$species <- tolower(.d$species)
