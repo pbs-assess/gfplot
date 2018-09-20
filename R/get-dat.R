@@ -44,6 +44,8 @@
 #' * `get_iphc_sets_info()` extracts IPHC survey data regarding each set, with no
 #'    species information, to give one unique row (with lat, lon etc.) for each
 #'    set, from 2003 to present (excluding 2013 which is not in database)
+#' * `get_iphc_hooks()` extracts IPHC survey data at the hook level for given
+#'    species, from 2003 to present (excluding 2013 which is not in database)
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    and caches extracted data to a given folder
 #'
@@ -449,7 +451,6 @@ get_iphc_sets <- function(species, usability = NULL) {
 #    if (!is.null(usability)) {
 #     .d <- filter(.d, usability_code %in% usability)
 #   }
-
   as_tibble(.d)
 }
 
@@ -461,6 +462,21 @@ get_iphc_sets_info <- function() {
   as_tibble(.d)
 }
 
+#' @export
+#' @rdname get_data
+#' @param usability Vector of usability codes to include. Defaults to all.
+#'        IPHC codes may be different to other surveys.
+get_iphc_hooks <- function(species, usability = NULL) {
+  .q <- read_sql("get-iphc-hook-level.sql")
+  .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
+  .d <- run_sql("GFBioSQL", .q)
+  .d$species <- tolower(.d$species)
+#
+#    if (!is.null(usability)) {
+#     .d <- filter(.d, usability_code %in% usability)
+#   }
+  as_tibble(.d)
+}
 
 
 #' @export
