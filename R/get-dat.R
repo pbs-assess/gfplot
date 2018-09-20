@@ -39,7 +39,11 @@
 #'    status and listings
 #' * `get_survey_index()` extracts survey catch data for given species
 #'    and survey series IDs
-#' * `get_iphc_sets()` extracts IPHC survey data at the set level for given species
+#' * `get_iphc_sets()` extracts IPHC survey data at the set level for given
+#'    species, from 2003 to present (excluding 2013 which is not in database)
+#' * `get_iphc_sets_info()` extracts IPHC survey data regarding each set, with no
+#'    species information, to give one unique row (with lat, lon etc.) for each
+#'    set, from 2003 to present (excluding 2013 which is not in database)
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    and caches extracted data to a given folder
 #'
@@ -448,6 +452,16 @@ get_iphc_sets <- function(species, usability = NULL) {
 
   as_tibble(.d)
 }
+
+##' @rdname get_data
+##' @export
+get_iphc_sets_info <- function() {
+  .q <- read_sql("get-iphc-set-info.sql")
+  .d <- run_sql("GFBioSQL", .q)
+  as_tibble(.d)
+}
+
+
 
 #' @export
 #' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
