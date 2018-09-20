@@ -57,6 +57,9 @@ test_that("get_* data functions work at PBS", {
 
   expect_error(get_survey_sets("lingcod", ssid = 99999))
 
+  d <- get_iphc_sets("lingcod")
+  expect_type(d$species, "character")
+
   d <- get_survey_sets(c("yelloweye rockfish", "lingcod"),
     join_sample_ids = TRUE
   )
