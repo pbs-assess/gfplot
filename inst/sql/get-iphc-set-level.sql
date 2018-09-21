@@ -1,7 +1,9 @@
+-- If any of this first call changes then update table in text (currently
+--  (in Andy's yeye15reproduce repo, will get moved to gfsynopsis)
 SELECT YEAR(TRIP_START_DATE) AS year,
 	T.TRIP_ID AS tripID,
 	FE.FISHING_EVENT_ID AS setID,
-    BLOCK_DESIGNATION AS block,
+        BLOCK_DESIGNATION AS block,
 	FE_MAJOR_LEVEL_ID AS setInTrip,
 	C.SPECIES_CODE AS speciesCode,
 	SPECIES_COMMON_NAME AS species,
