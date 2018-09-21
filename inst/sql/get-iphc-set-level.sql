@@ -1,5 +1,5 @@
 -- If any of this first call changes then update table in text (currently
---  (in Andy's yeye15reproduce repo, will get moved to gfsynopsis), and make
+--  in Andy's yeye15reproduce repo, will get moved to gfsynopsis), and make
 --  sure you change it in get-iphc-set-info.sql also
 SELECT YEAR(TRIP_START_DATE) AS year,
 	T.TRIP_ID AS tripID,
