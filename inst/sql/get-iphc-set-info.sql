@@ -1,10 +1,13 @@
+-- If any of this first call changes then update table in text (currently
+--  (in Andy's yeye15reproduce repo, will get moved to gfsynopsis), and make
+--  sure you change it in get-iphc-set-level.sql also
 SELECT YEAR(TRIP_START_DATE) AS year,
 	T.TRIP_ID AS tripID,
-	BLOCK_DESIGNATION AS block,
 	FE.FISHING_EVENT_ID AS setID,
-    FE_MAJOR_LEVEL_ID AS setInTrip,
+	BLOCK_DESIGNATION AS block,
+        FE_MAJOR_LEVEL_ID AS setInTrip,
 	-(FE.FE_START_LONGITUDE_DEGREE + FE_START_LONGITUDE_MINUTE/60) AS long,
-    FE.FE_START_LATTITUDE_DEGREE + FE.FE_START_LATTITUDE_MINUTE/60 AS lat,
+        FE.FE_START_LATTITUDE_DEGREE + FE.FE_START_LATTITUDE_MINUTE/60 AS lat,
 	LGLSP_HOOK_COUNT, 
 	LGLSP_HOOKS_SET_COUNT AS hooksCount,
 	SKATE_COUNT AS skatesCount,

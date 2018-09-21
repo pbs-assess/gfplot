@@ -44,6 +44,10 @@
 #' * `get_iphc_sets_info()` extracts IPHC survey data regarding each set, with no
 #'    species information, to give one unique row (with lat, lon etc.) for each
 #'    set, from 2003 to present (excluding 2013 which is not in database)
+#' * `get_iphc_skates_info()` extracts IPHC survey data regarding each skate,
+#'    with no species information, to give one unique row (with lat, lon etc.)
+#'    for each set, from 2003 to present (excluding 2013 which is not in database);
+#'    needed for the hooks per skate
 #' * `get_iphc_hooks()` extracts IPHC survey data at the hook level for given
 #'    species, from 2003 to present (excluding 2013 which is not in database)
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
@@ -461,6 +465,15 @@ get_iphc_sets_info <- function() {
   .d <- run_sql("GFBioSQL", .q)
   as_tibble(.d)
 }
+
+##' @rdname get_data
+##' @export
+get_iphc_skates_info <- function() {
+  .q <- read_sql("get-iphc-skate-info.sql")
+  .d <- run_sql("GFBioSQL", .q)
+  as_tibble(.d)
+}
+
 
 #' @export
 #' @rdname get_data

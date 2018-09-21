@@ -63,6 +63,12 @@ test_that("get_* data functions work at PBS", {
   d <- get_iphc_sets_info()
   expect_type(d$year, "integer")
 
+  d <- get_iphc_skates_info()
+  expect_type(d$year, "integer")
+
+  d <- get_iphc_hooks("lingcod")
+  expect_type(d$year, "integer")
+
   d <- get_survey_sets(c("yelloweye rockfish", "lingcod"),
     join_sample_ids = TRUE
   )
