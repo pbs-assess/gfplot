@@ -6,7 +6,7 @@
 SET NOCOUNT ON -- prevents timeout errors
 
 -- If any of this first call changes then update table in text (currently
---  (in Andy's yeye15reproduce repo, will get moved to gfsynopsis)
+--  in Andy's yeye15reproduce repo, will get moved to gfsynopsis)
 SELECT
   YEAR(T.TRIP_START_DATE) AS [year],
   FE.TRIP_ID AS tripID,
