@@ -8,10 +8,10 @@ fit_survey_sets(dat, years, survey = NULL,
   density_column = "density_kgpm2", chains = 4, iter = 1000,
   max_knots = 20, adapt_delta = 0.95, thin = 1,
   mcmc_posterior_samples = 150, required_obs_percent = 0.05,
-  utm_zone = 9, model = c("inla", "glmmfields"),
+  utm_zone = 9, model = c("inla", "sdmTMB", "glmmfields"),
   include_depth = TRUE, survey_boundary = NULL, premade_grid = NULL,
-  inla_knots_pos = 75, inla_knots_bin = 100, gamma_scaling = 1000,
-  ...)
+  tmb_knots = 200, inla_knots_pos = 75, inla_knots_bin = 100,
+  gamma_scaling = 1000, cell_width = 1.5, ...)
 }
 \arguments{
 \item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}
@@ -73,6 +73,8 @@ element \code{cell_area} the content a single numeric value describing the grid
 size in kilometers. The package includes a survey grid for the HBLL surveys
 in \code{gfplot::hbll_grid}.}
 
+\item{tmb_knots}{The number of knots to pass to \code{\link[sdmTMB:sdmTMB]{sdmTMB::sdmTMB()}}.}
+
 \item{inla_knots_pos}{The number of knots for the positive component model if
 fit with INLA.}
 
@@ -85,7 +87,9 @@ value internally to render a prediction on the original scale. The reason
 for this is that values to are too small can create computational problems
 for INLA.}
 
-\item{...}{Any other arguments to pass on to \code{\link[=fit_inla]{fit_inla()}}.}
+\item{cell_width}{The cell width if a prediction grid is made on the fly.}
+
+\item{...}{Any other arguments to pass on to the modelling function.}
 }
 \description{
 Implements geostatistical models of trawl or longline survey data. Uses INLA

@@ -17,7 +17,7 @@ plot_survey_sets(pred_dat, raw_dat, fill_column = c("combined", "bin",
   rotation_center = c(500, 5700), show_axes = TRUE, xlim = NULL,
   ylim = NULL, x_buffer = c(-5, 5), y_buffer = c(-5, 5),
   north_symbol = FALSE, north_symbol_coord = c(130, 5975),
-  north_symbol_length = 30, cell_size = 2, circles = FALSE)
+  north_symbol_length = 30, cell_size = 1.5, circles = FALSE)
 }
 \arguments{
 \item{pred_dat}{The \code{predictions} element of the output from

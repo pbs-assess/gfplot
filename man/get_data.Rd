@@ -174,7 +174,7 @@ GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
 GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 \item \code{get_cpue_index()} extracts catch and effort data from
 GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
-\item \code{\link[=get_cpue_historic]{get_cpue_historic()}} extracts historical catch and effort data back into
+\item \code{\link[=get_cpue_historical]{get_cpue_historical()}} extracts historical catch and effort data back into
 the 1950s. It's help file is on a separate page; see the link.
 \item \code{get_age_precision()} extracts age readings from biological samples for a
 given species where there is a second ('precision') age reading

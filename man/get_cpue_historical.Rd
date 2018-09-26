@@ -2,12 +2,17 @@
 % Please edit documentation in R/get-dat.R
 \name{get_cpue_historic}
 \alias{get_cpue_historic}
+\alias{get_cpue_historical}
 \title{Get all fishing catch and effort to calculate historic commercial CPUE}
 \usage{
-get_cpue_historic(species = NULL, alt_year_start_date = "04-01",
+get_cpue_historic(...)
+
+get_cpue_historical(species = NULL, alt_year_start_date = "04-01",
   areas = c("3[CD]+", "5[AB]+", "5[CDE]+"), end_year = NULL)
 }
 \arguments{
+\item{...}{Other arguments to pass.}
+
 \item{species}{Species to filter for positive fishing events. Leave as \code{NULL}
 to include all fishing events. One or more species common names (e.g.
 \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species
