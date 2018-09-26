@@ -18,6 +18,5 @@ r_packages:
   - devtools
 
 r_github_packages:
-  - seananderson/glmmfields
   - pbs-software/pbs-data/PBSdata
   - andrewzm/INLA
