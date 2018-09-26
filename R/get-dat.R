@@ -31,7 +31,7 @@
 #'    GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 #' * `get_cpue_index()` extracts catch and effort data from
 #'    GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
-#' * [get_cpue_historic()] extracts historical catch and effort data back into
+#' * [get_cpue_historical()] extracts historical catch and effort data back into
 #'    the 1950s. It's help file is on a separate page; see the link.
 #' * `get_age_precision()` extracts age readings from biological samples for a
 #'    given species where there is a second ('precision') age reading
@@ -541,6 +541,15 @@ get_catch <- function(species) {
   as_tibble(.d)
 }
 
+#' @param ... Other arguments to pass.
+#' @rdname get_cpue_historical
+#' @export
+get_cpue_historic <- function(...) {
+  warning("get_cpue_historic() is depreciated. Please use the grammatically",
+    "correct get_cpue_historical() instead.")
+  get_cpue_historical(...)
+}
+
 #' Get all fishing catch and effort to calculate historic commercial CPUE
 #'
 #' @param species Species to filter for positive fishing events. Leave as `NULL`
@@ -559,7 +568,7 @@ get_catch <- function(species) {
 #'   See [base::regex()].
 #' @param end_year Specify the last calendar year to be extracted.
 #' @export
-get_cpue_historic <- function(species = NULL,
+get_cpue_historical <- function(species = NULL,
   alt_year_start_date = "04-01", areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
   end_year = NULL) {
   .q <- read_sql("get-cpue-historic.sql")
