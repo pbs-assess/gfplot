@@ -50,9 +50,11 @@ Imports:
     pingr,
     INLA,
     DLMtool,
-    tweedie
-Remotes: github::pbs-software/pbs-data/PBSdata
-Additional_repositories: https://inla.r-inla-download.org/R/stable
+    tweedie,
+    sdmTMB,
+    ggrepel
+Remotes: github::pbs-software/pbs-data/PBSdata, github::seananderson/sdmTMB
+Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
 Suggests:
