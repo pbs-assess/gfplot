@@ -223,6 +223,7 @@ fit_glmmfields <- function(dat,
 #'   element `cell_area` the content a single numeric value describing the grid
 #'   size in kilometers. The package includes a survey grid for the HBLL surveys
 #'   in `gfplot::hbll_grid`.
+#' @param tmb_knots The number of knots to pass to [sdmTMB::sdmTMB()].
 #' @param inla_knots_pos The number of knots for the positive component model if
 #'   fit with INLA.
 #' @param inla_knots_bin The number of knots for the binary component model if
@@ -232,7 +233,8 @@ fit_glmmfields <- function(dat,
 #'   value internally to render a prediction on the original scale. The reason
 #'   for this is that values to are too small can create computational problems
 #'   for INLA.
-#' @param ... Any other arguments to pass on to [fit_inla()].
+#' @param cell_width The cell width if a prediction grid is made on the fly.
+#' @param ... Any other arguments to pass on to the modelling function.
 #'
 #' @examples
 #' \donttest{
@@ -258,14 +260,17 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             mcmc_posterior_samples = 150,
                             required_obs_percent = 0.05,
                             utm_zone = 9,
-                            model = c("inla", "glmmfields"),
+                            model = c("inla", "sdmTMB", "glmmfields"),
                             include_depth = TRUE,
                             survey_boundary = NULL,
                             premade_grid = NULL,
+                            tmb_knots = 200,
                             inla_knots_pos = 75,
                             inla_knots_bin = 100,
                             gamma_scaling = 1000,
+                            cell_width = 1.5,
                             ...) {
+
   model <- match.arg(model)
   if (model == "glmmfields")
     stop("glmmfields is temporarily disabled.")
@@ -277,15 +282,15 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     stop("No survey data for species-survey-year combination.")
   }
 
-  assertthat::assert_that(length(unique(.d_tidy$year)) == 1L,
-    msg = "fit_survey_sets() only works with a single year of data."
-  )
+  # assertthat::assert_that(length(unique(.d_tidy$year)) == 1L,
+  #   msg = "fit_survey_sets() only works with a single year of data."
+  # )
 
   if (!survey %in% c("HBLL OUT N", "HBLL OUT S", "HBLL", "HBLL OUT", "IPHC FISS")) {
     .d_interp <- interp_survey_bathymetry(.d_tidy)
     .d_scaled <- scale_survey_predictors(.d_interp$data)
     pg <- make_prediction_grid(.d_scaled,
-      survey = survey,
+      survey = survey, cell_width = cell_width,
       survey_boundary = survey_boundary,
       draw_boundary = TRUE,
       premade_grid = premade_grid
@@ -311,6 +316,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 
   model <- match.arg(model)
   if (model == "glmmfields") {
+    stop("glmmfields option needs to be checked!")
     if (!include_depth) {
       warning("Depth is currently always included with the glmmmfields model.")
     }
@@ -337,7 +343,8 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       newdata = data.frame(pg),
       type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
     )
-  } else {
+  }
+  if (model == "inla") {
     message("Predicting density onto grid...")
     bin <- fit_inla(.d_scaled,
       response = "present", family = "binomial",
@@ -371,15 +378,40 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     pos <- exp(p_pos) / gamma_scaling # note scaling for computational reasons
   }
 
-  com <- bin * pos
-  pg$combined <- apply(com, 1, median)
-  pg$combined0.05 <- apply(com, 1, quantile, probs = 0.05)
-  pg$combined0.95 <- apply(com, 1, quantile, probs = 0.95)
-  pg$bin <- apply(bin, 1, median)
-  pg$bin0.05 <- apply(bin, 1, quantile, probs = 0.05)
-  pg$bin0.95 <- apply(bin, 1, quantile, probs = 0.95)
-  pg$pos <- apply(pos, 1, median)
-
+  if (model %in% c("glmmfields", "inla")) {
+    com <- bin * pos
+    pg$combined <- apply(com, 1, median)
+    pg$combined0.05 <- apply(com, 1, quantile, probs = 0.05)
+    pg$combined0.95 <- apply(com, 1, quantile, probs = 0.95)
+    pg$bin <- apply(bin, 1, median)
+    pg$bin0.05 <- apply(bin, 1, quantile, probs = 0.05)
+    pg$bin0.95 <- apply(bin, 1, quantile, probs = 0.95)
+    pg$pos <- apply(pos, 1, median)
+  } else { # sdmTMB; tweedie
+    message("Predicting density onto grid across all years using sdmTMB...")
+    if (survey %in% c("IPHC FISS")) # fixed station
+      tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
+    .spde <- sdmTMB::make_spde(.d_scaled$X, .d_scaled$Y, n_knots = tmb_knots)
+    if (length(unique(.d_scaled$year)) > 1)
+      formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
+    else
+      formula <- density ~ depth_scaled + depth_scaled2
+    m <- sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
+      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
+    # These are fixed station (IPHC) or they come from grids without years
+    if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
+      pg_one <- pg
+      pg <- do.call("rbind",
+        replicate(length(unique(.d_scaled$year)), pg, simplify = FALSE))
+      pg$year <- rep(unique(.d_scaled$year), each = nrow(pg_one))
+    } else {
+      pg_one <- filter(pg, year == min(pg$year)) # all the same, pick one
+    }
+    pred <- predict(m, newdata = pg_one)
+    pg$combined <- exp(pred$est)
+    pg$pos <- NA
+    pg$bin <- NA
+  }
   list(
     predictions = pg, data = .d_scaled, models = m, survey = survey,
     years = years
@@ -498,7 +530,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol = FALSE,
                              north_symbol_coord = c(130, 5975),
                              north_symbol_length = 30,
-                             cell_size = 2, circles = FALSE) {
+                             cell_size = 1.5, circles = FALSE) {
   fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(
