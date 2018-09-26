@@ -52,7 +52,7 @@ Imports:
     DLMtool,
     tweedie
 Remotes: github::pbs-software/pbs-data/PBSdata
-Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
+Additional_repositories: https://inla.r-inla-download.org/R/stable
 RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
 Suggests:
