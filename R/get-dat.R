@@ -390,6 +390,7 @@ trawl <- run_sql("GFBioSQL", "SELECT
 #' @param remove_bad_data Remove known bad data, such as unrealistic
 #'  length or weight values.
 #' @param usability A vector of usability codes to include. Defaults to all.
+#'   IPHC codes may be different to other surveys.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   unsorted_only = TRUE, usability = NULL) {
   .q <- read_sql("get-survey-samples.sql")
@@ -444,8 +445,6 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
 
 #' @export
 #' @rdname get_data
-#' @param usability Vector of usability codes to include. Defaults to all.
-#'        IPHC codes may be different to other surveys.
 get_iphc_sets <- function(species, usability = NULL) {
   .q <- read_sql("get-iphc-set-level.sql")
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
@@ -477,8 +476,6 @@ get_iphc_skates_info <- function() {
 
 #' @export
 #' @rdname get_data
-#' @param usability Vector of usability codes to include. Defaults to all.
-#'        IPHC codes may be different to other surveys.
 get_iphc_hooks <- function(species, usability = NULL) {
   .q <- read_sql("get-iphc-hook-level.sql")
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
