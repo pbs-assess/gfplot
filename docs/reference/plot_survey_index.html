@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Plot survey relative biomass mass index" />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -58,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -72,18 +75,6 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -117,13 +108,14 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>tidy_survey_index</span>(<span class='no'>dat</span>, <span class='kw'>survey</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"SYN WCHG"</span>, <span class='st'>"SYN HS"</span>, <span class='st'>"SYN QCS"</span>, <span class='st'>"SYN WCVI"</span>,
-  <span class='st'>"HBLL OUT N"</span>, <span class='st'>"HBLL OUT S"</span>, <span class='st'>"HBLL INS N"</span>, <span class='st'>"HBLL INS S"</span>, <span class='st'>"MSA HS"</span>,
-  <span class='st'>"IPHC FISS"</span>), <span class='kw'>min_years</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>tidy_survey_index</span>(<span class='no'>dat</span>, <span class='kw'>survey</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"SYN WCHG"</span>, <span class='st'>"SYN HS"</span>, <span class='st'>"SYN QCS"</span>,
+  <span class='st'>"SYN WCVI"</span>, <span class='st'>"HBLL OUT N"</span>, <span class='st'>"HBLL OUT S"</span>, <span class='st'>"HBLL INS N"</span>, <span class='st'>"HBLL INS S"</span>,
+  <span class='st'>"MSA HS"</span>, <span class='st'>"IPHC FISS"</span>), <span class='kw'>min_years</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>plot_survey_index</span>(<span class='no'>dat</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fu'>brewer.pal</span>(<span class='fl'>9</span>, <span class='st'>"Greys"</span>)[<span class='fu'>c</span>(<span class='fl'>3</span>, <span class='fl'>7</span>)],
-  <span class='kw'>title</span> <span class='kw'>=</span> <span class='st'>"Biomass indices"</span>, <span class='kw'>max_cv</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>max_set_fraction</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>survey_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>max_cv</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>max_set_fraction</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>survey_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>year_increment</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>hide_y_axis</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -152,10 +144,6 @@ range of years to plot.</p></td>
       <td><p>A vector of two colours for the lines and shading.</p></td>
     </tr>
     <tr>
-      <th>title</th>
-      <td><p>Title for the plot.</p></td>
-    </tr>
-    <tr>
       <th>max_cv</th>
       <td><p>A coefficient of variation above which a panel will be shaded
 as more uncertain.</p></td>
@@ -173,6 +161,18 @@ be shaded as more uncertain.</p></td>
       <th>survey_cols</th>
       <td><p>If not <code>NULL</code>, a named character vector of colors for the
 various surveys.</p></td>
+    </tr>
+    <tr>
+      <th>scale</th>
+      <td><p>Logical: scale the biomass by the maximum?</p></td>
+    </tr>
+    <tr>
+      <th>year_increment</th>
+      <td><p>Increment for the year x axis.</p></td>
+    </tr>
+    <tr>
+      <th>hide_y_axis</th>
+      <td><p>Logical: hide the y axis ticks and labels?</p></td>
     </tr>
     </table>
     
@@ -197,7 +197,7 @@ various surveys.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

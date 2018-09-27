@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -36,6 +38,7 @@ plot_, or fit_ functions) for data visualization, which can be used as
 products themselves or can be fed into automated DFO Pacific groundfish data
 synopsis report production." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -62,7 +65,7 @@ synopsis report production." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -76,18 +79,6 @@ synopsis report production." />
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -129,21 +120,35 @@ synopsis report production.</p>
 
 <span class='fu'>get_major_areas</span>()
 
+<span class='fu'>get_management_areas</span>()
+
+<span class='fu'>get_fishery_ids</span>()
+
+<span class='fu'>get_species_groups</span>()
+
 <span class='fu'>get_gear_types</span>()
 
 <span class='fu'>get_age_methods</span>()
+
+<span class='fu'>get_other_surveys</span>()
 
 <span class='fu'>get_survey_sets</span>(<span class='no'>species</span>, <span class='kw'>ssid</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>16</span>, <span class='fl'>2</span>, <span class='fl'>14</span>, <span class='fl'>22</span>, <span class='fl'>36</span>),
   <span class='kw'>join_sample_ids</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='fu'>get_survey_samples</span>(<span class='no'>species</span>, <span class='kw'>ssid</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>remove_bad_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>unsorted_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+  <span class='kw'>unsorted_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>usability</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
-<span class='fu'>get_commercial_samples</span>(<span class='no'>species</span>, <span class='kw'>unsorted_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>get_iphc_sets</span>(<span class='no'>species</span>, <span class='kw'>usability</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>get_iphc_sets_info</span>()
+
+<span class='fu'>get_iphc_skates_info</span>()
+
+<span class='fu'>get_iphc_hooks</span>(<span class='no'>species</span>, <span class='kw'>usability</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>get_commercial_samples</span>(<span class='no'>species</span>, <span class='kw'>unsorted_only</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>usability</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>get_catch</span>(<span class='no'>species</span>)
-
-<span class='fu'>get_cpue_historic</span>(<span class='no'>species</span>, <span class='kw'>fishing_year</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>end_year</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
 
 <span class='fu'>get_cpue_spatial</span>(<span class='no'>species</span>)
 
@@ -154,6 +159,9 @@ synopsis report production.</p>
 <span class='fu'>get_age_precision</span>(<span class='no'>species</span>)
 
 <span class='fu'>get_survey_index</span>(<span class='no'>species</span>, <span class='kw'>ssid</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>get_management</span>(<span class='kw'>species</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>species_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fishery</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>area</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>start_year</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>get_sara_dat</span>()
 
@@ -202,15 +210,9 @@ length or weight values.</p></td>
 and unknown). Default = TRUE.</p></td>
     </tr>
     <tr>
-      <th>fishing_year</th>
-      <td><p>Specify whether fishing year should be calendar year
-(<code>FALSE</code>) or by Pacific Cod fishing year (<code>TRUE</code>) as calendar year for
-&lt;1997, Apr 1-Mar 31 for Apr 1997-Mar 2008, Apr 1 2008-Feb 20 2009, and Feb
-21-Feb 20 since Feb 2009.</p></td>
-    </tr>
-    <tr>
-      <th>end_year</th>
-      <td><p>Specify the last year or fishing year to be extracted.</p></td>
+      <th>usability</th>
+      <td><p>A vector of usability codes to include. Defaults to all.
+IPHC codes may be different to other surveys.</p></td>
     </tr>
     <tr>
       <th>gear</th>
@@ -221,6 +223,26 @@ gear types to select from.</p></td>
     <tr>
       <th>min_cpue_year</th>
       <td><p>Minimum year for the CPUE data.</p></td>
+    </tr>
+    <tr>
+      <th>species_group</th>
+      <td><p>Species group code(s) to include (see lookup table
+<code>get_species_groups()</code>). Defaults to all.</p></td>
+    </tr>
+    <tr>
+      <th>fishery</th>
+      <td><p>The fishery_id code(s) (see lookup table <code>get_fishery_ids()</code>)
+for fisheries to include in data extraction. Defaults to all.</p></td>
+    </tr>
+    <tr>
+      <th>area</th>
+      <td><p>The fishery area(s) (see lookup table <code>get_management_areas()</code>)
+to include in data extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).</p></td>
+    </tr>
+    <tr>
+      <th>start_year</th>
+      <td><p>The minimum year to include management actions.
+Defaults to all.</p></td>
     </tr>
     <tr>
       <th>path</th>
@@ -280,13 +302,25 @@ GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery</p></li>
 GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery</p></li>
 <li><p><code>get_cpue_index()</code> extracts catch and effort data from
 GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.</p></li>
-<li><p><code>get_cpue_historic()</code> extracts historical catch and effort data back into the 1950s.</p></li>
+<li><p><code><a href='get_cpue_historical.html'>get_cpue_historical()</a></code> extracts historical catch and effort data back into
+the 1950s. It's help file is on a separate page; see the link.</p></li>
 <li><p><code>get_age_precision()</code> extracts age readings from biological samples for a
 given species where there is a second ('precision') age reading</p></li>
 <li><p><code>get_sara_dat()</code> scrubs Species At Risk website for up-to-date species
 status and listings</p></li>
 <li><p><code>get_survey_index()</code> extracts survey catch data for given species
 and survey series IDs</p></li>
+<li><p><code>get_iphc_sets()</code> extracts IPHC survey data at the set level for given
+species, from 2003 to present (excluding 2013 which is not in database)</p></li>
+<li><p><code>get_iphc_sets_info()</code> extracts IPHC survey data regarding each set, with no
+species information, to give one unique row (with lat, lon etc.) for each
+set, from 2003 to present (excluding 2013 which is not in database)</p></li>
+<li><p><code>get_iphc_skates_info()</code> extracts IPHC survey data regarding each skate,
+with no species information, to give one unique row (with lat, lon etc.)
+for each set, from 2003 to present (excluding 2013 which is not in database);
+needed for the hooks per skate</p></li>
+<li><p><code>get_iphc_hooks()</code> extracts IPHC survey data at the hook level for given
+species, from 2003 to present (excluding 2013 which is not in database)</p></li>
 <li><p><code>cache_pbs_data()</code> runs all 'get' functions in the gfplot package
 and caches extracted data to a given folder</p></li>
 </ul>
@@ -298,7 +332,7 @@ and caches extracted data to a given folder</p></li>
 <li><p><code>get_cpue_spatial_ll()</code></p></li>
 <li><p><code>get_survey_index()</code></p></li>
 <li><p><code>get_age_precision()</code></p></li>
-<li><p>and optionally from <code>get_survey_sets()</code> and <code>get_cpue_historic()</code></p></li>
+<li><p>and optionally from <code>get_survey_sets()</code> and <code><a href='get_cpue_historical.html'>get_cpue_historic()</a></code></p></li>
 </ul>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
@@ -360,7 +394,7 @@ get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

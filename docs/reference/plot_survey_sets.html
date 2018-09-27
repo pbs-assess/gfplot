@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -34,6 +36,7 @@
 predictions and/or the raw data. Includes a number of options for customizing
 the map including the ability to rotate the map." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -60,7 +63,7 @@ the map including the ability to rotate the map." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -74,18 +77,6 @@ the map including the ability to rotate the map." />
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -121,19 +112,20 @@ the map including the ability to rotate the map.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_survey_sets</span>(<span class='no'>pred_dat</span>, <span class='no'>raw_dat</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"combined"</span>, <span class='st'>"bin"</span>, <span class='st'>"pos"</span>),
-  <span class='kw'>fill_scale</span> <span class='kw'>=</span> <span class='kw pkg'>viridis</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/viridis/topics/scale_viridis'>scale_fill_viridis</a></span>(<span class='kw'>trans</span> <span class='kw'>=</span> <span class='st'>"sqrt"</span>, <span class='kw'>option</span> <span class='kw'>=</span> <span class='st'>"C"</span>),
-  <span class='kw'>colour_scale</span> <span class='kw'>=</span> <span class='kw pkg'>viridis</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/viridis/topics/scale_viridis'>scale_colour_viridis</a></span>(<span class='kw'>trans</span> <span class='kw'>=</span> <span class='st'>"sqrt"</span>, <span class='kw'>option</span> <span class='kw'>=</span> <span class='st'>"C"</span>),
-  <span class='kw'>pos_pt_col</span> <span class='kw'>=</span> <span class='st'>"#FFFFFF60"</span>, <span class='kw'>bin_pt_col</span> <span class='kw'>=</span> <span class='st'>"#FFFFFF40"</span>,
-  <span class='kw'>pos_pt_fill</span> <span class='kw'>=</span> <span class='st'>"#FFFFFF05"</span>, <span class='kw'>pt_size_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.5</span>, <span class='fl'>9</span>),
-  <span class='kw'>show_legend</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>extrapolate_depth</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>extrapolation_buffer</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+    <pre class="usage"><span class='fu'>plot_survey_sets</span>(<span class='no'>pred_dat</span>, <span class='no'>raw_dat</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"combined"</span>, <span class='st'>"bin"</span>,
+  <span class='st'>"pos"</span>), <span class='kw'>fill_scale</span> <span class='kw'>=</span> <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/scale_viridis'>scale_fill_viridis_c</a></span>(<span class='kw'>trans</span> <span class='kw'>=</span> <span class='st'>"sqrt"</span>,
+  <span class='kw'>option</span> <span class='kw'>=</span> <span class='st'>"C"</span>), <span class='kw'>colour_scale</span> <span class='kw'>=</span> <span class='kw pkg'>ggplot2</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/scale_viridis'>scale_colour_viridis_c</a></span>(<span class='kw'>trans</span> <span class='kw'>=</span>
+  <span class='st'>"sqrt"</span>, <span class='kw'>option</span> <span class='kw'>=</span> <span class='st'>"C"</span>), <span class='kw'>pos_pt_col</span> <span class='kw'>=</span> <span class='st'>"#FFFFFF60"</span>,
+  <span class='kw'>bin_pt_col</span> <span class='kw'>=</span> <span class='st'>"#FFFFFF40"</span>, <span class='kw'>pos_pt_fill</span> <span class='kw'>=</span> <span class='st'>"#FFFFFF05"</span>,
+  <span class='kw'>pt_size_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.5</span>, <span class='fl'>9</span>), <span class='kw'>show_legend</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>extrapolate_depth</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>extrapolation_buffer</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>show_model_predictions</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>show_raw_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>utm_zone</span> <span class='kw'>=</span> <span class='fl'>9</span>,
   <span class='kw'>fill_label</span> <span class='kw'>=</span> <span class='st'>"Predicted\nbiomass\ndensity (kg/m^2)"</span>,
   <span class='kw'>pt_label</span> <span class='kw'>=</span> <span class='st'>"Tow density (kg/km^2)"</span>, <span class='kw'>rotation_angle</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>rotation_center</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>500</span>, <span class='fl'>5700</span>), <span class='kw'>show_axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>x_buffer</span> <span class='kw'>=</span> <span class='fu'>c</span>(-<span class='fl'>5</span>, <span class='fl'>5</span>), <span class='kw'>y_buffer</span> <span class='kw'>=</span> <span class='fu'>c</span>(-<span class='fl'>5</span>, <span class='fl'>5</span>),
   <span class='kw'>north_symbol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>north_symbol_coord</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>130</span>, <span class='fl'>5975</span>),
-  <span class='kw'>north_symbol_length</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>cell_size</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>circles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>north_symbol_length</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>cell_size</span> <span class='kw'>=</span> <span class='fl'>1.5</span>, <span class='kw'>circles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -286,7 +278,7 @@ This analysis report uses this for the IPHC survey.</p></td>
 <span class='co'># or use built-in data:</span>
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='survey-spatial-modelling.html'>fit_survey_sets</a></span>(<span class='no'>pop_surv</span>,
   <span class='kw'>years</span> <span class='kw'>=</span> <span class='fl'>2015</span>,
-  <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN QCS"</span>)</div><div class='output co'>#&gt; <span class='message'>Interpolating depth to fill in missing data if needed...</span></div><div class='output co'>#&gt; <span class='message'>Preloading interpolated depth for prediction grid...</span></div><div class='output co'>#&gt; <span class='message'>Predicting density onto grid...</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='input'>
+  <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN QCS"</span>)</div><div class='output co'>#&gt; <span class='message'>Interpolating depth to fill in missing data if needed...</span></div><div class='output co'>#&gt; <span class='message'>Interpolating depth for prediction grid...</span></div><div class='output co'>#&gt; <span class='message'>Predicting density onto grid...</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='input'>
 <span class='co'># The combined model:</span>
 <span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"combined"</span>)</div><div class='img'><img src='plot_survey_sets-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># The positive component model:</span>
 <span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"pos"</span>)</div><div class='img'><img src='plot_survey_sets-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Add a custom color scale for the binary model:</span>
@@ -317,7 +309,7 @@ This analysis report uses this for the IPHC survey.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

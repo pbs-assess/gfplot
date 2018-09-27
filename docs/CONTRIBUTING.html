@@ -21,14 +21,17 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="pkgdown.css" rel="stylesheet">
-<script src="jquery.sticky-kit.min.js"></script>
 <script src="pkgdown.js"></script>
 
 
 
 <meta property="og:title" content="Contributing" />
+
 
 
 <!-- mathjax -->
@@ -55,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -69,18 +72,6 @@
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -115,11 +106,8 @@
 <ul>
 <li>Make sure you have a <a href="https://github.com/signup/free">GitHub account</a>. If you are not familar with git and GitHub, take a look at <a href="http://happygitwithr.com/" class="uri">http://happygitwithr.com/</a> to get started.</li>
 <li>
-<a href="https://github.com/pbs-assess/gfplot/issues/">Submit a post for your issue</a>, assuming one does not already exist.
-<ul>
+<a href="https://github.com/pbs-assess/gfplot/issues/">Submit a post for your issue</a>, assuming one does not already exist.</li>
 <li>Clearly describe your issue, including steps to reproduce when it is a bug, or some justification for a proposed improvement.</li>
-</ul>
-</li>
 <li>
 <p><a href="https://github.com/pbs-assess/gfplot/#fork-destination-box">Fork</a> the repository on GitHub to make a copy of the repository on your account. Or use this line in your shell terminal:</p>
 <p><code>git clone git@github.com:your-username/gfplot.git</code></p>
@@ -154,12 +142,21 @@
 <div id="building-the-package" class="section level2">
 <h2 class="hasAnchor">
 <a href="#building-the-package" class="anchor"></a>Building the package</h2>
-<p>Having cloned the repo onto your computer, open R in the <code>gfplot/</code> directory and run</p>
-<p><code><a href="http://www.rdocumentation.org/packages/devtools/topics/build">devtools::build()</a></code></p>
+<p>The best resource on developing R packages is <a href="http://r-pkgs.had.co.nz/" class="uri">http://r-pkgs.had.co.nz/</a>.</p>
+<p>Having cloned the repository onto your computer, open R in the <code>gfplot/</code> directory (if you open the <code>gfplot.Rproj</code> file in RStudio your working directory will be automatically set) and run:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install">install</a></span>()</a></code></pre></div>
 <p>which will (re)build and install the package.</p>
-<p>When working on the package (e.g. editing functions) use</p>
-<p><code>devtool::load_all()</code></p>
-<p>which is quicker as it simulates an install but does not put it into your library.</p>
+<p>When working on the package (e.g. editing functions) use:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">devtool<span class="op">::</span><span class="kw">load_all</span>()</a></code></pre></div>
+<p>which is quicker as it simulates an install but does not put it into your permanent library.</p>
+<p>If you’ve added a new function or edited documentation and then the run</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">devtool<span class="op">::</span><span class="kw">document</span>()</a></code></pre></div>
+<p>to rebuild the documentation files.</p>
+<p>To also update the <a href="https://pbs-assess.github.io/gfplot/index.html">online version of the documentation</a>, run</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">pkgdown<span class="op">::</span><span class="kw"><a href="http://pkgdown.r-lib.org/reference/build_site.html">build_site</a></span>()</a></code></pre></div>
+<p>To download all the PBS data for specific species (as long as you have access to the SQL servers) use</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">gfplot<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/gfplot/topics/get_data">cache_pbs_data</a></span>(<span class="st">"lingcod"</span>)</a></code></pre></div>
+<p>replacing the species with your species of interest.</p>
 </div>
 </div>
 
@@ -170,7 +167,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

@@ -21,14 +21,17 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
 
 <meta property="og:title" content="Function reference" />
+
 
 
 <!-- mathjax -->
@@ -55,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -69,18 +72,6 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -109,6 +100,7 @@
     <table class="ref-index">
 
     <colgroup>
+      
       <col class="alias" />
       <col class="title" />
     </colgroup>
@@ -121,211 +113,271 @@
         </th>
       </tr>
       <tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="assign_areas.html">assign_areas()</a></code> </p>
+        </td>
+        <td><p>Assign areas</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="bind_samples.html">bind_samples()</a></code> </p>
         </td>
         <td><p>Join survey and commercial samples</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="cpue-index.html">fit_cpue_index()</a></code> <code><a href="cpue-index.html">predict_cpue_index()</a></code> <code><a href="cpue-index.html">plot_cpue_index()</a></code> <code><a href="cpue-index.html">tidy_cpue_index_coefs()</a></code> <code><a href="cpue-index.html">plot_cpue_index_coefs()</a></code> <code><a href="cpue-index.html">plot_cpue_index_jk()</a></code> </p>
         </td>
         <td><p>Commercial CPUE index standardization</p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="cpue-tweedie.html">fit_cpue_index_tweedie()</a></code> <code><a href="cpue-tweedie.html">predict_cpue_index_tweedie()</a></code> <code><a href="cpue-tweedie.html">tidy_cpue_index_coefs_tweedie()</a></code> </p>
+        </td>
+        <td><p>Commercial CPUE index standardization (Tweedie version)</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="f.html">f()</a></code> <code><a href="f.html">get_most_common_level()</a></code> </p>
         </td>
         <td><p>Force factors to be sequential within the positive or binary data sets for TMB</p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="fit_cpue_index_glmmtmb.html">fit_cpue_index_glmmtmb()</a></code> </p>
+        </td>
+        <td><p>Fit CPUE with glmmTMB</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="fit_inla.html">fit_inla()</a></code> </p>
         </td>
         <td><p>Fit a spatial model with INLA</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="fit_length_weight.html">fit_length_weight()</a></code> </p>
         </td>
         <td><p>Fit a length-weight model</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="fit_vb.html">fit_vb()</a></code> </p>
         </td>
         <td><p>Fit a von Bertalanffy growth model</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
-          <p><code><a href="get_data.html">get_ssids()</a></code> <code><a href="get_data.html">get_major_areas()</a></code> <code><a href="get_data.html">get_gear_types()</a></code> <code><a href="get_data.html">get_age_methods()</a></code> <code><a href="get_data.html">get_survey_sets()</a></code> <code><a href="get_data.html">get_survey_samples()</a></code> <code><a href="get_data.html">get_commercial_samples()</a></code> <code><a href="get_data.html">get_catch()</a></code> <code><a href="get_data.html">get_cpue_historic()</a></code> <code><a href="get_data.html">get_cpue_spatial()</a></code> <code><a href="get_data.html">get_cpue_spatial_ll()</a></code> <code><a href="get_data.html">get_cpue_index()</a></code> <code><a href="get_data.html">get_age_precision()</a></code> <code><a href="get_data.html">get_survey_index()</a></code> <code><a href="get_data.html">get_sara_dat()</a></code> <code><a href="get_data.html">cache_pbs_data()</a></code> </p>
+          <p><code><a href="get_cpue_historical.html">get_cpue_historic()</a></code> <code><a href="get_cpue_historical.html">get_cpue_historical()</a></code> </p>
+        </td>
+        <td><p>Get all fishing catch and effort to calculate historic commercial CPUE</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_data.html">get_ssids()</a></code> <code><a href="get_data.html">get_major_areas()</a></code> <code><a href="get_data.html">get_management_areas()</a></code> <code><a href="get_data.html">get_fishery_ids()</a></code> <code><a href="get_data.html">get_species_groups()</a></code> <code><a href="get_data.html">get_gear_types()</a></code> <code><a href="get_data.html">get_age_methods()</a></code> <code><a href="get_data.html">get_other_surveys()</a></code> <code><a href="get_data.html">get_survey_sets()</a></code> <code><a href="get_data.html">get_survey_samples()</a></code> <code><a href="get_data.html">get_iphc_sets()</a></code> <code><a href="get_data.html">get_iphc_sets_info()</a></code> <code><a href="get_data.html">get_iphc_skates_info()</a></code> <code><a href="get_data.html">get_iphc_hooks()</a></code> <code><a href="get_data.html">get_commercial_samples()</a></code> <code><a href="get_data.html">get_catch()</a></code> <code><a href="get_data.html">get_cpue_spatial()</a></code> <code><a href="get_data.html">get_cpue_spatial_ll()</a></code> <code><a href="get_data.html">get_cpue_index()</a></code> <code><a href="get_data.html">get_age_precision()</a></code> <code><a href="get_data.html">get_survey_index()</a></code> <code><a href="get_data.html">get_management()</a></code> <code><a href="get_data.html">get_sara_dat()</a></code> <code><a href="get_data.html">cache_pbs_data()</a></code> </p>
         </td>
         <td><p>Get PBS data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="gfplot.html">gfplot</a></code> </p>
         </td>
         <td><p>gfplot package</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="hbll_grid.html">hbll_grid</a></code> </p>
         </td>
         <td><p>A 2km x 2km grid for the HBLL survey</p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="hbll_n_grid.html">hbll_n_grid</a></code> </p>
+        </td>
+        <td><p>A 2km x 2km grid for the HBLL North survey</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="hbll_s_grid.html">hbll_s_grid</a></code> </p>
+        </td>
+        <td><p>A 2km x 2km grid for the HBLL South survey</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="pbs2dlmtool_data.html">pbs2dlmtool_data()</a></code> </p>
         </td>
         <td><p>Convert groundfish PBS data to a DLMtool data object</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="pbs_areas.html">pbs_areas</a></code> </p>
         </td>
         <td><p>PBS groundfish areas</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="pbs_species.html">pbs_species</a></code> </p>
         </td>
         <td><p>PBS groundfish species</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_age_precision.html">plot_age_precision()</a></code> </p>
         </td>
         <td><p>Plot ageing precision data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_ages.html">plot_ages()</a></code> </p>
         </td>
         <td><p>Plot age frequency data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_catch.html">tidy_catch()</a></code> <code><a href="plot_catch.html">plot_catch()</a></code> </p>
         </td>
         <td><p>Plot catch data over time</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_cpue_spatial.html">plot_cpue_spatial()</a></code> </p>
         </td>
         <td><p>Plot a map of commercial CPUE</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_growth.html">plot_growth()</a></code> <code><a href="plot_growth.html">plot_vb()</a></code> <code><a href="plot_growth.html">plot_length_weight()</a></code> </p>
         </td>
         <td><p>Plot von Bertalanffy or length-weight fits</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_lengths.html">plot_lengths()</a></code> </p>
         </td>
         <td><p>Plot length frequency data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_mat_ogive.html">fit_mat_ogive()</a></code> <code><a href="plot_mat_ogive.html">plot_mat_ogive()</a></code> </p>
         </td>
         <td><p>Fit and plot maturity ogives</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_maturity_months.html">tidy_maturity_months()</a></code> <code><a href="plot_maturity_months.html">plot_maturity_months()</a></code> </p>
         </td>
         <td><p>Plot maturity frequency by month</p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="plot_predictor_bubbles.html">plot_predictor_bubbles()</a></code> </p>
+        </td>
+        <td><p>Make predictor level bubble plots</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="plot_sample_avail.html">plot_sample_avail()</a></code> </p>
         </td>
         <td><p>Plot sample availability</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_survey_index.html">tidy_survey_index()</a></code> <code><a href="plot_survey_index.html">plot_survey_index()</a></code> </p>
         </td>
         <td><p>Plot survey relative biomass mass index</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="plot_survey_sets.html">plot_survey_sets()</a></code> </p>
         </td>
         <td><p>Plot the output from a geostatistical model of survey data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="pop_samples.html">pop_samples</a></code> </p>
         </td>
         <td><p>Example Pacific Ocean Perch biological samples from QCS.</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="pop_surv.html">pop_surv</a></code> </p>
         </td>
         <td><p>Example Pacific Ocean Perch survey data from QCS in 2015</p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="qres_tweedie.html">qres_tweedie()</a></code> <code><a href="qres_tweedie.html">qres_binomial()</a></code> <code><a href="qres_tweedie.html">qres_gamma()</a></code> <code><a href="qres_tweedie.html">qres_gaussian()</a></code> <code><a href="qres_tweedie.html">plot_qres_qq()</a></code> <code><a href="qres_tweedie.html">plot_qres_histogram()</a></code> </p>
+        </td>
+        <td><p>Quantile residuals for a Tweedie GLMM fit with glmmTMB</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="run_sql.html">run_sql()</a></code> </p>
         </td>
         <td><p>Run SQL</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="sim_cpue.html">sim_cpue()</a></code> </p>
         </td>
         <td><p>Simulate fake commercial CPUE data for examples and testing</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="survey-spatial-modelling.html">fit_survey_sets()</a></code> </p>
         </td>
         <td><p>Spatial modeling of survey data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="survey_boundaries.html">survey_boundaries</a></code> </p>
         </td>
         <td><p>Survey boundaries</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="theme_pbs.html">theme_pbs()</a></code> </p>
         </td>
         <td><p>A ggplot2 theme</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="tidy_age_precision.html">tidy_age_precision()</a></code> </p>
         </td>
         <td><p>Tidy PBS ageing precision data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="tidy_comps.html">tidy_ages_raw()</a></code> <code><a href="tidy_comps.html">tidy_ages_weighted()</a></code> <code><a href="tidy_comps.html">tidy_lengths_raw()</a></code> <code><a href="tidy_comps.html">tidy_lengths_weighted()</a></code> <code><a href="tidy_comps.html">tidy_comps()</a></code> </p>
         </td>
         <td><p>Tidy age or length composition data for plotting or modelling</p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="tidy_cpue_historic.html">tidy_cpue_historic()</a></code> </p>
+        </td>
+        <td><p>Tidy historical CPUE data</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="tidy_cpue_index.html">tidy_cpue_index()</a></code> </p>
         </td>
         <td><p>Tidy commercial PBS CPUE data</p></td>
       </tr><tr>
-        <!--  -->
+        
         <td>
           <p><code><a href="tidy_sample_avail.html">tidy_sample_avail()</a></code> </p>
         </td>
         <td><p>Tidy PBS samples data for <code>plot_sample_avail()</code></p></td>
       </tr><tr>
-        <!--  -->
+        
+        <td>
+          <p><code><a href="tidy_survey_sets.html">tidy_survey_sets()</a></code> </p>
+        </td>
+        <td><p>Tidy the survey set data for use in modeling</p></td>
+      </tr><tr>
+        
         <td>
           <p><code><a href="weight_comps.html">tidy_comps_commercial()</a></code> <code><a href="weight_comps.html">tidy_comps_survey()</a></code> <code><a href="weight_comps.html">weight_comps()</a></code> </p>
         </td>
@@ -345,7 +397,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

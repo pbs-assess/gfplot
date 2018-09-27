@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Force factors to be sequential within the positive or binary data sets for TMB — f • gfplot</title>
+<title>Tidy the survey set data for use in modeling — tidy_survey_sets • gfplot</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,12 +30,9 @@
 
 
 
-<meta property="og:title" content="Force factors to be sequential within the positive or binary data sets for TMB — f" />
+<meta property="og:title" content="Tidy the survey set data for use in modeling — tidy_survey_sets" />
 
-<meta property="og:description" content="This is necessary because sometimes, for example, a certain depth factor
-level appears in the binary data set (because this depth was fished at), but
-not in the positive data set (because a given species was now are caught at
-that depth). This function also sets the base/reference level of the factor." />
+<meta property="og:description" content="Tidy the survey set data for use in modeling" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,52 +97,52 @@ that depth). This function also sets the base/reference level of the factor." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Force factors to be sequential within the positive or binary data sets for TMB</h1>
-    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/cpue-index.R'><code>R/cpue-index.R</code></a></small>
-    <div class="hidden name"><code>f.Rd</code></div>
+    <h1>Tidy the survey set data for use in modeling</h1>
+    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/surveys-spatial.R'><code>R/surveys-spatial.R</code></a></small>
+    <div class="hidden name"><code>tidy_survey_sets.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This is necessary because sometimes, for example, a certain depth factor
-level appears in the binary data set (because this depth was fished at), but
-not in the positive data set (because a given species was now are caught at
-that depth). This function also sets the base/reference level of the factor.</p>
+    <p>Tidy the survey set data for use in modeling</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>f</span>(<span class='no'>x</span>, <span class='kw'>ref</span> <span class='kw'>=</span> <span class='no'>get_most_common_level</span>)
-
-<span class='fu'>get_most_common_level</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>tidy_survey_sets</span>(<span class='no'>dat</span>, <span class='no'>survey</span>, <span class='no'>years</span>, <span class='kw'>utm_zone</span> <span class='kw'>=</span> <span class='fl'>9</span>,
+  <span class='kw'>density_column</span> <span class='kw'>=</span> <span class='st'>"density_kgpm2"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>A vector of factor/character values.</p></td>
+      <th>dat</th>
+      <td><p>Output from <code><a href='get_data.html'>get_survey_sets()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>ref</th>
-      <td><p>A function to define the base "reference" level or a character
-object definining the base level. Defaults to the most common level.</p></td>
+      <th>survey</th>
+      <td><p>The name of a survey (see get_ssids()).</p></td>
+    </tr>
+    <tr>
+      <th>years</th>
+      <td><p>The years.</p></td>
+    </tr>
+    <tr>
+      <th>utm_zone</th>
+      <td><p>UTM zone.</p></td>
+    </tr>
+    <tr>
+      <th>density_column</th>
+      <td><p>Name of the density column.</p></td>
     </tr>
     </table>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'>factor</span>(<span class='fu'>c</span>(<span class='st'>"a"</span>, <span class='st'>"b"</span>, <span class='st'>"c"</span>, <span class='st'>"c"</span>))
-<span class='fu'>f</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] a b c c
-#&gt; Levels: c a b</div><div class='input'><span class='fu'>f</span>(<span class='no'>a</span>, <span class='st'>"b"</span>)</div><div class='output co'>#&gt; [1] a b c c
-#&gt; Levels: b a c</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
   </div>
 </div>

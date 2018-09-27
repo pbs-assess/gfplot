@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="For use with data for a single species." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -58,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -72,18 +75,6 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -196,25 +187,41 @@ on. Defaults to <code>NULL</code>, which brings in all valid ageing codes. See
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Note that in some cases you must load the rstan package first and
-you may choose to do so just in case. If the rstan package is not loaded
-first, you may get the warning:</p>
-<p><code>Error in cpp_object_initializer(.self, .refClassDef, ...) :</code>
-<code>could not find function "cpp_object_initializer"</code></p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>library</span>(<span class='no'>rstan</span>) <span class='co'># must load first</span>
-<span class='co'># with `rstan::optimizing()` for the mode of the posterior density:</span>
-<span class='no'>model_f</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"female"</span>)</div><div class='output co'>#&gt; Initial log joint probability = 2276.95
+    <pre class="examples"><div class='input'><span class='co'># with `rstan::optimizing()` for the mode of the posterior density:</span>
+<span class='no'>model_f</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"female"</span>)</div><div class='output co'>#&gt; Initial log joint probability = -1.5357e+06
+#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Error evaluating model log probability: Non-finite function evaluation.
+#&gt; 
 #&gt; Optimization terminated normally: 
-#&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='no'>model_m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"male"</span>)</div><div class='output co'>#&gt; Initial log joint probability = 3009.6
+#&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='no'>model_m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"male"</span>)</div><div class='output co'>#&gt; Initial log joint probability = -1.77128e+06
+#&gt; Exception: lognormal_lpdf: Location parameter[1] is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Error evaluating model log probability: Non-finite function evaluation.
+#&gt; 
+#&gt; Error evaluating model log probability: Non-finite gradient.
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Location parameter[1] is -inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Location parameter[1] is -inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; Exception: lognormal_lpdf: Location parameter[1] is -inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
+#&gt; 
+#&gt; 
 #&gt; Optimization terminated normally: 
 #&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='no'>model_f</span>, <span class='no'>model_m</span>)</div><div class='img'><img src='fit_vb-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>model_f</span>$<span class='no'>model</span></div><div class='output co'>#&gt; $par
 #&gt;           k        linf       sigma          t0 
-#&gt;  0.16292348 43.42801222  0.07106321 -0.63766600 
+#&gt;  0.16292254 43.42801155  0.07106446 -0.63775317 
 #&gt; 
 #&gt; $value
 #&gt; [1] 3096.104
@@ -224,10 +231,10 @@ first, you may get the warning:</p>
 #&gt; 
 #&gt; $hessian
 #&gt;                   k          linf         sigma            t0
-#&gt; k     -2.432587e+04 -6.046341e+04 -2.707254e-01 3391.68653676
-#&gt; linf  -6.046341e+04 -2.859421e+05 -1.219894e+00 6964.31354654
-#&gt; sigma -2.707254e-01 -1.219894e+00 -2.887981e+03    0.02758419
-#&gt; t0     3.391687e+03  6.964314e+03  2.758419e-02 -576.14843386
+#&gt; k     -2.432476e+04 -6.046116e+04  3.775639e-02 3391.47388249
+#&gt; linf  -6.046116e+04 -2.859321e+05 -7.128623e-01 6963.95662311
+#&gt; sigma  3.775639e-02 -7.128623e-01 -2.887880e+03   -0.03346994
+#&gt; t0     3.391474e+03  6.963957e+03 -3.346994e-02 -576.09283561
 #&gt; </div><div class='input'><span class='no'>model_f</span>$<span class='no'>predictions</span></div><div class='output co'>#&gt; # A tibble: 200 x 2
 #&gt;      age length
 #&gt;    &lt;dbl&gt;  &lt;dbl&gt;
@@ -247,8 +254,8 @@ first, you may get the warning:</p>
   <span class='kw'>chains</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>iter</span> <span class='kw'>=</span> <span class='fl'>800</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>) <span class='co'># just for a fast example</span></div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'vb' NOW (CHAIN 1).
 #&gt; 
-#&gt; Gradient evaluation took 0.00013 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.3 seconds.
+#&gt; Gradient evaluation took 0.000152 seconds
+#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.52 seconds.
 #&gt; Adjust your expectations accordingly!
 #&gt; 
 #&gt; 
@@ -265,9 +272,9 @@ first, you may get the warning:</p>
 #&gt; Iteration: 720 / 800 [ 90%]  (Sampling)
 #&gt; Iteration: 800 / 800 [100%]  (Sampling)
 #&gt; 
-#&gt;  Elapsed Time: 0.744558 seconds (Warm-up)
-#&gt;                0.73024 seconds (Sampling)
-#&gt;                1.4748 seconds (Total)
+#&gt;  Elapsed Time: 0.646932 seconds (Warm-up)
+#&gt;                0.627194 seconds (Sampling)
+#&gt;                1.27413 seconds (Total)
 #&gt; </div><div class='input'><span class='no'>x</span>$<span class='no'>pars</span></div><div class='output co'>#&gt; $k
 #&gt; [1] 0.162283
 #&gt; 
@@ -329,7 +336,7 @@ first, you may get the warning:</p>
 #&gt; t0      -0.66    0.01 0.11   -0.88   -0.73   -0.66   -0.59   -0.45   127 1.02
 #&gt; lp__  3093.29    0.14 1.54 3090.12 3092.49 3093.68 3094.35 3095.12   115 1.01
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Thu Jun 21 11:46:05 2018.
+#&gt; Samples were drawn using NUTS(diag_e) at Thu Sep 27 00:11:17 2018.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='no'>posterior</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rstan</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rstan/topics/stanfit-method-extract'>extract</a></span>(<span class='no'>x</span>$<span class='no'>model</span>)
@@ -343,9 +350,7 @@ first, you may get the warning:</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#details">Details</a></li>
-      
+            
       <li><a href="#examples">Examples</a></li>
     </ul>
 
@@ -354,7 +359,7 @@ first, you may get the warning:</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

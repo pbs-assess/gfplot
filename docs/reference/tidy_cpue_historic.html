@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy commercial PBS CPUE data — tidy_cpue_index • gfplot</title>
+<title>Tidy historical CPUE data — tidy_cpue_historic • gfplot</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,10 +30,11 @@
 
 
 
-<meta property="og:title" content="Tidy commercial PBS CPUE data — tidy_cpue_index" />
+<meta property="og:title" content="Tidy historical CPUE data — tidy_cpue_historic" />
 
-<meta property="og:description" content="This function determines the qualifying &quot;fleet&quot; for CPUE analyses. It is
-meant to be used with modern data available at the fishing event level." />
+<meta property="og:description" content="The function can create trip level historical CPUE for index standardization
+or an &quot;arithmetic&quot; CPUE where the catch and effort are summed each year and
+divided." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -98,48 +99,44 @@ meant to be used with modern data available at the fishing event level." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy commercial PBS CPUE data</h1>
-    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/tidy-cpue-index.R'><code>R/tidy-cpue-index.R</code></a></small>
-    <div class="hidden name"><code>tidy_cpue_index.Rd</code></div>
+    <h1>Tidy historical CPUE data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/tidy-cpue-historic.R'><code>R/tidy-cpue-historic.R</code></a></small>
+    <div class="hidden name"><code>tidy_cpue_historic.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This function determines the qualifying "fleet" for CPUE analyses. It is
-meant to be used with modern data available at the fishing event level.</p>
+    <p>The function can create trip level historical CPUE for index standardization
+or an "arithmetic" CPUE where the catch and effort are summed each year and
+divided.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>tidy_cpue_index</span>(<span class='no'>dat</span>, <span class='no'>species_common</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1996</span>,
-  <span class='fu'>as.numeric</span>(<span class='fu'>format</span>(<span class='fu'>Sys.Date</span>(), <span class='st'>"%Y"</span>)) - <span class='fl'>1</span>),
-  <span class='kw'>alt_year_start_date</span> <span class='kw'>=</span> <span class='st'>"04-01"</span>, <span class='kw'>use_alt_year</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>lat_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>48</span>, <span class='fl'>Inf</span>), <span class='kw'>min_positive_tows</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>min_positive_trips</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>min_yrs_with_trips</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>area_grep_pattern</span> <span class='kw'>=</span> <span class='st'>"5[CDE]+"</span>, <span class='kw'>lat_band_width</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>depth_band_width</span> <span class='kw'>=</span> <span class='fl'>25</span>, <span class='kw'>clean_bins</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>depth_bin_quantiles</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.001</span>, <span class='fl'>0.999</span>), <span class='kw'>min_bin_prop</span> <span class='kw'>=</span> <span class='fl'>0.001</span>,
-  <span class='kw'>lat_bin_quantiles</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0</span>, <span class='fl'>1</span>), <span class='kw'>gear</span> <span class='kw'>=</span> <span class='st'>"bottom trawl"</span>)</pre>
+    <pre class="usage"><span class='fu'>tidy_cpue_historic</span>(<span class='no'>dat</span>, <span class='no'>species_common</span>, <span class='kw'>year_range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1956</span>, <span class='fl'>1995</span>),
+  <span class='kw'>area_grep_pattern</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"3[CD]+"</span>, <span class='st'>"5[ABCDE]+"</span>), <span class='kw'>use_alt_year</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>depth_band_width</span> <span class='kw'>=</span> <span class='fl'>25</span>, <span class='kw'>depth_bin_quantiles</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>0.001</span>, <span class='fl'>0.999</span>),
+  <span class='kw'>min_bin_prop</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"trip-level-data"</span>, <span class='st'>"arithmetic-cpue"</span>),
+  <span class='kw'>max_fe_hours</span> <span class='kw'>=</span> <span class='fl'>5</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>dat</th>
-      <td><p>An input data frame from <code><a href='get_data.html'>get_cpue_index()</a></code>.</p></td>
+      <td><p>Data from <code><a href='get_cpue_historical.html'>get_cpue_historic()</a></code>.</p></td>
     </tr>
     <tr>
       <th>species_common</th>
-      <td><p>The species common name.</p></td>
+      <td><p>A species common name in lowercase.</p></td>
     </tr>
     <tr>
       <th>year_range</th>
-      <td><p>The range of years to include.</p></td>
+      <td><p>A range of years to include. Can go up to current year but
+note the management changes, particularly in 1996.</p></td>
     </tr>
     <tr>
-      <th>alt_year_start_date</th>
-      <td><p>Alternative year starting date specified as a
-month-day combination. E.g. "03-01" for March 1st. Can be used to create
-'fishing years'.</p></td>
+      <th>area_grep_pattern</th>
+      <td><p>A major statistical area as a regular expression.</p></td>
     </tr>
     <tr>
       <th>use_alt_year</th>
@@ -149,41 +146,8 @@ is set to <code>TRUE</code> then the <code>year</code> column will be replaced w
 <code>alt_year</code> column.</p></td>
     </tr>
     <tr>
-      <th>lat_range</th>
-      <td><p>The range of latitudes to include.</p></td>
-    </tr>
-    <tr>
-      <th>min_positive_tows</th>
-      <td><p>The minimum number of positive tows over all years.</p></td>
-    </tr>
-    <tr>
-      <th>min_positive_trips</th>
-      <td><p>The minimum number of annual positive trips.</p></td>
-    </tr>
-    <tr>
-      <th>min_yrs_with_trips</th>
-      <td><p>The number of years in which the
-<code>min_positive_trips</code> criteria needs to be met.</p></td>
-    </tr>
-    <tr>
-      <th>area_grep_pattern</th>
-      <td><p>A regular expression to extract the management areas
-of interest.</p></td>
-    </tr>
-    <tr>
-      <th>lat_band_width</th>
-      <td><p>The latitude bandwidths in degrees.</p></td>
-    </tr>
-    <tr>
       <th>depth_band_width</th>
       <td><p>The depth band widths in m.</p></td>
-    </tr>
-    <tr>
-      <th>clean_bins</th>
-      <td><p>Logical. Should the depth and latitude bands be rounded to
-the nearest clean value as defined by <code>lat_band_width</code> or
-<code>depth_band_width</code>? Internally, these use, for example:
-<code>gfplot:::round_down_even(lat_range[1], lat_band_width)</code>.</p></td>
     </tr>
     <tr>
       <th>depth_bin_quantiles</th>
@@ -198,29 +162,44 @@ be dropped.</p></td>
 level is less than this value then that factor level will be dropped.</p></td>
     </tr>
     <tr>
-      <th>lat_bin_quantiles</th>
-      <td><p>Quantiles for the latitude bands. Values above and
-below these quantiles will be discarded.</p></td>
+      <th>type</th>
+      <td><p>Should the trip-level data be returned (for possible future index
+standardization) or should the arithmetic CPUE be returned (species
+specific catch and all effort is summed each year and then divided.)</p></td>
     </tr>
     <tr>
-      <th>gear</th>
-      <td><p>One or more gear types as a character vector.</p></td>
+      <th>max_fe_hours</th>
+      <td><p>The maximum number of allowable hours per fishing event
+(e.g. per trawl). Fishing events that are longer than this will be removed.
+This can be used to remove erroneous fishing events. Only affects data in
+1991 and after when the data are recorded as fishing events.</p></td>
     </tr>
     </table>
     
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A (tibble) data frame.</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Note that fishing events prior to 1991 are 'rolled up' in the databases to
+locality-specific trips. This function well aggregate fishing events into
+trips in 1991 and after to create a consistent form of data.</p>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_data.html'>get_cpue_index</a></span>(<span class='kw'>gear</span> <span class='kw'>=</span> <span class='st'>"bottom trawl"</span>)
-<span class='no'>walleye</span> <span class='kw'>&lt;-</span> <span class='fu'>tidy_cpue_index</span>(<span class='no'>d</span>, <span class='st'>"walleye pollock"</span>,
-  <span class='kw'>area_grep_pattern</span> <span class='kw'>=</span> <span class='st'>"5[CDE]+"</span>)
-<span class='co'># }</span></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='get_cpue_historical.html'>get_cpue_historic</a></span>(<span class='kw'>end_year</span> <span class='kw'>=</span> <span class='fl'>2016</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'>tidy_cpue_historic</span>(<span class='kw'>species_common</span> <span class='kw'>=</span> <span class='st'>"pacific cod"</span>, <span class='kw'>area_grep_pattern</span> <span class='kw'>=</span> <span class='st'>"5[CD]+"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: get_cpue_historic() is depreciated. Please use the grammaticallycorrect get_cpue_historical() instead.</span></div><div class='output co'>#&gt; <span class='error'>Error: nanodbc/nanodbc.cpp:950: 01000: [unixODBC][Driver Manager]Can't open lib 'SQL Server' : file not found </span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
+      
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

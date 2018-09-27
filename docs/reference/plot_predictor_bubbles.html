@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Force factors to be sequential within the positive or binary data sets for TMB — f • gfplot</title>
+<title>Make predictor level bubble plots — plot_predictor_bubbles • gfplot</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,12 +30,9 @@
 
 
 
-<meta property="og:title" content="Force factors to be sequential within the positive or binary data sets for TMB — f" />
+<meta property="og:title" content="Make predictor level bubble plots — plot_predictor_bubbles" />
 
-<meta property="og:description" content="This is necessary because sometimes, for example, a certain depth factor
-level appears in the binary data set (because this depth was fished at), but
-not in the positive data set (because a given species was now are caught at
-that depth). This function also sets the base/reference level of the factor." />
+<meta property="og:description" content="Make predictor level bubble plots" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,50 +97,61 @@ that depth). This function also sets the base/reference level of the factor." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Force factors to be sequential within the positive or binary data sets for TMB</h1>
-    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/cpue-index.R'><code>R/cpue-index.R</code></a></small>
-    <div class="hidden name"><code>f.Rd</code></div>
+    <h1>Make predictor level bubble plots</h1>
+    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/plot_predictor_bubbles.R'><code>R/plot_predictor_bubbles.R</code></a></small>
+    <div class="hidden name"><code>plot_predictor_bubbles.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This is necessary because sometimes, for example, a certain depth factor
-level appears in the binary data set (because this depth was fished at), but
-not in the positive data set (because a given species was now are caught at
-that depth). This function also sets the base/reference level of the factor.</p>
+    <p>Make predictor level bubble plots</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>f</span>(<span class='no'>x</span>, <span class='kw'>ref</span> <span class='kw'>=</span> <span class='no'>get_most_common_level</span>)
-
-<span class='fu'>get_most_common_level</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_predictor_bubbles</span>(<span class='no'>dat</span>, <span class='no'>variable</span>, <span class='kw'>group_id</span> <span class='kw'>=</span> <span class='st'>"fishing_event_id"</span>,
+  <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>A vector of factor/character values.</p></td>
+      <th>dat</th>
+      <td><p>A data frame with the columns area, year</p></td>
     </tr>
     <tr>
-      <th>ref</th>
-      <td><p>A function to define the base "reference" level or a character
-object definining the base level. Defaults to the most common level.</p></td>
+      <th>variable</th>
+      <td><p>The column to summarize (character value)</p></td>
+    </tr>
+    <tr>
+      <th>group_id</th>
+      <td><p>The events to count over (e.g. <code>"fishing_event_id"</code> or <code>"trip_id"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>ncol</th>
+      <td><p>Number of facetted columns (facets by area)</p></td>
     </tr>
     </table>
     
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A ggplot object</p>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'>factor</span>(<span class='fu'>c</span>(<span class='st'>"a"</span>, <span class='st'>"b"</span>, <span class='st'>"c"</span>, <span class='st'>"c"</span>))
-<span class='fu'>f</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] a b c c
-#&gt; Levels: c a b</div><div class='input'><span class='fu'>f</span>(<span class='no'>a</span>, <span class='st'>"b"</span>)</div><div class='output co'>#&gt; [1] a b c c
-#&gt; Levels: b a c</div></pre>
+    <pre class="examples"><div class='input'><span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1991</span>:<span class='fl'>2010</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>20</span>),
+  <span class='kw'>spp_catch</span> <span class='kw'>=</span> <span class='fu'>rbinom</span>(<span class='fl'>20</span> * <span class='fl'>20</span>, <span class='kw'>size</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='fl'>0.8</span>),
+  <span class='kw'>fishing_event_id</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='fl'>20</span>),
+  <span class='kw'>my_predictor</span> <span class='kw'>=</span> <span class='fu'>sample</span>(<span class='fu'>gl</span>(<span class='fl'>20</span>, <span class='fl'>20</span>), <span class='kw'>size</span> <span class='kw'>=</span> <span class='fl'>400</span>),
+  <span class='kw'>area</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='st'>"a"</span>, <span class='fl'>400</span>))
+<span class='fu'>plot_predictor_bubbles</span>(<span class='no'>d</span>, <span class='st'>"my_predictor"</span>)</div><div class='img'><img src='plot_predictor_bubbles-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
+      
+      <li><a href="#value">Value</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 

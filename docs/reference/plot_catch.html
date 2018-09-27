@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Functions for plotting catch data over time as a stacked bar plot." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -58,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -72,18 +75,6 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -119,7 +110,7 @@
 
     <pre class="usage"><span class='fu'>tidy_catch</span>(<span class='no'>dat</span>, <span class='kw'>areas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
-<span class='fu'>plot_catch</span>(<span class='no'>dat</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>"Landings"</span>, <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1954</span>, <span class='fl'>2017</span>), <span class='kw'>units</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'>plot_catch</span>(<span class='no'>dat</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>"Catch"</span>, <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1954</span>, <span class='fl'>2017</span>), <span class='kw'>units</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>unreliable</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1996</span>, <span class='fl'>2006</span>), <span class='kw'>blank_plot</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -128,7 +119,7 @@
     <tr>
       <th>dat</th>
       <td><p>Input data frame. For <code>tidy_catch()</code> should be from
-<code><a href='get_data.html'>get_catch()</a></code>. For <code>plot_catch()</code> should be from <code><a href='tidy_comps.html'>tidy_ages_raw()</a></code> or be
+<code><a href='get_data.html'>get_catch()</a></code>. For <code>plot_catch()</code> should be from <code>tidy_catch()</code> or be
 formatted similarly. See details.</p></td>
     </tr>
     <tr>
@@ -202,7 +193,7 @@ or multiple species.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">

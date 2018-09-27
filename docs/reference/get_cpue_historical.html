@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Force factors to be sequential within the positive or binary data sets for TMB — f • gfplot</title>
+<title>Get all fishing catch and effort to calculate historic commercial CPUE — get_cpue_historic • gfplot</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,12 +30,9 @@
 
 
 
-<meta property="og:title" content="Force factors to be sequential within the positive or binary data sets for TMB — f" />
+<meta property="og:title" content="Get all fishing catch and effort to calculate historic commercial CPUE — get_cpue_historic" />
 
-<meta property="og:description" content="This is necessary because sometimes, for example, a certain depth factor
-level appears in the binary data set (because this depth was fished at), but
-not in the positive data set (because a given species was now are caught at
-that depth). This function also sets the base/reference level of the factor." />
+<meta property="og:description" content="Get all fishing catch and effort to calculate historic commercial CPUE" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,52 +97,65 @@ that depth). This function also sets the base/reference level of the factor." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Force factors to be sequential within the positive or binary data sets for TMB</h1>
-    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/cpue-index.R'><code>R/cpue-index.R</code></a></small>
-    <div class="hidden name"><code>f.Rd</code></div>
+    <h1>Get all fishing catch and effort to calculate historic commercial CPUE</h1>
+    <small class="dont-index">Source: <a href='https://github.com/pbs-assess/gfplot/blob/master/R/get-dat.R'><code>R/get-dat.R</code></a></small>
+    <div class="hidden name"><code>get_cpue_historical.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This is necessary because sometimes, for example, a certain depth factor
-level appears in the binary data set (because this depth was fished at), but
-not in the positive data set (because a given species was now are caught at
-that depth). This function also sets the base/reference level of the factor.</p>
+    <p>Get all fishing catch and effort to calculate historic commercial CPUE</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>f</span>(<span class='no'>x</span>, <span class='kw'>ref</span> <span class='kw'>=</span> <span class='no'>get_most_common_level</span>)
+    <pre class="usage"><span class='fu'>get_cpue_historic</span>(<span class='no'>...</span>)
 
-<span class='fu'>get_most_common_level</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>get_cpue_historical</span>(<span class='kw'>species</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>alt_year_start_date</span> <span class='kw'>=</span> <span class='st'>"04-01"</span>,
+  <span class='kw'>areas</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"3[CD]+"</span>, <span class='st'>"5[AB]+"</span>, <span class='st'>"5[CDE]+"</span>), <span class='kw'>end_year</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>A vector of factor/character values.</p></td>
+      <th>...</th>
+      <td><p>Other arguments to pass.</p></td>
     </tr>
     <tr>
-      <th>ref</th>
-      <td><p>A function to define the base "reference" level or a character
-object definining the base level. Defaults to the most common level.</p></td>
+      <th>species</th>
+      <td><p>Species to filter for positive fishing events. Leave as <code>NULL</code>
+to include all fishing events. One or more species common names (e.g.
+<code>"pacific ocean perch"</code>) or one or more species codes (e.g. <code>396</code>). Species
+codes can be specified as numeric vectors <code>c(396, 442</code>) or characters
+<code>c("396", "442")</code>. Numeric values shorter than 3 digits will be expanded to
+3 digits and converted to character objects (<code>1</code> turns into <code>"001"</code>).
+Species common names and species codes should not be mixed. If any element
+is missing a species code, then all elements will be assumed to be species
+common names.</p></td>
+    </tr>
+    <tr>
+      <th>alt_year_start_date</th>
+      <td><p>Alternative year starting date specified as a
+month-day combination. E.g. "03-01" for March 1st. Can be used to create
+'fishing years'.</p></td>
+    </tr>
+    <tr>
+      <th>areas</th>
+      <td><p>Area groupings as a vector of regular expressions.
+See <code><a href='http://www.rdocumentation.org/packages/base/topics/regex'>base::regex()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>end_year</th>
+      <td><p>Specify the last calendar year to be extracted.</p></td>
     </tr>
     </table>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'>factor</span>(<span class='fu'>c</span>(<span class='st'>"a"</span>, <span class='st'>"b"</span>, <span class='st'>"c"</span>, <span class='st'>"c"</span>))
-<span class='fu'>f</span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; [1] a b c c
-#&gt; Levels: c a b</div><div class='input'><span class='fu'>f</span>(<span class='no'>a</span>, <span class='st'>"b"</span>)</div><div class='output co'>#&gt; [1] a b c c
-#&gt; Levels: b a c</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
   </div>
 </div>

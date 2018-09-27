@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Functions for plotting length frequency data." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -58,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -72,18 +75,6 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/commercial-cpue-index.html">Commercial CPUE</a>
-    </li>
-  </ul>
 </li>
       </ul>
       
@@ -117,10 +108,10 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>plot_lengths</span>(<span class='no'>dat</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='st'>"Length (cm)"</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>"Relative length frequency"</span>,
-  <span class='kw'>fill_col</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>M</span> <span class='kw'>=</span> <span class='st'>"grey80"</span>, <span class='kw'>F</span> <span class='kw'>=</span> <span class='st'>"#FF000010"</span>), <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>M</span> <span class='kw'>=</span> <span class='st'>"grey40"</span>, <span class='kw'>F</span>
-  <span class='kw'>=</span> <span class='st'>"red"</span>), <span class='kw'>survey_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.24</span>, <span class='kw'>bin_size</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>min_total</span> <span class='kw'>=</span> <span class='fl'>20</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_lengths</span>(<span class='no'>dat</span>, <span class='kw'>xlab</span> <span class='kw'>=</span> <span class='st'>"Length (cm)"</span>,
+  <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>"Relative length frequency"</span>, <span class='kw'>fill_col</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>M</span> <span class='kw'>=</span> <span class='st'>"grey80"</span>, <span class='kw'>F</span> <span class='kw'>=</span>
+  <span class='st'>"#FF000010"</span>), <span class='kw'>line_col</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>M</span> <span class='kw'>=</span> <span class='st'>"grey40"</span>, <span class='kw'>F</span> <span class='kw'>=</span> <span class='st'>"red"</span>),
+  <span class='kw'>survey_cols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.24</span>, <span class='kw'>bin_size</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>min_total</span> <span class='kw'>=</span> <span class='fl'>20</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -227,7 +218,7 @@ surveys for a single species.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Anderson, Elise Keppel.</p>
+  <p>Developed by Sean C. Anderson, Elise A. Keppel, Andrew M. Edwards, Chris Grandin.</p>
 </div>
 
 <div class="pkgdown">
