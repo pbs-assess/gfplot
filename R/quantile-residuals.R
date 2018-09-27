@@ -61,8 +61,8 @@ qres_gaussian <- function (obj, response) {
   mu <- stats::fitted(obj)
   y <- obj$frame[[response]]
   dispersion <- exp(obj$fit$par[["betad"]])
-  logp <- pnorm(y, mu, dispersion, log.p = TRUE)
-  qnorm(logp, log.p = TRUE)
+  logp <- stats::pnorm(y, mu, dispersion, log.p = TRUE)
+  stats::qnorm(logp, log.p = TRUE)
 }
 
 #' @param qr A vector of quantile residuals from [qres_tweedie()].
