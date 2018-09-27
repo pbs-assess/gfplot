@@ -28,6 +28,7 @@ fit_cpue_index_glmmtmb <- function(dat, formula = cpue ~ year_factor, ...) {
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' set.seed(1)
 #' d <- sim_cpue()
 #' # assign factor levels with base as most common level:
@@ -43,10 +44,12 @@ fit_cpue_index_glmmtmb <- function(dat, formula = cpue ~ year_factor, ...) {
 #'
 #' predict_cpue_index_tweedie(m2, center = FALSE) %>%
 #'   plot_cpue_index()
+#' }
 #' @rdname cpue-tweedie
 
 fit_cpue_index_tweedie <- function(dat, formula = cpue ~ year_factor) {
 
+  warning("You should probably use fit_cpue_index_glmmtmb().")
   f_tw <- parse_formula(formula)
 
   re1 <- NULL

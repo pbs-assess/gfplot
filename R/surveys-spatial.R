@@ -505,9 +505,9 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 
 plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin", "pos"),
                              fill_scale =
-                               viridis::scale_fill_viridis(trans = "sqrt", option = "C"),
+                               ggplot2::scale_fill_viridis_c(trans = "sqrt", option = "C"),
                              colour_scale =
-                               viridis::scale_colour_viridis(trans = "sqrt", option = "C"),
+                               ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "C"),
                              pos_pt_col = "#FFFFFF60",
                              bin_pt_col = "#FFFFFF40",
                              pos_pt_fill = "#FFFFFF05",

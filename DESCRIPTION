@@ -14,7 +14,6 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     DBI,
-    FSA,
     MASS,
     PBSdata,
     PBSmapping,
@@ -43,9 +42,7 @@ Imports:
     scales,
     stringr,
     sp,
-    speedglm,
     tidyr,
-    viridis,
     xml2,
     pingr,
     INLA,

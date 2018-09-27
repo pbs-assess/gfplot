@@ -118,17 +118,11 @@ fit_vb <- function(dat,
   }
 
   if (method[[1]] == "mpd") {
-    vb_starts <- FSA::vbStarts(length ~ age, data = dat)
-
-    if (is.na(vb_starts$K))    vb_starts$K <- 0.1 # wild guess
-    if (is.na(vb_starts$Linf)) vb_starts$Linf <- 40 # wild guess
-    if (is.na(vb_starts$t0))   vb_starts$t0 <- -5 # wild guess
-    mpd_init <- list(
-      k = rlnorm(1, log(vb_starts$K), 0.01),
-      linf = rlnorm(1, log(vb_starts$Linf), 0.01),
-      t0 = rnorm(1, vb_starts$t0, 0.02),
-      sigma = runif(1, 0.1, 0.2)
-    )
+    mpd_init <- list()
+    mpd_init$K <- 0.1 # wild guess
+    mpd_init$Linf <- 40 # wild guess
+    mpd_init$t0 <- -5 # wild guess
+    mpd_init$sigma <- 0.1
 
     m <- suppressMessages(rstan::optimizing(vb_mod_gfplot,
       data = list(

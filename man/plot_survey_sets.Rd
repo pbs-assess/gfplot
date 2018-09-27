@@ -5,13 +5,13 @@
 \title{Plot the output from a geostatistical model of survey data}
 \usage{
 plot_survey_sets(pred_dat, raw_dat, fill_column = c("combined", "bin",
-  "pos"), fill_scale = viridis::scale_fill_viridis(trans = "sqrt", option
-  = "C"), colour_scale = viridis::scale_colour_viridis(trans = "sqrt",
-  option = "C"), pos_pt_col = "#FFFFFF60", bin_pt_col = "#FFFFFF40",
-  pos_pt_fill = "#FFFFFF05", pt_size_range = c(0.5, 9),
-  show_legend = TRUE, extrapolate_depth = TRUE,
-  extrapolation_buffer = 0, show_model_predictions = TRUE,
-  show_raw_data = TRUE, utm_zone = 9,
+  "pos"), fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt",
+  option = "C"), colour_scale = ggplot2::scale_colour_viridis_c(trans =
+  "sqrt", option = "C"), pos_pt_col = "#FFFFFF60",
+  bin_pt_col = "#FFFFFF40", pos_pt_fill = "#FFFFFF05",
+  pt_size_range = c(0.5, 9), show_legend = TRUE,
+  extrapolate_depth = TRUE, extrapolation_buffer = 0,
+  show_model_predictions = TRUE, show_raw_data = TRUE, utm_zone = 9,
   fill_label = "Predicted\\nbiomass\\ndensity (kg/m^2)",
   pt_label = "Tow density (kg/km^2)", rotation_angle = 0,
   rotation_center = c(500, 5700), show_axes = TRUE, xlim = NULL,
