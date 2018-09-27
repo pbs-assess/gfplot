@@ -60,11 +60,8 @@ qres_gamma <- function (obj, response) {
 qres_gaussian <- function (obj, response) {
   mu <- stats::fitted(obj)
   y <- obj$frame[[response]]
-  df <- stats::df.residual(obj)
-  w <- 1
-  # dispersion <- sum(w * ((y - mu)/mu)^2)/df
-  dispersion <- 1/exp(obj$fit$par[["betad"]])
-  logp <- pgamma((w * y)/mu/dispersion, w/dispersion, log.p = TRUE)
+  dispersion <- exp(obj$fit$par[["betad"]])
+  logp <- pnorm(y, mu, dispersion, log.p = TRUE)
   qnorm(logp, log.p = TRUE)
 }
 
