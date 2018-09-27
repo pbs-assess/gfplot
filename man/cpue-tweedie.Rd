@@ -41,7 +41,7 @@ index standardization model
 \examples{
 \donttest{
 set.seed(1)
-d <- sim_cpue(n_years = 5, n_vessels = 6, n_samples = 10)
+d <- sim_cpue()
 # assign factor levels with base as most common level:
 d$vessel <- gfplot::f(d$vessel)
 m1 <- fit_cpue_index_tweedie(d, cpue ~ year_factor + vessel)
