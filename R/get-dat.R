@@ -478,8 +478,9 @@ get_iphc_skates_info <- function() {
   # hook20 - hook number of 20th hook on that skate
   # lastHookTemp needed since need before firstHook, but want to re-order
   # chum... are just the chum-bait ones
-  # the hook numbering changed in 2007 (though in GFBio it was 2009 in 2014 -
-  #  Karina did some updating), hence the <2006.5 in lastHookTemp.
+  # Hook numbering starts at 1 for each set until 2006 (and so goes 1-800ish),
+  #  then resets at 1 for each skate for each skate for 2007 onwards (and so
+  #  goes 1-100ish). Hence the <2006.5 in lastHookTemp.
   .d <- mutate(group_by(.d, setID),
                lastHookTemp = cumsum(deplHooksPerSkate) * (year < 2006.5) +
                               deplHooksPerSkate * (year > 2006.5),
