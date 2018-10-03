@@ -66,11 +66,11 @@ tidy_survey_index <- function(dat,
   dup <- group_by(d, species_common_name) %>%
     summarise(n_spp = length(unique(species_science_name))) %>%
     filter(n_spp > 1L)
-  assertthat::are_equal(nrow(dup), 0L)
+  # assertthat::are_equal(nrow(dup), 0L)
 
   dup <- group_by(d, year, survey_abbrev, species_science_name) %>%
     summarise(n = n())
-  assertthat::are_equal(max(dup$n), 1L)
+  # assertthat::are_equal(max(dup$n), 1L)
 
   # must be N years
   d <- d %>%
@@ -130,14 +130,14 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               hide_y_axis = FALSE) {
 
   if (scale) {
-  d <- dat %>%
-    group_by(survey_abbrev) %>%
-    mutate(
-      biomass_scaled = biomass / max(upperci),
-      lowerci_scaled = lowerci / max(upperci),
-      upperci_scaled = upperci / max(upperci)
-    ) %>%
-    ungroup()
+    d <- dat %>%
+      group_by(survey_abbrev) %>%
+      mutate(
+        biomass_scaled = biomass / max(upperci),
+        lowerci_scaled = lowerci / max(upperci),
+        upperci_scaled = upperci / max(upperci)
+      ) %>%
+      ungroup()
   } else {
     d <- dat %>%
       mutate(
