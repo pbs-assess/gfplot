@@ -401,13 +401,14 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     # These are fixed station (IPHC) or they come from grids without years
     if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
       pg_one <- pg
-      pg <- do.call("rbind",
-        replicate(length(unique(.d_scaled$year)), pg, simplify = FALSE))
-      pg$year <- rep(unique(.d_scaled$year), each = nrow(pg_one))
+      pg_one$year <- max(.d_scaled$year)
     } else {
-      pg_one <- filter(pg, year == min(pg$year)) # all the same, pick one
+      pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
     }
-    pred <- predict(m, newdata = pg_one)
+    # FIXME: just returning last year for consistency!
+    pred <- predict(m, newdata = pg_one)$data # returns all years!
+    pred <- pred[pred$year == max(pred$year), ]
+    stopifnot(identical(nrow(pg), nrow(pred)))
     pg$combined <- exp(pred$data$est)
     pg$pos <- NA
     pg$bin <- NA
