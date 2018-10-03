@@ -75,340 +75,76 @@ tidy_iphc_survey <- function(hook_level, skate_info, set_info,
                             #min_bin_prop = 0.001,
                             #lat_bin_quantiles = c(0, 1),
                             #gear = "bottom trawl") {
-
-
-    hooksYYRskates = left_join(hooksYYR,
-                           # select(skateinfo, -year, -tripID, -set, -skate),
-                           select(skateinfo, setID, skateID, firstHook, lastHook,
-                                  hook20),
-                           by = "skateID")
-# It adds setID if don't include since a grouping variable.
-
-# Had checked these both 0 (before doing -set etc. in select):
-# range(hooksYYRskates$set.x - hooksYYRskates$set.y)
-# range(hooksYYRskates$skate.x - hooksYYRskates$skate.y)
-@
-
-Now work out the numbers in first 20:
-<<docounts>>=
-hooksYYRskates = mutate(hooksYYRskates,
-                        numOnHook20 = numOnHook * (hook >= (firstHook -0.01)) *
-                                       (hook <= (hook20 + 0.01) ))
+    # Append some skate info to the hook info, to then calculate counts for
+    #**all
+    #  hooks and counts for first 20 hooks
+    hook_w_skate_info <- left_join(hook_level,
+                                  select(skateinfo, setID, skateID,
+                                         firstHook, lastHook, hook20),
+                                  by = "skateID") %>%
                  # number on hook providing hook is in first 20
-
+                 mutate(numOnHook20 = numOnHook * (hook >= (firstHook -0.1)) *
+                                       (hook <= (hook20 + 0.1) ))
 # YYR assessment had to hook = NA for six hooks so had to:
 # data[which(is.na(data$numOnHook20)), "numOnHook20"] = 0     # so no NA's later
 
-hooksYYRskates
-@
+    # Summarise to skate level then join with skate info (to include zero counts)
+    skate_counts_nonzero <- summarise(group_by(hook_w_skate_info,
+                                               skateID),
+                                      species = unique(species),
+                                      countPerSkate = sum(numOnHook),
+                                      countPerSkate20 = sum(numOnHook20))
+    skate_counts <- left_join(skateinfo,
+                              skate_counts_nonzero,
+                              by = "skateID") %>%
+                    mutate(chumCountPerSkate = countPerSkate * (bait == 110),
+                           chumCountPerSkate20 = countPerSkate20 * (bait == 110) )
+    # To get rid of NA's (needed later):
+    skate_counts$species = unique(skate_counts$species)[!is.na(unique(skate_counts$species))]
+    skate_counts[is.na(skates_count)] = 0
 
-Summarise that to the skate level, then join that with {\tt skateinfo}; (can't just
-summarise on {\tt hooksYYRskates} since that doesn't have every skate).
-<<countstoskates>>=
-skatesYYRfromhooks = summarise(group_by(hooksYYRskates,
-                                        skateID),
-                               species = unique(species),
-                               countPerSkate = sum(numOnHook),
-                               countPerSkate20 = sum(numOnHook20))
-
-skatesYYR = left_join(skateinfo,
-                      skatesYYRfromhooks,
-                      by = "skateID") %>%
-            mutate(chumCountPerSkate = countPerSkate * (bait == 110),
-                   chumCountPerSkate20 = countPerSkate20 * (bait == 110) )
-
-# To get rid of NA's:
-skatesYYR$species = unique(skatesYYR$species)[!is.na(unique(skatesYYR$species))]
-skatesYYR[is.na(skatesYYR)] = 0
-
-skatesYYR
-@
-
-
-
-\end{document}
-<<stopping7>>=
-stop("stopping okay")
-@
-
-\subsection{Scale up to the set level}
-
-Now group up to the set level, then join with {\tt setinfo}:
-<<setgroup>>=
-# Just using chumbait hooks, can include all if necessary
-setsYYRfromhooks = summarise(group_by(skatesYYR, setID),
-                             H_it = sum(chumObsHooksPerSkate),
-                             species = unique(species),
-                             N_it = sum(chumCountPerSkate),
-                             N_it20 = sum(chumCountPerSkate20),
-                             hooksChumRatio = H_it /
-                                 sum(obsHooksPerSkate), # for B.1 in YYR
-                             hooksChumRatio20 = sum(chumObsHooksPerSkate20) /
-                                 sum(obsHooksPerSkate)) # for B.4 second eqn inYYR,
-                                                        # tilde{H}_it / H^*_{it}
-setsYYRfromhooks            # every set with a count (incl. 0) for YYR.
-# filter(setsYYRfromhooks, hooksChumRatio20 > 0.2)  # 1517 sets
-# filter(setsYYRfromhooks, hooksChumRatio20 > 0.2, H_it > 800)  # none, as can
-#  only have the ratio > 0.2 if H_it > 800, verifying calcs.
-
-@
-
-
-<<joinset>>=
-
-setsYYRoverall = left_join(setinfo,
-                           setsYYRfromhooks,
-                           by = "setID") %>%
-                 mutate(effSkateChum = effSkateIPHC * hooksChumRatio,
-                        effSkateChum20 = effSkateIPHC * hooksChumRatio20)
-summary(setsYYRoverall)
-setsYYRoverall
-@
-
-
-    setsYYRoverall
-latCutOff = 50.6
-setVals2003toNow = select(setsYYRoverall,
-                          year,
+    # Summarise to set leavel then join with set info (to include zero counts)
+    #  and just use chumbait hooks
+    set_counts_nonzero <- summarise(group_by(skate_counts, setID),
+                                    H_it = sum(chumObsHooksPerSkate),
+                                    species = unique(species),
+                                    N_it = sum(chumCountPerSkate),
+                                    N_it20 = sum(chumCountPerSkate20),
+                                    hooksChumRatio = H_it /
+                                        sum(obsHooksPerSkate),
+                                        # for B.1 in YYR 2014
+                                    hooksChumRatio20 =sum(chumObsHooksPerSkate20) /
+                                        sum(obsHooksPerSkate))
+                                        # for B.4 in YYR 2014, fraction in ():
+                                        # tilde{H}_it / H^*_{it}
+    set_counts <- = left_join(setinfo,
+                              set_counts_nozero,
+                              by = "setID") %>%
+                    mutate(E_it = effSkateIPHC * hooksChumRatio,
+                           E_it20 = effSkateIPHC * hooksChumRatio20) %>%
+    #setVals2003toNow = select(setsYYRoverall,
+    #                      year,
+    #                      station = block,
+    #                      lat,
+    #                      lon = long,
+    #                      E_it,
+    #                      N_it,
+    #                      E_it20,
+    #                      N_it20,
+    #                     usable) %>%
+                    mutate(C_it = N_it / E_it,
+                           C_it20 = N_it20 / E_it20) %>%
+                    # To re-order:
+                    select(year,
                           station = block,
                           lat,
                           lon = long,
-                          E_it = effSkateChum,
-                          N_it,
-                          E_it20 = effSkateChum20,
-                          N_it20,
-                          usable) %>%
-                    mutate(C_it = N_it / E_it,
-                          C_it20 = N_it20 / E_it20,
-                          keep = as.numeric(lat > latCutOff)) %>%
-                    # To re-order:
-                    select(year,
-                          station,
-                          lat,
-                          lon,
                           E_it,
                           N_it,
                           C_it,
                           E_it20,
                           N_it20,
                           C_it20,
-                          usable,
-                          keep)
-
-setVals2003toNowKeep = filter(setVals2003toNow, usable=="Y", keep == 1) %>%
-                            select(year,
-                                   station,
-                                   E_it,
-                                   N_it,
-                                   C_it,
-                                   E_it20,
-                                   N_it20,
-                                   C_it20)
-# ** CAREFUL - have usable in this one but not in setVals2003toNow - easier to fix
-#  when functionalising, as latCutOff will be specified for keep (maybe)
-setVals2003toNow
-setVals2003toNowKeep
-
-# What to return when make a function:
-setVals2003toNowList = list(setVals2003toNow = setVals2003toNow,
-                            setVals2003toNowKeep = setVals2003toNowKeep)
-@
-
-
-    THIS IS previous one:
-
-
-
-  pbs_areas <- gfplot::pbs_areas[grep(
-    area_grep_pattern,
-    gfplot::pbs_areas$major_stat_area_description
-  ), ]
-  names(dat) <- tolower(names(dat))
-  dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
-
-  dat <- dat %>% mutate(year = lubridate::year(best_date))
-
-  # create possibly alternate starting date:
-  if (alt_year_start_date != "01-01") {
-    dat <- dplyr::mutate(dat, .year_start_date =
-        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
-    dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
-    dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
-    dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
-  }
-
-  if (use_alt_year) {
-    dat$year <- NULL
-    dat$year <- dat$alt_year
-    dat$alt_year <- NULL
-  }
-
-  dat$locality_code <- paste(dat$major_stat_area_code,
-    dat$minor_stat_area_code, dat$locality_code, sep = "-")
-
-  # basic filtering:
-  catch <- dat %>%
-    inner_join(pbs_areas, by = "major_stat_area_code") %>%
-    filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
-    filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
-    filter(!is.na(latitude), !is.na(longitude), !is.na(best_depth)) %>%
-    filter(gear %in% toupper(gear)) %>%
-    filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
-    mutate(month = lubridate::month(best_date)) %>%
-    mutate(
-      hours_fished =
-        as.numeric(difftime(fe_end_date, fe_start_date, units = "hours"))
-    ) %>%
-    filter(hours_fished > 0) %>%
-    mutate(catch = landed_kg + discarded_kg) %>%
-    group_by(fishing_event_id) %>%
-    mutate(n_date = length(unique(best_date))) %>%
-    filter(n_date < Inf) %>%
-    select(-n_date) %>% # remove FE_IDs with multiple dates
-    ungroup()
-
-  # catch for target spp:
-  catch <- group_by(
-    catch, fishing_event_id, best_date, month, locality_code,
-    vessel_name, year, trip_id, hours_fished
-  ) %>%
-    mutate(
-      spp_in_fe = toupper(species_common) %in% species_common_name,
-      spp_in_row = species_common_name == toupper(species_common)
-    ) %>%
-    summarise(
-      pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
-      # hours_fished = mean(hours_fished, na.rm = TRUE),
-      spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
-      best_depth = mean(best_depth, na.rm = TRUE),
-      latitude = mean(latitude, na.rm = TRUE)
-    ) %>%
-    ungroup()
-
-  # figure out which vessels should be considered part of the spp. fleet
-  fleet <- catch %>%
-    group_by(vessel_name) %>%
-    mutate(total_positive_tows = sum(pos_catch)) %>%
-    filter(total_positive_tows >= min_positive_tows) %>%
-    filter(spp_catch > 0) %>%
-    group_by(year, vessel_name, trip_id) %>%
-    summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
-    filter(sum_catch > 0) %>%
-    group_by(vessel_name) %>%
-    mutate(n_years = length(unique(year))) %>%
-    # for speed (filter early known cases):
-    filter(n_years >= min_yrs_with_trips) %>%
-    group_by(year, vessel_name) %>%
-    summarise(n_trips_per_year = length(unique(trip_id))) %>%
-    mutate(
-      trips_over_treshold_this_year =
-        n_trips_per_year >= min_positive_trips
-    ) %>%
-    group_by(vessel_name) %>%
-    summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
-    filter(trips_over_thresh >= min_yrs_with_trips) %>%
-    ungroup()
-
-  # retain the data from our "fleet"
-  d_retained <- semi_join(catch, fleet, by = "vessel_name")
-
-  if (nrow(d_retained) == 0) {
-    warning("No vessels passed the fleet conditions.")
-    return(NA)
-  }
-
-  lat_range <- stats::quantile(d_retained$latitude,
-    probs = c(min(lat_bin_quantiles), max(lat_bin_quantiles))
-  )
-  # depth_range <- stats::quantile(d_retained$best_depth,
-  #   probs = c(min(depth_bin_quantiles), max(depth_bin_quantiles))
-  # )
-  depth_range <- vector(mode = "numeric", length = 2L)
-
-  if (clean_bins) {
-    lat_range[1] <- round_down_even(lat_range[1], lat_band_width)
-    lat_range[2] <- round_up_even(lat_range[2], lat_band_width)
-    depth_range[1] <- 0
-    depth_range[2] <- 10000
-  }
-
-  d_retained <- filter(
-    d_retained,
-    latitude > lat_range[[1]],
-    latitude < lat_range[[2]],
-    best_depth > depth_range[[1]],
-    best_depth < depth_range[[2]]
-  )
-  lat_bands <- seq(lat_range[[1]], lat_range[[2]], lat_band_width)
-  depth_bands <- seq(depth_range[[1]], depth_range[[2]], depth_band_width)
-
-  d_retained <- d_retained %>%
-    filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
-    mutate(
-      depth = factor_bin_clean(best_depth, depth_bands),
-      vessel = as.factor(vessel_name),
-      latitude = factor_bin_clean(latitude, lat_bands),
-      locality = as.factor(locality_code),
-      year_factor = factor_clean(year),
-      month = factor_clean(month)
-    ) %>%
-    mutate(pos_catch = ifelse(spp_catch > 0, 1, 0))
-
-  # anonymize the vessels
-  vessel_df <- dplyr::tibble(
-    vessel = unique(d_retained$vessel),
-    scrambled_vessel = factor_clean(seq_along(vessel))
-  )
-  d_retained <- left_join(d_retained, vessel_df, by = "vessel") %>%
-    select(-vessel) %>%
-    rename(vessel = scrambled_vessel)
-
-  pos_catch_fleet <- filter(d_retained, .data$pos_catch == 1)
-
-  # retain depth bins with enough data:
-  tb <- table(pos_catch_fleet$depth)
-  too_deep <- names(tb)[cumsum(tb)/sum(tb) > depth_bin_quantiles[2]]
-  too_shallow <- names(tb)[cumsum(tb)/sum(tb) < depth_bin_quantiles[1]]
-  d_retained <- filter(d_retained,
-    !.data$depth %in% union(too_deep, too_shallow))
-
-  too_few <- function(x) {
-    tb <- table(pos_catch_fleet[[x]])
-    names(tb)[tb/sum(tb) < min_bin_prop]
-  }
-
-  # not enough pos. data in bins?
-  d_retained <- filter(d_retained, !.data$latitude %in% too_few("latitude"))
-  d_retained <- filter(d_retained, !.data$month %in% too_few("month"))
-  d_retained <- filter(d_retained, !.data$depth %in% too_few("depth"))
-  d_retained <- filter(d_retained, !.data$locality %in% too_few("locality"))
-  # vessel already known
-
-  base_month      <- get_most_common_level(pos_catch_fleet$month)
-  base_depth      <- get_most_common_level(pos_catch_fleet$depth)
-  base_lat        <- get_most_common_level(pos_catch_fleet$latitude)
-  base_vessel     <- get_most_common_level(pos_catch_fleet$vessel)
-  base_locality   <- get_most_common_level(pos_catch_fleet$locality)
-
-  d_retained$locality  <- stats::relevel(as.factor(d_retained$locality),
-    ref = base_locality)
-  d_retained$depth     <- stats::relevel(as.factor(d_retained$depth),
-    ref = base_depth)
-  d_retained$latitude  <- stats::relevel(as.factor(d_retained$latitude),
-    ref = base_lat)
-  d_retained$vessel    <- stats::relevel(as.factor(d_retained$vessel),
-    ref = base_vessel)
-  d_retained$month     <- stats::relevel(as.factor(d_retained$month),
-    ref = base_month)
-
-  d_retained <- droplevels(d_retained)
-
-  d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$hours_fished)
-
-  # make sure unique:
-  d_retained <- mutate(d_retained,
-    fishing_event_id = paste(year, trip_id, fishing_event_id, sep = "-"))
-
-  arrange(d_retained, .data$year, .data$vessel) %>%
-    dplyr::as_tibble()
+                          usable) %>%
+                    as_tibble()
 }
