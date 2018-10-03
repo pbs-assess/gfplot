@@ -409,7 +409,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     pred <- predict(m, newdata = pg_one)$data # returns all years!
     pred <- pred[pred$year == max(pred$year), ]
     stopifnot(identical(nrow(pg), nrow(pred)))
-    pg$combined <- exp(pred$data$est)
+    pg$combined <- exp(pred$est)
     pg$pos <- NA
     pg$bin <- NA
   }
