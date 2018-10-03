@@ -52,7 +52,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
   out <- left_join(all_years, out, by = c("year"))
 
   out <- reshape2::melt(out,
-    id.vars = "year",
+    id.vars = c("species_common_name", "year"),
     variable.name = "type", value.name = "n"
   ) %>%
     as_tibble()
