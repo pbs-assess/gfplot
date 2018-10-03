@@ -139,34 +139,38 @@ plot_maturity_months <- function(dat,
   ))
 
   g <- ggplot(dat, aes_string("month_jitter", "maturity")) +
-    geom_vline(xintercept = seq(1, 12), col = "grey95", lwd = 0.4) +
-    geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
-      pch = 21, alpha = alpha
-    ) +
-    scale_fill_manual(values = fill_col) +
-    scale_colour_manual(values = line_col) +
-    scale_size_area(max_size = max_size) +
-    scale_x_continuous(breaks = seq(1, 12), labels = month.abb) +
     ylab("") + xlab("") +
-    guides(
-      size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
-      fill = guide_legend(override.aes = list(size = 3.5))
-    ) +
+    scale_x_continuous(breaks = seq(1, 12), labels = month.abb) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-    geom_text(
-      data = counts,
-      aes_string(
-        y = "y", x = "month_jitter", label = "total_month",
-        colour = "sex"
-      ), size = 2.25, hjust = 0.5, show.legend = FALSE
-    ) +
-    coord_cartesian(
-      ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.5),
-      expand = FALSE
-    ) +
     theme(panel.spacing = unit(-0.1, "lines")) +
     labs(title = title, colour = "Sex", fill = "Sex")
+
+  if (nrow(dat) >= 10) {
+    g <- g +
+      geom_vline(xintercept = seq(1, 12), col = "grey95", lwd = 0.4) +
+      geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
+        pch = 21, alpha = alpha
+      ) +
+      scale_fill_manual(values = fill_col) +
+      scale_colour_manual(values = line_col) +
+      scale_size_area(max_size = max_size) +
+      guides(
+        size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
+        fill = guide_legend(override.aes = list(size = 3.5))
+      ) +
+      geom_text(
+        data = counts,
+        aes_string(
+          y = "y", x = "month_jitter", label = "total_month",
+          colour = "sex"
+        ), size = 2.25, hjust = 0.5, show.legend = FALSE
+      ) +
+      coord_cartesian(
+        ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.5),
+        expand = FALSE
+      )
+  }
 
   g
 }
