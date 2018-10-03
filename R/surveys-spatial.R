@@ -268,7 +268,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             inla_knots_pos = 75,
                             inla_knots_bin = 100,
                             gamma_scaling = 1000,
-                            cell_width = 1.5,
+                            cell_width = 2,
                             ...) {
 
   model <- match.arg(model)
@@ -530,7 +530,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol = FALSE,
                              north_symbol_coord = c(130, 5975),
                              north_symbol_length = 30,
-                             cell_size = 1.5, circles = FALSE) {
+                             cell_size = 2, circles = FALSE) {
   fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(
