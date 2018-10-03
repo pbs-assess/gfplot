@@ -472,6 +472,29 @@ get_iphc_sets_info <- function() {
 get_iphc_skates_info <- function() {
   .q <- read_sql("get-iphc-skate-info.sql")
   .d <- run_sql("GFBioSQL", .q)
+  # Calculating here:
+  # lastHook - hook number of final hook on that skate
+  # firstHook - hook number of 1st hook on that skate
+  # hook20 - hook number of 20th hook on that skate
+  # lastHookTemp needed since need before firstHook, but want to re-order
+  # chum... are just the chum-bait ones
+  # the hook numbering changed in 2007 (though in GFBio it was 2009 in 2014 -
+  #  Karina did some updating), hence the <2006.5 in lastHookTemp.
+  .d <- mutate(group_by(.d, setID),
+               lastHookTemp = cumsum(deplHooksPerSkate) * (year < 2006.5) +
+                              deplHooksPerSkate * (year > 2006.5),
+               firstHook = lastHookTemp - deplHooksPerSkate + 1,
+               lastHook = lastHookTemp,
+               hook20 = firstHook +
+                        (deplHooksPerSkate < 19.5) * deplHooksPerSkate +
+                        (deplHooksPerSkate > 19.5) * 20 - 1,
+               chumDeplHooksPerSkate = deplHooksPerSkate * (bait == 110),
+               chumObsHooksPerSkate = obsHooksPerSkate * (bait == 110),
+               obsHooksPerSkate20 = 20,  # **Remove this line when Elise updates
+                                         #  sql query, Issue #40
+               chumObsHooksPerSkate20 = obsHooksPerSkate20 * (bait == 110)
+               ) %>%
+               select(-lastHookTemp)
   as_tibble(.d)
 }
 
