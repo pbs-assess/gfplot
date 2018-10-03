@@ -69,7 +69,7 @@ fit_vb <- function(dat,
                    ageing_method_codes = NULL,
                    ...) {
   if ("species_common_name" %in% names(dat)) {
-    if (length(unique(dat$species_common_name)) != 1L) {
+    if (length(unique(dat$species_common_name)) > 1L) {
       stop("Multiple species detected via the `species_common_name` column. ",
         "fit_vb() is for use with a single species. Filter the data yourself ",
         "first.",
