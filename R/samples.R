@@ -43,19 +43,20 @@ tidy_sample_avail <- function(dat, year_range = NULL,
     ) %>%
     ungroup()
 
+  year_range <- if (is.null(year_range)) range(dat$year) else year_range
   all_years <- expand.grid(
-    year = seq(min(dat$year), max(dat$year), 1),
-    species_common_name = unique(dat$species_common_name),
+    year = seq(min(year_range), max(year_range), 1),
     stringsAsFactors = FALSE
   )
 
-  out <- left_join(all_years, out, by = c("year", "species_common_name"))
+  out <- left_join(all_years, out, by = c("year"))
 
   out <- reshape2::melt(out,
-    id.vars = c("species_common_name", "year"),
+    id.vars = "year",
     variable.name = "type", value.name = "n"
   ) %>%
     as_tibble()
+  out$n <- as.numeric(out$n)
   out$n[is.na(out$n)] <- 0
   out
 }
