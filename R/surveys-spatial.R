@@ -408,7 +408,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       pg_one <- filter(pg, year == min(pg$year)) # all the same, pick one
     }
     pred <- predict(m, newdata = pg_one)
-    pg$combined <- exp(pred$est)
+    pg$combined <- exp(pred$data$est)
     pg$pos <- NA
     pg$bin <- NA
   }
