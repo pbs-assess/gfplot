@@ -144,6 +144,12 @@ plot_catch <-
       }
     }
 
+    dat <- left_join(
+      expand.grid(year = seq(min(xlim), max(xlim)),
+        area = unique(dat$area), gear = unique(dat$gear)), dat,
+      by = c("year", "area", "gear"))
+    dat$value[is.na(dat$value)] <- 0
+
     yrs <- xlim
     g <- ggplot(data = dat)
 
