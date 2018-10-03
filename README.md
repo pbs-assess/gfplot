@@ -14,6 +14,10 @@ the [issue tracker](https://github.com/pbs-assess/gfplot/issues) if you
 have questions or suggestions on how the package or its documentation
 could be improved. We welcome pull requests\!
 
+In addition to the help available through the R console, a [web version
+of the documentation is
+available](https://pbs-assess.github.io/gfplot/index.html).
+
 # Installation
 
 The gfplot package can be installed and loaded with:
