@@ -404,6 +404,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       pg_one$year <- max(.d_scaled$year)
     } else {
       pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
+      pg <- pg_one
     }
     # FIXME: just returning last year for consistency!
     pred <- predict(m, newdata = pg_one)$data # returns all years!
