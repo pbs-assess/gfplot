@@ -462,6 +462,8 @@ get_iphc_sets <- function(species, usability = NULL) {
 get_iphc_sets_info <- function() {
   .q <- read_sql("get-iphc-set-info.sql")
   .d <- run_sql("GFBioSQL", .q)
+  .d <- mutate(.d, usable = ifelse(iphcUsabilityCode %in% c(1, 52),
+                                   "Y", "N"))
   as_tibble(.d)
 }
 
