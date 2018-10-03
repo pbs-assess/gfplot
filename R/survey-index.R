@@ -83,11 +83,11 @@ tidy_survey_index <- function(dat,
 
   all_surv <- expand.grid(
     survey_abbrev = survey,
-    species_common_name = unique(d$species_common_name),
     stringsAsFactors = FALSE
   )
+
+  d$survey_abbrev <- as.character(d$survey_abbrev)
   d <- left_join(all_surv, d, by = c(
-    "species_common_name",
     "survey_abbrev"
   ))
 
@@ -98,7 +98,7 @@ tidy_survey_index <- function(dat,
   d <- inner_join(d, trans, by = "survey_abbrev") %>%
     mutate(survey_abbrev = fct_reorder(survey_abbrev, surv_order))
   select(
-    d, species_common_name, survey_abbrev, year,
+    d, survey_abbrev, year,
     biomass, lowerci, upperci, mean_cv,
     num_sets, num_pos_sets
   )
