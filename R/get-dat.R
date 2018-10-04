@@ -745,6 +745,8 @@ get_sara_dat <- function() {
   as_tibble(.d)
 }
 
+#' @param file_name Optional filename(s) for the cached file. Defaults to the
+#'   same as the `species` argument.
 #' @param path The folder where the cached data will be saved.
 #' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
 #'   reading and writing at the expense of disk space.
@@ -772,8 +774,8 @@ get_sara_dat <- function() {
 #' * and optionally from [get_survey_sets()] and [get_cpue_historic()]
 
 #' @rdname get_data
-cache_pbs_data <- function(species, path = ".", compress = FALSE,
-  unsorted_only = TRUE, historic_cpue = FALSE,
+cache_pbs_data <- function(species, file_name = NULL, path = ".",
+  compress = FALSE, unsorted_only = TRUE, historic_cpue = FALSE,
   survey_sets = FALSE, verbose = TRUE) {
 
   if (!sql_server_accessible()) {
@@ -786,7 +788,12 @@ cache_pbs_data <- function(species, path = ".", compress = FALSE,
 
   for (sp_i in seq_along(species)) {
     this_sp <- species[[sp_i]]
-    this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+
+    if (is.null(file_name))
+      this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+    else
+      this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
+
     message("Extracting data for ", this_sp)
 
     out <- list()
