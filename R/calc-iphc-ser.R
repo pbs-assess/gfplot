@@ -28,16 +28,27 @@
 #'                              get_iphc_sets_info() )
 #' }
 calc_iphc_ser <- function(set_counts, lat_cut_off=50.6) {
-    ser_A <- filter(set_counts, usable == "Y", lat > lat_cut_off)
+    set_counts_usable <- filter(set_counts, usable == "Y")
+    ser_A <- filter(set_counts_usable, lat > lat_cut_off)
     ser_A <- summarise(group_by(ser_A, year),
                        Sets = n(),
                        NoYYR20 = sum(C_it20 == 0) / n(),
                        SampleIT20=mean(C_it20))
 
-    ser_B <- filter(set_counts, usable == "Y", lat > lat_cut_off)
+    ser_B <- filter(set_counts_usable, lat > lat_cut_off)
     ser_B <- summarise(group_by(ser_B, year),
                        Sets = n(),
                        NoYYR = sum(C_it == 0) / n(),
                        SampleIT=mean(C_it))
-    list(ser_A = ser_A, ser_B = ser_B)
+
+    ser_C <- summarise(group_by(set_counts_usable, year),
+                       Sets = n(),
+                       NoYYR = sum(C_it == 0) / n(),
+                       SampleIT=mean(C_it))
+
+    ser_D <- summarise(group_by(set_counts_usable, year),
+                       Sets = n(),
+                       NoYYR20 = sum(C_it20 == 0) / n(),
+                       SampleIT20=mean(C_it20))
+    list(ser_A = ser_A, ser_B = ser_B, ser_C = ser_C, ser_D = ser_D)
 }
