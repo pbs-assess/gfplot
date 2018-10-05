@@ -9,11 +9,18 @@ public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus
 Facilitates the creation of an annual groundfish data synopsis report
 with [gfsynopsis](https://github.com/pbs-assess/gfsynopsis).
 
+Note that the documentation is incomplete in some places. Please post in
+the [issue tracker](https://github.com/pbs-assess/gfplot/issues) if you
+have questions or suggestions on how the package or its documentation
+could be improved. We welcome pull requests\!
+
+In addition to the help available through the R console, a [web version
+of the documentation is
+available](https://pbs-assess.github.io/gfplot/index.html).
+
 # Installation
 
-The gfplot package is *not* ready for use yet. In particular, the
-documentation is far from complete. However, it can be installed and
-loaded with:
+The gfplot package can be installed and loaded with:
 
 ``` r
 install.packages("INLA", repos = c(getOption("repos"), 
