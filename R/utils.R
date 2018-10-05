@@ -3,6 +3,14 @@
 #' @param database The name of the database.
 #' @param query The query to run.
 #'
+#' @details
+#' If you need to use a user-password set up to access the databases, then you
+#' will need to set the R options in your .Rprofile file: `pbs.uid`, `pbs.pwd`,
+#' `pbs.ip`, `pbs.sqldriver`. E.g. `options(pbs.uid="MyUserName")` The default
+#' SQL driver will be `"SQL Server"` if not specified in the options. This will
+#' probably work for most people. You might try using
+#' `usethis::edit_r_profile()` if you need help finding your R profile file.
+#'
 #' @export
 run_sql <- function(database, query) {
   query <- paste(query, collapse = "\n")
@@ -11,16 +19,14 @@ run_sql <- function(database, query) {
 
 db_connection <- function(server = "DFBCV9TWVASP001",
                           database = "GFBioSQL") {
-  ## if (!sql_server_accessible()) {
-  ##   stop("SQL server not accessible.")
-  ## }
 
   pbs_uid <- getOption("pbs.uid")
   pbs_pwd <- getOption("pbs.pwd")
   pbs_ip <- getOption("pbs.ip")
+  pbs_sqldriver <- getOption("pbs.sqldriver")
   if (!is.null(pbs_uid) && !is.null(pbs_uid) && !is.null(pbs_ip)) {
     DBI::dbConnect(odbc::odbc(),
-      driver = "ODBC Driver 17 for SQL Server",
+      driver = if (is.null(pbs_sqldriver)) "SQL Server" else pbs_sqldriver,
       server = pbs_ip, database = database,
       pwd = pbs_pwd, uid = pbs_uid
     )
