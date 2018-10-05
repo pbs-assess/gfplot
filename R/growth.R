@@ -39,6 +39,11 @@
 #' model_f$model
 #' model_f$predictions
 #'
+#' # You can also fit both sexes combined if you want.
+#' # Just note that you need to specify the colours explicitly in the plot.
+#' model_all <- fit_vb(pop_samples, sex = "all")
+#' plot_vb(object_all = model_all, col = c("All" = "black"))
+#'
 #' # with MCMC via Stan (slower):
 #' x <- fit_vb(pop_samples, method = "mcmc",
 #'   chains = 1, iter = 800, seed = 123) # just for a fast example
@@ -286,6 +291,7 @@ fit_length_weight <- function(dat,
 #' }
 
 plot_growth <- function(object_female, object_male,
+                        object_all,
                         type = c("vb", "length-weight"),
                         downsample = 2000L,
                         pt_alpha = 0.2,
@@ -300,25 +306,37 @@ plot_growth <- function(object_female, object_male,
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
 
-  line_dat <- bind_rows(
-    data.frame(object_female$predictions,
-      sex = "Female",
-      stringsAsFactors = FALSE
-    ),
-    data.frame(object_male$predictions,
-      sex = "Male",
+  if (missing(object_all)) {
+    line_dat <- bind_rows(
+      data.frame(object_female$predictions,
+        sex = "Female",
+        stringsAsFactors = FALSE
+      ),
+      data.frame(object_male$predictions,
+        sex = "Male",
+        stringsAsFactors = FALSE
+      )
+    )
+  } else {
+    line_dat <- data.frame(object_all$predictions,
+      sex = "All",
       stringsAsFactors = FALSE
     )
-  )
+  }
 
   no_lines <- if (all(is.na(line_dat[[1]]))) TRUE else FALSE
 
-  pt_dat <- bind_rows(object_female$data, object_male$data)
-  pt_dat$sex <- dplyr::case_when(
-    pt_dat$sex == 1 ~ "Male",
-    pt_dat$sex == 2 ~ "Female",
-    TRUE ~ ""
-  )
+  if (missing(object_all)) {
+    pt_dat <- bind_rows(object_female$data, object_male$data)
+    pt_dat$sex <- dplyr::case_when(
+      pt_dat$sex == 1 ~ "Male",
+      pt_dat$sex == 2 ~ "Female",
+      TRUE ~ ""
+    )
+  } else {
+    pt_dat <- object_all$data
+    pt_dat$sex <- "All"
+  }
   no_pts <- if (nrow(pt_dat) == 0L) TRUE else FALSE
 
   xdat <- if (type[[1]] == "vb") pt_dat$age else pt_dat$length
@@ -329,20 +347,20 @@ plot_growth <- function(object_female, object_male,
     pt_dat <- pt_dat[sample(seq_len(nrow(pt_dat)), downsample), , drop = FALSE]
   }
 
+  labs <- if (missing(object_all)) c("F", "M") else "All"
   g <- ggplot() +
-    scale_colour_manual(values = col, labels = c("F", "M")) +
-    ggplot2::scale_linetype_manual(values = c(1, 2), labels = c("F", "M")) +
+    scale_colour_manual(values = col, labels = labs) +
+    ggplot2::scale_linetype_manual(values = c(1, 2), labels = labs) +
     theme_pbs() + xlab(xlab) + ylab(ylab) +
     ggplot2::labs(colour = "Sex", lty = "Sex")
 
   if (!no_pts) {
-
     if (!no_lines) {
-      xlim <- c(0, max(line_dat[,xvar], na.rm = TRUE) * 1.03)
-      ylim <- c(0, max(line_dat[,yvar], na.rm = TRUE) * 1.20)
+      xlim <- c(0, max(line_dat[, xvar], na.rm = TRUE) * 1.03)
+      ylim <- c(0, max(line_dat[, yvar], na.rm = TRUE) * 1.20)
     } else {
-      xlim <- c(0, max(pt_dat[,xvar], na.rm = TRUE) * 1.03)
-      ylim <- c(0, max(pt_dat[,yvar], na.rm = TRUE) * 1.03)
+      xlim <- c(0, max(pt_dat[, xvar], na.rm = TRUE) * 1.03)
+      ylim <- c(0, max(pt_dat[, yvar], na.rm = TRUE) * 1.03)
     }
 
     g <- g + geom_point(
@@ -359,17 +377,26 @@ plot_growth <- function(object_female, object_male,
   }
 
   ann_func <- if (type[[1]] == "vb") ann_vb else ann_lw
-  if (!is.na(object_female$pars[[1]])) {
-    g <- ann_func(g, object_female$pars, "Females", col[["Female"]],
-      x = lab_x * max(xlim),
-      y = lab_y * max(ylim),
-      gap = lab_y_gap * max(ylim)
-    )
-  }
 
-  if (!is.na(object_male$pars[[1]])) {
-    g <- ann_func(g, object_male$pars, "Males", col[["Male"]],
-      x = (lab_x + lab_x_gap) * max(xlim),
+  if (missing(object_all)) {
+    if (!is.na(object_female$pars[[1]])) {
+      g <- ann_func(g, object_female$pars, "Females", col[["Female"]],
+        x = lab_x * max(xlim),
+        y = lab_y * max(ylim),
+        gap = lab_y_gap * max(ylim)
+      )
+    }
+
+    if (!is.na(object_male$pars[[1]])) {
+      g <- ann_func(g, object_male$pars, "Males", col[["Male"]],
+        x = (lab_x + lab_x_gap) * max(xlim),
+        y = lab_y * max(ylim),
+        gap = lab_y_gap * max(ylim)
+      )
+    }
+  } else {
+    g <- ann_func(g, object_all$pars, "Females", col[[1]],
+      x = lab_x * max(xlim),
       y = lab_y * max(ylim),
       gap = lab_y_gap * max(ylim)
     )

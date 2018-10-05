@@ -62,6 +62,11 @@ plot_vb(model_f, model_m)
 model_f$model
 model_f$predictions
 
+# You can also fit both sexes combined if you want.
+# Just note that you need to specify the colours explicitly in the plot.
+model_all <- fit_vb(pop_samples, sex = "all")
+plot_vb(object_all = model_all, col = c("All" = "black"))
+
 # with MCMC via Stan (slower):
 x <- fit_vb(pop_samples, method = "mcmc",
   chains = 1, iter = 800, seed = 123) # just for a fast example
