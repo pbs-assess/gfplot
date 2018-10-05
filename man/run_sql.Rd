@@ -15,7 +15,7 @@ run_sql(database, query)
 Run SQL
 }
 \details{
-If you need to use a user-password set up to access the databases, then you
+If you need to use a user-password setup to access the databases, then you
 will need to set the R options in your .Rprofile file: \code{pbs.uid}, \code{pbs.pwd},
 \code{pbs.ip}, \code{pbs.sqldriver}. E.g. \code{options(pbs.uid="MyUserName")} The default
 SQL driver will be \code{"SQL Server"} if not specified in the options. This will

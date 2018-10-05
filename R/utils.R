@@ -4,7 +4,7 @@
 #' @param query The query to run.
 #'
 #' @details
-#' If you need to use a user-password set up to access the databases, then you
+#' If you need to use a user-password setup to access the databases, then you
 #' will need to set the R options in your .Rprofile file: `pbs.uid`, `pbs.pwd`,
 #' `pbs.ip`, `pbs.sqldriver`. E.g. `options(pbs.uid="MyUserName")` The default
 #' SQL driver will be `"SQL Server"` if not specified in the options. This will
