@@ -338,11 +338,11 @@ plot_growth <- function(object_female, object_male,
   if (!no_pts) {
 
     if (!no_lines) {
-      xlim <- c(0, max(line_dat[,xvar]) * 1.03)
-      ylim <- c(0, max(line_dat[,yvar]) * 1.20)
+      xlim <- c(0, max(line_dat[,xvar], na.rm = TRUE) * 1.03)
+      ylim <- c(0, max(line_dat[,yvar], na.rm = TRUE) * 1.20)
     } else {
-      xlim <- c(0, max(pt_dat[,xvar]) * 1.03)
-      ylim <- c(0, max(pt_dat[,yvar]) * 1.03)
+      xlim <- c(0, max(pt_dat[,xvar], na.rm = TRUE) * 1.03)
+      ylim <- c(0, max(pt_dat[,yvar], na.rm = TRUE) * 1.03)
     }
 
     g <- g + geom_point(
