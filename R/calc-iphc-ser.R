@@ -10,7 +10,8 @@
 #'  Series C - first 20 hooks from each skate, full coast
 #' @param set_counts species-specific set-level counts from [tidy_iphc_survey()]
 #'  or **other.
-#' @param lat_cut_off cut off below which sets are excluded for Series A and B
+#' @param lat_cut_off cut off below which sets are excluded for Series A and B,
+#'   default is that used in YYR 2014 assessment.
 #' @return **tibble with one row for each set in each year, with columns
 #'   year, station, lat, lon, E_it (effective skate number), N_it (number of
 #'   fish caught of the given species), C_it (catch rate of given species, as
