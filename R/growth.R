@@ -55,7 +55,7 @@
 #' plot_vb(obj, obj)
 
 fit_vb <- function(dat,
-                   sex = c("female", "male"),
+                   sex = c("female", "male", "all"),
                    method = c("mpd", "mcmc"),
                    downsample = Inf,
                    chains = 4L,
@@ -89,7 +89,8 @@ fit_vb <- function(dat,
   sex <- match.arg(sex)
   dat <- switch(sex,
     "female" = filter(dat, sex == 2L),
-    "male" = filter(dat, sex == 1L)
+    "male" = filter(dat, sex == 1L),
+    "all" = dat
   )
 
   if (nrow(dat) < min_samples) {
