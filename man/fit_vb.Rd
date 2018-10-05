@@ -4,8 +4,8 @@
 \alias{fit_vb}
 \title{Fit a von Bertalanffy growth model}
 \usage{
-fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
-  downsample = Inf, chains = 4L, iter = 1000L,
+fit_vb(dat, sex = c("female", "male", "all"), method = c("mpd",
+  "mcmc"), downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
   uniform_priors = FALSE, ageing_method_codes = NULL, ...)

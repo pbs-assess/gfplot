@@ -4,9 +4,9 @@
 \alias{fit_length_weight}
 \title{Fit a length-weight model}
 \usage{
-fit_length_weight(dat, sex = c("female", "male"), downsample = Inf,
-  min_samples = 50L, method = c("rlm", "lm"), too_high_quantile = 1,
-  scale_weight = 1/1000)
+fit_length_weight(dat, sex = c("female", "male", "all"),
+  downsample = Inf, min_samples = 50L, method = c("rlm", "lm"),
+  too_high_quantile = 1, scale_weight = 1/1000)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or

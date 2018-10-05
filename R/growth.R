@@ -196,7 +196,7 @@ fit_vb <- function(dat,
 #' }
 
 fit_length_weight <- function(dat,
-                              sex = c("female", "male"),
+                              sex = c("female", "male", "all"),
                               downsample = Inf,
                               min_samples = 50L,
                               method = c("rlm", "lm"),
@@ -222,7 +222,8 @@ fit_length_weight <- function(dat,
   dat <- switch(sex[[1]],
     "female" = filter(dat, sex == 2),
     "male" = filter(dat, sex == 1),
-    stop("`sex` argument must be 'female' or 'male'.", call. = FALSE)
+    "all" = dat,
+    stop("`sex` argument must be 'female' or 'male' or 'all'.", call. = FALSE)
   )
 
   dat$weight <- dat$weight * scale_weight
