@@ -11,7 +11,7 @@ fit_survey_sets(dat, years, survey = NULL,
   utm_zone = 9, model = c("inla", "sdmTMB", "glmmfields"),
   include_depth = TRUE, survey_boundary = NULL, premade_grid = NULL,
   tmb_knots = 200, inla_knots_pos = 75, inla_knots_bin = 100,
-  gamma_scaling = 1000, cell_width = 1.5, ...)
+  gamma_scaling = 1000, cell_width = 2, ...)
 }
 \arguments{
 \item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}

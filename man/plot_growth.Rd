@@ -6,11 +6,11 @@
 \alias{plot_length_weight}
 \title{Plot von Bertalanffy or length-weight fits}
 \usage{
-plot_growth(object_female, object_male, type = c("vb", "length-weight"),
-  downsample = 2000L, pt_alpha = 0.2, xlab = "Age (years)",
-  ylab = "Length (cm)", seed = 42, lab_x = 0.45, lab_y = 0.3,
-  lab_x_gap = 0.3, lab_y_gap = 0.06, col = c(Female = "black", Male =
-  "grey40"))
+plot_growth(object_female, object_male, object_all, type = c("vb",
+  "length-weight"), downsample = 2000L, pt_alpha = 0.2,
+  xlab = "Age (years)", ylab = "Length (cm)", seed = 42,
+  lab_x = 0.45, lab_y = 0.3, lab_x_gap = 0.3, lab_y_gap = 0.06,
+  col = c(Female = "black", Male = "grey40"))
 
 plot_vb(..., type = "vb")
 

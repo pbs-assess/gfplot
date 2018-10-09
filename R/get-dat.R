@@ -211,6 +211,24 @@ get_sample_trips <- function() {
   )
 }
 
+#' @export
+get_species <- function()  {
+  species <- DBI::dbGetQuery(
+    db_connection(database = "GFBioSQL"),
+    "SELECT * FROM SPECIES"
+  )
+  names(species) <- tolower(names(species))
+  mutate(species,
+    species_common_name = tolower(species_common_name),
+    species_science_name = tolower(species_science_name),
+    parent_taxonomic_unit = tolower(parent_taxonomic_unit),
+    taxonomic_rank = tolower(taxonomic_rank),
+    species_grouping = tolower(species_grouping)
+  ) %>%
+    select(-row_version, -rsty_id, -parent_rsty_id, -species_desc) %>%
+    dplyr::as.tbl()
+}
+
 get_strata_areas <- function() {
   run_sql(
     "GFBioSQL",

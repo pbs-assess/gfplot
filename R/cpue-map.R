@@ -17,6 +17,8 @@
 #'   the coast if it is rotated at all.
 #' @param fill_lab Label for the color legend.
 #' @param return_data Logical for whether to return the data instead of the plot.
+#' @param min_cells The minimum number of cells needed before the hexagons are
+#'   shown.
 #'
 #' @export
 #' @importFrom utils data
@@ -44,7 +46,8 @@ plot_cpue_spatial <-
              rotation_angle = 0,
              rotation_center = c(500, 5700),
              fill_lab = "CPUE (kg/hr)",
-             return_data = FALSE) {
+             return_data = FALSE,
+             min_cells = 5) {
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
     plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
@@ -98,7 +101,7 @@ plot_cpue_spatial <-
       if (return_data) {
         return(gdat)
       } else {
-        if (nrow(gdat) == 0) {
+        if (nrow(gdat) < min_cells) {
           plot_hexagons <- FALSE
         } else {
           # compute hexagon x-y coordinates for geom_polygon()
@@ -114,6 +117,7 @@ plot_cpue_spatial <-
       }
     }
     # rotate if needed:
+
     isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
     coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
 

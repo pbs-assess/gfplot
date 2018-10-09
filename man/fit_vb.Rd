@@ -4,8 +4,8 @@
 \alias{fit_vb}
 \title{Fit a von Bertalanffy growth model}
 \usage{
-fit_vb(dat, sex = c("female", "male"), method = c("mpd", "mcmc"),
-  downsample = Inf, chains = 4L, iter = 1000L,
+fit_vb(dat, sex = c("female", "male", "all"), method = c("mpd",
+  "mcmc"), downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
   uniform_priors = FALSE, ageing_method_codes = NULL, ...)
@@ -61,6 +61,11 @@ model_m <- fit_vb(pop_samples, sex = "male")
 plot_vb(model_f, model_m)
 model_f$model
 model_f$predictions
+
+# You can also fit both sexes combined if you want.
+# Just note that you need to specify the colours explicitly in the plot.
+model_all <- fit_vb(pop_samples, sex = "all")
+plot_vb(object_all = model_all, col = c("All" = "black"))
 
 # with MCMC via Stan (slower):
 x <- fit_vb(pop_samples, method = "mcmc",

@@ -396,8 +396,17 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
     else
       formula <- density ~ depth_scaled + depth_scaled2
-    m <- sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
+    m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
       spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
+    }, error = function(e) NA)
+    if (is.na(m)) { # Did not converge.
+      warning('The spatial TMB model did not converge.', call. = FALSE)
+      return(list(
+        predictions = pg, data = .d_tidy,
+        models = NA, survey = survey,
+        years = years
+      ))
+    }
     # These are fixed station (IPHC) or they come from grids without years
     if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
       pg_one <- pg

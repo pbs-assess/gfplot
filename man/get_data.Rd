@@ -77,9 +77,9 @@ get_management(species = NULL, species_group = NULL, fishery = NULL,
 
 get_sara_dat()
 
-cache_pbs_data(species, path = ".", compress = FALSE,
-  unsorted_only = TRUE, historic_cpue = FALSE, survey_sets = FALSE,
-  verbose = TRUE)
+cache_pbs_data(species, file_name = NULL, path = ".",
+  compress = FALSE, unsorted_only = TRUE, historic_cpue = FALSE,
+  survey_sets = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
@@ -127,6 +127,9 @@ to include in data extraction (eg. '5A'; c('3C', '3D', '5A', '5B')).}
 
 \item{start_year}{The minimum year to include management actions.
 Defaults to all.}
+
+\item{file_name}{Optional filename(s) for the cached file. Defaults to the
+same as the \code{species} argument.}
 
 \item{path}{The folder where the cached data will be saved.}
 

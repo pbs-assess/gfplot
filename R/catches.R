@@ -144,11 +144,13 @@ plot_catch <-
       }
     }
 
-    dat <- left_join(
-      expand.grid(year = seq(min(xlim), max(xlim)),
-        area = levels(dat$area), gear = levels(dat$gear)), dat,
-      by = c("year", "area", "gear"))
-    dat$value[is.na(dat$value)] <- 0
+    if (!blank_plot) {
+      dat <- left_join(
+        expand.grid(year = seq(min(xlim), max(xlim)),
+          area = levels(dat$area), gear = levels(dat$gear)), dat,
+        by = c("year", "area", "gear"))
+      dat$value[is.na(dat$value)] <- 0
+    }
 
     yrs <- xlim
     g <- ggplot(data = dat)
@@ -178,6 +180,10 @@ plot_catch <-
         aes_string("year", "value/scale_val", colour = "gear", fill = "gear")
       ) +
         ylim(0, max(stacked_data$catch, na.rm = TRUE) * 1.05)
+    }
+
+    if (blank_plot) {
+      g <- g + ylim(0, 1)
     }
 
     g <- g +
