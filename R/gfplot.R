@@ -125,6 +125,19 @@ if (getRversion() >= "2.15.1") {
     "sampling_desc", "mean_num_pos_sets", "cv", "sets",
     "true_b", "true", "mean_num_sets",
 
+    # IPHC survey calculations
+    "C_it", "C_it20", "E_it", "E_it20", "H_it", "N_it", "N_it20", "bait",
+    "block", "chumCountPerSkate", "chumCountPerSkate20", "chumObsHooksPerSkate",
+    "chumObsHooksPerSkate20", "countPerSkate", "countPerSkate20",
+    "deplHooksPerSkate", "effSkateIPHC", "firstHook", "hook", "hook20",
+    "hooksChumRatio", "hooksChumRatio20", "iphcUsabilityCode", "lastHook",
+    "lastHookTemp", "lat", "long", "numOnHook", "numOnHook20", "obsHooksPerSkate",
+    "obsHooksPerSkate20", "usable", "setID", "skateID",
+
+    # others
+    "parent_rsty_id", "parent_taxonomic_unit", "row_version", "rsty_id",
+    "species_grouping", "taxonomic_rank",
+
     # other
     "usability_code",
 
