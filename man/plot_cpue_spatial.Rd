@@ -10,7 +10,7 @@ plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3,
   fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option =
   "D"), colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt",
   option = "D"), rotation_angle = 0, rotation_center = c(500, 5700),
-  fill_lab = "CPUE (kg/hr)", return_data = FALSE)
+  fill_lab = "CPUE (kg/hr)", return_data = FALSE, min_cells = 5)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
@@ -42,6 +42,9 @@ the coast if it is rotated at all.}
 \item{fill_lab}{Label for the color legend.}
 
 \item{return_data}{Logical for whether to return the data instead of the plot.}
+
+\item{min_cells}{The minimum number of cells needed before the hexagons are
+shown.}
 }
 \description{
 Plot a map of commercial CPUE
