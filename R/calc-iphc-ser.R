@@ -28,7 +28,7 @@
 #'                              get_iphc_skates_info(),
 #'                              get_iphc_sets_info() )
 #' }
-calc_iphc_ser <- function(set_counts, lat_cut_off=50.6) {
+calc_iphc_ser_2003 <- function(set_counts, lat_cut_off=50.6) {
     set_counts_usable <- filter(set_counts, usable == "Y")
     ser_A <- filter(set_counts_usable, lat > lat_cut_off)
     ser_A <- summarise(group_by(ser_A, year),
