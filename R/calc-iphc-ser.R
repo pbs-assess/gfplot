@@ -1,13 +1,13 @@
 #' Calculate Series A, B, C and D from the IPHC data
 #'
 #' For a given species and tibble containing one row for each set in each year,
-#'  and outpu from [tidy_iphc_survey()] or ***, . Currently just working for
+#'  and output from [tidy_iphc_survey()] or ***, . Currently just working for
 #'  years with hook-by-hook data and all hooks were enumerated (2003-2012,
 #'  2014-2017 and likely later), for which we can build all four Series A-D.
 #'  Series A - first 20 hooks from each skate, only north of WCVI
 #'  Series B - all hooks from each skate, only north of WCVI
 #'  Series C - all hooks from each skate, full coast
-#'  Series C - first 20 hooks from each skate, full coast
+#'  Series D - first 20 hooks from each skate, full coast
 #' @param set_counts species-specific set-level counts from [tidy_iphc_survey()]
 #'  or **other.
 #' @param lat_cut_off cut off below which sets are excluded for Series A and B,
