@@ -8,6 +8,9 @@ dist: trusty
 
 warnings_are_errors: false
 
+before_install:
+  - source travis/before-install.sh
+
 addons:
   apt:
     packages:
