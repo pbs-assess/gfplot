@@ -2,6 +2,5 @@
 
 mkdir -p ~/.R
 
-echo "CXX14FLAGS=-O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function  -Wno-macro-redefined" >> ~/.R/Makevars
+echo "CXXFLAGS += -std=c++11" >> ~/.R/Makevars
 echo "CXX14 = g++ -fPIC"    >> ~/.R/Makevars
-echo "CXX14FLAGS+=-flto -Wno-unused-local-typedefs" >> ~/.R/Makevars

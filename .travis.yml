@@ -5,6 +5,9 @@ r: devel
 sudo: required
 cache: packages
 
+before_install:
+  - source travis/before-install.sh
+
 warnings_are_errors: false
 
 r_build_args: '--no-build-vignettes'
