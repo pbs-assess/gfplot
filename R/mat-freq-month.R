@@ -21,11 +21,10 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
       month,
       maturity_convention_code,
       maturity_code,
-      maturity_name,
       sex
     )
 
-  dat <- filter(dat, !is.na(maturity_name), !is.na(sex))
+  dat <- filter(dat, !is.na(sex))
 
   file <- system.file("extdata", "maturity_short_names.csv",
     package = "gfplot"
