@@ -133,13 +133,15 @@ plot_cpue_spatial <-
       ), inherit.aes = FALSE) + fill_scale + colour_scale
     }
 
-    g <- g + geom_path(
-      data = isobath_utm, aes_string(
-        x = "X", y = "Y",
-        group = "paste(PID, SID)"
-      ),
-      inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
-    )
+    suppressMessages({
+      g <- g + geom_path(
+        data = isobath_utm, aes_string(
+          x = "X", y = "Y",
+          group = "paste(PID, SID)"
+        ),
+        inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+      )
+    })
 
     g <- g + geom_polygon(
       data = coastline_utm,
