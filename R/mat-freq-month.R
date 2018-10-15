@@ -95,6 +95,8 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
 #' @param n_label_pos A numeric vector of length 2 that gives the y position of
 #'   the text describing the number of male and female samples within each month
 #'   bin.
+#' @param min_fish The minimum number of fish for the circles to be plotted for
+#'   a given month.
 #'
 #' @export
 #' @rdname plot_maturity_months
@@ -110,13 +112,14 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
 #'   plot_maturity_months()
 #' }
 plot_maturity_months <- function(dat,
-                                 max_size = 11,
+                                 max_size = 9,
                                  sex_gap = 0.2,
                                  fill_col = c("M" = "grey70", "F" = "black"),
                                  line_col = c("M" = "grey70", "F" = "black"),
                                  alpha = 0.8,
                                  title = "Maturity frequencies",
-                                 n_label_pos = c(0.7, 1)) {
+                                 n_label_pos = c(0.7, 1.3),
+                                 min_fish = 20) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
     mutate(
@@ -126,9 +129,11 @@ plot_maturity_months <- function(dat,
     group_by(sex, month, month_jitter, maturity) %>%
     summarise(.n = n()) %>%
     ungroup() %>%
+    group_by(month) %>%
     mutate(n_scaled = .n / max(.n)) %>%
     group_by(month, sex) %>%
-    mutate(total_month = sum(.n)) %>%
+    mutate(total_month = sum(.n),
+      n_scaled = ifelse(total_month >= min_fish, n_scaled, NA)) %>%
     ungroup()
 
   counts <- select(dat, sex, total_month, month_jitter) %>% unique()
@@ -166,7 +171,8 @@ plot_maturity_months <- function(dat,
         ), size = 2.25, hjust = 0.5, show.legend = FALSE
       ) +
       coord_cartesian(
-        ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.5),
+        xlim = c(0.5, 12.5),
+        ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.7),
         expand = FALSE
       )
   }
