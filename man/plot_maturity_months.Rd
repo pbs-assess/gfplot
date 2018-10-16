@@ -7,10 +7,10 @@
 \usage{
 tidy_maturity_months(dat, months = seq(1, 12))
 
-plot_maturity_months(dat, max_size = 11, sex_gap = 0.2,
-  fill_col = c(M = "grey70", F = "black"), line_col = c(M = "grey70", F
-  = "black"), alpha = 0.8, title = "Maturity frequencies",
-  n_label_pos = c(0.7, 1))
+plot_maturity_months(dat, max_size = 9, sex_gap = 0.2, fill_col = c(M
+  = "grey70", F = "black"), line_col = c(M = "grey70", F = "black"),
+  alpha = 0.8, title = "Maturity frequencies", n_label_pos = c(0.7,
+  1.3), min_fish = 20)
 }
 \arguments{
 \item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}
@@ -34,6 +34,9 @@ data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 \item{n_label_pos}{A numeric vector of length 2 that gives the y position of
 the text describing the number of male and female samples within each month
 bin.}
+
+\item{min_fish}{The minimum number of fish for the circles to be plotted for
+a given month.}
 }
 \description{
 Plot maturity frequency by month
