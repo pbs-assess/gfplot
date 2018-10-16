@@ -52,5 +52,5 @@ spatial-survey/*
 inst/shortraker-kni*
 figs/*
 inst/pcod-vb.html
-*.*~
+*~
 *.dll
