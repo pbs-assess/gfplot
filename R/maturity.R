@@ -234,6 +234,11 @@ plot_mat_ogive <- function(object,
     labs <- mutate(labs, x = max_x * 0.05) # actual x position calculation
   }
 
+  nd_fe$sex <- factor(nd_fe$sex, levels = c('F', 'M'))
+  nd_re$sex <- factor(nd_re$sex, levels = c('F', 'M'))
+  labs$sex <- factor(labs$sex, levels = c('F', 'M'))
+  labs$sex <- factor(labs$sex, levels = c('F', 'M'))
+
   g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex", lty = "sex"))
   if ("glmm_re" %in% names(nd_re)) {
     g <- g + geom_line(
@@ -258,7 +263,9 @@ plot_mat_ogive <- function(object,
     )
   }
 
-  g <- g + scale_colour_manual(values = c("M" = "grey50", "F" = "black")) +
+  g <- g + scale_colour_manual(values = c("M" = "grey50", "F" = "black"),
+    breaks = c("F", "M"), drop = FALSE) +
+    ggplot2::scale_linetype_discrete(breaks = c('F', 'M'), drop = FALSE) +
     xlab(xlab) + ylab("Probability mature") +
     theme_pbs() +
     coord_cartesian(
