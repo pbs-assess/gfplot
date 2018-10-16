@@ -143,6 +143,9 @@ if (getRversion() >= "2.15.1") {
     "NoYYR", "NoYYR20", "everything", "prop_empty_sets", "wcvi",
     "catchCount", "effSkate",
     "lon", "spNameIPHC", "specCount", "station",
+    "countData1995", "countData2013", "data1996to2002",
+    "setData1995", "setData2013", "spNameIPHC",
+
 
     # others
     "parent_rsty_id", "parent_taxonomic_unit", "row_version", "rsty_id",
