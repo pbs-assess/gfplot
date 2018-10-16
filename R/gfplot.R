@@ -89,10 +89,9 @@ if (getRversion() >= "2.15.1") {
     "specimen_id", "specimen_sex_code",
 
     # maturity:
-    "n_scaled"
+    "n_scaled",
 
     # cpue:
-
     "best_date", "best_depth", "fe_start_date", "hours_fished", "latitude",
     "locality_code", "longitude", "n_trips_per_year", "n_years", "pos_catch",
     "scrambled_vessel", "species_category_code", "spp_catch", "spp_in_fe",

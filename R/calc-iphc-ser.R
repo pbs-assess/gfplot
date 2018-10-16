@@ -1,25 +1,30 @@
 #' Calculate Series A, B, C and D from the IPHC data
 #'
-#' **UPDATE - now works for all years and returns the four series with bootstrapped values**
-#' For a given species and tibble containing one row for each set in each year,
-#'  and output from [**tidy_iphc_survey()] or ***, . Currently just working for
-#'  years with hook-by-hook data and all hooks were enumerated (2003-2012,
-#'  2014-2017 and likely later), for which we can build all four Series A-D.
-#'  Series A - first 20 hooks from each skate, only north of WCVI
-#'  Series B - all hooks from each skate, only north of WCVI
-#'  Series C - all hooks from each skate, full coast
-#'  Series D - first 20 hooks from each skate, full coast
+#' Calculate all four series for as many years as possible, including bootstrapped
+#'  values.
+#'
+#' @details The four series are:
+#'
+#'  Series A: first 20 hooks from each skate, only north of WCVI
+#'
+#'  Series B: all hooks from each skate, only north of WCVI
+#'
+#'  Series C: all hooks from each skate, full coast
+#'
+#'  Series D: first 20 hooks from each skate, full coast
+#'
 #' @param set_counts species-specific set-level counts from [tidy_iphc_survey()]
 #'  or **other.
 #' @param lat_cut_off cut off below which sets are excluded for Series A and B,
 #'   default is that used in YYR 2014 assessment.
-#' @return **tibble with one row for each set in each year, with columns
+#' @return list containing four tibbles, one for each survey (ser_A, ser_B, ser_C
+#'   and ser_D). Each tibble has one row for each set in each year, with columns
 #'   year, station, lat, lon, E_it (effective skate number), N_it (number of
 #'   fish caught of the given species), C_it (catch rate of given species, as
 #'   numbers per effective skate), E_it20, N_it20 and C_it20 are the same but
 #'   considering the first 20 hooks of each skate only, usable (whether the set
-#'   should be used, based on IPHC codes; some cannot be used for geospatial
-#'   analysis but are included here).
+#'   should be used, based on IPHC codes; note that some should not be used for
+#'   geospatial analysis but are included here).
 #'
 #' @export
 #'
@@ -103,7 +108,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     list(ser_A = ser_A, ser_B = ser_B, ser_C = ser_C, ser_D = ser_D)
 }
-##' boot......**
+##' Do bootstrap calculations on each IPHC Series
 ##'
 ##' To be called from within [calc_iphc_ser_all()],
 ##'  once for each series.
@@ -154,21 +159,28 @@ boot_iphc <- function(ser_year_rates,
 
 ##' Calculate Series AB and test if the scaled A and B are significantly different
 ##'
-##' .. content for **
+##' Calculate Series AB (Series A with 1995 and 1996 appropriately scaled from
+##'  Series B)
 ##' @param series_all List of tibbles, one for each of Series A, B, C and D,
 ##'   resulting from [calc_iphc_ser_all()]
 ##' @return List containing
-##'   ser_longest - the longest time series possible from
+##'
+##'   ser_longest: the longest time series possible from
 ##'   Series A and B,
-##'   test_AB - the results from the paired t-test,
-##'   G_A, G_B - geometric means of Series A and Series D (based on bootstrapped
+##'
+##'   test_AB: the results from the paired t-test,
+##'
+##'   G_A, G_B: geometric means of Series A and Series D (based on bootstrapped
 ##'    means).
-##'   Longest series is
-##'   either (i) Series AB (Series A with 1995 and 1996 appropriately scaled from
-##'   Series B) if [test_AB$p.value > 0.05], because the p-value means that we can't
-##'   reject the null hypothesis that the true difference
+##'
+##'   Longest series is either
+##'
+##'   (i) Series AB (Series A with 1995 and 1996 appropriately scaled from
+##'   Series B) if [test_AB$p.value > 0.05], because the p-value means that we
+##'   cannot reject the null hypothesis that the true difference
 ##'   in means of the rescaled (by their geometric means) Series A and B equals 0,
-##'   or (ii) Series A, which is the longest series available if the rescaled
+##'
+##'   (ii) Series A, which is the longest series available if the rescaled
 ##'  series are significantly different.
 calc_iphc_ser_AB <- function(series_all) {
     years_AB <- intersect(series_all$ser_A$year, series_all$ser_B$year)
@@ -236,7 +248,8 @@ calc_iphc_ser_AB <- function(series_all) {
 
 ##' Compare Series A and D to see if A can be considered a relative index for the whole coast
 ##'
-##' .. content for **
+##' Compare Series A and D to see if A can be considered a relative index for
+##'  the whole coast.
 ##' @param series_all List of tibbles, one for each of Series A, B, C and D,
 ##'   resulting from [calc_iphc_ser_all()]
 ##' @return List of t_AD (results of the paired t-test), and geometric means G_A
@@ -276,7 +289,8 @@ compare_iphc_ser_A_D <- function(series_all) {
 
 ##' Compare Series B and C to see if A can be considered a relative index for the whole coast
 ##'
-##' **.. content
+##' Compare Series B and C to see if A can be considered a relative index for
+##'  the whole coast
 ##' @param series_all List of tibbles, one for each of Series A, B, C and D,
 ##'   resulting from [calc_iphc_ser_all()]
 ##' @return List of t_BC (results of the paired t-test), and geometric means G_B
@@ -316,17 +330,26 @@ compare_iphc_ser_B_C <- function(series_all) {
 
 ##' Do all the calculations for the IPHC survey.
 ##'
-##' **Do it all**
+##' From species-specific set-level counts, derive all the required Series and
+##'  test their equivalence.
 ##' @param set_counts species-specific set-level counts from [tidy_iphc_survey()]
 #'  or **other.
 ##' @param sp Species names (as used in gfplot).
 ##' @return List containing
-##'   ser_longest - tibble for the longest time series that can be made for this
-##'     species, as output from [calc_iphc_ser_AB()].
-##'   ser_all - Series A, B, C and D, as output from [calc_iphc_ser_all()].
-##'   test_AB - t-test results from [calc_iphc_ser_AB()]
-##'   test_AD - t-test results from [compare_iphc_ser_AD()]
-##'   test_BC - t-test results from [compare_iphc_ser_BC()]
+##'
+##' ser_longest: tibble for the longest time series that can be made for this
+##'     species, as output from [calc_iphc_ser_AB()]; either Series A or AB.
+##'
+##' full_coast: whether or not the longest time series can be considered
+##'     representative of the full coast (based on the paired t-tests).
+##'
+##' ser_all: Series A, B, C and D, as output from [calc_iphc_ser_all()].
+##'
+##' test_AB: t-test results from [calc_iphc_ser_AB()]
+##'
+##' test_AD: t-test results from [compare_iphc_ser_AD()]
+##'
+##' test_BC: t-test results from [compare_iphc_ser_BC()]
 calc_iphc_full_res <- function(set_counts, sp)
     {
         series_all <- calc_iphc_ser_all(set_counts)
@@ -385,7 +408,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' Format the longest IPHC time series index to agree with other surveys so
 ##'   that [plot_survey_index()] works automatically. So the mean catch rate
 ##'   gets renames as `biomass' even though it's numbers per effective skate.
-##' ****num_sets is currently hardwired as 130 -
+##'   **NOTE** num_sets is currently hardwired as 130, Issue 45.
 ##' @param ser_longest Output from [calc_iphc_full_res()], but only want the
 ##'   ser_longest component.
 ##' @return Renamed ser_longest, with some required columns calculated.
@@ -422,13 +445,15 @@ format_iphc_longest <- function(ser_longest){
 ##'  a given species. Will take a while since queries GFbio (and need to be on DFO
 ##'  network).
 ##' @param sp Species names (as used in gfplot).
-##' @return ***List containing *lots* plus figure
-##'   ser_longest - tibble for the longest time series that can be made for this
-##'     species, as output from [calc_iphc_ser_AB()].
-##'   ser_all - Series A, B, C and D, as output from [calc_iphc_ser_all()].
-##'   test_AB - t-test results from [calc_iphc_ser_AB()]
-##'   test_AD - t-test results from [compare_iphc_ser_AD()]
-##'   test_BC - t-test results from [compare_iphc_ser_BC()]
+##' @return For the given species, list containing
+##'
+##'   iphc_set_counts_sp: list returned from [calc_iphc_full_res()]
+##'
+##'   iphc_set_counts_sp_format: just the longest series, returned from
+##'     [format_iphc_longest()] with calculations and formatting to match that
+##'     of other surveys
+##'
+##'   g_iphc_index: plot of just the iphc data (useful for testing all species)
 iphc_get_calc_plot <- function(sp)
 {
      set_counts <- tidy_all_iphc_set_counts(sp)
