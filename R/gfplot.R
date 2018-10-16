@@ -88,6 +88,9 @@ if (getRversion() >= "2.15.1") {
     "maturity_convention_maxvalue", "n_employee", "p", "species_code",
     "specimen_id", "specimen_sex_code",
 
+    # maturity:
+    "n_scaled"
+
     # cpue:
 
     "best_date", "best_depth", "fe_start_date", "hours_fished", "latitude",
