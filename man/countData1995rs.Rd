@@ -7,7 +7,7 @@
 \format{A tibble:
 \describe{
 \item{year}{1995 for this data set}
-\item{station}{station name, to link with setData1995rs}
+\item{station}{station name, to link with setData1995}
 \item{specName}{species name for the counts for that set}
 \item{specCount}{count of that species for that set}
 }}
@@ -19,8 +19,7 @@ received from Aaron Ranta at the IPHC.
 countData1995rs
 }
 \description{
-A dataset containing counts of each species for each RS (Random Sample?)
-station for the 1995 IPHC survey. We are not using these data
-but including here for completeness.
+A dataset containing counts of the RS (Random Sample?) stations for
+the 1995 IPHC survey.
 }
 \keyword{datasets}

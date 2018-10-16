@@ -23,6 +23,7 @@ received from Aaron Ranta at the IPHC.
 setData1995
 }
 \description{
-A dataset containing details of the Setline Grid stations for the 1995 IPHC survey, one set was deployed at each station.
+A dataset containing details of the Setline Grid stations for the 1995 IPHC
+survey; one set was deployed at each station.
 }
 \keyword{datasets}

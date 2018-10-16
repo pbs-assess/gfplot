@@ -13,7 +13,6 @@
 \item{usable}{whether or not the set is usable, as determined by IPHC plus
 four extra that had no hooks enumerated except for Pacific
 Halibut, and so are not usable by us}
-
 }}
 \source{
 Originally from file 1995IPHCSetlineData.xlsx that Lynne Yamanaka
@@ -24,7 +23,7 @@ setData1995rs
 }
 \description{
 A dataset containing details of the RS (Random Sample?) stations for the 1995
-IPHC survey, one set was deployed at each station. We are not using these data
+IPHC survey; one set was deployed at each station. We are not using these data
 but including here for completeness.
 }
 \keyword{datasets}
