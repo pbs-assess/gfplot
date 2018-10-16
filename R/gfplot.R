@@ -26,6 +26,7 @@
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
 #' @importFrom grDevices chull
+#' @importFrom boot boot.ci boot
 #' @import Rcpp
 NULL
 

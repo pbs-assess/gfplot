@@ -347,9 +347,9 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##'
 ##' test_AB: t-test results from [calc_iphc_ser_AB()]
 ##'
-##' test_AD: t-test results from [compare_iphc_ser_AD()]
+##' test_AD: t-test results from [compare_iphc_ser_A_D()]
 ##'
-##' test_BC: t-test results from [compare_iphc_ser_BC()]
+##' test_BC: t-test results from [compare_iphc_ser_B_C()]
 calc_iphc_full_res <- function(set_counts, sp)
     {
         series_all <- calc_iphc_ser_all(set_counts)

@@ -25,9 +25,9 @@ ser_all: Series A, B, C and D, as output from \code{\link[=calc_iphc_ser_all]{ca
 
 test_AB: t-test results from \code{\link[=calc_iphc_ser_AB]{calc_iphc_ser_AB()}}
 
-test_AD: t-test results from \code{\link[=compare_iphc_ser_AD]{compare_iphc_ser_AD()}}
+test_AD: t-test results from \code{\link[=compare_iphc_ser_A_D]{compare_iphc_ser_A_D()}}
 
-test_BC: t-test results from \code{\link[=compare_iphc_ser_BC]{compare_iphc_ser_BC()}}
+test_BC: t-test results from \code{\link[=compare_iphc_ser_B_C]{compare_iphc_ser_B_C()}}
 }
 \description{
 From species-specific set-level counts, derive all the required Series and
