@@ -685,13 +685,15 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     )
   }
 
-  g <- g + geom_path(
-    data = isobath, aes_string(
-      x = "X", y = "Y",
-      group = "paste(PID, SID)"
-    ),
-    inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
-  )
+  suppressWarnings({
+    suppressMessages({
+      g <- g + geom_path(
+        data = isobath, aes_string(
+          x = "X", y = "Y",
+          group = "paste(PID, SID)"
+        ),
+        inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+      )})})
 
   if (north_symbol) {
     g <- g + ggplot2::geom_segment(

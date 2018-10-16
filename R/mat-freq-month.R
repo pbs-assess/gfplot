@@ -13,19 +13,20 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
-  dat <- dat %>% filter(maturity_convention_code != 9) %>%
-    filter(maturity_code <= maturity_convention_maxvalue)
+  dat <- dat %>% filter(maturity_convention_code != 9)
+  dat <- dat %>% filter(maturity_convention_code != 9)
+  if ("maturity_convention_maxvalue" %in% names(dat))
+  dat <- dat %>% filter(maturity_code <= maturity_convention_maxvalue)
   dat <- dat %>%
     select(
       species_common_name,
       month,
       maturity_convention_code,
       maturity_code,
-      maturity_name,
       sex
     )
 
-  dat <- filter(dat, !is.na(maturity_name), !is.na(sex))
+  dat <- filter(dat, !is.na(sex))
 
   file <- system.file("extdata", "maturity_short_names.csv",
     package = "gfplot"
@@ -96,6 +97,8 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
 #' @param n_label_pos A numeric vector of length 2 that gives the y position of
 #'   the text describing the number of male and female samples within each month
 #'   bin.
+#' @param min_fish The minimum number of fish for the circles to be plotted for
+#'   a given month.
 #'
 #' @export
 #' @rdname plot_maturity_months
@@ -111,13 +114,14 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
 #'   plot_maturity_months()
 #' }
 plot_maturity_months <- function(dat,
-                                 max_size = 11,
+                                 max_size = 9,
                                  sex_gap = 0.2,
                                  fill_col = c("M" = "grey70", "F" = "black"),
                                  line_col = c("M" = "grey70", "F" = "black"),
                                  alpha = 0.8,
                                  title = "Maturity frequencies",
-                                 n_label_pos = c(0.7, 1)) {
+                                 n_label_pos = c(0.7, 1.3),
+                                 min_fish = 20) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
     mutate(
@@ -127,9 +131,11 @@ plot_maturity_months <- function(dat,
     group_by(sex, month, month_jitter, maturity) %>%
     summarise(.n = n()) %>%
     ungroup() %>%
+    group_by(month) %>%
     mutate(n_scaled = .n / max(.n)) %>%
     group_by(month, sex) %>%
-    mutate(total_month = sum(.n)) %>%
+    mutate(total_month = sum(.n),
+      n_scaled = ifelse(total_month >= min_fish, n_scaled, 0)) %>%
     ungroup()
 
   counts <- select(dat, sex, total_month, month_jitter) %>% unique()
@@ -140,7 +146,7 @@ plot_maturity_months <- function(dat,
 
   g <- ggplot(dat, aes_string("month_jitter", "maturity")) +
     ylab("") + xlab("") +
-    scale_x_continuous(breaks = seq(1, 12), labels = month.abb) +
+    scale_x_continuous(breaks = seq(1, 12), labels = month.abb, limits = c(1, 12)) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     theme(panel.spacing = unit(-0.1, "lines")) +
@@ -167,7 +173,8 @@ plot_maturity_months <- function(dat,
         ), size = 2.25, hjust = 0.5, show.legend = FALSE
       ) +
       coord_cartesian(
-        ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.5),
+        xlim = c(0.5, 12.5),
+        ylim = range(as.numeric(dat$maturity)) + c(-0.5, 1.7),
         expand = FALSE
       )
   }

@@ -1,10 +1,8 @@
 # gfplot: An R package for data extraction (at PBS) and plotting (of any) groundfish data
 
-[![Travis-CI Build
-Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot)
-[![Project Status: WIP - Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+<!-- [![Travis-CI Build Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot) -->
+
+<!-- [![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip) -->
 
 Facilitates the creation of an annual groundfish data synopsis report
 with [gfsynopsis](https://github.com/pbs-assess/gfsynopsis).
@@ -48,9 +46,10 @@ sort(fns[grepl("get", fns)])
 #> [15] "get_iphc_skates_info"   "get_major_areas"       
 #> [17] "get_management"         "get_management_areas"  
 #> [19] "get_most_common_level"  "get_other_surveys"     
-#> [21] "get_sara_dat"           "get_species_groups"    
-#> [23] "get_ssids"              "get_survey_index"      
-#> [25] "get_survey_samples"     "get_survey_sets"
+#> [21] "get_sara_dat"           "get_species"           
+#> [23] "get_species_groups"     "get_ssids"             
+#> [25] "get_survey_index"       "get_survey_samples"    
+#> [27] "get_survey_sets"
 ```
 
 Generic functions for any similarly formatted data:
