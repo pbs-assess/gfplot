@@ -176,7 +176,7 @@ boot_iphc <- function(ser_year_rates,
 ##'   Longest series is either
 ##'
 ##'   (i) Series AB (Series A with 1995 and 1996 appropriately scaled from
-##'   Series B) if [test_AB$p.value > 0.05], because the p-value means that we
+##'   Series B) if `test_AB$p.value > 0.05`, because the p-value means that we
 ##'   cannot reject the null hypothesis that the true difference
 ##'   in means of the rescaled (by their geometric means) Series A and B equals 0,
 ##'
@@ -209,9 +209,9 @@ calc_iphc_ser_AB <- function(series_all) {
                            I_tBootHigh = I_tBootHigh / G_B)
     # exp(mean(log(ser_B_scaled$I_tBootMean)))  # =1
 
-    t_AB <- t.test( ser_A_scaled$I_t20BootMean,
-                   ser_B_scaled$I_tBootMean,
-                   paired = TRUE)
+    t_AB <- stats::t.test( ser_A_scaled$I_t20BootMean,
+                          ser_B_scaled$I_tBootMean,
+                          paired = TRUE)
 
     if(t_AB$p.value >= 0.05){   # Can't reject null hypothesis that true difference
                                 #  in means equals 0
@@ -280,9 +280,9 @@ compare_iphc_ser_A_D <- function(series_all) {
                            I_t20BootLow = I_t20BootLow / G_D,
                            I_t20BootHigh = I_t20BootHigh / G_D)
 
-    t_AD <- t.test( ser_A_scaled$I_t20BootMean,
-                   ser_D_scaled$I_t20BootMean,
-                   paired = TRUE)
+    t_AD <- stats::t.test( ser_A_scaled$I_t20BootMean,
+                          ser_D_scaled$I_t20BootMean,
+                          paired = TRUE)
     list(t_AD = t_AD, G_A = G_A, G_D = G_D)
 }
 
@@ -321,9 +321,9 @@ compare_iphc_ser_B_C <- function(series_all) {
                            I_tBootLow = I_tBootLow / G_C,
                            I_tBootHigh = I_tBootHigh / G_C)
 
-    t_BC <- t.test( ser_B_scaled$I_tBootMean,
-                   ser_C_scaled$I_tBootMean,
-                   paired = TRUE)
+    t_BC <- stats::t.test( ser_B_scaled$I_tBootMean,
+                          ser_C_scaled$I_tBootMean,
+                          paired = TRUE)
     list(t_BC = t_BC, G_B = G_B, G_C = G_C)
 }
 

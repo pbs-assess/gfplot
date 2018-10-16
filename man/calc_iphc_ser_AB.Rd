@@ -24,7 +24,7 @@ means).
 Longest series is either
 
 (i) Series AB (Series A with 1995 and 1996 appropriately scaled from
-Series B) if \link{test_AB$p.value > 0.05}, because the p-value means that we
+Series B) if \code{test_AB$p.value > 0.05}, because the p-value means that we
 cannot reject the null hypothesis that the true difference
 in means of the rescaled (by their geometric means) Series A and B equals 0,
 

@@ -27,6 +27,7 @@
 #' @importFrom methods as
 #' @importFrom grDevices chull
 #' @importFrom boot boot.ci boot
+#' @importFrom stats t.test
 #' @import Rcpp
 NULL
 
@@ -136,6 +137,9 @@ if (getRversion() >= "2.15.1") {
     "hooksChumRatio", "hooksChumRatio20", "iphcUsabilityCode", "lastHook",
     "lastHookTemp", "lat", "long", "numOnHook", "numOnHook20", "obsHooksPerSkate",
     "obsHooksPerSkate20", "usable", "setID", "skateID",
+    "I_t20BootHigh", "I_t20BootLow", "I_t20BootMean", "I_t20SampleMean",
+    "I_tBootCV", "I_tBootHigh", "I_tBootLow", "I_tBootMean", "I_tSampleMean",
+    "NoYYR", "NoYYR20", "everything", "prop_empty_sets", "wcvi",
 
     # others
     "parent_rsty_id", "parent_taxonomic_unit", "row_version", "rsty_id",
