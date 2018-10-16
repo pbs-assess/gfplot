@@ -50,8 +50,11 @@ get_iphc_spp_name <- function(species = NULL){
 ##' @return IPHC species common names in countData (or if NULL names in all
 ##'  current 20-hook files) that do not show up in extdata/iphc-spp-names.csv.
 ##' @examples
+##' \dontrun{
 ##' check_iphc_spp_name()              # All the names not in our Type A list
 ##' check_iphc_spp_name(countData2013) # All the 2013 names not in our Type A list
+##' }
+
 
 ##' @rdname get_early_iphc
 ##' @export
@@ -112,8 +115,10 @@ check_iphc_spp_name <- function(countData=NULL){
 ##'
 ##' If no data at all on that species then C_it and N_it are NA's.
 ##' @examples
+##' \dontrun{
 ##' yyr1995 <- get_iphc_1995("yelloweye rockfish")
 ##' summary(yyr1995)
+##' }
 ##'
 ##' @rdname get_early_iphc
 ##' @export
@@ -170,10 +175,13 @@ get_iphc_1995 <- function(species){
 ##'
 ##' If no data on that species then C_it and N_it are NA's.
 ##' @examples
+##' \dontrun{
 ##' yyr1996to2002 <- get_iphc_1996to2002("yelloweye rockfish")
 ##' summary(yyr1996to2002)
 ##' dplyr::summarise(group_by(yyr1996to2002, year, num.stations = n()))
 ##' # number of stations in each year.
+##' }
+##'
 ##' @rdname get_early_iphc
 ##' @export
 get_iphc_1996to2002 <- function(species){
@@ -248,8 +256,10 @@ get_iphc_1996to2002 <- function(species){
 ##'
 ##' If no data at all on that species then C_it and N_it are NA's.
 ##' @examples
+##' \dontrun{
 ##' yyr2013 <- get_iphc_2013("yelloweye rockfish")
 ##' summary(yyr2013[["setVals2013"]])
+##' }
 ##'
 ##' @rdname get_early_iphc
 ##' @export

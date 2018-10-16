@@ -28,6 +28,7 @@
 #' @importFrom grDevices chull
 #' @importFrom boot boot.ci boot
 #' @importFrom stats t.test
+#' @importFrom utils read.csv
 #' @import Rcpp
 NULL
 
@@ -140,6 +141,8 @@ if (getRversion() >= "2.15.1") {
     "I_t20BootHigh", "I_t20BootLow", "I_t20BootMean", "I_t20SampleMean",
     "I_tBootCV", "I_tBootHigh", "I_tBootLow", "I_tBootMean", "I_tSampleMean",
     "NoYYR", "NoYYR20", "everything", "prop_empty_sets", "wcvi",
+    "catchCount", "effSkate",
+    "lon", "spNameIPHC", "specCount", "station",
 
     # others
     "parent_rsty_id", "parent_taxonomic_unit", "row_version", "rsty_id",
@@ -159,3 +162,4 @@ if (getRversion() >= "2.15.1") {
 
   ))
 }
+
