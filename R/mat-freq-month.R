@@ -146,7 +146,8 @@ plot_maturity_months <- function(dat,
 
   g <- ggplot(dat, aes_string("month_jitter", "maturity")) +
     ylab("") + xlab("") +
-    scale_x_continuous(breaks = seq(1, 12), labels = month.abb) +
+    scale_x_continuous(breaks = seq(1, 12), labels = month.abb,
+      breaks = month.abb) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     theme(panel.spacing = unit(-0.1, "lines")) +
