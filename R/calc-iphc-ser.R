@@ -369,8 +369,13 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##' test_AD: t-test results from [compare_iphc_ser_A_D()]
 ##'
 ##' test_BC: t-test results from [compare_iphc_ser_B_C()]
+##'
+##' If no observations at all for the species then return NA.
 calc_iphc_full_res <- function(set_counts, sp)
-    {
+   {
+        if(is.na(unique(c(set_counts$N_it20, set_counts$N_it20)))){
+           return(NA)
+        }
         series_all <- calc_iphc_ser_all(set_counts)
         iphc_ser_longest <- calc_iphc_ser_AB(series_all)
                                                    # list of longest series and
