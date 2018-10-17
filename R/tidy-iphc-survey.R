@@ -19,8 +19,8 @@
 #'   numbers per effective skate), E_it20, N_it20 and C_it20 are the same but
 #'   considering the first 20 hooks of each skate only, usable (whether the set
 #'   should be used, based on IPHC codes; some cannot be used for geospatial
-#'   analysis but are included here).
-#'
+#'   analysis but are included here). Returns single row with year 2003 and
+#'   all entries NA, so that functions that call this still work.
 #' @export
 #'
 #' @examples

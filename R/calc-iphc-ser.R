@@ -122,6 +122,17 @@ boot_iphc <- function(ser_year_rates,
                       num.boots = 10000,
                       seed_val = 42){
     if(dim(ser_year_rates)[2] != 2) stop("Tibble must have only two columns.")
+
+    if(is.na(unique(ser_year_rates[,2]))) {
+        return(  tibble(year = pull(ser_A_counts[1,1]),
+                        I_tBootMean = NA,
+                        I_tBootLow = NA,
+                        I_tBootHigh = NA,
+                        I_tBootCV = NA) )  # Just one row (year), even though gets
+                                           #  left_join'ed in calc_iphc_ser_all
+                                           #  with multiple years
+    }
+
     meanFun = function(x, I) mean(x[I])
 
     unique_years <- unique(ser_year_rates$year)
