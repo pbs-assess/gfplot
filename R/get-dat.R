@@ -525,10 +525,8 @@ get_iphc_hooks <- function(species, usability = NULL) {
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
   .d$species <- tolower(.d$species)
-#
-#    if (!is.null(usability)) {
-#     .d <- filter(.d, usability_code %in% usability)
-#   }
+  if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
+                                   # No data, give NA's
   as_tibble(.d)
 }
 

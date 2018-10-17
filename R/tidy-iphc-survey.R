@@ -32,6 +32,21 @@
 tidy_iphc_survey <- function(hook_level,
                              skate_info,
                              set_info) {
+    if(dim(hook_level)[1] == 1 & is.na(hook_level$numOnHook)){
+        return(  tibble(year = 2003,
+                        set = NA,
+                        station = NA,
+                        lat = NA,
+                        lon = NA,
+                        E_it = NA,
+                        N_it = NA,
+                        C_it = NA,
+                        E_it20 = NA,
+                        N_it20 = NA,
+                        C_it20 = NA,
+                        usable = NA) )
+        }
+
     # Append some skate info to the hook info, to then calculate counts on
     #  each skate for all hooks and counts for first 20 hooks
     hook_w_skate_info <- left_join(hook_level,
