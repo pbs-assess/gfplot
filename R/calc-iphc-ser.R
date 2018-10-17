@@ -78,8 +78,8 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
     # Series C
     ser_C_counts <- filter(set_counts_usable, year %in% years_full_coast$year,
                            !is.na(E_it))
-    #if(nrow(ser_C_counts) == 0) ser_C_counts[1,] <-
-    #                                c(2003, rep(NA, ncol(ser_C_counts)-1))
+    if(nrow(ser_C_counts) == 0) ser_C_counts[1,] <-
+                                    c(2003, rep(NA, ncol(ser_C_counts)-1))
 
     ser_C_boot <- boot_iphc(select(ser_C_counts,
                                    year,
@@ -374,7 +374,7 @@ compare_iphc_ser_B_C <- function(series_all) {
 calc_iphc_full_res <- function(set_counts, sp)
    {
         if(is.na(unique(c(set_counts$N_it20, set_counts$N_it20)))){
-           return(NA)
+           return(NULL)
         }
         series_all <- calc_iphc_ser_all(set_counts)
         iphc_ser_longest <- calc_iphc_ser_AB(series_all)
@@ -445,6 +445,16 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' }
 ##'
 format_iphc_longest <- function(ser_longest){
+      if(is.null(ser_longest)) {
+          return( tibble( survey_abbrev = "IPHC FISS",
+                          year = 2003,
+                          biomass = NA,
+                          lowerci = NA,
+                          upperci = NA,
+                          mean_cv = NA,
+                          num_sets = NA,
+                         num_pos_sets = NA ) )
+      }
       new_names <- select(ser_longest,
                           year = year,
                           biomass = I_t20BootMean,
@@ -478,6 +488,7 @@ format_iphc_longest <- function(ser_longest){
 ##'     of other surveys
 ##'
 ##'   g_iphc_index: plot of just the iphc data (useful for testing all species)
+##'     providing there are some data
 iphc_get_calc_plot <- function(sp)
 {
      set_counts <- get_all_iphc_set_counts(sp)
@@ -485,8 +496,10 @@ iphc_get_calc_plot <- function(sp)
      iphc_set_counts_sp_format <-
                              format_iphc_longest(iphc_set_counts_sp$ser_longest)
 
-     g_iphc_index <- plot_iphc_index(iphc_set_counts_sp_format)
-
+     if(!is.null(iphc_set_counts_sp)) {
+         g_iphc_index <- plot_iphc_index(iphc_set_counts_sp_format)} else {
+         g_iphc_index <- NULL
+     }
      list(iphc_set_counts_sp = iphc_set_counts_sp,
           iphc_set_counts_sp_format = iphc_set_counts_sp_format,
           g_iphc_index = g_iphc_index)
