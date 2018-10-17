@@ -10,7 +10,7 @@ plot_cpue_spatial(dat, bin_width = 7, n_minimum_vessels = 3,
   fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option =
   "D"), colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt",
   option = "D"), rotation_angle = 0, rotation_center = c(500, 5700),
-  fill_lab = "CPUE (kg/hr)", return_data = FALSE, min_cells = 5)
+  fill_lab = "CPUE (kg/hr)", return_data = FALSE, min_cells = 10)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
