@@ -54,8 +54,6 @@ get_iphc_spp_name <- function(species = NULL){
 ##' check_iphc_spp_name()              # All the names not in our Type A list
 ##' check_iphc_spp_name(countData2013) # All the 2013 names not in our Type A list
 ##' }
-
-
 ##' @rdname get_early_iphc
 ##' @export
 check_iphc_spp_name <- function(countData=NULL){
@@ -296,7 +294,7 @@ get_iphc_2013 <- function(species){
     setVals2013
 }
 
-##' Combine all the IPHC survey data for a given species
+##' Get and combine all the IPHC survey data for a given species
 ##'
 ##' Combine all the IPHC survey data for a given species, with catch rates
 ##'  calculated
@@ -316,7 +314,7 @@ get_iphc_2013 <- function(species){
 ##'           C_it20 (catch rate of 'species' as number per effective skate,
 ##'                   based on the first 20 hooks),
 ##'           usable (whether or not that station is usable, as deemed by IPHC),
-tidy_all_iphc_set_counts <- function(species){
+get_all_iphc_set_counts <- function(species){
     bind_rows(get_iphc_1995(species),
               get_iphc_1996to2002(species),
               get_iphc_2013(species),

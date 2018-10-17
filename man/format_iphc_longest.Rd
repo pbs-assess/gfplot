@@ -22,7 +22,7 @@ gets renames as `biomass' even though it's numbers per effective skate.
 \examples{
 \dontrun{
 sp = "yelloweye rockfish"
-set_counts <- tidy_all_iphc_set_counts(sp)
+set_counts <- get_all_iphc_set_counts(sp)
 iphc_set_counts_sp <- calc_iphc_full_res(set_counts, sp)
 format_iphc_longest(iphc_set_counts_sp$ser_longest)
 }

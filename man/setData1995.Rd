@@ -13,7 +13,6 @@
 \item{usable}{whether or not the set is usable, as determined by IPHC plus
 four extra that had no hooks enumerated except for Pacific
 Halibut, and so are not usable by us}
-
 }}
 \source{
 Originally from file 1995IPHCSetlineData.xlsx that Lynne Yamanaka

@@ -415,7 +415,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' @examples
 ##' \dontrun{
 ##' sp = "yelloweye rockfish"
-##' set_counts <- tidy_all_iphc_set_counts(sp)
+##' set_counts <- get_all_iphc_set_counts(sp)
 ##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts, sp)
 ##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
 ##' }
@@ -456,7 +456,7 @@ format_iphc_longest <- function(ser_longest){
 ##'   g_iphc_index: plot of just the iphc data (useful for testing all species)
 iphc_get_calc_plot <- function(sp)
 {
-     set_counts <- tidy_all_iphc_set_counts(sp)
+     set_counts <- get_all_iphc_set_counts(sp)
      iphc_set_counts_sp <- calc_iphc_full_res(set_counts, sp)
      iphc_set_counts_sp_format <-
                              format_iphc_longest(iphc_set_counts_sp$ser_longest)

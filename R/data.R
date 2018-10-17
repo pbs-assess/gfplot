@@ -77,7 +77,6 @@
 #'   \item{usable}{whether or not the set is usable, as determined by IPHC plus
 #'                 four extra that had no hooks enumerated except for Pacific
 #'                 Halibut, and so are not usable by us}
-#'
 #' }
 #' @source Originally from file 1995IPHCSetlineData.xlsx that Lynne Yamanaka
 #'         received from Aaron Ranta at the IPHC.
@@ -168,7 +167,8 @@
 #'   \item{avgDepthlon}{average depth of set}
 #'   \item{effSkateIPHC}{effective skate number of the set, as calculated by IPHC}
 #'   \item{E_it20}{effective skate number of the set based on the first 20 hooks
-#'     only, calculated as the (number of hooks observed)/(number of hooks retrieved) * effSkateIPHC
+#'     only, calculated as the (number of hooks observed)/
+#'     (number of hooks retrieved) * effSkateIPHC}
 #'   \item{usable}{whether or not the set is usable, as determined by IPHC}
 #' }
 #' @source Originally from file 2013.20-SetInfo.csv from a spreadsheet from the
