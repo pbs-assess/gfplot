@@ -1,8 +1,8 @@
 #' Calculate Series A, B, C and D from the IPHC data
 #'
 #' Calculate all four series for as many years as possible, including bootstrapped
-#'  values.
-#'
+#'  values. Series with no data are treated slightly different to each other
+#'  (ser_C ends up as an empty tibble, which may cause problems down the road).
 #' @details The four series are:
 #'
 #'  Series A: first 20 hooks from each skate, only north of WCVI
@@ -77,7 +77,10 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     # Series C
     ser_C_counts <- filter(set_counts_usable, year %in% years_full_coast$year,
-                                              !is.na(E_it))
+                           !is.na(E_it))
+    #if(nrow(ser_C_counts) == 0) ser_C_counts[1,] <-
+    #                                c(2003, rep(NA, ncol(ser_C_counts)-1))
+
     ser_C_boot <- boot_iphc(select(ser_C_counts,
                                    year,
                                    C_it))
@@ -123,8 +126,13 @@ boot_iphc <- function(ser_year_rates,
                       seed_val = 42){
     if(dim(ser_year_rates)[2] != 2) stop("Tibble must have only two columns.")
 
-    if(is.na(unique(ser_year_rates[,2]))) {
-        return(  tibble(year = pull(ser_A_counts[1,1]),
+    return_NA = FALSE
+    if( dim(ser_year_rates)[1] == 0 ) {
+           return_NA = TRUE } else {
+        if(is.na(unique(ser_year_rates[,2]) ) ) {
+           return_NA = TRUE } }
+    if(return_NA) {
+        return(  tibble(year = 2003,      # pull(ser_A_counts[1,1]),
                         I_tBootMean = NA,
                         I_tBootLow = NA,
                         I_tBootHigh = NA,
