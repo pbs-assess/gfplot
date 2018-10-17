@@ -47,7 +47,7 @@ plot_cpue_spatial <-
              rotation_center = c(500, 5700),
              fill_lab = "CPUE (kg/hr)",
              return_data = FALSE,
-             min_cells = 5) {
+             min_cells = 10) {
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
     plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
