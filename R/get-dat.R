@@ -828,7 +828,7 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
     out$cpue_spatial       <- get_cpue_spatial(this_sp)
     out$cpue_spatial_ll    <- get_cpue_spatial_ll(this_sp)
     out$survey_index       <- get_survey_index(this_sp)
-    out$management         <- get_management(this_sp)
+    # out$management         <- get_management(this_sp)
     out$age_precision      <- get_age_precision(this_sp)
 
     saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
