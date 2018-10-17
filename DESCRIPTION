@@ -1,6 +1,6 @@
 Package: gfplot
 Title: Data Extraction and Plotting for DFO PBS Groundfish Stocks
-Version: 0.1.3
+Version: 0.1.4
 Authors@R: c(person(c("Sean", "C."), "Anderson",
     email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
     person(c("Elise", "A."), "Keppel", role = "aut"),
@@ -50,7 +50,7 @@ Imports:
     INLA,
     DLMtool,
     tweedie,
-    sdmTMB,
+    sdmTMB (>= 0.0.0.9001),
     ggrepel
 Remotes: github::pbs-software/pbs-data/PBSdata, github::seananderson/sdmTMB
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
