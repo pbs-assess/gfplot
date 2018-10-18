@@ -127,10 +127,11 @@ boot_iphc <- function(ser_year_rates,
     if(dim(ser_year_rates)[2] != 2) stop("Tibble must have only two columns.")
 
     return_NA = FALSE
-    if( dim(ser_year_rates)[1] == 0 ) {
+    if( nrow(ser_year_rates) == 0 ) {
            return_NA = TRUE } else {
-        if(is.na(unique(ser_year_rates[,2]) ) ) {
-           return_NA = TRUE } }
+       if( nrow(ser_year_rates) == 1){
+           if(is.na((ser_year_rates[1,2]) ) ) {
+              return_NA = TRUE } } }
     if(return_NA) {
         return(  tibble(year = 2003,      # pull(ser_A_counts[1,1]),
                         I_tBootMean = NA,
@@ -373,9 +374,11 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##' If no observations at all for the species then return NA.
 calc_iphc_full_res <- function(set_counts, sp)
    {
-        if(is.na(unique(c(set_counts$N_it20, set_counts$N_it20)))){
-           return(NULL)
-        }
+       if( length(unique(c(set_counts$N_it, set_counts$N_it20))) == 1) {
+           if( is.na(unique(c(set_counts$N_it, set_counts$N_it20)))){
+               return(NULL)
+           }
+       }
         series_all <- calc_iphc_ser_all(set_counts)
         iphc_ser_longest <- calc_iphc_ser_AB(series_all)
                                                    # list of longest series and
