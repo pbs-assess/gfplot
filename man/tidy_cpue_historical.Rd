@@ -62,7 +62,7 @@ trips in 1991 and after to create a consistent form of data.
 }
 \examples{
 \donttest{
-get_cpue_historic(end_year = 2016) \%>\%
-  tidy_cpue_historic(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
+get_cpue_historical(end_year = 2016) \%>\%
+  tidy_cpue_historical(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 }
 }

@@ -25,7 +25,8 @@ geospatial analysis but are included here).
 }
 \description{
 Calculate all four series for as many years as possible, including bootstrapped
-values.
+values. Series with no data are treated slightly different to each other
+(ser_C ends up as an empty tibble, which may cause problems down the road).
 }
 \details{
 The four series are:

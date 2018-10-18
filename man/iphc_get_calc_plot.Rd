@@ -19,6 +19,7 @@ iphc_set_counts_sp_format: just the longest series, returned from
 of other surveys
 
 g_iphc_index: plot of just the iphc data (useful for testing all species)
+providing there are some data
 }
 \description{
 Get data, do calculations and plot longest series for the IPHC survey for

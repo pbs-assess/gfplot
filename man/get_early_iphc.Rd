@@ -32,7 +32,7 @@ if species is NULL
 then a data.frame of all species names (the file iphc-spp-names.csv).
 
 IPHC species common names in countData (or if NULL names in all
-current 20-hook files) that do not show up in extdata/iphc-spp-names.csv.
+current set-level files) that do not show up in extdata/iphc-spp-names.csv.
 
 Tibble contains year (1995), station name, lat, lon,
 E_it (effective skate number for that station, based on all
@@ -87,8 +87,8 @@ Those data are not all in GFBio.
 
 Use the gfplot species common name to extract IPHC data.
 
-For 20-hook data the counts are not in GFbio but in data/. When
-getting a new dataset (unlikely, unless we only have 20-hook data again)
+For set-level data the counts are not in GFbio but in data/. When
+getting a new dataset for which we do not have hook level data
 then run this to check that all IPHC names have a GFbio name.
 
 Details The IPHC report for 1996 mentions 120 stations and does not use the
@@ -110,6 +110,11 @@ products themselves or can be fed into automated DFO Pacific groundfish data
 synopsis report production.
 }
 \examples{
+\dontrun{
+get_iphc_spp_name("redbanded rockfish")
+get_iphc_spp_name("made up name")
+testthat::expect_error(get_iphc_spp_name(c("redbanded rockfish", "yellowmouth rockfish")))
+}
 \dontrun{
 check_iphc_spp_name()              # All the names not in our Type A list
 check_iphc_spp_name(countData2013) # All the 2013 names not in our Type A list

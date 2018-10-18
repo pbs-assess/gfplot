@@ -26,6 +26,7 @@
 \alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
+\alias{cache_pbs_data_iphc}
 \title{Get PBS data}
 \usage{
 get_ssids()
@@ -80,6 +81,9 @@ get_sara_dat()
 cache_pbs_data(species, file_name = NULL, path = ".",
   compress = FALSE, unsorted_only = TRUE, historic_cpue = FALSE,
   survey_sets = FALSE, verbose = TRUE)
+
+cache_pbs_data_iphc(species, file_name = NULL, path = ".",
+  compress = FALSE)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
@@ -141,6 +145,14 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
+
+\item{file_name}{Optional filename(s) for the cached file. Defaults to the
+same as the \code{species} argument.}
+
+\item{path}{The folder where the cached data will be saved.}
+
+\item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
+reading and writing at the expense of disk space.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
@@ -150,6 +162,13 @@ containing a data frame from a \code{get_*} function. The element name of the li
 reflects the function name with the \code{get_} part removed. For example, the
 output from \code{\link[=get_survey_samples]{get_survey_samples()}} is in a list element named
 \code{survey_samples()}.
+
+The \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}} function returns a data frame.
+The \code{\link[=cache_pbs_data_iphc]{cache_pbs_data_iphc()}}
+function writes an \code{.rds} file to \code{path} for each specified species. A data
+object for a single species is a named list object with one element
+containing the data frame from \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}}.
+The element name of the list is \code{set_counts}.
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific
@@ -204,7 +223,10 @@ needed for the hooks per skate
 \item \code{get_iphc_hooks()} extracts IPHC survey data at the hook level for given
 species, from 2003 to present (excluding 2013 which is not in database)
 \item \code{cache_pbs_data()} runs all 'get' functions in the gfplot package
-and caches extracted data to a given folder
+(except those specific to IPHC data) and caches extracted data to a given
+folder
+\item \code{cache_pbs_data_iphc()} runs \code{get_all_iphc_set_counts} for a given species
+and caches extracted data to a give folder
 }
 
 This \code{\link[=cache_pbs_data]{cache_pbs_data()}} function caches data from
@@ -218,6 +240,9 @@ This \code{\link[=cache_pbs_data]{cache_pbs_data()}} function caches data from
 \item \code{\link[=get_age_precision]{get_age_precision()}}
 \item and optionally from \code{\link[=get_survey_sets]{get_survey_sets()}} and \code{\link[=get_cpue_historic]{get_cpue_historic()}}
 }
+
+This \code{\link[=cache_pbs_data_iphc]{cache_pbs_data_iphc()}} function caches the data for the given
+species from \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}}
 }
 \section{Note}{
 
@@ -256,4 +281,10 @@ get_cpue_index(gear = "bottom trawl", min_cpue_year = 2012)
 get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
 }
 
+\dontrun{
+cache_pbs_data_iphc("redbanded rockfish")
+cache_pbs_data_iphc(c("redbanded rockfish",
+                      "pacific ocean perch",
+                      "made up species") )
+}
 }

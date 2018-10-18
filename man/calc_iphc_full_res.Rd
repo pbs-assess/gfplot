@@ -28,6 +28,8 @@ test_AB: t-test results from \code{\link[=calc_iphc_ser_AB]{calc_iphc_ser_AB()}}
 test_AD: t-test results from \code{\link[=compare_iphc_ser_A_D]{compare_iphc_ser_A_D()}}
 
 test_BC: t-test results from \code{\link[=compare_iphc_ser_B_C]{compare_iphc_ser_B_C()}}
+
+If no observations at all for the species then return NA.
 }
 \description{
 From species-specific set-level counts, derive all the required Series and
