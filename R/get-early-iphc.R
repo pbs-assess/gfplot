@@ -27,7 +27,7 @@ NULL
 ##' @export
 get_iphc_spp_name <- function(species = NULL){
     iphc_names <- read.csv(system.file("extdata/iphc-spp-names.csv",
-                                       package = "yeye15reproduce"),
+                                       package = "gfplot"),
                            comment.char = "#",
                            as.is = TRUE)
     if(is.null(species)){
