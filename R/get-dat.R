@@ -883,6 +883,9 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
 #' @examples
 #' \dontrun{
 #' cache_pbs_data_iphc("redbanded rockfish")
+#' cache_pbs_data_iphc(c("redbanded rockfish",
+#'                       "pacific ocean perch",
+#'                       "made up species") )
 #' }
 cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
   compress = FALSE) {
