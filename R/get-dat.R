@@ -51,8 +51,10 @@
 #' * `get_iphc_hooks()` extracts IPHC survey data at the hook level for given
 #'    species, from 2003 to present (excluding 2013 which is not in database)
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
-#'    and caches extracted data to a given folder
-#'
+#'    (except those specific to IPHC data) and caches extracted data to a given
+#'    folder
+#' * `cache_pbs_data_iphc()` runs `get_all_iphc_set_counts` for a given species
+#'    and caches extracted data to a give folder
 #' @section Note:
 #' `get_*` functions only extract data when performed on a computer connected to
 #' the Pacific Biological Station DFO network.
@@ -860,4 +862,50 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
   }
 
   message("All data extracted and saved in the folder `", path, "`.")
+}
+
+#' @param file_name Optional filename(s) for the cached file. Defaults to the
+#'   same as the `species` argument.
+#' @param path The folder where the cached data will be saved.
+#' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
+#'   reading and writing at the expense of disk space.
+#' @export
+#' @return The [get_all_iphc_set_counts()] function returns a data frame.
+#'  The [cache_pbs_data_iphc()]
+#' function writes an `.rds` file to `path` for each specified species. A data
+#' object for a single species is a named list object with one element
+#' containing the data frame from [get_all_iphc_set_counts()].
+#' The element name of the list ***SHOULD BE `all_iphc_set_counts.
+#' @details
+#' This [cache_pbs_data_iphc()] function caches the data for the given
+#'   species from [get_all_iphc_set_counts()]
+#' @rdname get_data
+cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
+  compress = FALSE) {
+
+  if (!sql_server_accessible()) {
+    stop("SQL server is not accessible. Either you are not on the DFO network or your",
+         " Rprofile file does not contain the required variables options pbs.ip,",
+         " pbs.uid, and pbs.pwd. On Windows, this file is located at",
+         " C:\\R\\etc\\Rprofile.site")
+  }
+  dir.create(path, showWarnings = FALSE)
+
+  for (sp_i in seq_along(species)) {
+    this_sp <- species[[sp_i]]
+
+    if (is.null(file_name))
+      this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+    else
+      this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
+
+    message("Extracting IPHC data for ", this_sp)
+
+    out <- list()
+    out$set_counts         <- get_all_iphc_set_counts(sp)
+
+    saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
+      compress = compress)
+  }
+  message("All IPHC data extracted and saved in the folder `", path, "`.")
 }
