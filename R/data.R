@@ -208,3 +208,21 @@
 #'   Edwards preprocessed in iphc9602.Snw for Yelloweye 2014 assessment, and then
 #'   tidied further in private yeye15reproduce repository.
 "data1996to2002"
+
+
+#' Conversion from GFbio names to IPHC species names (for data not in GFbio)
+#'
+#' A data fraom with the GFbio name and the corresponding name used by IPHC in
+#'  the datasets that are at the set level and so not extracted from GFbio.
+#' @format A csv file:
+#' \describe{
+#'   \item{species_common_nameyear}{GFbio species common name}
+#'   \item{iphc_common_name}{IPHC data sets species common name}
+#' }
+#' @source Created manually by Andrew Edwards. Most are obvious. If get a new
+#'   set-level dataset from IPHC (that doesn't get put into GFbio) then see
+#'   [check_iphc_spp_name()].
+#'   Currently this only has Type A species ****Andy to update with Type B.
+#'   **And may also want "Hook with Bait" if different in GFbio******
+#' @name iphc-spp-names.csv
+NULL

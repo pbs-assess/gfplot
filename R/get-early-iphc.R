@@ -16,7 +16,7 @@
 ##' @name get_early_iphc
 NULL
 
-##' Get IPHC species common name given gfplot species common name
+##' Get IPHC species common name given a single gfplot species common name
 ##'
 ##' Use the gfplot species common name to extract IPHC data.
 ##' @return IPHC species common name, or NA if species is not in IPHC data
@@ -24,6 +24,12 @@ NULL
 ##' if species is NULL
 ##' then a data.frame of all species names (the file iphc-spp-names.csv).
 ##' @rdname get_early_iphc
+##' @examples
+##' \dontrun{
+##' get_iphc_spp_name("redbanded rockfish")
+##' get_iphc_spp_name("made up name")
+##' testthat::expect_error(get_iphc_spp_name(c("redbanded rockfish", "yellowmouth rockfish")))
+##' }
 ##' @export
 get_iphc_spp_name <- function(species = NULL){
     iphc_names <- read.csv(system.file("extdata/iphc-spp-names.csv",
@@ -32,23 +38,26 @@ get_iphc_spp_name <- function(species = NULL){
                            as.is = TRUE)
     if(is.null(species)){
         return(iphc_names)
-    } else
-    {
+    } else {
+        if(length(species) > 1){
+            stop("get_iphc_spp_name() only works for one species")
+        } else {
         name <- iphc_names[which(iphc_names$species_common_name == species),
                        "iphc_common_name"]
         if(length(name) == 0) { name = NA }  # species is not in .csv
         return(name)
+        }
     }
 }
 
-##' Check whether the names in a new IPHC data are already included
+##' Check whether the names in a new IPHC data set are already included
 ##'
-##' For 20-hook data the counts are not in GFbio but in data/. When
-##'  getting a new dataset (unlikely, unless we only have 20-hook data again)
+##' For set-level data the counts are not in GFbio but in data/. When
+##'  getting a new dataset for which we do not have hook level data
 ##'  then run this to check that all IPHC names have a GFbio name.
 ##' @param countData A new IPHC dataset to check all species names against.
 ##' @return IPHC species common names in countData (or if NULL names in all
-##'  current 20-hook files) that do not show up in extdata/iphc-spp-names.csv.
+##'  current set-level files) that do not show up in extdata/iphc-spp-names.csv.
 ##' @examples
 ##' \dontrun{
 ##' check_iphc_spp_name()              # All the names not in our Type A list
@@ -58,7 +67,7 @@ get_iphc_spp_name <- function(species = NULL){
 ##' @export
 check_iphc_spp_name <- function(countData=NULL){
     iphc_names <- read.csv(system.file("extdata/iphc-spp-names.csv",
-                                       package = "yeye15reproduce"),
+                                       package = "gfplot"),
                            comment.char = "#",
                            as.is = TRUE)
     not_species <- c("Missing Hook/Gangion",
