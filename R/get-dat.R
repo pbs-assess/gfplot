@@ -875,11 +875,15 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
 #' function writes an `.rds` file to `path` for each specified species. A data
 #' object for a single species is a named list object with one element
 #' containing the data frame from [get_all_iphc_set_counts()].
-#' The element name of the list ***SHOULD BE `all_iphc_set_counts.
+#' The element name of the list is `set_counts`.
 #' @details
 #' This [cache_pbs_data_iphc()] function caches the data for the given
 #'   species from [get_all_iphc_set_counts()]
 #' @rdname get_data
+#' @examples
+#' \dontrun{
+#' cache_pbs_data_iphc("redbanded rockfish")
+#' }
 cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
   compress = FALSE) {
 
@@ -894,15 +898,16 @@ cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
   for (sp_i in seq_along(species)) {
     this_sp <- species[[sp_i]]
 
-    if (is.null(file_name))
-      this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
-    else
-      this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
+    if (is.null(file_name)) {
+        this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+    } else {
+        this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
+    }      # Not sure why Sean's works in cache_pbs_data without the { }
 
     message("Extracting IPHC data for ", this_sp)
 
     out <- list()
-    out$set_counts         <- get_all_iphc_set_counts(sp)
+    out$set_counts <- get_all_iphc_set_counts(this_sp)
 
     saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
       compress = compress)

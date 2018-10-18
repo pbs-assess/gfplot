@@ -492,6 +492,7 @@ format_iphc_longest <- function(ser_longest){
 ##'
 ##'   g_iphc_index: plot of just the iphc data (useful for testing all species)
 ##'     providing there are some data
+##' @export
 iphc_get_calc_plot <- function(sp)
 {
      set_counts <- get_all_iphc_set_counts(sp)
