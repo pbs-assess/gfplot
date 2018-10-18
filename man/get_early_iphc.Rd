@@ -23,7 +23,9 @@ get_iphc_2013(species)
 \item{species}{Species common name (as used by gfplot). If NULL then
 get_iphc_spp_name returns the full data frame of names (iphc-spp-names-csv).}
 
-\item{countData}{A new IPHC dataset to check all species names against.}
+\item{countData}{A new IPHC dataset to check all species names against, if
+NULL then returns all IPHC names in the saved set-level data that are not
+in our Type A list***B soon***.}
 }
 \value{
 IPHC species common name, or NA if species is not in IPHC data
@@ -31,8 +33,8 @@ IPHC species common name, or NA if species is not in IPHC data
 if species is NULL
 then a data.frame of all species names (the file iphc-spp-names.csv).
 
-IPHC species common names in countData (or if NULL names in all
-current set-level files) that do not show up in extdata/iphc-spp-names.csv.
+IPHC species common names in countData (or if NULL IPHC species names
+in saved set-level IPHC data that are not in iphc-spp-names.csv.
 
 Tibble contains year (1995), station name, lat, lon,
 E_it (effective skate number for that station, based on all
@@ -116,8 +118,10 @@ get_iphc_spp_name("made up name")
 testthat::expect_error(get_iphc_spp_name(c("redbanded rockfish", "yellowmouth rockfish")))
 }
 \dontrun{
-check_iphc_spp_name()              # All the names not in our Type A list
-check_iphc_spp_name(countData2013) # All the 2013 names not in our Type A list
+check_iphc_spp_name()              # All the IPHC names not in
+                                   #  iphc-spp-names.csv
+check_iphc_spp_name(countData2013) # All the 2013 IPHC names not in
+                                   #  iphc-spp-names.csv
 }
 \dontrun{
 yyr1995 <- get_iphc_1995("yelloweye rockfish")

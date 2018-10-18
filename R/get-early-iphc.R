@@ -55,13 +55,17 @@ get_iphc_spp_name <- function(species = NULL){
 ##' For set-level data the counts are not in GFbio but in data/. When
 ##'  getting a new dataset for which we do not have hook level data
 ##'  then run this to check that all IPHC names have a GFbio name.
-##' @param countData A new IPHC dataset to check all species names against.
-##' @return IPHC species common names in countData (or if NULL names in all
-##'  current set-level files) that do not show up in extdata/iphc-spp-names.csv.
+##' @param countData A new IPHC dataset to check all species names against, if
+##'  NULL then returns all IPHC names in the saved set-level data that are not
+##'  in our Type A list***B soon***.
+##' @return IPHC species common names in countData (or if NULL IPHC species names
+##'  in saved set-level IPHC data that are not in iphc-spp-names.csv.
 ##' @examples
 ##' \dontrun{
-##' check_iphc_spp_name()              # All the names not in our Type A list
-##' check_iphc_spp_name(countData2013) # All the 2013 names not in our Type A list
+##' check_iphc_spp_name()              # All the IPHC names not in
+##'                                    #  iphc-spp-names.csv
+##' check_iphc_spp_name(countData2013) # All the 2013 IPHC names not in
+##'                                    #  iphc-spp-names.csv
 ##' }
 ##' @rdname get_early_iphc
 ##' @export

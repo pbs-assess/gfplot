@@ -864,11 +864,6 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
   message("All data extracted and saved in the folder `", path, "`.")
 }
 
-#' @param file_name Optional filename(s) for the cached file. Defaults to the
-#'   same as the `species` argument.
-#' @param path The folder where the cached data will be saved.
-#' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
-#'   reading and writing at the expense of disk space.
 #' @export
 #' @return The [get_all_iphc_set_counts()] function returns a data frame.
 #'  The [cache_pbs_data_iphc()]

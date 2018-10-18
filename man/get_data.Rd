@@ -145,14 +145,6 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
-
-\item{file_name}{Optional filename(s) for the cached file. Defaults to the
-same as the \code{species} argument.}
-
-\item{path}{The folder where the cached data will be saved.}
-
-\item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
-reading and writing at the expense of disk space.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
