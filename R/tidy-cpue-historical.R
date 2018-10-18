@@ -41,11 +41,11 @@ clean_localities <- function(x) {
 #'
 #' @examples
 #' \donttest{
-#' get_cpue_historic(end_year = 2016) %>%
-#'   tidy_cpue_historic(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
+#' get_cpue_historical(end_year = 2016) %>%
+#'   tidy_cpue_historical(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 #' }
 #' @export
-tidy_cpue_historic <- function(dat,
+tidy_cpue_historical <- function(dat,
                             species_common,
                             year_range = c(1956, 1995),
                             area_grep_pattern = c("3[CD]+", "5[ABCDE]+"),
@@ -161,4 +161,12 @@ tidy_cpue_historic <- function(dat,
   } else {
     dplyr::as_tibble(cpue_arith)
   }
+}
+
+#' @export
+#' @rdname tidy_cpue_historical
+tidy_cpue_historic <- function(...) {
+  warning("Depreciated: Please use the grammatically correct ",
+    "version tidy_cpue_historical()")
+  tidy_cpue_historical(...)
 }
