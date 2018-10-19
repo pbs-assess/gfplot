@@ -4,13 +4,11 @@
 \alias{calc_iphc_full_res}
 \title{Do all the calculations for the IPHC survey.}
 \usage{
-calc_iphc_full_res(set_counts, sp)
+calc_iphc_full_res(set_counts)
 }
 \arguments{
 \item{set_counts}{species-specific set-level counts from \code{\link[=tidy_iphc_survey]{tidy_iphc_survey()}}
 or **other.}
-
-\item{sp}{Species names (as used in gfplot).}
 }
 \value{
 List containing
