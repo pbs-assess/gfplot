@@ -354,7 +354,6 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##'  test their equivalence.
 ##' @param set_counts species-specific set-level counts from [tidy_iphc_survey()]
 #'  or **other.
-##' @param sp Species names (as used in gfplot).
 ##' @return List containing
 ##'
 ##' ser_longest: tibble for the longest time series that can be made for this
@@ -372,7 +371,7 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##' test_BC: t-test results from [compare_iphc_ser_B_C()]
 ##'
 ##' If no observations at all for the species then return NA.
-calc_iphc_full_res <- function(set_counts, sp)
+calc_iphc_full_res <- function(set_counts)
    {
        if( length(unique(c(set_counts$N_it, set_counts$N_it20))) == 1) {
            if( is.na(unique(c(set_counts$N_it, set_counts$N_it20)))){
