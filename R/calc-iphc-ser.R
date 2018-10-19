@@ -48,6 +48,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
                        Sets = n(),
                        NoYYR20 = sum(C_it20 == 0) / n(),
                        I_t20SampleMean = mean(C_it20)) %>%
+             filter(!is.na(I_t20SampleMean)) %>%   # NA's got carried through
              left_join(ser_A_boot, by = "year")
     names(ser_A)[ names(ser_A) == "I_tBootMean"] = "I_t20BootMean"
     names(ser_A)[ names(ser_A) == "I_tBootLow"] = "I_t20BootLow"
