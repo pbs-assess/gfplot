@@ -127,13 +127,16 @@ boot_iphc <- function(ser_year_rates,
     if(dim(ser_year_rates)[2] != 2) stop("Tibble must have only two columns.")
 
     return_NA = FALSE
+
     if( nrow(ser_year_rates) == 0 ) {
-           return_NA = TRUE } else {
+          return_NA = TRUE } else {
+      # Get rid of the NA years (should make the if below redundant)
+      ser_year_rates = ser_year_rates[which(!is.na(ser_year_rates[,2])), ]
        if( nrow(ser_year_rates) == 1){
            if(is.na((ser_year_rates[1,2]) ) ) {
               return_NA = TRUE } } }
     if(return_NA) {
-        return(  tibble(year = 2003,      # pull(ser_A_counts[1,1]),
+        return(  tibble(year = 2003,
                         I_tBootMean = NA,
                         I_tBootLow = NA,
                         I_tBootHigh = NA,
@@ -442,7 +445,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' \dontrun{
 ##' sp = "yelloweye rockfish"
 ##' set_counts <- get_all_iphc_set_counts(sp)
-##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts, sp)
+##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
 ##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
 ##' }
 ##'
@@ -495,7 +498,7 @@ format_iphc_longest <- function(ser_longest){
 iphc_get_calc_plot <- function(sp)
 {
      set_counts <- get_all_iphc_set_counts(sp)
-     iphc_set_counts_sp <- calc_iphc_full_res(set_counts, sp)
+     iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
      iphc_set_counts_sp_format <-
                              format_iphc_longest(iphc_set_counts_sp$ser_longest)
 
