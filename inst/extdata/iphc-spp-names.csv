@@ -1,10 +1,9 @@
-# NA means haven't seen yet in IPHC data
+# NA means haven't seen yet in the non-GFbio IPHC data
 species_common_name,iphc_common_name
 north pacific spiny dogfish,Spiny Dogfish
 big skate,Big Skate
 longnose skate,Longnose Skate
 pacific cod,Pacific Cod
-pacific hake,Pacific Hake
 walleye pollock,Walleye Pollock
 rougheye/blackspotted rockfish complex,Rougheye Rockfish
 pacific ocean perch,NA
@@ -31,7 +30,7 @@ rex sole,NA
 southern rock sole,Rock Sole
 dover sole,Dover Sole
 english sole,English Sole
-sixgill shark,Sixgill Shark
+bluntnose sixgill shark,Sixgill Shark
 basking shark,NA
 salmon shark,NA
 brown cat shark,NA
