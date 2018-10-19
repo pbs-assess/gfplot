@@ -57,9 +57,11 @@ get_iphc_spp_name <- function(species = NULL){
 ##'  then run this to check that all IPHC names have a GFbio name.
 ##' @param countData A new IPHC dataset to check all species names against, if
 ##'  NULL then returns all IPHC names in the saved set-level data that are not
-##'  in our Type A list***B soon***.
+##'  in our list of Type A or Type B species given in gfsynopsis.
+##' @param ignore_obvious Whether or not to ignore some obvious non-groundfish
+##'  species (listed in function) when countData is NULL.
 ##' @return IPHC species common names in countData (or if NULL IPHC species names
-##'  in saved set-level IPHC data that are not in iphc-spp-names.csv.
+##'  in saved set-level IPHC data that are not in iphc-spp-names.csv).
 ##' @examples
 ##' \dontrun{
 ##' check_iphc_spp_name()              # All the IPHC names not in
@@ -69,22 +71,56 @@ get_iphc_spp_name <- function(species = NULL){
 ##' }
 ##' @rdname get_early_iphc
 ##' @export
-check_iphc_spp_name <- function(countData=NULL){
+check_iphc_spp_name <- function(countData=NULL, ignore_obvious=TRUE){
     iphc_names <- read.csv(system.file("extdata/iphc-spp-names.csv",
                                        package = "gfplot"),
                            comment.char = "#",
                            as.is = TRUE)
-    not_species <- c("Missing Hook/Gangion",
-                     "Bent Hook",
-                     "Hook with Skin",
-                     "Empty Hook",
-                     "Hook with Bait",
-                     "Bent/Broken/Missing")
+    ignore <- c("Missing Hook/Gangion",
+                "Bent Hook",
+                "Hook with Skin",
+                "Empty Hook",
+                "Hook with Bait",
+                "Bent/Broken/Missing")
+    if(ignore_obvious){
+        ignore <- c(ignore,
+                    "unident. Starfish",
+                    "Scallop",
+                    "Sea Anemone",
+                    "Unknown/Unspecified",
+                    "Sea Pen",
+                    "Oregon Rock Crab",
+                    "Shells",
+                    "Box Crab",
+                    "unident. Sponge",
+                    "Octopus",
+                    "unident. Invertebrate",
+                    "Sea Cucumber",
+                    "Inanimate Object",
+                    "Gastropod",
+                    "Sea Urchin",
+                    "unident. Coral",
+                    "Skate Egg Case",
+                    "unident. Crab",
+                    "Tunicates",
+                    "(none)",
+                    "Red King Crab",
+                    "Black-footed Albatross",
+                    "Nudibranch",
+                    "Bivalve",
+                    "Steller Sea Lion",
+                    "Red Tree Coral",
+                    "Solaster sp (starfish)",
+                    "Sunflower Sea Star",
+                    "Gorgonian coral",
+                    "Giant Pacific Octopus",
+                    "Fish-eating Star")
+        }
     if(!is.null(countData)) {
         data_names <- unique(countData$spNameIPHC)
         new_missing_names <- data_names[!(data_names %in%
                                           unique(iphc_names$iphc_common_name))]
-        new_missing_names <- new_missing_names[!(new_missing_names %in% not_species)]
+        new_missing_names <- new_missing_names[!(new_missing_names %in% ignore)]
         return(new_missing_names)
     } else
     {
@@ -97,7 +133,7 @@ check_iphc_spp_name <- function(countData=NULL){
                           unique()
         old_missing_names <- data_names_all[!(data_names_all %in%
                                               unique(iphc_names$iphc_common_name))]
-        old_missing_names <- old_missing_names[!(old_missing_names %in% not_species)]
+        old_missing_names <- old_missing_names[!(old_missing_names %in% ignore)]
         return(old_missing_names)
     }
 }
