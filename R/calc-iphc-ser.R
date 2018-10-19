@@ -48,7 +48,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
                        Sets = n(),
                        NoYYR20 = sum(C_it20 == 0) / n(),
                        I_t20SampleMean = mean(C_it20)) %>%
-             filter(!is.na(I_t20SampleMean)) %>%   # NA's got carried through
+             filter(!is.na(I_t20SampleMean)) %>%   # NA's got carried through, thinking may get error if this ends up empty
              left_join(ser_A_boot, by = "year")
     names(ser_A)[ names(ser_A) == "I_tBootMean"] = "I_t20BootMean"
     names(ser_A)[ names(ser_A) == "I_tBootLow"] = "I_t20BootLow"
@@ -68,6 +68,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
                        Sets = n(),
                        NoYYR = sum(C_it == 0) / n(),
                        I_tSampleMean = mean(C_it))  %>%
+             filter(!is.na(I_tSampleMean)) %>%   # NA's got carried through
              left_join(ser_B_boot, by = "year")
 
     # Years that full coast is covered (have stations off WCVI):
@@ -90,6 +91,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
                        Sets = n(),
                        NoYYR = sum(C_it == 0) / n(),
                        I_tSampleMean = mean(C_it)) %>%
+             filter(!is.na(I_tSampleMean)) %>%   # NA's may have got carried through
              left_join(ser_C_boot, by = "year")
 
     # Series D
@@ -104,7 +106,8 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
                        Sets = n(),
                        NoYYR20 = sum(C_it20 == 0) / n(),
                        I_t20SampleMean = mean(C_it20)) %>%
-             left_join(ser_D_boot, by = "year")
+          filter(!is.na(I_t20SampleMean)) %>%   # NA's may have got carried through
+          left_join(ser_D_boot, by = "year")
     names(ser_D)[ names(ser_D) == "I_tBootMean"] = "I_t20BootMean"
     names(ser_D)[ names(ser_D) == "I_tBootLow"] = "I_t20BootLow"
     names(ser_D)[ names(ser_D) == "I_tBootHigh"] = "I_t20BootHigh"
@@ -112,6 +115,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     list(ser_A = ser_A, ser_B = ser_B, ser_C = ser_C, ser_D = ser_D)
 }
+
 ##' Do bootstrap calculations on each IPHC Series
 ##'
 ##' To be called from within [calc_iphc_ser_all()],
