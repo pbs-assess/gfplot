@@ -187,7 +187,7 @@ boot_iphc <- function(ser_year_rates,
              bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"]
        }
    }
-   filter(ser_year_rates,!is.na(I_tBootMean))
+   filter(bcaConf, !is.na(I_tBootMean))
 }
 
 
