@@ -207,8 +207,8 @@ boot_iphc <- function(ser_year_rates,
 ##'
 ##'   test_AB: the results from the paired t-test,
 ##'
-##'   G_A, G_B: geometric means of Series A and Series D (based on bootstrapped
-##'    means).
+##'   G_A, G_B: geometric means of nonzero values in Series A and Series D
+##'   (based on bootstrapped means).
 ##'
 ##'   Longest series is either
 ##'
@@ -222,14 +222,16 @@ boot_iphc <- function(ser_year_rates,
 calc_iphc_ser_AB <- function(series_all) {
     years_AB <- intersect(series_all$ser_A$year, series_all$ser_B$year)
 
-    # Geometric means of each series for the overlapping years
+    # Geometric means of each series for the overlapping years, excluding zeros
     G_A <- exp( mean( log( filter(series_all$ser_A,
-                                     year %in% years_AB)$I_t20BootMean)))
+                                  year %in% years_AB,
+                                  I_t20BootMean > 0)$I_t20BootMean)))
 
     G_B <- exp( mean( log( filter(series_all$ser_B,
-                                  year %in% years_AB)$I_tBootMean)))
+                                  year %in% years_AB,
+                                  I_tBootMean > 0)$I_tBootMean)))
 
-    # Scale by G_A, geometricetric mean of bootstrapped means.
+    # Scale by G_A, geometric mean of bootstrapped means.
     ser_A_scaled <- filter(series_all$ser_A,
                            year %in% years_AB) %>%
                     mutate(I_t20SampleMean = I_t20SampleMean / G_A,
@@ -296,10 +298,12 @@ compare_iphc_ser_A_D <- function(series_all) {
 
     # Geometric means of each series for the overlapping years
     G_A <- exp( mean( log( filter(series_all$ser_A,
-                                     year %in% years_AD)$I_t20BootMean)))
+                                  year %in% years_AD,
+                                  I_t20BootMean > 0)$I_t20BootMean)))
 
     G_D <- exp( mean( log( filter(series_all$ser_D,
-                                  year %in% years_AD)$I_t20BootMean)))
+                                  year %in% years_AD,
+                                  I_t20BootMean > 0)$I_t20BootMean)))
 
     # Scale by G_A, geometricetric mean of bootstrapped means.
     ser_A_scaled <- filter(series_all$ser_A,
@@ -337,12 +341,14 @@ compare_iphc_ser_B_C <- function(series_all) {
 
     # Geometric means of each series for the overlapping years
     G_B <- exp( mean( log( filter(series_all$ser_B,
-                                     year %in% years_BC)$I_tBootMean)))
+                                  year %in% years_BC,
+                                  I_tBootMean > 0)$I_tBootMean)))
 
     G_C <- exp( mean( log( filter(series_all$ser_C,
-                                  year %in% years_BC)$I_tBootMean)))
+                                  year %in% years_BC,
+                                  I_tBootMean > 0)$I_tBootMean)))
 
-    # Scale by G_B, geometricetric mean of bootstrapped means.
+    # Scale by G_B, geometric mean of bootstrapped means.
     ser_B_scaled <- filter(series_all$ser_B,
                            year %in% years_BC) %>%
                     mutate(I_tSampleMean = I_tSampleMean / G_B,
