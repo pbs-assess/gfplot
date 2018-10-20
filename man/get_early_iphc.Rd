@@ -11,7 +11,7 @@
 \usage{
 get_iphc_spp_name(species = NULL)
 
-check_iphc_spp_name(countData = NULL)
+check_iphc_spp_name(countData = NULL, ignore_obvious = TRUE)
 
 get_iphc_1995(species)
 
@@ -25,7 +25,10 @@ get_iphc_spp_name returns the full data frame of names (iphc-spp-names-csv).}
 
 \item{countData}{A new IPHC dataset to check all species names against, if
 NULL then returns all IPHC names in the saved set-level data that are not
-in our Type A list***B soon***.}
+in our list of Type A or Type B species given in gfsynopsis.}
+
+\item{ignore_obvious}{Whether or not to ignore some obvious non-groundfish
+species (listed in function) when countData is NULL.}
 }
 \value{
 IPHC species common name, or NA if species is not in IPHC data
@@ -34,7 +37,7 @@ if species is NULL
 then a data.frame of all species names (the file iphc-spp-names.csv).
 
 IPHC species common names in countData (or if NULL IPHC species names
-in saved set-level IPHC data that are not in iphc-spp-names.csv.
+in saved set-level IPHC data that are not in iphc-spp-names.csv).
 
 Tibble contains year (1995), station name, lat, lon,
 E_it (effective skate number for that station, based on all
