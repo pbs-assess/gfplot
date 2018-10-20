@@ -125,7 +125,8 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 ##' @param num.boots Number of bootstrap replicates to do.
 ##' @param seed_val Seed for random number generator.
 ##' @return Tibble containg one row for each year, with columns year, I_tBootMean,
-##'   I_tBootLow, I_tBootHigh and I_tBootCV.
+##'   I_tBootLow, I_tBootHigh and I_tBootCV. If ser_year_rates is NULL or all
+##'   counts are NA then return year = 2003 and all NA's (to not break later code).
 boot_iphc <- function(ser_year_rates,
                       num.boots = 10000,
                       seed_val = 42){
@@ -133,9 +134,9 @@ boot_iphc <- function(ser_year_rates,
 
     return_NA = FALSE
 
-    if( nrow(ser_year_rates) == 0 ) {
-          return_NA = TRUE } else {
-      # Get rid of the NA years (should make the if below redundant)
+    if( nrow(ser_year_rates) == 0 | all(is.na(ser_year_rates[,2]))) {
+      return_NA = TRUE } else {
+      # Get rid of the NA years (should make the if below redundant):
       ser_year_rates = ser_year_rates[which(!is.na(ser_year_rates[,2])), ]
        if( nrow(ser_year_rates) == 1){
            if(is.na((ser_year_rates[1,2]) ) ) {
@@ -186,7 +187,7 @@ boot_iphc <- function(ser_year_rates,
              bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"]
        }
    }
-   bcaConf
+   filter(ser_year_rates,!is.na(I_tBootMean))
 }
 
 
