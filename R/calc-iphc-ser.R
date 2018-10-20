@@ -379,6 +379,7 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##' test_BC: t-test results from [compare_iphc_ser_B_C()]
 ##'
 ##' If no observations at all for the species then return NA.
+##' @export
 calc_iphc_full_res <- function(set_counts)
    {
        if( length(unique(c(set_counts$N_it, set_counts$N_it20))) == 1) {
@@ -453,7 +454,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
 ##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
 ##' }
-##'
+##' @export
 format_iphc_longest <- function(ser_longest){
       if(is.null(ser_longest)) {
           return( tibble( survey_abbrev = "IPHC FISS",
