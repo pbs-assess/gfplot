@@ -168,8 +168,11 @@ boot_iphc <- function(ser_year_rates,
                           pull(names(ser_year_rates)[2])
        if(all(this_year_rates == 0)) {        # e.g. China Rockfish for 2003,
                                               #  NA for earlier years, else
-                                              #  error in boot.ci. Just skip,
-                                              #  and leave NA's in bcaConf for i
+                                              #  error in boot.ci.
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"] <- 0
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootLow"] <- 0
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootHigh"] <- 0
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootCV"] <- NA
        } else {
          bool[[i]] <- boot::boot(this_year_rates, meanFun, R = num.boots)
 
@@ -187,7 +190,7 @@ boot_iphc <- function(ser_year_rates,
              bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"]
        }
    }
-   filter(bcaConf, !is.na(I_tBootMean))
+   bcaConf
 }
 
 
