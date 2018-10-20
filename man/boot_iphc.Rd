@@ -16,7 +16,8 @@ rates (either C_it or C_it20 depending on the Series).}
 }
 \value{
 Tibble containg one row for each year, with columns year, I_tBootMean,
-I_tBootLow, I_tBootHigh and I_tBootCV.
+I_tBootLow, I_tBootHigh and I_tBootCV. If ser_year_rates is NULL or all
+counts are NA then return year = 2003 and all NA's (to not break later code).
 }
 \description{
 To be called from within \code{\link[=calc_iphc_ser_all]{calc_iphc_ser_all()}},

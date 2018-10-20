@@ -25,5 +25,15 @@ sp = "yelloweye rockfish"
 set_counts <- get_all_iphc_set_counts(sp)
 iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
 format_iphc_longest(iphc_set_counts_sp$ser_longest)
+# Has no data for ***:
+sp = "china rockfish"
+# If already loaded data via gfsynopsis then
+dc <- "../gfsynopsis/report/data-cache/iphc"
+dat_iphc <- readRDS(paste0(file.path(dc, "china-rockfish"), ".rds"))
+set_counts <- dat_iphc$set_counts
+# Else to load from scratch:
+# set_counts <- get_all_iphc_set_counts(sp)
+iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
+format_iphc_longest(iphc_set_counts_sp$ser_longest)
 }
 }

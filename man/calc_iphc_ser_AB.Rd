@@ -16,10 +16,10 @@ List containing
 ser_longest: the longest time series possible from
 Series A and B,
 
-test_AB: the results from the paired t-test,
+test_AB: the results from the paired t-test, NULL if Series B is longest.
 
-G_A, G_B: geometric means of Series A and Series D (based on bootstrapped
-means).
+G_A, G_B: geometric means of nonzero values in Series A and Series D
+(based on bootstrapped means).
 
 Longest series is either
 
@@ -30,6 +30,15 @@ in means of the rescaled (by their geometric means) Series A and B equals 0,
 
 (ii) Series A, which is the longest series available if the rescaled
 series are significantly different.
+
+(iii) Series B, if the years for which only the first 20 hooks are enumerated
+never catch the species (but other years do). Then Series AB becomes Series
+A plus some zeros, so we may as well use Series B that uses all the hooks
+and so is more likely to catch the species. This is a rare situation (and
+likely arises because not all species were specifically identified in
+earlier years (or 2013?), but seems to occur for China Rockfish. Return NULL
+for t_AB (to then use later to identify that Series B is the longest
+series).
 }
 \description{
 Calculate Series AB (Series A with 1995 and 1996 appropriately scaled from

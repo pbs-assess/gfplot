@@ -205,7 +205,7 @@ boot_iphc <- function(ser_year_rates,
 ##'   ser_longest: the longest time series possible from
 ##'   Series A and B,
 ##'
-##'   test_AB: the results from the paired t-test,
+##'   test_AB: the results from the paired t-test, NULL if Series B is longest.
 ##'
 ##'   G_A, G_B: geometric means of nonzero values in Series A and Series D
 ##'   (based on bootstrapped means).
@@ -225,7 +225,10 @@ boot_iphc <- function(ser_year_rates,
 ##'    A plus some zeros, so we may as well use Series B that uses all the hooks
 ##'    and so is more likely to catch the species. This is a rare situation (and
 ##'    likely arises because not all species were specifically identified in
-##'    earlier years (or 2013?), but seems to occur for China Rockfish.
+##'    earlier years (or 2013?), but seems to occur for China Rockfish. Return NULL
+##'    for t_AB (to then use later to identify that Series B is the longest
+##'    series).
+##'
 calc_iphc_ser_AB <- function(series_all) {
     years_AB <- intersect(series_all$ser_A$year, series_all$ser_B$year)
 
@@ -400,7 +403,8 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##'     are enumerated (1997-2002 or 2013) but is caught when all hooks are
 ##'     enumerated - then Series AB is just Series A but only includes years
 ##'     that are in Series B, so we may as well use Series B (all hooks).
-##'     **May need to think a little more.
+##'     **May need to think a little more. Just need results of test_BC to
+##'     be mentioned later.
 ##' full_coast: whether or not the longest time series can be considered
 ##'     representative of the full coast (based on the paired t-tests).
 ##'

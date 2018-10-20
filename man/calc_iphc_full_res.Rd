@@ -15,7 +15,12 @@ List containing
 
 ser_longest: tibble for the longest time series that can be made for this
 species, as output from \code{\link[=calc_iphc_ser_AB]{calc_iphc_ser_AB()}}; either Series A or AB.
-
+Or Series B if a species is never caught when only the first 20 hooks
+are enumerated (1997-2002 or 2013) but is caught when all hooks are
+enumerated - then Series AB is just Series A but only includes years
+that are in Series B, so we may as well use Series B (all hooks).
+**May need to think a little more. Just need results of test_BC to
+be mentioned later.
 full_coast: whether or not the longest time series can be considered
 representative of the full coast (based on the paired t-tests).
 
