@@ -165,21 +165,26 @@ boot_iphc <- function(ser_year_rates,
     {
        this_year_rates <- filter(ser_year_rates, year == unique_years[i]) %>%
                           pull(names(ser_year_rates)[2])
+       if(all(this_year_rates == 0)) {        # e.g. China Rockfish for 2003,
+                                              #  NA for earlier years, else
+                                              #  error in boot.ci. Just skip,
+                                              #  and leave NA's in bcaConf for i
+       } else {
+         bool[[i]] <- boot::boot(this_year_rates, meanFun, R = num.boots)
 
-       bool[[i]] <- boot::boot(this_year_rates, meanFun, R = num.boots)
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"] <-
+             mean(bool[[i]]$t)
 
-       bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"] <-
-           mean(bool[[i]]$t)
+         boolCI[[i]] = boot::boot.ci(bool[[i]], type="bca")
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootLow"] <-
+             boolCI[[i]]$bca[4]
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootHigh"] <-
+             boolCI[[i]]$bca[5]
 
-       boolCI[[i]] = boot::boot.ci(bool[[i]], type="bca")
-       bcaConf[bcaConf$year == unique_years[i], "I_tBootLow"] <-
-           boolCI[[i]]$bca[4]
-       bcaConf[bcaConf$year == unique_years[i], "I_tBootHigh"] <-
-           boolCI[[i]]$bca[5]
-
-       bcaConf[bcaConf$year == unique_years[i], "I_tBootCV"] <-
-           sd(bool[[i]]$t) /
-           bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"]
+         bcaConf[bcaConf$year == unique_years[i], "I_tBootCV"] <-
+             sd(bool[[i]]$t) /
+             bcaConf[bcaConf$year == unique_years[i], "I_tBootMean"]
+       }
    }
    bcaConf
 }
@@ -451,6 +456,16 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' \dontrun{
 ##' sp = "yelloweye rockfish"
 ##' set_counts <- get_all_iphc_set_counts(sp)
+##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
+##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
+##' # Has no data for ***:
+##' sp = "china rockfish"
+##' # If already loaded data via gfsynopsis then
+##' dc <- "../gfsynopsis/report/data-cache/iphc"
+##' dat_iphc <- readRDS(paste0(file.path(dc, "china-rockfish"), ".rds"))
+##' set_counts <- dat_iphc$set_counts
+##' # Else to load from scratch:
+##' # set_counts <- get_all_iphc_set_counts(sp)
 ##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
 ##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
 ##' }
