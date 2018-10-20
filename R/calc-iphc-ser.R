@@ -219,6 +219,13 @@ boot_iphc <- function(ser_year_rates,
 ##'
 ##'   (ii) Series A, which is the longest series available if the rescaled
 ##'  series are significantly different.
+##'
+##'   (iii) Series B, if the years for which only the first 20 hooks are enumerated
+##'    never catch the species (but other years do). Then Series AB becomes Series
+##'    A plus some zeros, so we may as well use Series B that uses all the hooks
+##'    and so is more likely to catch the species. This is a rare situation (and
+##'    likely arises because not all species were specifically identified in
+##'    earlier years (or 2013?), but seems to occur for China Rockfish.
 calc_iphc_ser_AB <- function(series_all) {
     years_AB <- intersect(series_all$ser_A$year, series_all$ser_B$year)
 
@@ -230,6 +237,14 @@ calc_iphc_ser_AB <- function(series_all) {
     G_B <- exp( mean( log( filter(series_all$ser_B,
                                   year %in% years_AB,
                                   I_tBootMean > 0)$I_tBootMean)))
+
+    # If Series A has no more years than Series B then just return Series B
+    if(all(unique(series_all$ser_A$year) == unique(series_all$ser_B$year))) {
+        return(list(ser_longest = series_all$ser_B,
+                    test_AB = list(t_AB = NULL,
+                                    G_A = G_A,
+                                    G_B = G_B) ) )
+    }
 
     # Scale by G_A, geometric mean of bootstrapped means.
     ser_A_scaled <- filter(series_all$ser_A,
@@ -381,7 +396,11 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##'
 ##' ser_longest: tibble for the longest time series that can be made for this
 ##'     species, as output from [calc_iphc_ser_AB()]; either Series A or AB.
-##'
+##'     Or Series B if a species is never caught when only the first 20 hooks
+##'     are enumerated (1997-2002 or 2013) but is caught when all hooks are
+##'     enumerated - then Series AB is just Series A but only includes years
+##'     that are in Series B, so we may as well use Series B (all hooks).
+##'     **May need to think a little more.
 ##' full_coast: whether or not the longest time series can be considered
 ##'     representative of the full coast (based on the paired t-tests).
 ##'
