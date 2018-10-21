@@ -250,6 +250,14 @@ calc_iphc_ser_AB <- function(series_all) {
                                      G_A = NA,
                                      G_B = NA) ) ) }
     }
+    # If Series A in overlapping years ends up with no catch (Bluntnose Sixgill
+    #  Shark), then return Series B
+    if(nrow(filter(series_all$ser_A, year %in% years_AB, I_t20BootMean > 0)) == 0){
+          return(list(ser_longest = series_all$ser_B,
+                      test_AB = list(t_AB = NULL,
+                                     G_A = NA,
+                                     G_B = NA) ) )
+    }
     # Geometric means of each series for the overlapping years, excluding zeros
     G_A <- exp( mean( log( filter(series_all$ser_A,
                                   year %in% years_AB,
@@ -579,7 +587,8 @@ format_iphc_longest <- function(iphc_set_counts_sp){
                           num_sets = NA,
                          num_pos_sets = NA ) )
       }
-      if(!is.null(iphc_set_counts_sp$test_AB$t_AB)) {
+      # Series AB is longest, or occasionally Series A (English Sole)
+      if("I_t20SampleMean" %in% names(iphc_set_counts_sp$ser_longest) ) {
         new_names <- select(iphc_set_counts_sp$ser_longest,
                             year = year,
                             biomass = I_t20BootMean,
