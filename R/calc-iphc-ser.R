@@ -326,14 +326,17 @@ compare_iphc_ser_A_D <- function(series_all) {
     G_D <- exp( mean( log( filter(series_all$ser_D,
                                   year %in% years_AD,
                                   I_t20BootMean > 0)$I_t20BootMean)))
-    # If Series A has no more years than Series D then just return Series D
-    #  [For Darkblotched they are both just all 0's, but Series B has a few]
+    # If Series A and Series D all have 0 counts for al the intersecting years
+    #  then return NULL for t_AD (else t-test fails), e.g. Darkblotched.
     if(length(unique(series_all$ser_A$year)) ==
                                   length( unique(series_all$ser_D$year) ) ){
        if(all(unique(series_all$ser_A$year) == unique(series_all$ser_D$year))) {
-          return(list(t_AD = NULL,
-                      G_A = G_A,
-                      G_D = G_D) )
+           if( max( c( series_all$ser_A$I_t20SampleMean,
+                       series_all$ser_D$I_t20SampleMean) ) == 0) {
+              return(list(t_AD = NULL,
+                          G_A = G_A,
+                          G_D = G_D) )
+           }
         }
     }
 
