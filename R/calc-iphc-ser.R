@@ -624,6 +624,18 @@ format_iphc_longest <- function(iphc_set_counts_sp){
                             everything(),
                             -prop_empty_sets)
       }
+      # This happend for Pearly Prickleback, 0's made it through giving NaN not
+      #  NA for CV, messing up figure.
+      if(max(new_names$biomass) == 0) {
+         return( tibble( survey_abbrev = "IPHC FISS",
+                         year = 2003,
+                         biomass = NA,
+                         lowerci = NA,
+                         upperci = NA,
+                         mean_cv = NA,
+                         num_sets = NA,
+                         num_pos_sets = NA ) )
+      }
       new_names
     }
 
