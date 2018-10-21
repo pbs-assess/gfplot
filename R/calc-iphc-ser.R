@@ -234,7 +234,22 @@ boot_iphc <- function(ser_year_rates,
 ##'    Not implemented yet - see Issue 49.
 calc_iphc_ser_AB <- function(series_all) {
     years_AB <- intersect(series_all$ser_A$year, series_all$ser_B$year)
-
+    # Series B for English Sole catches none, and only returns 1995 and 1996.
+    #  Series A caught one English Sole in 2001. Therefore use A as the longest.
+    #  No overlapping years since never caught one when all hooks were evaluated
+    #  and we have hook-by-hook data. Could have 1995 and 1996 catching one, so
+    #  then may want Series B; but this is only when we catch the odd fish.
+    if(length(years_AB) == 0) {
+        if(nrow(series_all$ser_A) > nrow(series_all$ser_B) ) {
+          return(list(ser_longest = series_all$ser_A,
+                      test_AB = list(t_AB = NULL,
+                                     G_A = NA,
+                                     G_B = NA) ) ) } else {
+          return(list(ser_longest = series_all$ser_B,
+                      test_AB = list(t_AB = NULL,
+                                     G_A = NA,
+                                     G_B = NA) ) ) }
+    }
     # Geometric means of each series for the overlapping years, excluding zeros
     G_A <- exp( mean( log( filter(series_all$ser_A,
                                   year %in% years_AB,
@@ -389,6 +404,13 @@ compare_iphc_ser_A_D <- function(series_all) {
 compare_iphc_ser_B_C <- function(series_all) {
     years_BC <- intersect(series_all$ser_B$year, series_all$ser_C$year)
 
+    # Years in C should be a subset of those in B, but for no data they get
+    #  returned slightly differently (English Sole).
+    if(length(years_BC) == 0) {
+      return(list(t_BC = NULL,
+                   G_B = NA,
+                   G_C = NA) )
+    }
     # Geometric means of each series for the overlapping years
     G_B <- exp( mean( log( filter(series_all$ser_B,
                                   year %in% years_BC,
