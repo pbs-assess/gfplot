@@ -313,7 +313,8 @@ calc_iphc_ser_AB <- function(series_all) {
 ##' @param series_all List of tibbles, one for each of Series A, B, C and D,
 ##'   resulting from [calc_iphc_ser_all()]
 ##' @return List of t_AD (results of the paired t-test), and geometric means G_A
-##'   and G_D.
+##'   and G_D. t_AD is NULL if years are the same in Series A and Series D.
+##'
 compare_iphc_ser_A_D <- function(series_all) {
     years_AD <- intersect(series_all$ser_A$year, series_all$ser_D$year)
 
@@ -325,6 +326,16 @@ compare_iphc_ser_A_D <- function(series_all) {
     G_D <- exp( mean( log( filter(series_all$ser_D,
                                   year %in% years_AD,
                                   I_t20BootMean > 0)$I_t20BootMean)))
+    # If Series A has no more years than Series D then just return Series D
+    #  [For Darkblotched they are both just all 0's, but Series B has a few]
+    if(length(unique(series_all$ser_A$year)) ==
+                                  length( unique(series_all$ser_D$year) ) ){
+       if(all(unique(series_all$ser_A$year) == unique(series_all$ser_D$year))) {
+          return(list(t_AD = NULL,
+                      G_A = G_A,
+                      G_D = G_D) )
+        }
+    }
 
     # Scale by G_A, geometricetric mean of bootstrapped means.
     ser_A_scaled <- filter(series_all$ser_A,
@@ -491,8 +502,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' @examples
 ##' \dontrun{
 ##' # If already loaded data via gfsynopsis then
-##' dc <- "../gfsynopsis/report/data-cache/iphc"
-##' dat_iphc <- readRDS(paste0(file.path(dc, "yelloweye-rockfish"), ".rds"))
+##' dat_iphc <- readRDS("../gfsynopsis/report/data-cache/iphc/yelloweye-rockfish.rds")
 ##' set_counts <- dat_iphc$set_counts
 ##' # Else to load from scratch:
 ##' # set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
@@ -501,8 +511,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' # Has no data for early years or 2013:
 ##' sp = "china rockfish"
 ##' # If already loaded data via gfsynopsis then
-##' dc <- "../gfsynopsis/report/data-cache/iphc"
-##' dat_iphc <- readRDS(paste0(file.path(dc, "china-rockfish"), ".rds"))
+##' dat_iphc <- readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")
 ##' set_counts <- dat_iphc$set_counts
 ##' # Else to load from scratch:
 ##' # set_counts <- get_all_iphc_set_counts(sp)
