@@ -213,7 +213,7 @@ boot_iphc <- function(ser_year_rates,
 ##'   Longest series is either
 ##'
 ##'   (i) Series AB (Series A with 1995 and 1996 appropriately scaled from
-##'   Series B) if `test_AB$p.value > 0.05`, because the p-value means that we
+##'   Series B) if `test_AB$p.value >= 0.05`, because the p-value means that we
 ##'   cannot reject the null hypothesis that the true difference
 ##'   in means of the rescaled (by their geometric means) Series A and B equals 0,
 ##'
@@ -471,10 +471,19 @@ calc_iphc_full_res <- function(set_counts)
                                                    #  compared with Series C)
         # full_coast is TRUE if the longest time series is representative of
         #  the full coast:
-        if(test_AD$t_AD$p.value >= 0.05) {
-            full_coast <- (test_AD$t_AD$p.value >= 0.05 &
-                           test_BC$t_BC$p.value)} else {
-            full_coast <- (test_AD$t_AD$p.value >= 0.05)} # as A is the long Series
+        if(!is.null(test_AD$t_AD)) {
+          if(test_AD$t_AD$p.value >= 0.05) {
+              full_coast <- (test_AD$t_AD$p.value >= 0.05 &
+                             test_BC$t_BC$p.value >= 0.05)
+          } else {
+                 full_coast <- (test_AD$t_AD$p.value >= 0.05) # as A is the longest
+                 }
+        } else {
+        # test_AD$t_AD is NULL because no catches in either, so B or C then the
+        #  longest, currently can only be B (may not have the situation where C
+        # is yet)
+        full_coast <- (test_BC$t_BC$p.value >= 0.05) # as B is the longest
+        }
     list(ser_longest = iphc_ser_longest$ser_longest,
          full_coast = full_coast,
          ser_all = series_all,
