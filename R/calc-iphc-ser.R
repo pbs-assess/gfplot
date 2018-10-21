@@ -242,11 +242,14 @@ calc_iphc_ser_AB <- function(series_all) {
                                   I_tBootMean > 0)$I_tBootMean)))
 
     # If Series A has no more years than Series B then just return Series B
-    if(all(unique(series_all$ser_A$year) == unique(series_all$ser_B$year))) {
-        return(list(ser_longest = series_all$ser_B,
-                    test_AB = list(t_AB = NULL,
-                                    G_A = G_A,
-                                    G_B = G_B) ) )
+    if(length(unique(series_all$ser_A$year)) ==
+                                  length( unique(series_all$ser_B$year) ) ){
+       if(all(unique(series_all$ser_A$year) == unique(series_all$ser_B$year))) {
+          return(list(ser_longest = series_all$ser_B,
+                      test_AB = list(t_AB = NULL,
+                                     G_A = G_A,
+                                     G_B = G_B) ) )
+        }
     }
 
     # Scale by G_A, geometric mean of bootstrapped means.
@@ -416,7 +419,7 @@ compare_iphc_ser_B_C <- function(series_all) {
 ##'
 ##' test_BC: t-test results from [compare_iphc_ser_B_C()]
 ##'
-##' If no observations at all for the species then return NA.
+##' If no observations at all for the species then return NA (says NULL, no?).
 ##' @export
 calc_iphc_full_res <- function(set_counts)
    {
@@ -482,16 +485,20 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##'   that [plot_survey_index()] works automatically. So the mean catch rate
 ##'   gets renames as `biomass' even though it's numbers per effective skate.
 ##'   **NOTE** num_sets is currently hardwired as 130, Issue 45.
-##' @param ser_longest Output from [calc_iphc_full_res()], but only want the
-##'   ser_longest component.
+##' @param iphc_set_counts_sp Output from [calc_iphc_full_res()] (only actually
+##'   need the ser_longest component and test_AB).
 ##' @return Renamed ser_longest, with some required columns calculated.
 ##' @examples
 ##' \dontrun{
-##' sp = "yelloweye rockfish"
-##' set_counts <- get_all_iphc_set_counts(sp)
+##' # If already loaded data via gfsynopsis then
+##' dc <- "../gfsynopsis/report/data-cache/iphc"
+##' dat_iphc <- readRDS(paste0(file.path(dc, "yelloweye-rockfish"), ".rds"))
+##' set_counts <- dat_iphc$set_counts
+##' # Else to load from scratch:
+##' # set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
 ##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
-##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
-##' # Has no data for ***:
+##' format_iphc_longest(iphc_set_counts_sp)
+##' # Has no data for early years or 2013:
 ##' sp = "china rockfish"
 ##' # If already loaded data via gfsynopsis then
 ##' dc <- "../gfsynopsis/report/data-cache/iphc"
@@ -500,11 +507,11 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' # Else to load from scratch:
 ##' # set_counts <- get_all_iphc_set_counts(sp)
 ##' iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
-##' format_iphc_longest(iphc_set_counts_sp$ser_longest)
+##' format_iphc_longest(iphc_set_counts_sp)
 ##' }
 ##' @export
-format_iphc_longest <- function(ser_longest){
-      if(is.null(ser_longest)) {
+format_iphc_longest <- function(iphc_set_counts_sp){
+      if(is.null(iphc_set_counts_sp$ser_longest)) {
           return( tibble( survey_abbrev = "IPHC FISS",
                           year = 2003,
                           biomass = NA,
@@ -514,20 +521,41 @@ format_iphc_longest <- function(ser_longest){
                           num_sets = NA,
                          num_pos_sets = NA ) )
       }
-      new_names <- select(ser_longest,
-                          year = year,
-                          biomass = I_t20BootMean,
-                          lowerci = I_t20BootLow,
-                          upperci = I_t20BootHigh,
-                          prop_empty_sets = NoYYR20
-                          ) %>%
-                   mutate(mean_cv = mean(ser_longest$I_t20BootCV, na.rm=TRUE),
-                          num_sets = 130,
-                          num_pos_sets = num_sets * (1 - prop_empty_sets),
-                          survey_abbrev = "IPHC FISS") %>%
-                   select(survey_abbrev,
-                          everything(),
-                          -prop_empty_sets)
+      if(!is.null(iphc_set_counts_sp$test_AB$t_AB)) {
+        new_names <- select(iphc_set_counts_sp$ser_longest,
+                            year = year,
+                            biomass = I_t20BootMean,
+                            lowerci = I_t20BootLow,
+                            upperci = I_t20BootHigh,
+                            prop_empty_sets = NoYYR20
+                            ) %>%
+                      mutate(mean_cv =
+                                mean(iphc_set_counts_sp$ser_longest$I_t20BootCV,
+                                     na.rm=TRUE),
+                            num_sets = 130,
+                            num_pos_sets = num_sets * (1 - prop_empty_sets),
+                            survey_abbrev = "IPHC FISS") %>%
+                     select(survey_abbrev,
+                            everything(),
+                            -prop_empty_sets)
+      } else {    # This would be Series B case
+        new_names <- select(iphc_set_counts_sp$ser_longest,
+                            year = year,
+                            biomass = I_tBootMean,
+                            lowerci = I_tBootLow,
+                            upperci = I_tBootHigh,
+                            prop_empty_sets = NoYYR
+                            ) %>%
+                      mutate(mean_cv =
+                                mean(iphc_set_counts_sp$ser_longest$I_tBootCV,
+                                     na.rm=TRUE),
+                            num_sets = 130,
+                            num_pos_sets = num_sets * (1 - prop_empty_sets),
+                            survey_abbrev = "IPHC FISS") %>%
+                     select(survey_abbrev,
+                            everything(),
+                            -prop_empty_sets)
+      }
       new_names
     }
 
