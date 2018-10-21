@@ -367,12 +367,13 @@ compare_iphc_ser_A_D <- function(series_all) {
     #    }
     #
 
-    #Actually just want the intersecting years:
+    #Actually just want the intersecting years, or if either A or D is 0 in those
+    #  (Bluntnose Sixgill Shark, I'm looking at you)
 
-    if( max( c( filter(series_all$ser_A,
-                       year %in% years_AD)$I_t20SampleMean,
-                filter(series_all$ser_D,
-                       year %in% years_AD)$I_t20SampleMean) ) == 0 ) {
+    if( ( max( filter(series_all$ser_A,
+                      year %in% years_AD)$I_t20SampleMean) == 0 ) |
+          max( filter(series_all$ser_D,
+                      year %in% years_AD)$I_t20SampleMean) == 0 ) {
        return(list(t_AD = NULL,
                    G_A = G_A,
                    G_D = G_D) )
