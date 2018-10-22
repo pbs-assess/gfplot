@@ -503,7 +503,7 @@ calc_iphc_full_res <- function(set_counts)
                                                    #  Series B representative
                                                    #  of whole coast (having
                                                    #  compared with Series C)
-        # full_coast is TRUE if the longest time series is representative of
+       # full_coast is TRUE if the longest time series is representative of
        #  the full coast:
        if(!is.null(test_AD$t_AD)) {
            if(is.na(test_AD$t_AD$p.value)) {
