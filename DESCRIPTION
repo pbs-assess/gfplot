@@ -39,7 +39,7 @@ Imports:
     reshape2,
     rgdal,
     rlang,
-    rstan (>= 2.18.1),
+    rstan (>= 2.17.0),
     rvest,
     scales,
     stringr,
@@ -51,7 +51,8 @@ Imports:
     DLMtool,
     tweedie,
     sdmTMB (>= 0.0.0.9001),
-    ggrepel
+    ggrepel,
+    boot  
 Remotes: github::pbs-software/pbs-data/PBSdata, github::seananderson/sdmTMB
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.1.0

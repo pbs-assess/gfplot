@@ -5,6 +5,7 @@ test_that("get_* data functions work at PBS", {
   skip_on_cran()
   skip_on_travis()
   skip_on_appveyor()
+  skip("Skipping tests to save time on DFO Windows Computer")
 
   if (!is_dfo() || !is_windows()) skip("Not a DFO computer")
   d <- get_age_precision("lingcod")

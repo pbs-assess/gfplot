@@ -51,8 +51,10 @@
 #' * `get_iphc_hooks()` extracts IPHC survey data at the hook level for given
 #'    species, from 2003 to present (excluding 2013 which is not in database)
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
-#'    and caches extracted data to a given folder
-#'
+#'    (except those specific to IPHC data) and caches extracted data to a given
+#'    folder
+#' * `cache_pbs_data_iphc()` runs `get_all_iphc_set_counts` for a given species
+#'    and caches extracted data to a give folder
 #' @section Note:
 #' `get_*` functions only extract data when performed on a computer connected to
 #' the Pacific Biological Station DFO network.
@@ -480,6 +482,8 @@ get_iphc_sets <- function(species, usability = NULL) {
 get_iphc_sets_info <- function() {
   .q <- read_sql("get-iphc-set-info.sql")
   .d <- run_sql("GFBioSQL", .q)
+  .d <- mutate(.d, usable = ifelse(iphcUsabilityCode %in% c(1, 52),
+                                   "Y", "N"))
   as_tibble(.d)
 }
 
@@ -488,6 +492,30 @@ get_iphc_sets_info <- function() {
 get_iphc_skates_info <- function() {
   .q <- read_sql("get-iphc-skate-info.sql")
   .d <- run_sql("GFBioSQL", .q)
+  # Calculating here:
+  # lastHook - hook number of final hook on that skate
+  # firstHook - hook number of 1st hook on that skate
+  # hook20 - hook number of 20th hook on that skate
+  # lastHookTemp needed since need before firstHook, but want to re-order
+  # chum... are just the chum-bait ones
+  # Hook numbering starts at 1 for each set until 2006 (and so goes 1-800ish),
+  #  then resets at 1 for each skate for each skate for 2007 onwards (and so
+  #  goes 1-100ish). Hence the <2006.5 in lastHookTemp.
+  .d <- mutate(group_by(.d, setID),
+               lastHookTemp = cumsum(deplHooksPerSkate) * (year < 2006.5) +
+                              deplHooksPerSkate * (year > 2006.5),
+               firstHook = lastHookTemp - deplHooksPerSkate + 1,
+               lastHook = lastHookTemp,
+               hook20 = firstHook +
+                        (deplHooksPerSkate < 19.5) * deplHooksPerSkate +
+                        (deplHooksPerSkate > 19.5) * 20 - 1,
+               chumDeplHooksPerSkate = deplHooksPerSkate * (bait == 110),
+               chumObsHooksPerSkate = obsHooksPerSkate * (bait == 110),
+               obsHooksPerSkate20 = 20,  # **Remove this line when Elise updates
+                                         #  sql query, Issue #40
+               chumObsHooksPerSkate20 = obsHooksPerSkate20 * (bait == 110)
+               ) %>%
+               select(-lastHookTemp)
   as_tibble(.d)
 }
 
@@ -499,10 +527,8 @@ get_iphc_hooks <- function(species, usability = NULL) {
   .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
   .d$species <- tolower(.d$species)
-#
-#    if (!is.null(usability)) {
-#     .d <- filter(.d, usability_code %in% usability)
-#   }
+  if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
+                                   # No data, give NA's
   as_tibble(.d)
 }
 
@@ -836,4 +862,53 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
   }
 
   message("All data extracted and saved in the folder `", path, "`.")
+}
+
+#' @export
+#' @return The [get_all_iphc_set_counts()] function returns a data frame.
+#'  The [cache_pbs_data_iphc()]
+#' function writes an `.rds` file to `path` for each specified species. A data
+#' object for a single species is a named list object with one element
+#' containing the data frame from [get_all_iphc_set_counts()].
+#' The element name of the list is `set_counts`.
+#' @details
+#' This [cache_pbs_data_iphc()] function caches the data for the given
+#'   species from [get_all_iphc_set_counts()]
+#' @rdname get_data
+#' @examples
+#' \dontrun{
+#' cache_pbs_data_iphc("redbanded rockfish")
+#' cache_pbs_data_iphc(c("redbanded rockfish",
+#'                       "pacific ocean perch",
+#'                       "made up species") )
+#' }
+cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
+  compress = FALSE) {
+
+  if (!sql_server_accessible()) {
+    stop("SQL server is not accessible. Either you are not on the DFO network or your",
+         " Rprofile file does not contain the required variables options pbs.ip,",
+         " pbs.uid, and pbs.pwd. On Windows, this file is located at",
+         " C:\\R\\etc\\Rprofile.site")
+  }
+  dir.create(path, showWarnings = FALSE)
+
+  for (sp_i in seq_along(species)) {
+    this_sp <- species[[sp_i]]
+
+    if (is.null(file_name)) {
+        this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+    } else {
+        this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
+    }      # Not sure why Sean's works in cache_pbs_data without the { }
+
+    message("Extracting IPHC data for ", this_sp)
+
+    out <- list()
+    out$set_counts <- get_all_iphc_set_counts(this_sp)
+
+    saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
+      compress = compress)
+  }
+  message("All IPHC data extracted and saved in the folder `", path, "`.")
 }

@@ -26,6 +26,9 @@
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
 #' @importFrom grDevices chull
+#' @importFrom boot boot.ci boot
+#' @importFrom stats t.test
+#' @importFrom utils read.csv
 #' @import Rcpp
 NULL
 
@@ -88,8 +91,10 @@ if (getRversion() >= "2.15.1") {
     "maturity_convention_maxvalue", "n_employee", "p", "species_code",
     "specimen_id", "specimen_sex_code",
 
-    # cpue:
+    # maturity:
+    "n_scaled",
 
+    # cpue:
     "best_date", "best_depth", "fe_start_date", "hours_fished", "latitude",
     "locality_code", "longitude", "n_trips_per_year", "n_years", "pos_catch",
     "scrambled_vessel", "species_category_code", "spp_catch", "spp_in_fe",
@@ -133,6 +138,14 @@ if (getRversion() >= "2.15.1") {
     "hooksChumRatio", "hooksChumRatio20", "iphcUsabilityCode", "lastHook",
     "lastHookTemp", "lat", "long", "numOnHook", "numOnHook20", "obsHooksPerSkate",
     "obsHooksPerSkate20", "usable", "setID", "skateID",
+    "I_t20BootHigh", "I_t20BootLow", "I_t20BootMean", "I_t20SampleMean",
+    "I_tBootCV", "I_tBootHigh", "I_tBootLow", "I_tBootMean", "I_tSampleMean",
+    "NoYYR", "NoYYR20", "everything", "prop_empty_sets", "wcvi",
+    "catchCount", "effSkate",
+    "lon", "spNameIPHC", "specCount", "station",
+    "countData1995", "countData2013", "data1996to2002",
+    "setData1995", "setData2013", "spNameIPHC",
+
 
     # others
     "parent_rsty_id", "parent_taxonomic_unit", "row_version", "rsty_id",
@@ -152,3 +165,4 @@ if (getRversion() >= "2.15.1") {
 
   ))
 }
+
