@@ -80,10 +80,14 @@ codes2common <- function(spp_code) {
     SPECIES_CODE = spp_code,
     order_by = seq_along(spp_code), stringsAsFactors = FALSE
   )
+  common_df <- data.frame(
+    SPECIES_CODE = spp_code,
+    order_by = seq_along(spp_code), stringsAsFactors = FALSE
+  )
   .d <- filter(species, SPECIES_CODE %in% spp_code)
   # Remove erroneous species codes for basking shark and lingcod:
   .d <- filter(.d, !SPECIES_CODE %in% c("033", "465")) %>%
-    left_join(common_df, by = "SPECIES_COMMON_NAME") %>%
+    left_join(common_df, by = "SPECIES_CODE") %>%
     arrange(.data$order_by)
   .d$SPECIES_COMMON_NAME
 }
