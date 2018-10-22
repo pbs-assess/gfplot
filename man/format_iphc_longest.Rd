@@ -4,11 +4,11 @@
 \alias{format_iphc_longest}
 \title{Format the longest IPHC time series index to agree with other surveys}
 \usage{
-format_iphc_longest(ser_longest)
+format_iphc_longest(iphc_set_counts_sp)
 }
 \arguments{
-\item{ser_longest}{Output from \code{\link[=calc_iphc_full_res]{calc_iphc_full_res()}}, but only want the
-ser_longest component.}
+\item{iphc_set_counts_sp}{Output from \code{\link[=calc_iphc_full_res]{calc_iphc_full_res()}} (only actually
+need the ser_longest component and test_AB).}
 }
 \value{
 Renamed ser_longest, with some required columns calculated.
@@ -21,19 +21,21 @@ gets renames as `biomass' even though it's numbers per effective skate.
 }
 \examples{
 \dontrun{
-sp = "yelloweye rockfish"
-set_counts <- get_all_iphc_set_counts(sp)
+# If already loaded data via gfsynopsis then
+dat_iphc <- readRDS("../gfsynopsis/report/data-cache/iphc/yelloweye-rockfish.rds")
+set_counts <- dat_iphc$set_counts
+# Else to load from scratch:
+# set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
 iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
-format_iphc_longest(iphc_set_counts_sp$ser_longest)
-# Has no data for ***:
+format_iphc_longest(iphc_set_counts_sp)
+# Has no data for early years or 2013:
 sp = "china rockfish"
 # If already loaded data via gfsynopsis then
-dc <- "../gfsynopsis/report/data-cache/iphc"
-dat_iphc <- readRDS(paste0(file.path(dc, "china-rockfish"), ".rds"))
+dat_iphc <- readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")
 set_counts <- dat_iphc$set_counts
 # Else to load from scratch:
 # set_counts <- get_all_iphc_set_counts(sp)
 iphc_set_counts_sp <- calc_iphc_full_res(set_counts)
-format_iphc_longest(iphc_set_counts_sp$ser_longest)
+format_iphc_longest(iphc_set_counts_sp)
 }
 }

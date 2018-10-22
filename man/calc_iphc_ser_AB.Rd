@@ -24,7 +24,7 @@ G_A, G_B: geometric means of nonzero values in Series A and Series D
 Longest series is either
 
 (i) Series AB (Series A with 1995 and 1996 appropriately scaled from
-Series B) if \code{test_AB$p.value > 0.05}, because the p-value means that we
+Series B) if \code{test_AB$p.value >= 0.05}, because the p-value means that we
 cannot reject the null hypothesis that the true difference
 in means of the rescaled (by their geometric means) Series A and B equals 0,
 
@@ -39,6 +39,10 @@ likely arises because not all species were specifically identified in
 earlier years (or 2013?), but seems to occur for China Rockfish. Return NULL
 for t_AB (to then use later to identify that Series B is the longest
 series).
+
+(iv) But can also have Series C being the longest if A is all 0's and
+B and C cover the same years. Looks like this happens for Darkblotched.
+Not implemented yet - see Issue 49.
 }
 \description{
 Calculate Series AB (Series A with 1995 and 1996 appropriately scaled from

@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.4</span>
       </span>
     </div>
 
@@ -108,8 +108,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>fit_vb</span>(<span class='no'>dat</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"female"</span>, <span class='st'>"male"</span>), <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mpd"</span>, <span class='st'>"mcmc"</span>),
-  <span class='kw'>downsample</span> <span class='kw'>=</span> <span class='fl'>Inf</span>, <span class='kw'>chains</span> <span class='kw'>=</span> <span class='fl'>4L</span>, <span class='kw'>iter</span> <span class='kw'>=</span> <span class='fl'>1000L</span>,
+    <pre class="usage"><span class='fu'>fit_vb</span>(<span class='no'>dat</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"female"</span>, <span class='st'>"male"</span>, <span class='st'>"all"</span>), <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mpd"</span>,
+  <span class='st'>"mcmc"</span>), <span class='kw'>downsample</span> <span class='kw'>=</span> <span class='fl'>Inf</span>, <span class='kw'>chains</span> <span class='kw'>=</span> <span class='fl'>4L</span>, <span class='kw'>iter</span> <span class='kw'>=</span> <span class='fl'>1000L</span>,
   <span class='kw'>cores</span> <span class='kw'>=</span> <span class='kw pkg'>parallel</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></span>(), <span class='kw'>allow_slow_mcmc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>est_method</span> <span class='kw'>=</span> <span class='no'>median</span>, <span class='kw'>min_samples</span> <span class='kw'>=</span> <span class='fl'>50L</span>, <span class='kw'>too_high_quantile</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>uniform_priors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>ageing_method_codes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
@@ -190,38 +190,188 @@ on. Defaults to <code>NULL</code>, which brings in all valid ageing codes. See
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># with `rstan::optimizing()` for the mode of the posterior density:</span>
-<span class='no'>model_f</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"female"</span>)</div><div class='output co'>#&gt; Initial log joint probability = -1.5357e+06
-#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Error evaluating model log probability: Non-finite function evaluation.
-#&gt; 
-#&gt; Optimization terminated normally: 
-#&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='no'>model_m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"male"</span>)</div><div class='output co'>#&gt; Initial log joint probability = -1.77128e+06
-#&gt; Exception: lognormal_lpdf: Location parameter[1] is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Scale parameter is inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Error evaluating model log probability: Non-finite function evaluation.
-#&gt; 
-#&gt; Error evaluating model log probability: Non-finite gradient.
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Location parameter[1] is -inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Location parameter[1] is -inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; Exception: lognormal_lpdf: Location parameter[1] is -inf, but must be finite!  (in 'modeladc6793d8dea_vb' at line 18)
-#&gt; 
-#&gt; 
-#&gt; Optimization terminated normally: 
-#&gt;   Convergence detected: relative gradient magnitude is below tolerance</div><div class='input'><span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='no'>model_f</span>, <span class='no'>model_m</span>)</div><div class='img'><img src='fit_vb-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>model_f</span>$<span class='no'>model</span></div><div class='output co'>#&gt; $par
+<span class='no'>model_f</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"female"</span>)</div><div class='output co'>#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:1:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Core:531:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:2:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/LU:47:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:3:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Cholesky:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Jacobi:29:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:3:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Cholesky:43:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/QR:17:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Householder:27:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:5:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/SVD:48:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:6:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Geometry:58:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:14:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/matrix_vari.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat/fun/Eigen_NumTraits.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Dense:7:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Eigenvalues:58:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat.hpp:96:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/csr_extract_u.hpp:6:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Sparse:26:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/SparseCore:66:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat.hpp:96:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/csr_extract_u.hpp:6:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Sparse:27:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/OrderingMethods:71:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat.hpp:96:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/csr_extract_u.hpp:6:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Sparse:29:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/SparseCholesky:43:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat.hpp:96:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/csr_extract_u.hpp:6:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Sparse:32:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/SparseQR:35:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat.hpp:96:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/csr_extract_u.hpp:6:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/Sparse:33:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/IterativeLinearSolvers:46:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/RcppEigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h:10:30: warning: pragma diagnostic pop could not pop, no matching push [-Wunknown-pragmas]
+#&gt;     #pragma clang diagnostic pop
+#&gt;                              ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core.hpp:44:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:13: warning: unused function 'set_zero_all_adjoints' [-Wunused-function]
+#&gt; static void set_zero_all_adjoints() {
+#&gt;             ^
+#&gt; In file included from fileec82f417354.cpp:8:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/src/stan/model/model_header.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math.hpp:4:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/rev/mat.hpp:12:
+#&gt; In file included from /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat.hpp:70:
+#&gt; /Library/Frameworks/R.framework/Versions/3.5/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/autocorrelation.hpp:18:8: warning: function 'fft_next_good_size' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+#&gt; size_t fft_next_good_size(size_t N) {
+#&gt;        ^
+#&gt; 15 warnings generated.
+#&gt; ld: warning: text-based stub file /System/Library/Frameworks//CoreFoundation.framework/CoreFoundation.tbd and library file /System/Library/Frameworks//CoreFoundation.framework/CoreFoundation are out of sync. Falling back to library file for linking.</div><div class='input'><span class='no'>model_m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"male"</span>)
+<span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='no'>model_f</span>, <span class='no'>model_m</span>)</div><div class='img'><img src='fit_vb-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='no'>model_f</span>$<span class='no'>model</span></div><div class='output co'>#&gt; $par
 #&gt;           k        linf       sigma          t0 
-#&gt;  0.16292254 43.42801155  0.07106446 -0.63775317 
+#&gt;  0.16292708 43.42794914  0.07106316 -0.63756511 
 #&gt; 
 #&gt; $value
 #&gt; [1] 3096.104
@@ -231,10 +381,10 @@ on. Defaults to <code>NULL</code>, which brings in all valid ageing codes. See
 #&gt; 
 #&gt; $hessian
 #&gt;                   k          linf         sigma            t0
-#&gt; k     -2.432476e+04 -6.046116e+04  3.775639e-02 3391.47388249
-#&gt; linf  -6.046116e+04 -2.859321e+05 -7.128623e-01 6963.95662311
-#&gt; sigma  3.775639e-02 -7.128623e-01 -2.887880e+03   -0.03346994
-#&gt; t0     3.391474e+03  6.963957e+03 -3.346994e-02 -576.09283561
+#&gt; k     -2.432531e+04 -6.046251e+04 -5.761814e-02 3391.69695755
+#&gt; linf  -6.046251e+04 -2.859425e+05 -7.884493e-01 6964.35672018
+#&gt; sigma -5.761814e-02 -7.884493e-01 -2.887985e+03    0.01444723
+#&gt; t0     3.391697e+03  6.964357e+03  1.444723e-02 -576.16873418
 #&gt; </div><div class='input'><span class='no'>model_f</span>$<span class='no'>predictions</span></div><div class='output co'>#&gt; # A tibble: 200 x 2
 #&gt;      age length
 #&gt;    &lt;dbl&gt;  &lt;dbl&gt;
@@ -249,33 +399,31 @@ on. Defaults to <code>NULL</code>, which brings in all valid ageing codes. See
 #&gt;  9  4.81   25.6
 #&gt; 10  5.17   26.6
 #&gt; # ... with 190 more rows</div><div class='input'>
+<span class='co'># You can also fit both sexes combined if you want.</span>
+<span class='co'># Just note that you need to specify the colours explicitly in the plot.</span>
+<span class='no'>model_all</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>sex</span> <span class='kw'>=</span> <span class='st'>"all"</span>)
+<span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='kw'>object_all</span> <span class='kw'>=</span> <span class='no'>model_all</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"All"</span> <span class='kw'>=</span> <span class='st'>"black"</span>))</div><div class='img'><img src='fit_vb-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># with MCMC via Stan (slower):</span>
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"mcmc"</span>,
   <span class='kw'>chains</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>iter</span> <span class='kw'>=</span> <span class='fl'>800</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>) <span class='co'># just for a fast example</span></div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'vb' NOW (CHAIN 1).
-#&gt; 
-#&gt; Gradient evaluation took 0.000152 seconds
-#&gt; 1000 transitions using 10 leapfrog steps per transition would take 1.52 seconds.
-#&gt; Adjust your expectations accordingly!
-#&gt; 
-#&gt; 
-#&gt; Iteration:   1 / 800 [  0%]  (Warmup)
-#&gt; Iteration:  80 / 800 [ 10%]  (Warmup)
-#&gt; Iteration: 160 / 800 [ 20%]  (Warmup)
-#&gt; Iteration: 240 / 800 [ 30%]  (Warmup)
-#&gt; Iteration: 320 / 800 [ 40%]  (Warmup)
-#&gt; Iteration: 400 / 800 [ 50%]  (Warmup)
-#&gt; Iteration: 401 / 800 [ 50%]  (Sampling)
-#&gt; Iteration: 480 / 800 [ 60%]  (Sampling)
-#&gt; Iteration: 560 / 800 [ 70%]  (Sampling)
-#&gt; Iteration: 640 / 800 [ 80%]  (Sampling)
-#&gt; Iteration: 720 / 800 [ 90%]  (Sampling)
-#&gt; Iteration: 800 / 800 [100%]  (Sampling)
-#&gt; 
-#&gt;  Elapsed Time: 0.646932 seconds (Warm-up)
-#&gt;                0.627194 seconds (Sampling)
-#&gt;                1.27413 seconds (Total)
-#&gt; </div><div class='input'><span class='no'>x</span>$<span class='no'>pars</span></div><div class='output co'>#&gt; $k
+#&gt; Chain 1: Gradient evaluation took 0.000123 seconds
+#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.23 seconds.
+#&gt; Chain 1: Iteration:   1 / 800 [  0%]  (Warmup)
+#&gt; Chain 1: Iteration:  80 / 800 [ 10%]  (Warmup)
+#&gt; Chain 1: Iteration: 160 / 800 [ 20%]  (Warmup)
+#&gt; Chain 1: Iteration: 240 / 800 [ 30%]  (Warmup)
+#&gt; Chain 1: Iteration: 320 / 800 [ 40%]  (Warmup)
+#&gt; Chain 1: Iteration: 400 / 800 [ 50%]  (Warmup)
+#&gt; Chain 1: Iteration: 401 / 800 [ 50%]  (Sampling)
+#&gt; Chain 1: Iteration: 480 / 800 [ 60%]  (Sampling)
+#&gt; Chain 1: Iteration: 560 / 800 [ 70%]  (Sampling)
+#&gt; Chain 1: Iteration: 640 / 800 [ 80%]  (Sampling)
+#&gt; Chain 1: Iteration: 720 / 800 [ 90%]  (Sampling)
+#&gt; Chain 1: Iteration: 800 / 800 [100%]  (Sampling)
+#&gt; Chain 1:  Elapsed Time: 0.758282 seconds (Warm-up)
+#&gt; Chain 1:                0.704365 seconds (Sampling)
+#&gt; Chain 1:                1.46265 seconds (Total)</div><div class='input'><span class='no'>x</span>$<span class='no'>pars</span></div><div class='output co'>#&gt; $k
 #&gt; [1] 0.162283
 #&gt; 
 #&gt; $linf
@@ -330,21 +478,21 @@ on. Defaults to <code>NULL</code>, which brings in all valid ageing codes. See
 #&gt; post-warmup draws per chain=400, total post-warmup draws=400.
 #&gt; 
 #&gt;          mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
-#&gt; k        0.16    0.00 0.00    0.16    0.16    0.16    0.16    0.17   121 1.02
-#&gt; linf    43.44    0.01 0.14   43.16   43.34   43.44   43.54   43.70   307 1.00
-#&gt; sigma    0.07    0.00 0.00    0.07    0.07    0.07    0.07    0.07   252 1.00
-#&gt; t0      -0.66    0.01 0.11   -0.88   -0.73   -0.66   -0.59   -0.45   127 1.02
-#&gt; lp__  3093.29    0.14 1.54 3090.12 3092.49 3093.68 3094.35 3095.12   115 1.01
+#&gt; k        0.16    0.00 0.00    0.16    0.16    0.16    0.16    0.17   138 1.02
+#&gt; linf    43.44    0.01 0.14   43.16   43.34   43.44   43.54   43.70   318 1.00
+#&gt; sigma    0.07    0.00 0.00    0.07    0.07    0.07    0.07    0.07   257 1.00
+#&gt; t0      -0.66    0.01 0.11   -0.88   -0.73   -0.66   -0.59   -0.45   145 1.02
+#&gt; lp__  3093.29    0.14 1.54 3090.12 3092.49 3093.68 3094.35 3095.12   125 1.01
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Thu Sep 27 00:11:17 2018.
+#&gt; Samples were drawn using NUTS(diag_e) at Mon Oct 22 12:00:23 2018.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='no'>posterior</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rstan</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/rstan/topics/stanfit-method-extract'>extract</a></span>(<span class='no'>x</span>$<span class='no'>model</span>)
-<span class='fu'>hist</span>(<span class='no'>posterior</span>$<span class='no'>linf</span>)</div><div class='img'><img src='fit_vb-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>hist</span>(<span class='no'>posterior</span>$<span class='no'>linf</span>)</div><div class='img'><img src='fit_vb-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># If less than `min_samples`, fit_vb() returns an empty object that</span>
 <span class='co'># plot_vb() will correctly parse and produce an empty plot:</span>
 <span class='no'>obj</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_vb</span>(<span class='no'>pop_samples</span>[<span class='fl'>1</span>:<span class='fl'>2</span>,])
-<span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='no'>obj</span>, <span class='no'>obj</span>)</div><div class='img'><img src='fit_vb-3.png' alt='' width='700' height='433' /></div></pre>
+<span class='fu'><a href='plot_growth.html'>plot_vb</a></span>(<span class='no'>obj</span>, <span class='no'>obj</span>)</div><div class='img'><img src='fit_vb-4.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

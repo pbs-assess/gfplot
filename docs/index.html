@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.4</span>
       </span>
     </div>
 
@@ -72,13 +72,16 @@
 <div id="gfplot-an-r-package-for-data-extraction-at-pbs-and-plotting-of-any-groundfish-data" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#gfplot-an-r-package-for-data-extraction-at-pbs-and-plotting-of-any-groundfish-data" class="anchor"></a>gfplot: An R package for data extraction (at PBS) and plotting (of any) groundfish data</h1></div>
-
+<!-- [![Travis-CI Build Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot) -->
+<!-- [![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip) -->
 <p>Facilitates the creation of an annual groundfish data synopsis report with <a href="https://github.com/pbs-assess/gfsynopsis">gfsynopsis</a>.</p>
+<p>Note that the documentation is incomplete in some places. Please post in the <a href="https://github.com/pbs-assess/gfplot/issues">issue tracker</a> if you have questions or suggestions on how the package or its documentation could be improved. We welcome pull requests!</p>
+<p>In addition to the help available through the R console, a <a href="https://pbs-assess.github.io/gfplot/index.html">web version of the documentation is available</a>.</p>
 </div>
 <div id="installation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
-<p>The gfplot package is <em>not</em> ready for use yet. In particular, the documentation is far from complete. However, it can be installed and loaded with:</p>
+<p>The gfplot package can be installed and loaded with:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">"INLA"</span>, <span class="dt">repos =</span> <span class="kw">c</span>(<span class="kw">getOption</span>(<span class="st">"repos"</span>), </a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">  <span class="dt">INLA =</span> <span class="st">"https://inla.r-inla-download.org/R/stable"</span>), <span class="dt">dep =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># install.packages("devtools")</span></a>
@@ -92,41 +95,45 @@
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;  [5] "get_cpue_historic"      "get_cpue_historical"   </span></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;  [7] "get_cpue_index"         "get_cpue_spatial"      </span></a>
 <a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;  [9] "get_cpue_spatial_ll"    "get_fishery_ids"       </span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; [11] "get_gear_types"         "get_iphc_hooks"        </span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; [13] "get_iphc_sets"          "get_iphc_sets_info"    </span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; [15] "get_iphc_skates_info"   "get_major_areas"       </span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; [17] "get_management"         "get_management_areas"  </span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; [19] "get_most_common_level"  "get_other_surveys"     </span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt; [21] "get_sara_dat"           "get_species_groups"    </span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; [23] "get_ssids"              "get_survey_index"      </span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; [25] "get_survey_samples"     "get_survey_sets"</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; [11] "get_gear_types"         "get_iphc_1995"         </span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; [13] "get_iphc_1996to2002"    "get_iphc_2013"         </span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; [15] "get_iphc_hooks"         "get_iphc_sets"         </span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; [17] "get_iphc_sets_info"     "get_iphc_skates_info"  </span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; [19] "get_iphc_spp_name"      "get_major_areas"       </span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt; [21] "get_management"         "get_management_areas"  </span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; [23] "get_most_common_level"  "get_other_surveys"     </span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; [25] "get_sara_dat"           "get_species"           </span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; [27] "get_species_groups"     "get_ssids"             </span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; [29] "get_survey_index"       "get_survey_samples"    </span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; [31] "get_survey_sets"        "iphc_get_calc_plot"</span></a></code></pre></div>
 <p>Generic functions for any similarly formatted data:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">sort</span>(fns[<span class="kw">grepl</span>(<span class="st">"tidy"</span>, fns)])</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt;  [1] "tidy_age_precision"            "tidy_ages_raw"                </span></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;  [3] "tidy_ages_weighted"            "tidy_catch"                   </span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  [5] "tidy_comps"                    "tidy_comps_commercial"        </span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt;  [7] "tidy_comps_survey"             "tidy_cpue_historic"           </span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  [9] "tidy_cpue_index"               "tidy_cpue_index_coefs"        </span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; [11] "tidy_cpue_index_coefs_tweedie" "tidy_lengths_raw"             </span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; [13] "tidy_lengths_weighted"         "tidy_maturity_months"         </span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; [15] "tidy_sample_avail"             "tidy_survey_index"            </span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; [17] "tidy_survey_sets"</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  [9] "tidy_cpue_historical"          "tidy_cpue_index"              </span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; [11] "tidy_cpue_index_coefs"         "tidy_cpue_index_coefs_tweedie"</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; [13] "tidy_iphc_survey"              "tidy_lengths_raw"             </span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; [15] "tidy_lengths_weighted"         "tidy_maturity_months"         </span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; [17] "tidy_sample_avail"             "tidy_survey_index"            </span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; [19] "tidy_survey_sets"</span></a></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">sort</span>(fns[<span class="kw">grepl</span>(<span class="st">"fit"</span>, fns)])</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; [1] "fit_cpue_index"         "fit_cpue_index_glmmtmb"</span></a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; [3] "fit_cpue_index_tweedie" "fit_length_weight"     </span></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; [5] "fit_mat_ogive"          "fit_survey_sets"       </span></a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; [7] "fit_vb"</span></a></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">sort</span>(fns[<span class="kw">grepl</span>(<span class="st">"plot"</span>, fns)])</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt;  [1] "plot_age_precision"     "plot_ages"             </span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;  [3] "plot_catch"             "plot_cpue_index"       </span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;  [5] "plot_cpue_index_coefs"  "plot_cpue_index_jk"    </span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;  [7] "plot_cpue_spatial"      "plot_growth"           </span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt;  [9] "plot_length_weight"     "plot_lengths"          </span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; [11] "plot_mat_ogive"         "plot_maturity_months"  </span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; [13] "plot_predictor_bubbles" "plot_qres_histogram"   </span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; [15] "plot_qres_qq"           "plot_sample_avail"     </span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; [17] "plot_survey_index"      "plot_survey_sets"      </span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; [19] "plot_vb"</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt;  [1] "iphc_get_calc_plot"     "plot_age_precision"    </span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;  [3] "plot_ages"              "plot_catch"            </span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;  [5] "plot_cpue_index"        "plot_cpue_index_coefs" </span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;  [7] "plot_cpue_index_jk"     "plot_cpue_spatial"     </span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt;  [9] "plot_growth"            "plot_length_weight"    </span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; [11] "plot_lengths"           "plot_mat_ogive"        </span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; [13] "plot_maturity_months"   "plot_predictor_bubbles"</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; [15] "plot_qres_histogram"    "plot_qres_qq"          </span></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; [17] "plot_sample_avail"      "plot_survey_index"     </span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; [19] "plot_survey_sets"       "plot_vb"</span></a></code></pre></div>
 </div>
   </div>
 
@@ -156,14 +163,7 @@
 </ul>
 </div>
 
-      <div class="dev-status">
-<h2>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://travis-ci.org/pbs-assess/gfplot"><img src="https://travis-ci.org/pbs-assess/gfplot.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="http://www.repostatus.org/#wip"><img src="http://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a></li>
-</ul>
-</div>
-</div>
+      </div>
 
 </div>
 

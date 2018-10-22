@@ -12,7 +12,8 @@ resulting from \code{\link[=calc_iphc_ser_all]{calc_iphc_ser_all()}}}
 }
 \value{
 List of t_AD (results of the paired t-test), and geometric means G_A
-and G_D.
+and G_D. t_AD is NULL if there is no catch in the overlapping years for
+Series A or Series D.
 }
 \description{
 Compare Series A and D to see if A can be considered a relative index for

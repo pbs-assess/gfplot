@@ -63,7 +63,7 @@ the map including the ability to rotate the map." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gfplot</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.4</span>
       </span>
     </div>
 
@@ -125,7 +125,7 @@ the map including the ability to rotate the map.</p>
   <span class='kw'>rotation_center</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>500</span>, <span class='fl'>5700</span>), <span class='kw'>show_axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>xlim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>ylim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>x_buffer</span> <span class='kw'>=</span> <span class='fu'>c</span>(-<span class='fl'>5</span>, <span class='fl'>5</span>), <span class='kw'>y_buffer</span> <span class='kw'>=</span> <span class='fu'>c</span>(-<span class='fl'>5</span>, <span class='fl'>5</span>),
   <span class='kw'>north_symbol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>north_symbol_coord</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>130</span>, <span class='fl'>5975</span>),
-  <span class='kw'>north_symbol_length</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>cell_size</span> <span class='kw'>=</span> <span class='fl'>1.5</span>, <span class='kw'>circles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>north_symbol_length</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>cell_size</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>circles</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -278,7 +278,7 @@ This analysis report uses this for the IPHC survey.</p></td>
 <span class='co'># or use built-in data:</span>
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='survey-spatial-modelling.html'>fit_survey_sets</a></span>(<span class='no'>pop_surv</span>,
   <span class='kw'>years</span> <span class='kw'>=</span> <span class='fl'>2015</span>,
-  <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN QCS"</span>)</div><div class='output co'>#&gt; <span class='message'>Interpolating depth to fill in missing data if needed...</span></div><div class='output co'>#&gt; <span class='message'>Interpolating depth for prediction grid...</span></div><div class='output co'>#&gt; <span class='message'>Predicting density onto grid...</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='input'>
+  <span class='kw'>survey</span> <span class='kw'>=</span> <span class='st'>"SYN QCS"</span>)</div><div class='output co'>#&gt; <span class='message'>Interpolating depth to fill in missing data if needed...</span></div><div class='output co'>#&gt; <span class='message'>Preloading interpolated depth for prediction grid...</span></div><div class='output co'>#&gt; <span class='message'>Predicting density onto grid...</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='output co'>#&gt; <span class='message'>INLA max_edge = c(20, 100)</span></div><div class='input'>
 <span class='co'># The combined model:</span>
 <span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"combined"</span>)</div><div class='img'><img src='plot_survey_sets-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># The positive component model:</span>
 <span class='fu'>plot_survey_sets</span>(<span class='no'>fit</span>$<span class='no'>predictions</span>, <span class='no'>fit</span>$<span class='no'>data</span>, <span class='kw'>fill_column</span> <span class='kw'>=</span> <span class='st'>"pos"</span>)</div><div class='img'><img src='plot_survey_sets-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># Add a custom color scale for the binary model:</span>
