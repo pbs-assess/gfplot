@@ -504,14 +504,19 @@ calc_iphc_full_res <- function(set_counts)
                                                    #  of whole coast (having
                                                    #  compared with Series C)
         # full_coast is TRUE if the longest time series is representative of
-        #  the full coast:
-        if(!is.null(test_AD$t_AD)) {
-          if(test_AD$t_AD$p.value >= 0.05) {
-              full_coast <- (test_AD$t_AD$p.value >= 0.05 &
-                             test_BC$t_BC$p.value >= 0.05)
-          } else {
-                 full_coast <- (test_AD$t_AD$p.value >= 0.05) # as A is the longest
-                 }
+       #  the full coast:
+browser()
+       if(!is.null(test_AD$t_AD)) {
+           if(is.na(test_AD$t_AD$p.value)) {
+               full_coast <- (test_BC$t_BC$p.value >= 0.05) # as B is the longest, see comment below
+           } else {
+               if(test_AD$t_AD$p.value >= 0.05) {
+                  full_coast <- (test_AD$t_AD$p.value >= 0.05 &
+                                 test_BC$t_BC$p.value >= 0.05)
+               } else {
+                     full_coast <- (test_AD$t_AD$p.value >= 0.05) # as A is the longest
+               }
+           }
         } else {
         # test_AD$t_AD is NULL because no catches in either, so B or C then the
         #  longest, currently can only be B (may not have the situation where C
