@@ -353,7 +353,7 @@ compare_iphc_ser_A_D <- function(series_all) {
     G_D <- exp( mean( log( filter(series_all$ser_D,
                                   year %in% years_AD,
                                   I_t20BootMean > 0)$I_t20BootMean)))
-    # If Series A and Series D all have 0 counts for al the intersecting years
+    # If Series A and Series D all have 0 counts for all the intersecting years
     #  then return NULL for t_AD (else t-test fails), e.g. Darkblotched.
     #if(length(unique(series_all$ser_A$year)) ==
     #                              length( unique(series_all$ser_D$year) ) ){
