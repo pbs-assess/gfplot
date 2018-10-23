@@ -557,7 +557,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' Format the longest IPHC time series index to agree with other surveys so
 ##'   that [plot_survey_index()] works automatically. So the mean catch rate
 ##'   gets renames as `biomass' even though it's numbers per effective skate.
-##'   **NOTE** num_sets is currently hardwired as 130, Issue 45.
+##'
 ##' @param iphc_set_counts_sp Output from [calc_iphc_full_res()] (only actually
 ##'   need the ser_longest component and test_AB).
 ##' @return Renamed ser_longest, with some required columns calculated.
@@ -599,32 +599,30 @@ format_iphc_longest <- function(iphc_set_counts_sp){
                             biomass = I_t20BootMean,
                             lowerci = I_t20BootLow,
                             upperci = I_t20BootHigh,
-                            num_pos_sets = num_pos_sets20
+                            num_pos_sets = num_pos20,
+                            num_sets = Sets
                             ) %>%
                       mutate(mean_cv =
                                 mean(iphc_set_counts_sp$ser_longest$I_t20BootCV,
                                      na.rm=TRUE),
-                            num_sets = 130,
                             survey_abbrev = "IPHC FISS") %>%
                      select(survey_abbrev,
-                            everything(),
-                            -prop_empty_sets)
+                            everything())
       } else {    # This would be Series B case
         new_names <- select(iphc_set_counts_sp$ser_longest,
                             year = year,
                             biomass = I_tBootMean,
                             lowerci = I_tBootLow,
                             upperci = I_tBootHigh,
-                            num_pos_sets
+                            num_pos_sets,
+                            num_sets = Sets
                             ) %>%
                       mutate(mean_cv =
                                 mean(iphc_set_counts_sp$ser_longest$I_tBootCV,
                                      na.rm=TRUE),
-                            num_sets = 130,
                             survey_abbrev = "IPHC FISS") %>%
                      select(survey_abbrev,
-                            everything(),
-                            -prop_empty_sets)
+                            everything())
       }
       # This happend for Pearly Prickleback, 0's made it through giving NaN not
       #  NA for CV, messing up figure.
