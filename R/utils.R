@@ -24,7 +24,7 @@ db_connection <- function(server = "DFBCV9TWVASP001",
   pbs_pwd <- getOption("pbs.pwd")
   pbs_ip <- getOption("pbs.ip")
   pbs_sqldriver <- getOption("pbs.sqldriver")
-  if (!is.null(pbs_uid) && !is.null(pbs_uid) && !is.null(pbs_ip)) {
+  if (!is.null(pbs_uid) && !is.null(pbs_pwd) && !is.null(pbs_ip)) {
     DBI::dbConnect(odbc::odbc(),
       driver = if (is.null(pbs_sqldriver)) "SQL Server" else pbs_sqldriver,
       server = pbs_ip, database = database,
