@@ -1,4 +1,4 @@
-# gfplot: An R package for data extraction (at PBS) and plotting (of any) groundfish data
+# gfplot: An R package for data extraction and plotting of British Columbia groundfish data
 
 <!-- [![Travis-CI Build Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot) -->
 
