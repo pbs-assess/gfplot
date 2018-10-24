@@ -673,3 +673,51 @@ iphc_get_calc_plot <- function(sp)
           g_iphc_index = g_iphc_index)
     }
 
+##' Format the final year of IPHC data to use in the spatial map
+##'
+##' Takes the final year of data to get into the correct format to fit into
+##'  plotting functions for gfsynopsis report.
+##' @param set_counts species-specific set-level data from [tidy_iphc_survey()]
+##' @param final_year year for which to plot the set-by-set catch rates
+##' @return tibble in the format required by the plotting function, with a row
+##'  of NA's if the data are not present.
+format_final_year_for_map <- function(set_counts, final_year = 2017)
+{
+    return_NA <- tibble(X = NA,
+                        Y = NA,
+                        akima_depth = NA,
+                        depth_scaled = NA,
+                        depth_scaled2 = NA,
+                        combined = NA,
+                        pos = NA,
+                        bin = NA,
+                        survey = "IPHC FISS")
+
+    set_counts_final <- filter(set_counts,
+                               year == 2017,
+                               usable == "Y") %>%
+                        select(lat,
+                               lon,
+                               C_it)
+
+    if(nrow(set_counts_final) == 0 ) {
+        return(return_NA)
+    }
+
+    if(all(is.na(set_counts_final$C_it))) {
+        return(return_NA)
+    }
+
+    utm <- ll2utm(select(set_counts_final,
+                         X = lon,
+                         Y = lat))
+
+    mutate(utm,
+           akima_depth = NA,
+           depth_scaled = NA,
+           depth_scaled2 = NA,
+           combined = set_counts_final$C_it,
+           pos = NA,
+           bin = NA,
+           survey = "IPHC FISS")
+    }

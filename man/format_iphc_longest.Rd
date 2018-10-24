@@ -17,7 +17,6 @@ Renamed ser_longest, with some required columns calculated.
 Format the longest IPHC time series index to agree with other surveys so
 that \code{\link[=plot_survey_index]{plot_survey_index()}} works automatically. So the mean catch rate
 gets renames as `biomass' even though it's numbers per effective skate.
-\strong{NOTE} num_sets is currently hardwired as 130, Issue 45.
 }
 \examples{
 \dontrun{
