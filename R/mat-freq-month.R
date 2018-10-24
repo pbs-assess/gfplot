@@ -42,6 +42,7 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
       maturity_name = readr::col_character(),
       maturity_desc = readr::col_character(),
       mature_at = readr::col_integer(),
+      maturity_name_short_old = readr::col_character(),
       maturity_name_short = readr::col_character()
     )
   )
@@ -57,19 +58,9 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
   mat_levels <- rev(c(
     "Immature",
     "Maturing",
-    "Maturing-Small",
-    "Maturing-Large",
-    "Pre-Ripening (Mature)",
     "Mature",
-    "Ripening (Mature)",
-    "Gravid",
-    "Fertilized",
     "Ripe",
-    "Running Ripe",
-    "Embryos",
     "Spent",
-    "Resorbing",
-    "Recovering",
     "Resting"
   ))
 
@@ -121,7 +112,7 @@ plot_maturity_months <- function(dat,
                                  alpha = 0.8,
                                  title = "Maturity frequencies",
                                  n_label_pos = c(0.7, 1.3),
-                                 min_fish = 20) {
+                                 min_fish = 0) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
     mutate(
