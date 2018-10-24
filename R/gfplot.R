@@ -145,7 +145,7 @@ if (getRversion() >= "2.15.1") {
     "catchCount", "effSkate",
     "lon", "spNameIPHC", "specCount", "station",
     "countData1995", "countData2013", "data1996to2002",
-    "setData1995", "setData2013", "spNameIPHC",
+    "setData1995", "setData2013", "spNameIPHC", "Sets",
 
 
     # others

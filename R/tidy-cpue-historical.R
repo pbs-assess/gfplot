@@ -163,6 +163,7 @@ tidy_cpue_historical <- function(dat,
   }
 }
 
+#' @param ... Arguments to pass to [tidy_cpue_historical()].
 #' @export
 #' @rdname tidy_cpue_historical
 tidy_cpue_historic <- function(...) {

@@ -214,6 +214,7 @@ get_sample_trips <- function() {
 }
 
 #' @export
+#' @rdname get_data
 get_species <- function()  {
   species <- DBI::dbGetQuery(
     db_connection(database = "GFBioSQL"),

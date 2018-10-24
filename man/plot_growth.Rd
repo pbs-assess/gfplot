@@ -22,6 +22,8 @@ plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
 
 \item{object_male}{Output from \code{\link[=fit_length_weight]{fit_length_weight()}} or \code{\link[=fit_vb]{fit_vb()}}.}
 
+\item{object_all}{Output from \code{\link[=fit_length_weight]{fit_length_weight()}} or \code{\link[=fit_vb]{fit_vb()}}.}
+
 \item{type}{von Bertalanffy or length-weight fits?}
 
 \item{downsample}{Downsample the individual fish to plot down to this number.}
@@ -49,6 +51,11 @@ fish.}
 }
 \description{
 Plot von Bertalanffy or length-weight fits
+}
+\details{
+You can include \code{object_female} and/or \code{object_male} or \code{object_all}
+depending on whether the model was fit to female, male, or both sexes
+combined.
 }
 \examples{
 \donttest{

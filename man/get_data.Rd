@@ -9,6 +9,7 @@
 \alias{get_species_groups}
 \alias{get_gear_types}
 \alias{get_age_methods}
+\alias{get_species}
 \alias{get_other_surveys}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
@@ -42,6 +43,8 @@ get_species_groups()
 get_gear_types()
 
 get_age_methods()
+
+get_species()
 
 get_other_surveys()
 

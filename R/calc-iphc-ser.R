@@ -684,7 +684,8 @@ iphc_get_calc_plot <- function(sp)
 ##' @examples
 ##' \dontrun{
 ##' # If already loaded data via gfsynopsis then just, for any species,
-##' format_final_year_for_map(readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")$set_counts)
+##' format_final_year_for_map(
+##'   readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")$set_counts)
 ##'
 ##' # Else to load from scratch:
 ##' set_counts <- get_all_iphc_set_counts("yelloweye rockfish")

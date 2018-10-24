@@ -46,6 +46,8 @@ specific catch and all effort is summed each year and then divided.)}
 (e.g. per trawl). Fishing events that are longer than this will be removed.
 This can be used to remove erroneous fishing events. Only affects data in
 1991 and after when the data are recorded as fishing events.}
+
+\item{...}{Arguments to pass to \code{\link[=tidy_cpue_historical]{tidy_cpue_historical()}}.}
 }
 \value{
 A (tibble) data frame.

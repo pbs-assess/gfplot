@@ -261,6 +261,7 @@ fit_length_weight <- function(dat,
 #'
 #' @param object_female Output from [fit_length_weight()] or [fit_vb()].
 #' @param object_male Output from [fit_length_weight()] or [fit_vb()].
+#' @param object_all Output from [fit_length_weight()] or [fit_vb()].
 #' @param type von Bertalanffy or length-weight fits?
 #' @param downsample Downsample the individual fish to plot down to this number.
 #' @param pt_alpha Transparency for the points.
@@ -273,6 +274,10 @@ fit_length_weight <- function(dat,
 #' @param lab_y_gap The vertical gap between text labels.
 #' @param col A named character vector declaring the colors for female and male
 #'   fish.
+#'
+#' @details You can include `object_female` and/or `object_male` or `object_all`
+#' depending on whether the model was fit to female, male, or both sexes
+#' combined.
 #'
 #' @export
 #' @rdname plot_growth
