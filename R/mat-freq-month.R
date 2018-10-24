@@ -121,7 +121,7 @@ plot_maturity_months <- function(dat,
                                  alpha = 0.8,
                                  title = "Maturity frequencies",
                                  n_label_pos = c(0.7, 1.3),
-                                 min_fish = 20) {
+                                 min_fish = 0) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
     mutate(
