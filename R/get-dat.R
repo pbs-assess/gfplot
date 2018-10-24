@@ -49,7 +49,9 @@
 #'    for each set, from 2003 to present (excluding 2013 which is not in database);
 #'    needed for the hooks per skate
 #' * `get_iphc_hooks()` extracts IPHC survey data at the hook level for given
-#'    species, from 2003 to present (excluding 2013 which is not in database)
+#'    species, from 2003 to present (excluding 2013 which is not in database).
+#'    If species is 'hook with bait' then it returns the hooks that were returned
+#'    with bait.
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    (except those specific to IPHC data) and caches extracted data to a given
 #'    folder
@@ -524,13 +526,22 @@ get_iphc_skates_info <- function() {
 #' @export
 #' @rdname get_data
 get_iphc_hooks <- function(species, usability = NULL) {
-  .q <- read_sql("get-iphc-hook-level.sql")
-  .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
-  .d <- run_sql("GFBioSQL", .q)
-  .d$species <- tolower(.d$species)
-  if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
-                                   # No data, give NA's
-  as_tibble(.d)
+  if(species != "hook with bait"){
+    .q <- read_sql("get-iphc-hook-level.sql")
+    .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
+    .d <- run_sql("GFBioSQL", .q)
+    .d$species <- tolower(.d$species)
+    if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
+                                     # No data, give NA's
+    return(as_tibble(.d))} else
+  {
+    .q <- read_sql("get-iphc-hook-level-bait-on-hook.sql")
+    .d <- run_sql("GFBioSQL", .q)
+    # .d$species <- tolower(.d$species)
+    if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
+                                     # No data, give NA's
+    return(as_tibble(.d))
+  }
 }
 
 

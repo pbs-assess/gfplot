@@ -26,3 +26,4 @@ ORDER BY hookYieldCode,
 	year, 
 	T.TRIP_ID, 
 	FE.FISHING_EVENT_ID
+	
