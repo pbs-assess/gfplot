@@ -634,10 +634,10 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
   if (show_model_predictions && circles) {
     g <- g + ggplot2::geom_point(
       data = pred_dat, aes_string("X", "Y",
-        colour = fill_column, group = "id"
-      ), size = cell_size
+        fill = fill_column, colour = fill_column, group = "id"
+      ), size = cell_size, pch = 21
     ) +
-      colour_scale
+      fill_scale + colour_scale
   }
   if (show_raw_data) {
     g <- g +
