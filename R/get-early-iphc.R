@@ -80,7 +80,6 @@ check_iphc_spp_name <- function(countData=NULL, ignore_obvious=TRUE){
                 "Bent Hook",
                 "Hook with Skin",
                 "Empty Hook",
-                "Hook with Bait",
                 "Bent/Broken/Missing")
     if(ignore_obvious){
         ignore <- c(ignore,
