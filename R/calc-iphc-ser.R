@@ -251,12 +251,12 @@ calc_iphc_ser_AB <- function(series_all) {
                                      G_B = NA) ) ) }
     }
     # If Series A in overlapping years ends up with no catch (Bluntnose Sixgill
-    #  Shark), then return Series B
+    #  Shark), then return Series B.
     if(nrow(filter(series_all$ser_A, year %in% years_AB, I_t20BootMean > 0)) == 0){
-          return(list(ser_longest = series_all$ser_B,
-                      test_AB = list(t_AB = NULL,
-                                     G_A = NA,
-                                     G_B = NA) ) )
+            return(list(ser_longest = series_all$ser_B,
+                        test_AB = list(t_AB = NULL,
+                                       G_A = NA,
+                                       G_B = NA) ) )
     }
     # Geometric means of each series for the overlapping years, excluding zeros
     G_A <- exp( mean( log( filter(series_all$ser_A,
@@ -267,14 +267,25 @@ calc_iphc_ser_AB <- function(series_all) {
                                   year %in% years_AB,
                                   I_tBootMean > 0)$I_tBootMean)))
 
-    # If Series A has no more years than Series B then just return Series B
+    # If Series A has no more years than Series B then just return Series B....
     if(length(unique(series_all$ser_A$year)) ==
                                   length( unique(series_all$ser_B$year) ) ){
-       if(all(unique(series_all$ser_A$year) == unique(series_all$ser_B$year))) {
+        if(all(unique(series_all$ser_A$year) == unique(series_all$ser_B$year))) {
+            # ....unless also B and C have the same years, then return C for the
+            # full coast. Sandpaper skate may be the only one - turns out 2013
+            # and pre-2003 are empty so Series D is not longer (may not have that
+            # possibility included) .
+          if(all.equal(series_all$ser_B$year, series_all$ser_C$year)){
+              return(list(ser_longest = series_all$ser_C,
+                          test_AB = list(t_AB = NULL,
+                                         G_A = NA,
+                                         G_B = NA) ) )
+          } else {
           return(list(ser_longest = series_all$ser_B,
-                      test_AB = list(t_AB = NULL,
-                                     G_A = G_A,
-                                     G_B = G_B) ) )
+                        test_AB = list(t_AB = NULL,
+                                       G_A = G_A,
+                                       G_B = G_B) ) )
+          }
         }
     }
 
@@ -519,9 +530,17 @@ calc_iphc_full_res <- function(set_counts)
         } else {
         # test_AD$t_AD is NULL because no catches in either, so B or C then the
         #  longest, currently can only be B (may not have the situation where C
-        # is yet)
+        # is yet - do now, sandpaper skate, so putting in extra check below)
         full_coast <- (test_BC$t_BC$p.value >= 0.05) # as B is the longest
         }
+   # Double check if B or C is longest. Maybe no longer all of the above checks.
+   if(isTRUE(all.equal(iphc_ser_longest$ser_longest, series_all$ser_B))) {
+        full_coast = TRUE
+   }
+   if(isTRUE(all.equal(iphc_ser_longest$ser_longest, series_all$ser_C))) {
+        full_coast = TRUE
+   }
+
     list(ser_longest = iphc_ser_longest$ser_longest,
          full_coast = full_coast,
          ser_all = series_all,
@@ -590,7 +609,7 @@ format_iphc_longest <- function(iphc_set_counts_sp){
                           upperci = NA,
                           mean_cv = NA,
                           num_sets = NA,
-                         num_pos_sets = NA ) )
+                          num_pos_sets = NA ) )
       }
       # Series AB is longest, or occasionally Series A (English Sole)
       if("I_t20SampleMean" %in% names(iphc_set_counts_sp$ser_longest) ) {
@@ -608,13 +627,13 @@ format_iphc_longest <- function(iphc_set_counts_sp){
                             survey_abbrev = "IPHC FISS") %>%
                      select(survey_abbrev,
                             everything())
-      } else {    # This would be Series B case
+      } else {    # This would be Series B or C (sandpaper skate) cases
         new_names <- select(iphc_set_counts_sp$ser_longest,
                             year = year,
                             biomass = I_tBootMean,
                             lowerci = I_tBootLow,
                             upperci = I_tBootHigh,
-                            num_pos_sets,
+                            num_pos_sets = num_pos,
                             num_sets = Sets
                             ) %>%
                       mutate(mean_cv =
