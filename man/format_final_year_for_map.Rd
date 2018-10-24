@@ -4,7 +4,7 @@
 \alias{format_final_year_for_map}
 \title{Format the final year of IPHC data to use in the spatial map}
 \usage{
-format_final_year_for_map(set_counts, final_year = 2017)
+format_final_year_for_map(set_counts, final_year)
 }
 \arguments{
 \item{set_counts}{species-specific set-level data from \code{\link[=tidy_iphc_survey]{tidy_iphc_survey()}}}
@@ -18,4 +18,14 @@ of NA's if the data are not present.
 \description{
 Takes the final year of data to get into the correct format to fit into
 plotting functions for gfsynopsis report.
+}
+\examples{
+\dontrun{
+# If already loaded data via gfsynopsis then just, for any species,
+format_final_year_for_map(readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")$set_counts)
+
+# Else to load from scratch:
+set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
+format_final_year_for_map(set_counts, 2017)
+}
 }

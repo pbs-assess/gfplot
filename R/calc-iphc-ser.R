@@ -688,9 +688,9 @@ iphc_get_calc_plot <- function(sp)
 ##'
 ##' # Else to load from scratch:
 ##' set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
-##' format_final_year_for_map(set_counts)
+##' format_final_year_for_map(set_counts, 2017)
 ##' }
-format_final_year_for_map <- function(set_counts, final_year = 2017)
+format_final_year_for_map <- function(set_counts, final_year)
 {
     return_NA <- tibble(X = NA,
                         Y = NA,
@@ -703,7 +703,7 @@ format_final_year_for_map <- function(set_counts, final_year = 2017)
                         survey = "IPHC FISS")
 
     set_counts_final <- filter(set_counts,
-                               year == 2017,
+                               year == final_year,
                                usable == "Y") %>%
                         select(lat,
                                lon,
