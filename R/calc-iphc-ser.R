@@ -681,6 +681,15 @@ iphc_get_calc_plot <- function(sp)
 ##' @param final_year year for which to plot the set-by-set catch rates
 ##' @return tibble in the format required by the plotting function, with a row
 ##'  of NA's if the data are not present.
+##' @examples
+##' \dontrun{
+##' # If already loaded data via gfsynopsis then just, for any species,
+##' format_final_year_for_map(readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")$set_counts)
+##'
+##' # Else to load from scratch:
+##' set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
+##' format_final_year_for_map(set_counts)
+##' }
 format_final_year_for_map <- function(set_counts, final_year = 2017)
 {
     return_NA <- tibble(X = NA,
