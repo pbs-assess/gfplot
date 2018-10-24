@@ -46,7 +46,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     ser_A <- summarise(group_by(ser_A_counts, year),
                        Sets = n(),
-                       NoYYR20 = sum(C_it20 == 0) / n(),
+                       num_pos20 = sum(C_it20 > 0),
                        I_t20SampleMean = mean(C_it20)) %>%
              filter(!is.na(I_t20SampleMean)) %>%   # NA's got carried through, thinking may get error if this ends up empty
              left_join(ser_A_boot, by = "year")
@@ -66,7 +66,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     ser_B <- summarise(group_by(ser_B_counts, year),
                        Sets = n(),
-                       NoYYR = sum(C_it == 0) / n(),
+                       num_pos = sum(C_it > 0),
                        I_tSampleMean = mean(C_it))  %>%
              filter(!is.na(I_tSampleMean)) %>%   # NA's got carried through
              left_join(ser_B_boot, by = "year")
@@ -89,7 +89,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     ser_C <- summarise(group_by(ser_C_counts, year),
                        Sets = n(),
-                       NoYYR = sum(C_it == 0) / n(),
+                       num_pos = sum(C_it > 0),
                        I_tSampleMean = mean(C_it)) %>%
              filter(!is.na(I_tSampleMean)) %>%   # NA's may have got carried through
              left_join(ser_C_boot, by = "year")
@@ -104,7 +104,7 @@ calc_iphc_ser_all <- function(set_counts, lat_cut_off=50.6) {
 
     ser_D <- summarise(group_by(ser_D_counts, year),
                        Sets = n(),
-                       NoYYR20 = sum(C_it20 == 0) / n(),
+                       num_pos20 = sum(C_it20 > 0),
                        I_t20SampleMean = mean(C_it20)) %>%
           filter(!is.na(I_t20SampleMean)) %>%   # NA's may have got carried through
           left_join(ser_D_boot, by = "year")
@@ -303,17 +303,17 @@ calc_iphc_ser_AB <- function(series_all) {
                                 #  in means equals 0
                    # Multiply the ser_B years not in years_AB by G_A/G_B,
                    #  naming columns with 20 since rescaling (and to combine with
-                   #  series_all$ser_A. Note that NoYYR20 is not scaled (as
-                   #  we're implicitly scaling all the catch rates, but the zeros
-                   #  wouldn't change).
+                   #  series_all$ser_A. Note that num_pos20 is not scaled (as
+                   #  we're implicitly scaling all the catch rates, but the numbers
+                   #  of sets won't change).
                    ser_AB <- filter(series_all$ser_B, !year %in% years_AB) %>%
-                             mutate(NoYYR20 = NoYYR,
+                             mutate(num_pos20 = num_pos,
                                     I_t20SampleMean = I_tSampleMean * G_A / G_B,
                                     I_t20BootMean = I_tBootMean * G_A / G_B,
                                     I_t20BootLow = I_tBootLow * G_A / G_B,
                                     I_t20BootHigh = I_tBootHigh * G_A / G_B,
                                     I_t20BootCV = I_tBootCV) %>%
-                             select(-c("NoYYR",
+                             select(-c("num_pos",
                                        "I_tSampleMean",
                                        "I_tBootMean",
                                        "I_tBootLow",
@@ -557,7 +557,7 @@ plot_iphc_index <- function(iphc_set_counts_sp_format){
 ##' Format the longest IPHC time series index to agree with other surveys so
 ##'   that [plot_survey_index()] works automatically. So the mean catch rate
 ##'   gets renames as `biomass' even though it's numbers per effective skate.
-##'   **NOTE** num_sets is currently hardwired as 130, Issue 45.
+##'
 ##' @param iphc_set_counts_sp Output from [calc_iphc_full_res()] (only actually
 ##'   need the ser_longest component and test_AB).
 ##' @return Renamed ser_longest, with some required columns calculated.
@@ -599,34 +599,30 @@ format_iphc_longest <- function(iphc_set_counts_sp){
                             biomass = I_t20BootMean,
                             lowerci = I_t20BootLow,
                             upperci = I_t20BootHigh,
-                            prop_empty_sets = NoYYR20
+                            num_pos_sets = num_pos20,
+                            num_sets = Sets
                             ) %>%
                       mutate(mean_cv =
                                 mean(iphc_set_counts_sp$ser_longest$I_t20BootCV,
                                      na.rm=TRUE),
-                            num_sets = 130,
-                            num_pos_sets = num_sets * (1 - prop_empty_sets),
                             survey_abbrev = "IPHC FISS") %>%
                      select(survey_abbrev,
-                            everything(),
-                            -prop_empty_sets)
+                            everything())
       } else {    # This would be Series B case
         new_names <- select(iphc_set_counts_sp$ser_longest,
                             year = year,
                             biomass = I_tBootMean,
                             lowerci = I_tBootLow,
                             upperci = I_tBootHigh,
-                            prop_empty_sets = NoYYR
+                            num_pos_sets,
+                            num_sets = Sets
                             ) %>%
                       mutate(mean_cv =
                                 mean(iphc_set_counts_sp$ser_longest$I_tBootCV,
                                      na.rm=TRUE),
-                            num_sets = 130,
-                            num_pos_sets = num_sets * (1 - prop_empty_sets),
                             survey_abbrev = "IPHC FISS") %>%
                      select(survey_abbrev,
-                            everything(),
-                            -prop_empty_sets)
+                            everything())
       }
       # This happend for Pearly Prickleback, 0's made it through giving NaN not
       #  NA for CV, messing up figure.
@@ -677,3 +673,60 @@ iphc_get_calc_plot <- function(sp)
           g_iphc_index = g_iphc_index)
     }
 
+##' Format the final year of IPHC data to use in the spatial map
+##'
+##' Takes the final year of data to get into the correct format to fit into
+##'  plotting functions for gfsynopsis report.
+##' @param set_counts species-specific set-level data from [tidy_iphc_survey()]
+##' @param final_year year for which to plot the set-by-set catch rates
+##' @return tibble in the format required by the plotting function, with a row
+##'  of NA's if the data are not present.
+##' @examples
+##' \dontrun{
+##' # If already loaded data via gfsynopsis then just, for any species,
+##' format_final_year_for_map(readRDS("../gfsynopsis/report/data-cache/iphc/china-rockfish.rds")$set_counts)
+##'
+##' # Else to load from scratch:
+##' set_counts <- get_all_iphc_set_counts("yelloweye rockfish")
+##' format_final_year_for_map(set_counts)
+##' }
+format_final_year_for_map <- function(set_counts, final_year = 2017)
+{
+    return_NA <- tibble(X = NA,
+                        Y = NA,
+                        akima_depth = NA,
+                        depth_scaled = NA,
+                        depth_scaled2 = NA,
+                        combined = NA,
+                        pos = NA,
+                        bin = NA,
+                        survey = "IPHC FISS")
+
+    set_counts_final <- filter(set_counts,
+                               year == 2017,
+                               usable == "Y") %>%
+                        select(lat,
+                               lon,
+                               C_it)
+
+    if(nrow(set_counts_final) == 0 ) {
+        return(return_NA)
+    }
+
+    if(all(is.na(set_counts_final$C_it))) {
+        return(return_NA)
+    }
+
+    utm <- ll2utm(select(set_counts_final,
+                         X = lon,
+                         Y = lat))
+
+    mutate(utm,
+           akima_depth = NA,
+           depth_scaled = NA,
+           depth_scaled2 = NA,
+           combined = set_counts_final$C_it,
+           pos = NA,
+           bin = NA,
+           survey = "IPHC FISS")
+    }
