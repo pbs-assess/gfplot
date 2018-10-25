@@ -349,7 +349,7 @@ get_iphc_2013 <- function(species){
 ##'  based on effective skates and numbers of hooks observed. Catch rates are
 ##'  given for the first 20 hooks and/or for all hooks, depending on the data
 ##'  collected.
-##' @param species Species common name (as used by gfplot).
+##' @param species Species common name (as used by gfplot), or 'hook with bait'.
 ##' @return Tibble contains year, station name, lat, lon,
 ##'           E_it (effective skate number for that station, based on all
 ##'                   hooks),

@@ -538,6 +538,17 @@ get_iphc_hooks <- function(species, usability = NULL) {
     .q <- read_sql("get-iphc-hook-level-bait-on-hook.sql")
     .d <- run_sql("GFBioSQL", .q)
     # .d$species <- tolower(.d$species)
+    .d <- mutate(.d,
+                 speciesCode = NA,
+                 species = "hook with bait",
+                 numOnHook = 1,
+                 hookCondCode = NA) %>%   # that code unlikely to be useful
+          select(year:hook,
+                 speciesCode,
+                 species,
+                 numOnHook,
+                 hookYieldCode,
+                 hookCondCode)            # return same order as for species
     if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
                                      # No data, give NA's
     return(as_tibble(.d))
