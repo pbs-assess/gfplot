@@ -7,7 +7,7 @@
 get_all_iphc_set_counts(species)
 }
 \arguments{
-\item{species}{Species common name (as used by gfplot).}
+\item{species}{Species common name (as used by gfplot), or 'hook with bait'.}
 }
 \value{
 Tibble contains year, station name, lat, lon,

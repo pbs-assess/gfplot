@@ -10,7 +10,7 @@ tidy_maturity_months(dat, months = seq(1, 12))
 plot_maturity_months(dat, max_size = 9, sex_gap = 0.2, fill_col = c(M
   = "grey70", F = "black"), line_col = c(M = "grey70", F = "black"),
   alpha = 0.8, title = "Maturity frequencies", n_label_pos = c(0.7,
-  1.3), min_fish = 20)
+  1.3), min_fish = 0)
 }
 \arguments{
 \item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}

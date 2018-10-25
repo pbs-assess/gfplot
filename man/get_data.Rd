@@ -216,7 +216,9 @@ with no species information, to give one unique row (with lat, lon etc.)
 for each set, from 2003 to present (excluding 2013 which is not in database);
 needed for the hooks per skate
 \item \code{get_iphc_hooks()} extracts IPHC survey data at the hook level for given
-species, from 2003 to present (excluding 2013 which is not in database)
+species, from 2003 to present (excluding 2013 which is not in database).
+If species is 'hook with bait' then it returns the hooks that were returned
+with bait.
 \item \code{cache_pbs_data()} runs all 'get' functions in the gfplot package
 (except those specific to IPHC data) and caches extracted data to a given
 folder
