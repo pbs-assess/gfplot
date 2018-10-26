@@ -1,4 +1,4 @@
-maturity_convention_code,maturity_convention_desc,Maturity Convention Max Value,maturity_code,sex,maturity_name,maturity_desc,mature_at,maturity_name_short_old,maturity_name_short
+maturity_convention_code,maturity_convention_desc,Maturity Convention Max Value,maturity_code,sex,maturity_name,maturity_desc,mature_at,maturity_name_short,maturity_name_short_new
 1,ROCKFISH (1977+),7,1,1,IMMATURE,"TRANSLUCENT, STRING-LIKE",3,Immature,Immature
 1,ROCKFISH (1977+),7,1,2,IMMATURE,"TRANSLUCENT, SMALL",3,Immature,Immature
 1,ROCKFISH (1977+),7,2,1,MATURING,"SWELLING, BROWN-WHITE",3,Maturing,Maturing
@@ -8,7 +8,7 @@ maturity_convention_code,maturity_convention_desc,Maturity Convention Max Value,
 1,ROCKFISH (1977+),7,4,1,MATURE,"LARGE WHITE, EASILY BROKEN",3,Mature,Mature
 1,ROCKFISH (1977+),7,4,2,FERTILIZED,"LARGE, ORANGE-YELLOW EGGS, TRANSLUCENT",3,Fertilized,Mature
 1,ROCKFISH (1977+),7,5,1,RIPE,RUNNING SPERM,3,Running Ripe,Ripe
-1,ROCKFISH (1977+),7,5,2,EMBRYOS OR LARVAE,INCLUDES EYED EGGS,3,Embryos,Mature
+1,ROCKFISH (1977+),7,5,2,EMBRYOS OR LARVAE,INCLUDES EYED EGGS,3,Embryos,Embryos
 1,ROCKFISH (1977+),7,6,1,SPENT,"FLACCID, RED",3,Spent,Spent
 1,ROCKFISH (1977+),7,6,2,SPENT,LARGE FLACCID RED OVARIES; A FEW LARVAE MAY BE PRESENT,3,Spent,Spent
 1,ROCKFISH (1977+),7,7,1,RESTING,"RIBBON-LIKE, SMALL BROWN",3,Resting,Resting
@@ -165,7 +165,7 @@ maturity_convention_code,maturity_convention_desc,Maturity Convention Max Value,
 13,AMR,7,1,2,IMMATURE,NULL,3,Immature,Immature
 13,AMR,7,2,1,MATURING - SMALL,NULL,3,Maturing-Small,Maturing
 13,AMR,7,2,2,MATURING - SMALL,NULL,3,Maturing-Small,Maturing
-13,AMR,7,3,2,MATURING - LARGE,NULL,3,Maturing-Large,Maturing
+13,AMR,7,3,2,MATURING - LARGE,NULL,3,Maturing-Large,Mature
 13,AMR,7,4,1,MATURE,NULL,3,Mature,Mature
 13,AMR,7,4,2,MATURE,NULL,3,Mature,Mature
 13,AMR,7,5,1,RIPE,NULL,3,Ripe,Ripe
