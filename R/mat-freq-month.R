@@ -59,7 +59,13 @@ tidy_maturity_months <- function(dat, months = seq(1, 12)) {
     "Immature",
     "Maturing",
     "Mature",
+    "Uterine Eggs",
+    "Yolk Sac Pups",
+    "Term Pups",
+    "Gravid",
+    "Embryos",
     "Ripe",
+    "Running Ripe",
     "Spent",
     "Resting"
   ))
