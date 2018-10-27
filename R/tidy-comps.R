@@ -263,6 +263,8 @@ tidy_comps <- function(dat,
       summarise(n = n()) %>%
       group_by(year, survey_abbrev) %>%
       mutate(proportion = n / sum(n)) %>%
+      group_by(survey_abbrev) %>%
+      mutate(proportion = proportion / max(proportion)) %>%
       select(-n) %>%
       ungroup()
   }
