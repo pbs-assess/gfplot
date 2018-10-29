@@ -147,7 +147,7 @@ plot_catch <-
     if (!blank_plot) {
       dat <- left_join(
         expand.grid(year = seq(min(xlim), max(xlim)),
-          area = levels(dat$area), gear = levels(dat$gear)), dat,
+          area = levels(as.factor(dat$area)), gear = levels(dat$gear)), dat,
         by = c("year", "area", "gear"))
       dat$value[is.na(dat$value)] <- 0
     }
