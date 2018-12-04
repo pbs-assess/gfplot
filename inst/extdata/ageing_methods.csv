@@ -1,61 +1,112 @@
-SPECIES_COMMON_NAME,type,ageing_method_codes
-LINGCOD,A,6
-PACIFIC COD,A,6
-WALLEYE POLLOCK,A,7
-PACIFIC HAKE,A,"1, 3, 17"
-ROUGHEYE/BLACKSPOTTED ROCKFISH COMPLEX,A,"1, 3, 17"
-PACIFIC OCEAN PERCH,A,"1, 3, 17"
-REDBANDED ROCKFISH,A,"1, 3, 17"
-SILVERGRAY ROCKFISH,A,"1, 3, 17"
-COPPER ROCKFISH,A,"1, 3, 17"
-DARKBLOTCHED ROCKFISH,A,"1, 3, 17"
-WIDOW ROCKFISH,A,"1, 3, 17"
-YELLOWTAIL ROCKFISH,A,"1, 3, 17"
-QUILLBACK ROCKFISH,A,"1, 3, 17"
-BOCACCIO,A,"1, 3, 17"
-CANARY ROCKFISH,A,"1, 3, 17"
-REDSTRIPE ROCKFISH,A,"1, 3, 17"
-YELLOWMOUTH ROCKFISH,A,"1, 3, 17"
-YELLOWEYE ROCKFISH,A,"1, 3, 17"
-SABLEFISH,A,"1, 3, 17"
-ARROWTOOTH FLOUNDER,A,"1, 3, 17"
-PETRALE SOLE,A,"1, 3, 17"
-REX SOLE,A,"1, 3, 17"
-SOUTHERN ROCK SOLE,A,"1, 3, 17"
-DOVER SOLE,A,"1, 3, 17"
-ENGLISH SOLE,A,"1, 3, 17"
-SHORTRAKER ROCKFISH,A,"1, 3, 4, 17"
-SHORTSPINE THORNYHEAD,A,"1, 3, 4, 17"
-LONGSPINE THORNYHEAD,A,"1, 3, 4, 17"
-NORTH PACIFIC SPINY DOGFISH,A,11
-BIG SKATE,A,12
-LONGNOSE SKATE,A,12
-BASKING SHARK,B,12
-SALMON SHARK,B,12
-BROWN CAT SHARK,B,12
-BLUE SHARK,B,12
-PACIFIC SLEEPER SHARK,B,12
-ALEUTIAN SKATE,B,12
-ABYSSAL SKATE,B,12
-BROAD SKATE,B,12
-ROUGHTAIL SKATE,B,12
-SANDPAPER SKATE,B,12
-ALASKA SKATE,B,na
-SPOTTED RATFISH,B,na
-WHITEBAIT SMELT,B,na
-PACIFIC FLATNOSE,B,na
-PACIFIC TOMCOD,B,na
-BIGFIN EELPOUT,B,na
-TWOLINE EELPOUT,B,na
-SHORTFIN EELPOUT,B,na
-BLACK EELPOUT,B,na
-WATTLED EELPOUT,B,na
-BLACKBELLY EELPOUT,B,na
-PACIFIC GRENADIER,B,na
-THREADFIN GRENADIER,B,na
-GIANT GRENADIER,B,na
-SHINER PERCH,B,na
-SNAKE PRICKLEBACK,B,na
-WHITEBARRED PRICKLEBACK,B,na
-WOLF EEL,B,na
-GIANT WRYMOUTH,B,na
+species_common_name,species_ageing_group,species_code,species_science_name,ageing_method_codes
+bluntnose sixgill shark,sharks_skates,27,hexanchus griseus,12
+basking shark,sharks_skates,34,cetorhinus maximus,12
+salmon shark,sharks_skates,36,lamna ditropis,12
+brown cat shark,sharks_skates,38,apristurus brunneus,12
+blue shark,sharks_skates,41,prionace glauca,12
+pacific sleeper shark,sharks_skates,43,somniosus pacificus,12
+north pacific spiny dogfish,dogfish,44,squalus suckleyi,11
+aleutian skate,sharks_skates,52,bathyraja aleutica,12
+abyssal skate,sharks_skates,54,bathyraja abyssicola,12
+broad skate,sharks_skates,55,amblyraja badia,12
+big skate,sharks_skates,56,beringraja binoculata,12
+roughtail skate,sharks_skates,57,bathyraja trachura,12
+sandpaper skate,sharks_skates,58,bathyraja interrupta,12
+longnose skate,sharks_skates,59,raja rhina,12
+alaska skate,sharks_skates,61,bathyraja parmifera,12
+spotted ratfish,,66,hydrolagus colliei,
+whitebait smelt,,138,allosmerus elongatus,
+pacific flatnose,,220,antimora microlepis,
+pacific cod,pcod_lingcod,222,gadus macrocephalus,6
+pacific tomcod,,226,microgadus proximus,
+walleye pollock,pollock,228,gadus chalcogrammus,7
+bigfin eelpout,,233,lycodes cortezianus,
+twoline eelpout,,235,bothrocara brunneum,
+shortfin eelpout,,242,lycodes brevipes,
+black eelpout,,243,lycodes diapterus,
+wattled eelpout,,244,lycodes palearis,
+blackbelly eelpout,,245,lycodes pacificus,
+pacific grenadier,,251,coryphaenoides acrolepis,
+threadfin grenadier,,254,coryphaenoides filifer,
+giant grenadier,,256,albatrossia pectoralis,
+california grenadier,,257,nezumia stelgidolepis,
+shiner perch,,304,cymatogaster aggregata,
+pearly prickleback,,331,bryozoichthys marjorius,
+snake prickleback,,337,lumpenus sagitta,
+whitebarred prickleback,,340,poroclinus rothrocki,
+wolf eel,,351,anarrhichthys ocellatus,
+giant wrymouth,,355,cryptacanthodes giganteus,
+dwarf wrymouth,,356,cryptacanthodes aleutensis,
+prowfish,,359,zaprora silenus,
+pacific sand lance,,361,ammodytes personatus,
+ragfish,,386,icosteus aenigmaticus,
+rougheye/blackspotted rockfish complex,rockfish_flatfish_hake,394,sebastes aleutianus/melanostictus complex,"1, 3, 16, 17"
+pacific ocean perch,rockfish_flatfish_hake,396,sebastes alutus,"1, 3, 16, 17"
+aurora rockfish,rockfish_flatfish_hake,400,sebastes aurora,"1, 3, 16, 17"
+redbanded rockfish,rockfish_flatfish_hake,401,sebastes babcocki,"1, 3, 16, 17"
+shortraker rockfish,shortraker_thornyheads,403,sebastes borealis,"1, 3, 4, 16, 17"
+silvergray rockfish,rockfish_flatfish_hake,405,sebastes brevispinis,"1, 3, 16, 17"
+copper rockfish,rockfish_flatfish_hake,407,sebastes caurinus,"1, 3, 16, 17"
+dusky rockfish,rockfish_flatfish_hake,409,sebastes variabilis,"1, 3, 16, 17"
+darkblotched rockfish,rockfish_flatfish_hake,410,sebastes crameri,"1, 3, 16, 17"
+splitnose rockfish,rockfish_flatfish_hake,412,sebastes diploproa,"1, 3, 16, 17"
+greenstriped rockfish,rockfish_flatfish_hake,414,sebastes elongatus,"1, 3, 16, 17"
+puget sound rockfish,rockfish_flatfish_hake,415,sebastes emphaeus,"1, 3, 16, 17"
+widow rockfish,rockfish_flatfish_hake,417,sebastes entomelas,"1, 3, 16, 17"
+yellowtail rockfish,rockfish_flatfish_hake,418,sebastes flavidus,"1, 3, 16, 17"
+chilipepper,rockfish_flatfish_hake,420,sebastes goodei,"1, 3, 16, 17"
+rosethorn rockfish,rockfish_flatfish_hake,421,sebastes helvomaculatus,"1, 3, 16, 17"
+quillback rockfish,rockfish_flatfish_hake,424,sebastes maliger,"1, 3, 16, 17"
+black rockfish,rockfish_flatfish_hake,426,sebastes melanops,"1, 3, 16, 17"
+blackgill rockfish,rockfish_flatfish_hake,427,sebastes melanostomus,"1, 3, 16, 17"
+vermilion rockfish,rockfish_flatfish_hake,428,sebastes miniatus,"1, 3, 16, 17"
+deacon rockfish,rockfish_flatfish_hake,429,sebastes diaconus,"1, 3, 16, 17"
+china rockfish,rockfish_flatfish_hake,431,sebastes nebulosus,"1, 3, 16, 17"
+tiger rockfish,rockfish_flatfish_hake,433,sebastes nigrocinctus,"1, 3, 16, 17"
+bocaccio,rockfish_flatfish_hake,435,sebastes paucispinis,"1, 3, 16, 17"
+canary rockfish,rockfish_flatfish_hake,437,sebastes pinniger,"1, 3, 16, 17"
+redstripe rockfish,rockfish_flatfish_hake,439,sebastes proriger,"1, 3, 16, 17"
+yellowmouth rockfish,rockfish_flatfish_hake,440,sebastes reedi,"1, 3, 16, 17"
+yelloweye rockfish,rockfish_flatfish_hake,442,sebastes ruberrimus,"1, 3, 16, 17"
+stripetail rockfish,rockfish_flatfish_hake,444,sebastes saxicola,"1, 3, 16, 17"
+harlequin rockfish,rockfish_flatfish_hake,446,sebastes variegatus,"1, 3, 16, 17"
+pygmy rockfish,rockfish_flatfish_hake,448,sebastes wilsoni,"1, 3, 16, 17"
+sharpchin rockfish,rockfish_flatfish_hake,450,sebastes zacentrus,"1, 3, 16, 17"
+shortspine thornyhead,shortraker_thornyheads,451,sebastolobus alascanus,"1, 3, 4, 16, 17"
+longspine thornyhead,shortraker_thornyheads,453,sebastolobus altivelis,"1, 3, 4, 16, 17"
+sablefish,rockfish_flatfish_hake,455,anoplopoma fimbria,"1, 3, 16, 17"
+kelp greenling,,461,hexagrammos decagrammus,
+whitespotted greenling,,466,hexagrammos stelleri,
+lingcod,pcod_lingcod,467,ophiodon elongatus,6
+spinyhead sculpin,,497,dasycottus setiger,
+buffalo sculpin,,499,enophrys bison,
+red irish lord,,502,hemilepidotus hemilepidotus,
+bigmouth sculpin,,505,hemitripterus bolini,
+threadfin sculpin,,510,icelinus filamentosus,
+spotfin sculpin,,513,icelinus tenuis,
+pacific staghorn sculpin,,518,leptocottus armatus,
+blackfin sculpin,,519,malacocottus kincaidi,
+great sculpin,,521,myoxocephalus polyacanthocephalus,
+thornback sculpin,,532,paricelinus hopliticus,
+giant blobsculpin,,534,psychrolutes phrictus,
+slim sculpin,,535,radulinus asprellus,
+cabezon,,540,scorpaenichthys marmoratus,
+sturgeon poacher,,550,podothecus accipenserinus,
+smootheye poacher,,555,xeneretmus leiops,
+blacktail snailfish,,574,careproctus melanurus,
+pacific sanddab,rockfish_flatfish_hake,596,citharichthys sordidus,"1, 3, 16, 17"
+arrowtooth flounder,rockfish_flatfish_hake,602,atheresthes stomias,"1, 3, 16, 17"
+deepsea sole,rockfish_flatfish_hake,605,embassichthys bathybius,"1, 3, 16, 17"
+petrale sole,rockfish_flatfish_hake,607,eopsetta jordani,"1, 3, 16, 17"
+rex sole,rockfish_flatfish_hake,610,glyptocephalus zachirus,"1, 3, 16, 17"
+flathead sole,rockfish_flatfish_hake,612,hippoglossoides elassodon,"1, 3, 16, 17"
+butter sole,rockfish_flatfish_hake,619,isopsetta isolepis,"1, 3, 16, 17"
+southern rock sole,rockfish_flatfish_hake,621,lepidopsetta bilineata,"1, 3, 16, 17"
+slender sole,rockfish_flatfish_hake,625,lyopsetta exilis,"1, 3, 16, 17"
+dover sole,rockfish_flatfish_hake,626,microstomus pacificus,"1, 3, 16, 17"
+english sole,rockfish_flatfish_hake,628,parophrys vetulus,"1, 3, 16, 17"
+starry flounder,rockfish_flatfish_hake,631,platichthys stellatus,"1, 3, 16, 17"
+c-o sole,rockfish_flatfish_hake,633,pleuronichthys coenosus,"1, 3, 16, 17"
+curlfin sole,rockfish_flatfish_hake,635,pleuronichthys decurrens,"1, 3, 16, 17"
+sand sole,rockfish_flatfish_hake,636,psettichthys melanostictus,"1, 3, 16, 17"
+soupfin shark,,NA,NA,

@@ -448,7 +448,30 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   }
 
   # remove ages from unaccepted ageing methods:
-  .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
+  file <- system.file("extdata", "ageing_methods.csv",
+    package = "gfplot"
+  )
+
+  ageing_methods <- readr::read_csv(file,
+    col_types = readr::cols(
+      species_code = readr::col_character()))
+
+  .d <- left_join(.d,
+    select(ageing_methods, species_code, species_ageing_group),
+    by = "species_code")
+
+  .d <- .d %>%
+      mutate(
+        age = case_when(
+          species_ageing_group == "rockfish_flatfish_hake" & ageing_method_code %in% c(1, 3, 16, 17) ~.d$age,
+          species_ageing_group == "sharks_skates" & ageing_method_code %in% c(12) ~.d$age,
+          species_ageing_group == "dogfish" & ageing_method_code %in% c(11) ~.d$age,
+          species_ageing_group == "pcod_lingcod" & ageing_method_code %in% c(6) ~.d$age,
+          species_ageing_group == "pollock" & ageing_method_code %in% c(7) ~.d$age,
+          species_ageing_group == "shortraker_thornyheads" & ageing_method_code %in% c(1, 3, 4, 16, 17) ~.d$age,
+          is.na(species_ageing_group) ~NA_real_
+          )
+      )
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
@@ -580,7 +603,30 @@ get_commercial_samples <- function(species, unsorted_only = TRUE,
   }
 
   # remove ages from unaccepted ageing methods:
-  .d <- mutate(.d, age = ifelse(is.na(ageing_method), NA, age))
+  file <- system.file("extdata", "ageing_methods.csv",
+    package = "gfplot"
+  )
+
+  ageing_methods <- readr::read_csv(file,
+    col_types = readr::cols(
+      species_code = readr::col_character()))
+
+  .d <- left_join(.d,
+    select(ageing_methods, species_code, species_ageing_group),
+    by = "species_code")
+
+  .d <- .d %>%
+    mutate(
+      age = case_when(
+        species_ageing_group == "rockfish_flatfish_hake" & ageing_method_code %in% c(1, 3, 16, 17) ~.d$age,
+        species_ageing_group == "sharks_skates" & ageing_method_code %in% c(12) ~.d$age,
+        species_ageing_group == "dogfish" & ageing_method_code %in% c(11) ~.d$age,
+        species_ageing_group == "pcod_lingcod" & ageing_method_code %in% c(6) ~.d$age,
+        species_ageing_group == "pollock" & ageing_method_code %in% c(7) ~.d$age,
+        species_ageing_group == "shortraker_thornyheads" & ageing_method_code %in% c(1, 3, 4, 16, 17) ~.d$age,
+        is.na(species_ageing_group) ~NA_real_
+      )
+    )
 
   as_tibble(.d)
 }
