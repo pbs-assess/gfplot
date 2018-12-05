@@ -14,32 +14,32 @@ roughtail skate,sharks_skates,57,bathyraja trachura,12
 sandpaper skate,sharks_skates,58,bathyraja interrupta,12
 longnose skate,sharks_skates,59,raja rhina,12
 alaska skate,sharks_skates,61,bathyraja parmifera,12
-spotted ratfish,,66,hydrolagus colliei,
-whitebait smelt,,138,allosmerus elongatus,
-pacific flatnose,,220,antimora microlepis,
+spotted ratfish,NA,66,hydrolagus colliei,NA
+whitebait smelt,NA,138,allosmerus elongatus,NA
+pacific flatnose,NA,220,antimora microlepis,NA
 pacific cod,pcod_lingcod,222,gadus macrocephalus,6
-pacific tomcod,,226,microgadus proximus,
+pacific tomcod,NA,226,microgadus proximus,NA
 walleye pollock,pollock,228,gadus chalcogrammus,7
-bigfin eelpout,,233,lycodes cortezianus,
-twoline eelpout,,235,bothrocara brunneum,
-shortfin eelpout,,242,lycodes brevipes,
-black eelpout,,243,lycodes diapterus,
-wattled eelpout,,244,lycodes palearis,
-blackbelly eelpout,,245,lycodes pacificus,
-pacific grenadier,,251,coryphaenoides acrolepis,
-threadfin grenadier,,254,coryphaenoides filifer,
-giant grenadier,,256,albatrossia pectoralis,
-california grenadier,,257,nezumia stelgidolepis,
-shiner perch,,304,cymatogaster aggregata,
-pearly prickleback,,331,bryozoichthys marjorius,
-snake prickleback,,337,lumpenus sagitta,
-whitebarred prickleback,,340,poroclinus rothrocki,
-wolf eel,,351,anarrhichthys ocellatus,
-giant wrymouth,,355,cryptacanthodes giganteus,
-dwarf wrymouth,,356,cryptacanthodes aleutensis,
-prowfish,,359,zaprora silenus,
-pacific sand lance,,361,ammodytes personatus,
-ragfish,,386,icosteus aenigmaticus,
+bigfin eelpout,NA,233,lycodes cortezianus,NA
+twoline eelpout,NA,235,bothrocara brunneum,NA
+shortfin eelpout,NA,242,lycodes brevipes,NA
+black eelpout,NA,243,lycodes diapterus,NA
+wattled eelpout,NA,244,lycodes palearis,NA
+blackbelly eelpout,NA,245,lycodes pacificus,NA
+pacific grenadier,NA,251,coryphaenoides acrolepis,NA
+threadfin grenadier,NA,254,coryphaenoides filifer,NA
+giant grenadier,NA,256,albatrossia pectoralis,NA
+california grenadier,NA,257,nezumia stelgidolepis,NA
+shiner perch,NA,304,cymatogaster aggregata,NA
+pearly prickleback,NA,331,bryozoichthys marjorius,NA
+snake prickleback,NA,337,lumpenus sagitta,NA
+whitebarred prickleback,NA,340,poroclinus rothrocki,NA
+wolf eel,NA,351,anarrhichthys ocellatus,NA
+giant wrymouth,NA,355,cryptacanthodes giganteus,NA
+dwarf wrymouth,NA,356,cryptacanthodes aleutensis,NA
+prowfish,NA,359,zaprora silenus,NA
+pacific sand lance,NA,361,ammodytes personatus,NA
+ragfish,NA,386,icosteus aenigmaticus,NA
 rougheye/blackspotted rockfish complex,rockfish_flatfish_hake,394,sebastes aleutianus/melanostictus complex,"1, 3, 16, 17"
 pacific ocean perch,rockfish_flatfish_hake,396,sebastes alutus,"1, 3, 16, 17"
 aurora rockfish,rockfish_flatfish_hake,400,sebastes aurora,"1, 3, 16, 17"
@@ -75,25 +75,25 @@ sharpchin rockfish,rockfish_flatfish_hake,450,sebastes zacentrus,"1, 3, 16, 17"
 shortspine thornyhead,shortraker_thornyheads,451,sebastolobus alascanus,"1, 3, 4, 16, 17"
 longspine thornyhead,shortraker_thornyheads,453,sebastolobus altivelis,"1, 3, 4, 16, 17"
 sablefish,rockfish_flatfish_hake,455,anoplopoma fimbria,"1, 3, 16, 17"
-kelp greenling,,461,hexagrammos decagrammus,
-whitespotted greenling,,466,hexagrammos stelleri,
+kelp greenling,NA,461,hexagrammos decagrammus,NA
+whitespotted greenling,NA,466,hexagrammos stelleri,NA
 lingcod,pcod_lingcod,467,ophiodon elongatus,6
-spinyhead sculpin,,497,dasycottus setiger,
-buffalo sculpin,,499,enophrys bison,
-red irish lord,,502,hemilepidotus hemilepidotus,
-bigmouth sculpin,,505,hemitripterus bolini,
-threadfin sculpin,,510,icelinus filamentosus,
-spotfin sculpin,,513,icelinus tenuis,
-pacific staghorn sculpin,,518,leptocottus armatus,
-blackfin sculpin,,519,malacocottus kincaidi,
-great sculpin,,521,myoxocephalus polyacanthocephalus,
-thornback sculpin,,532,paricelinus hopliticus,
-giant blobsculpin,,534,psychrolutes phrictus,
-slim sculpin,,535,radulinus asprellus,
-cabezon,,540,scorpaenichthys marmoratus,
-sturgeon poacher,,550,podothecus accipenserinus,
-smootheye poacher,,555,xeneretmus leiops,
-blacktail snailfish,,574,careproctus melanurus,
+spinyhead sculpin,NA,497,dasycottus setiger,NA
+buffalo sculpin,NA,499,enophrys bison,NA
+red irish lord,NA,502,hemilepidotus hemilepidotus,NA
+bigmouth sculpin,NA,505,hemitripterus bolini,NA
+threadfin sculpin,NA,510,icelinus filamentosus,NA
+spotfin sculpin,NA,513,icelinus tenuis,NA
+pacific staghorn sculpin,NA,518,leptocottus armatus,NA
+blackfin sculpin,NA,519,malacocottus kincaidi,NA
+great sculpin,NA,521,myoxocephalus polyacanthocephalus,NA
+thornback sculpin,NA,532,paricelinus hopliticus,NA
+giant blobsculpin,NA,534,psychrolutes phrictus,NA
+slim sculpin,NA,535,radulinus asprellus,NA
+cabezon,NA,540,scorpaenichthys marmoratus,NA
+sturgeon poacher,NA,550,podothecus accipenserinus,NA
+smootheye poacher,NA,555,xeneretmus leiops,NA
+blacktail snailfish,NA,574,careproctus melanurus,NA
 pacific sanddab,rockfish_flatfish_hake,596,citharichthys sordidus,"1, 3, 16, 17"
 arrowtooth flounder,rockfish_flatfish_hake,602,atheresthes stomias,"1, 3, 16, 17"
 deepsea sole,rockfish_flatfish_hake,605,embassichthys bathybius,"1, 3, 16, 17"
@@ -109,4 +109,4 @@ starry flounder,rockfish_flatfish_hake,631,platichthys stellatus,"1, 3, 16, 17"
 c-o sole,rockfish_flatfish_hake,633,pleuronichthys coenosus,"1, 3, 16, 17"
 curlfin sole,rockfish_flatfish_hake,635,pleuronichthys decurrens,"1, 3, 16, 17"
 sand sole,rockfish_flatfish_hake,636,psettichthys melanostictus,"1, 3, 16, 17"
-soupfin shark,,NA,NA,
+soupfin shark,NA,NA,NA,NA
