@@ -61,6 +61,8 @@ tidy_catch <- function(dat, areas = NULL) {
     ungroup() %>%
     arrange(species_common_name, year)
 
+# Note that discarded_kg only includes trawl discards from 1996+ and
+# trap/hook and line discards from 2006+
   catches <- mutate(dat,
     gear = dplyr::recode(gear,
       UNKNOWN = "Unknown/trawl",
