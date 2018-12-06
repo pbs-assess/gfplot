@@ -19,6 +19,11 @@
 #' @param return_data Logical for whether to return the data instead of the plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
+#' @param percent_excluded_text If not `NULL`, should be a numeric vector of length 2
+#'   corresponding to the x and y location (as fraction from the bottom left)
+#'   of text describing the percentage of fishing events excluded due to the privacy rule.
+#' @param percent_excluded_text The text to associate with the annotation showing
+#'   the percentage of fishing events excluded due to the privacy rule.
 #'
 #' @export
 #' @importFrom utils data
@@ -47,7 +52,9 @@ plot_cpue_spatial <-
              rotation_center = c(500, 5700),
              fill_lab = "CPUE (kg/hr)",
              return_data = FALSE,
-             min_cells = 10) {
+             min_cells = 10,
+             percent_excluded_xy = NULL,
+             percent_excluded_text = "Fishing events excluded due to Privacy Act") {
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
     plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
@@ -80,6 +87,17 @@ plot_cpue_spatial <-
         fun = function(x) length(unique(x))
         )
 
+      # count fishing events per hexagon cell to keep track of how many not shown:
+      g_fe_id_count <- ggplot(dat, aes_string("X", "Y")) +
+        coord_equal(xlim = xlim, ylim = ylim) +
+        stat_summary_hex(aes_string(
+          x = "X", y = "Y",
+          z = "fishing_event_id"
+        ),
+          data = dat, binwidth = bin_width,
+          fun = function(x) length(unique(x))
+        )
+
       # the actual CPUE hexagon binning:
       g <- ggplot(dat, aes_string("X", "Y")) +
         coord_equal(xlim = xlim, ylim = ylim) +
@@ -92,12 +110,20 @@ plot_cpue_spatial <-
       # enact the privacy rule:
       gdat <- ggplot2::ggplot_build(g)$data[[1]]
       gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
+      gdat_fe_id_count <- ggplot2::ggplot_build(g_fe_id_count)$data[[1]]
 
+      # sanity check:
       stopifnot(identical(nrow(gdat), nrow(gdat_count)))
+      stopifnot(identical(nrow(gdat), nrow(gdat_fe_id_count)))
       # Number of hexagon cells for vessel count and CPUE didn't match.
       # Stopping because the privacy rule might not remain valid in this case.
 
       gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
+
+      lost_fe_id_df <- gdat_fe_id_count[gdat_count$value < n_minimum_vessels, , drop = FALSE]
+      lost_fe_ids <- sum(lost_fe_id_df$value)
+      total_fe_ids <- sum(gdat_fe_id_count$value)
+
       if (return_data) {
         return(gdat)
       } else {
@@ -152,7 +178,19 @@ plot_cpue_spatial <-
       coord_equal(xlim = xlim, ylim = ylim) +
       theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
 
-    g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
+    g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
+
+    if (!is.null(percent_excluded_xy)) {
+      excluded_fe <- round(lost_fe_ids/total_fe_ids * 100, 0)
+      if (excluded_fe == 0) excluded_fe <- "< 0.5%"
+      g <- g + ggplot2::annotate("text",
+        x = min(xlim) + percent_excluded_xy[1] * diff(range(xlim)),
+        y = min(ylim) + percent_excluded_xy[2] * diff(range(ylim)),
+        label = paste0(percent_excluded_text, ": ", excluded_fe, "%"),
+        hjust = 0, colour = "grey30", angle = 90)
+    }
+
+    g
   }
 
 hex_coords <- function(x, y, unitcell_x = 1, unitcell_y = 1) {
