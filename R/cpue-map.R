@@ -180,7 +180,7 @@ plot_cpue_spatial <-
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 
-    if (!is.null(percent_excluded_xy)) {
+    if (!is.null(percent_excluded_xy) && plot_hexagons) {
       excluded_fe <- round(lost_fe_ids/total_fe_ids * 100, 0)
       if (excluded_fe == 0) excluded_fe <- "< 0.5%"
       g <- g + ggplot2::annotate("text",
