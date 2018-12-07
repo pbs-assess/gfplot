@@ -41,7 +41,7 @@
 
 plot_cpue_spatial <-
   function(dat,
-             start_year = 2012,
+             start_year = 2013,
              bin_width = 7,
              n_minimum_vessels = 3,
              xlim = c(122, 890),
