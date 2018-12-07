@@ -41,6 +41,7 @@
 
 plot_cpue_spatial <-
   function(dat,
+             start_year = 2012,
              bin_width = 7,
              n_minimum_vessels = 3,
              xlim = c(122, 890),
@@ -57,6 +58,7 @@ plot_cpue_spatial <-
              percent_excluded_text = "Fishing events excluded due to Privacy Act") {
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
+    dat <- filter(dat, year >= start_year)
     plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
 
     ll_range <- utm2ll(cbind(X = xlim, Y = ylim))
