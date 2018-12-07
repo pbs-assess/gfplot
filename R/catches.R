@@ -21,7 +21,7 @@
 #' @param units A named character vector with names referring to text that will
 #'   be pasted into the y-axis label and a value defining the quantity to divide
 #'   the `value` column by for that unit label.
-#'   Defaults to `c('1000 tons' = 1000000, 'tons' = 1000, 'kg' = 1)` if
+#'   Defaults to `c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)` if
 #'   `units = NULL`.
 #' @param unreliable An optional numeric vector defining years before which the
 #'   data are less reliable. Leave as `NA` to omit.
@@ -116,8 +116,8 @@ plot_catch <-
              unreliable = c(1996, 2006),
              blank_plot = FALSE) {
     if (is.null(units)) {
-      units <- c(`1000 tons` = 1000000,
-        `tons` = 1000, `kg` = 1)
+      units <- c(`1000 t` = 1000000,
+        `t` = 1000, `kg` = 1)
     }
 
     gears <- c(
