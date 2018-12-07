@@ -27,7 +27,7 @@ with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B
 \item{units}{A named character vector with names referring to text that will
 be pasted into the y-axis label and a value defining the quantity to divide
 the \code{value} column by for that unit label.
-Defaults to \code{c('1000 tons' = 1000000, 'tons' = 1000, 'kg' = 1)} if
+Defaults to \code{c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)} if
 \code{units = NULL}.}
 
 \item{unreliable}{An optional numeric vector defining years before which the
