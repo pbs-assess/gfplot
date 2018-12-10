@@ -57,9 +57,13 @@
 #'    folder
 #' * `cache_pbs_data_iphc()` runs `get_all_iphc_set_counts` for a given species
 #'    and caches extracted data to a give folder
-#' @section Note:
+#'
+#' @section Authentication:
 #' `get_*` functions only extract data when performed on a computer connected to
-#' the Pacific Biological Station DFO network.
+#' the Pacific Biological Station DFO network. By default, the functions assume
+#' that you are on an authorized DFO Windows computer where authentication with
+#' the databases happens automatically. If instead, you wish to connect by
+#' username and password, see the details section in [run_sql()].
 #'
 #' @examples
 #' \dontrun{

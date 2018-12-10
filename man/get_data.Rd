@@ -241,10 +241,13 @@ This \code{\link[=cache_pbs_data]{cache_pbs_data()}} function caches data from
 This \code{\link[=cache_pbs_data_iphc]{cache_pbs_data_iphc()}} function caches the data for the given
 species from \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}}
 }
-\section{Note}{
+\section{Authentication}{
 
 \code{get_*} functions only extract data when performed on a computer connected to
-the Pacific Biological Station DFO network.
+the Pacific Biological Station DFO network. By default, the functions assume
+that you are on an authorized DFO Windows computer where authentication with
+the databases happens automatically. If instead, you wish to connect by
+username and password, see the details section in \code{\link[=run_sql]{run_sql()}}.
 }
 
 \examples{
