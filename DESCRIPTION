@@ -54,7 +54,6 @@ Imports:
     ggrepel,
     boot  
 Remotes: github::pbs-software/pbs-data/PBSdata, github::seananderson/sdmTMB
-Additional_repositories: https://www.math.ntnu.no/inla/R/stable/
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests:
