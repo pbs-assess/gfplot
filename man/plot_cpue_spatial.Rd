@@ -48,7 +48,7 @@ the coast if it is rotated at all.}
 \item{min_cells}{The minimum number of cells needed before the hexagons are
 shown.}
 
-\item{percent_excluded_text}{If not \code{NULL}, should be a numeric vector of length 2
+\item{percent_excluded_xy}{If not \code{NULL}, should be a numeric vector of length 2
 corresponding to the x and y location (as fraction from the bottom left)
 of text describing the percentage of fishing events excluded due to the privacy rule.}
 
@@ -64,8 +64,8 @@ xlim <- c(-134.1, -123.0)
 ylim <- c(48.4, 54.25)
 d <- dplyr::tibble(lat = runif(1000, min(ylim), max(ylim)),
   lon = runif(length(lat), min(xlim), max(xlim)),
-  species_common_name = "fake species",
-  cpue = rlnorm(length(lat), log(1000), 0.6),
+  species_common_name = "fake species", fishing_event_id = 1,
+  year = 2013, cpue = rlnorm(length(lat), log(1000), 0.6),
   vessel_registration_number = rep(seq_len(100), each = 10))
 plot_cpue_spatial(d, bin_width = 15, n_minimum_vessels = 1)
 }

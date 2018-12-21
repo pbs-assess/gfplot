@@ -19,7 +19,7 @@
 #' @param return_data Logical for whether to return the data instead of the plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
-#' @param percent_excluded_text If not `NULL`, should be a numeric vector of length 2
+#' @param percent_excluded_xy If not `NULL`, should be a numeric vector of length 2
 #'   corresponding to the x and y location (as fraction from the bottom left)
 #'   of text describing the percentage of fishing events excluded due to the privacy rule.
 #' @param percent_excluded_text The text to associate with the annotation showing
@@ -34,8 +34,8 @@
 #' ylim <- c(48.4, 54.25)
 #' d <- dplyr::tibble(lat = runif(1000, min(ylim), max(ylim)),
 #'   lon = runif(length(lat), min(xlim), max(xlim)),
-#'   species_common_name = "fake species",
-#'   cpue = rlnorm(length(lat), log(1000), 0.6),
+#'   species_common_name = "fake species", fishing_event_id = 1,
+#'   year = 2013, cpue = rlnorm(length(lat), log(1000), 0.6),
 #'   vessel_registration_number = rep(seq_len(100), each = 10))
 #' plot_cpue_spatial(d, bin_width = 15, n_minimum_vessels = 1)
 

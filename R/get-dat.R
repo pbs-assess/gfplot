@@ -571,11 +571,11 @@ get_iphc_hooks <- function(species, usability = NULL) {
                  numOnHook = 1,
                  hookCondCode = NA) %>%   # that code unlikely to be useful
           select(year:hook,
-                 speciesCode,
-                 species,
-                 numOnHook,
-                 hookYieldCode,
-                 hookCondCode)            # return same order as for species
+                 .data$speciesCode,
+                 .data$species,
+                 .data$numOnHook,
+                 .data$hookYieldCode,
+                 .data$hookCondCode)            # return same order as for species
     if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
                                      # No data, give NA's
     return(as_tibble(.d))
@@ -616,7 +616,7 @@ get_commercial_samples <- function(species, unsorted_only = TRUE,
       species_code = readr::col_character()))
 
   .d <- left_join(.d,
-    select(ageing_methods, species_code, species_ageing_group),
+    select(ageing_methods, species_code, .data$species_ageing_group),
     by = "species_code")
 
   .d <- .d %>%

@@ -26,6 +26,7 @@
 ^data-cache$
 ^inst/stan/*\.rds$
 ^\.travis\.yml$
+^travis/*
 ^report$
 ^data-raw$
 ^pbssynopsis.sublime-project$
@@ -39,6 +40,10 @@
 ^tags$
 ^README.Rmd$
 ^inst/shortraker-*
+^inst/data/*
+^inst/data/pcod-figs*
+^src$
+^vignettes$
 ^inst/pcod-knit*
 ^inst/pcod-cache/*
 ^docs$
