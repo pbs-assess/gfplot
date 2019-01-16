@@ -17,6 +17,8 @@ plot_cpue_spatial(dat, start_year = 2013, bin_width = 7,
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
 
+\item{start_year}{Starting year.}
+
 \item{bin_width}{Width of hexagons in km.}
 
 \item{n_minimum_vessels}{Minimum number of unique vessels before a hexagon is

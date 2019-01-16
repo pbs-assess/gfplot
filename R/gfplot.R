@@ -162,7 +162,9 @@ if (getRversion() >= "2.15.1") {
     "count_surveys_since_2008",
 
     # historical CPUE tidy
-    "best_depth_m", "locality", "locality_description", "mean_depth"
+    "best_depth_m", "locality", "locality_description", "mean_depth",
+
+    "species_ageing_group"
 
   ))
 }

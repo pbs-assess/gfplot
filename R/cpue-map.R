@@ -1,6 +1,7 @@
 #' Plot a map of commercial CPUE
 #'
 #' @param dat Data from [get_cpue_spatial()] or [get_cpue_spatial_ll()]
+#' @param start_year Starting year.
 #' @param bin_width Width of hexagons in km.
 #' @param n_minimum_vessels Minimum number of unique vessels before a hexagon is
 #'   shown. Defaults to 3 to satisfy privacy requirements.
