@@ -11,8 +11,10 @@ test_that("get_* data functions work at PBS", {
   d <- get_age_precision("lingcod")
   expect_equal(d$species_code[[1L]], "467")
 
-  # d <- get_catch("lingcod")
-  # expect_gte(nrow(d), 1L)
+  d <- get_catch("lingcod")
+  expect_gte(nrow(d), 1L)
+
+  d <- get_hake_catch()
 
   d <- get_survey_sets("lingcod", 16)
   expect_gte(d$catch_weight[[1]], 0)

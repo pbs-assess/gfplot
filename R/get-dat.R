@@ -25,6 +25,8 @@
 #'    from commercial data for given species from GFBio
 #' * `get_catch()` extracts all landing and discard records for a given species
 #'    from GFFOS.GF_MERGED_CATCH
+#' * `get_hake_catch()` extracts all landing and discard records for Pacific Hake
+#'    with some extra data used in the Hake assessment.
 #' * `get_cpue_spatial()` extracts catch, effort and spatial data from
 #'    GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
 #' * `get_cpue_spatial_ll()` extracts catch, effort and spatial data from
@@ -648,6 +650,19 @@ get_catch <- function(species) {
   .d <- run_sql("GFFOS", .q)
   .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
+  names(.d) <- tolower(names(.d))
+  .d$species_common_name <- tolower(.d$species_common_name)
+  .d$species_scientific_name <- tolower(.d$species_scientific_name)
+  .d$year <- lubridate::year(.d$best_date)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
+get_hake_catch <- function() {
+  .q <- read_sql("get-hake-catch.sql")
+  .q <- inject_filter("WHERE SP.SPECIES_CODE IN", "255", sql_code = .q)
+  .d <- run_sql("GFFOS", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_scientific_name <- tolower(.d$species_scientific_name)

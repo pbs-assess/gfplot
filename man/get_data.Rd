@@ -19,6 +19,7 @@
 \alias{get_iphc_hooks}
 \alias{get_commercial_samples}
 \alias{get_catch}
+\alias{get_hake_catch}
 \alias{get_cpue_spatial}
 \alias{get_cpue_spatial_ll}
 \alias{get_cpue_index}
@@ -65,6 +66,8 @@ get_iphc_hooks(species, usability = NULL)
 get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
 get_catch(species)
+
+get_hake_catch()
 
 get_cpue_spatial(species)
 
@@ -192,6 +195,8 @@ from research surveys for given species and survey series IDs from GFBio
 from commercial data for given species from GFBio
 \item \code{get_catch()} extracts all landing and discard records for a given species
 from GFFOS.GF_MERGED_CATCH
+\item \code{get_hake_catch()} extracts all landing and discard records for Pacific Hake
+with some extra data used in the Hake assessment.
 \item \code{get_cpue_spatial()} extracts catch, effort and spatial data from
 GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
 \item \code{get_cpue_spatial_ll()} extracts catch, effort and spatial data from
