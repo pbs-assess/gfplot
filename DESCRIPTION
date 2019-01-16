@@ -63,3 +63,4 @@ Suggests:
 VignetteBuilder: knitr
 URL: https://github.com/pbs-assess/gfplot
 BugReports: https://github.com/pbs-assess/gfplot/issues
+Additional_repositories: https://inla.r-inla-download.org/R/testing
