@@ -21,4 +21,5 @@ addons:
 
 r_github_packages:
   - pbs-software/pbs-data/PBSdata
-  - andrewzm/INLA
+  - jsta/r-inla
+  - seananderson/sdmTMB
