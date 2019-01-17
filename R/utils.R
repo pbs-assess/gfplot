@@ -120,8 +120,12 @@ read_sql <- function(x) {
   }
 }
 
+round_any <- function(x, accuracy) {
+  round(x / accuracy) * accuracy
+}
+
 round_nice <- function(x) {
-  out <- plyr::round_any(x, 100)
+  out <- round_any(x, 100)
   out[out == 0] <- x[out == 0]
   out[x == 0] <- ""
   out
@@ -147,18 +151,18 @@ is_dfo <- function() {
   grepl("PBS", Sys.info()[["nodename"]])
 }
 
-is_ip_valid <- function(timeout = 5) {
-  pbs_ip <- getOption("pbs.ip")
-  if (is.null(pbs_ip)) return(FALSE)
-  out <- pingr::ping(pbs_ip, verbose = FALSE,
-    count = 1L, timeout = timeout)
-  !is.na(out)
-}
-
-# Is this a DFO Windows computer or is the server IP accessible?
-sql_server_accessible <- function() {
-  if ((is_windows() && is_dfo()) || is_ip_valid()) TRUE else FALSE
-}
+# is_ip_valid <- function(timeout = 5) {
+#   pbs_ip <- getOption("pbs.ip")
+#   if (is.null(pbs_ip)) return(FALSE)
+#   out <- pingr::ping(pbs_ip, verbose = FALSE,
+#     count = 1L, timeout = timeout)
+#   !is.na(out)
+# }
+#
+# # Is this a DFO Windows computer or is the server IP accessible?
+# sql_server_accessible <- function() {
+#   if ((is_windows() && is_dfo()) || is_ip_valid()) TRUE else FALSE
+# }
 
 factor_bin_clean <- function(x, bins, clean = TRUE) {
   out <- bins[findInterval(x, bins, rightmost.closed = TRUE)]

@@ -910,12 +910,12 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
   compress = FALSE, unsorted_only = TRUE, historic_cpue = FALSE,
   survey_sets = FALSE, verbose = TRUE) {
 
-  if (!sql_server_accessible()) {
-    stop("SQL server is not accessible. Either you are not on the DFO network or your",
-         " Rprofile file does not contain the required variables options pbs.ip,",
-         " pbs.uid, and pbs.pwd. On Windows, this file is located at",
-         " C:\\R\\etc\\Rprofile.site")
-  }
+  # if (!sql_server_accessible()) {
+  #   stop("SQL server is not accessible. Either you are not on the DFO network or your",
+  #        " Rprofile file does not contain the required variables options pbs.ip,",
+  #        " pbs.uid, and pbs.pwd. On Windows, this file is located at",
+  #        " C:\\R\\etc\\Rprofile.site")
+  # }
   dir.create(path, showWarnings = FALSE)
 
   for (sp_i in seq_along(species)) {
@@ -973,12 +973,12 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
 cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
   compress = FALSE) {
 
-  if (!sql_server_accessible()) {
-    stop("SQL server is not accessible. Either you are not on the DFO network or your",
-         " Rprofile file does not contain the required variables options pbs.ip,",
-         " pbs.uid, and pbs.pwd. On Windows, this file is located at",
-         " C:\\R\\etc\\Rprofile.site")
-  }
+  # if (!sql_server_accessible()) {
+  #   stop("SQL server is not accessible. Either you are not on the DFO network or your",
+  #        " Rprofile file does not contain the required variables options pbs.ip,",
+  #        " pbs.uid, and pbs.pwd. On Windows, this file is located at",
+  #        " C:\\R\\etc\\Rprofile.site")
+  # }
   dir.create(path, showWarnings = FALSE)
 
   for (sp_i in seq_along(species)) {

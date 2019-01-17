@@ -34,7 +34,6 @@ Imports:
     magrittr,
     methods,
     odbc,
-    plyr,
     readr,
     reshape2,
     rgdal,
@@ -46,9 +45,7 @@ Imports:
     sp,
     tidyr,
     xml2,
-    pingr,
     INLA,
-    DLMtool,
     tweedie,
     sdmTMB (>= 0.0.0.9001),
     ggrepel,
@@ -63,4 +60,4 @@ Suggests:
 VignetteBuilder: knitr
 URL: https://github.com/pbs-assess/gfplot
 BugReports: https://github.com/pbs-assess/gfplot/issues
-Additional_repositories: https://inla.r-inla-download.org/R/testing
+Additional_repositories: https://inla.r-inla-download.org/R/stable
