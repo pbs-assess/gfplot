@@ -36,12 +36,9 @@ Imports:
     odbc,
     readr,
     reshape2,
-    rgdal,
     rlang,
     rstan (>= 2.17.0),
     rvest,
-    scales,
-    stringr,
     sp,
     tidyr,
     xml2,
@@ -56,7 +53,9 @@ Roxygen: list(markdown = TRUE)
 Suggests:
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    rgdal,
+    scales
 VignetteBuilder: knitr
 URL: https://github.com/pbs-assess/gfplot
 BugReports: https://github.com/pbs-assess/gfplot/issues
