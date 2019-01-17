@@ -30,6 +30,8 @@
 #' @importFrom stats t.test
 #' @importFrom utils read.csv
 #' @import Rcpp
+# avoid R CMD check warning; import something:
+#' @importFrom PBSdata .PBSdataEnv
 NULL
 
 # from: https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
