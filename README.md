@@ -1,7 +1,7 @@
 # gfplot: An R package for data extraction and plotting of British Columbia groundfish data
 
-<!-- [![Travis-CI Build Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot) -->
-
+[![Travis-CI Build
+Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot)
 <!-- [![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip) -->
 
 Facilitates the creation of an annual groundfish data synopsis report
@@ -41,17 +41,18 @@ sort(fns[grepl("get", fns)])
 #>  [5] "get_cpue_historic"      "get_cpue_historical"   
 #>  [7] "get_cpue_index"         "get_cpue_spatial"      
 #>  [9] "get_cpue_spatial_ll"    "get_fishery_ids"       
-#> [11] "get_gear_types"         "get_iphc_1995"         
-#> [13] "get_iphc_1996to2002"    "get_iphc_2013"         
-#> [15] "get_iphc_hooks"         "get_iphc_sets"         
-#> [17] "get_iphc_sets_info"     "get_iphc_skates_info"  
-#> [19] "get_iphc_spp_name"      "get_major_areas"       
-#> [21] "get_management"         "get_management_areas"  
-#> [23] "get_most_common_level"  "get_other_surveys"     
-#> [25] "get_sara_dat"           "get_species"           
-#> [27] "get_species_groups"     "get_ssids"             
-#> [29] "get_survey_index"       "get_survey_samples"    
-#> [31] "get_survey_sets"        "iphc_get_calc_plot"
+#> [11] "get_gear_types"         "get_hake_catch"        
+#> [13] "get_iphc_1995"          "get_iphc_1996to2002"   
+#> [15] "get_iphc_2013"          "get_iphc_hooks"        
+#> [17] "get_iphc_sets"          "get_iphc_sets_info"    
+#> [19] "get_iphc_skates_info"   "get_iphc_spp_name"     
+#> [21] "get_major_areas"        "get_management"        
+#> [23] "get_management_areas"   "get_most_common_level" 
+#> [25] "get_other_surveys"      "get_sara_dat"          
+#> [27] "get_species"            "get_species_groups"    
+#> [29] "get_ssids"              "get_survey_index"      
+#> [31] "get_survey_samples"     "get_survey_sets"       
+#> [33] "iphc_get_calc_plot"
 ```
 
 Generic functions for any similarly formatted data:
