@@ -46,18 +46,19 @@ load_bath <- function(utm_zone = 9) {
 # @rdname survey-spatial-modelling
 interp_survey_bathymetry <- function(dat, utm_zone = 9) {
 
+  .dat <- dat[is.na(dat$depth), , drop = FALSE]
   # reduce size first for speed:
   bath <- load_bath(utm_zone = utm_zone) %>%
     filter(
-      X < max(dat$X + 20),
-      X > min(dat$X - 20),
-      Y < max(dat$Y + 20),
-      Y > min(dat$Y - 20),
+      X < max(.dat$X + 20),
+      X > min(.dat$X - 20),
+      Y < max(.dat$Y + 20),
+      Y > min(.dat$Y - 20),
       depth > 0
     )
 
-  xo <- sort(unique(dat$X))
-  yo <- sort(unique(dat$Y))
+  xo <- sort(unique(.dat$X))
+  yo <- sort(unique(.dat$Y))
 
   message("Interpolating depth to fill in missing data if needed...")
   ii <- suppressWarnings(akima::interp(
@@ -71,7 +72,7 @@ interp_survey_bathymetry <- function(dat, utm_zone = 9) {
   z <- reshape2::melt(ii$z)
   z$x <- ii$x[z$Var1]
   z$y <- ii$y[z$Var2]
-  z <- filter(z, paste(x, y) %in% paste(dat$X, dat$Y))
+  z <- filter(z, paste(x, y) %in% paste(.dat$X, .dat$Y))
   z <- rename(z, X = x, Y = y, akima_depth = value) %>%
     select(-Var1, -Var2)
   z <- mutate(z, akima_depth = exp(akima_depth))
