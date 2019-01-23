@@ -274,7 +274,19 @@ get_other_surveys <- function() {
   .d <- .d %>% filter(count_surveys_since_2008 >1) %>%
     select(survey_series_desc, count_surveys_since_2008)
   .d
-  }
+}
+
+# get_survey_sensors <- function(ssid = c(1, 3, 4, 16)) {
+#   .q <- read_sql("get-survey-sensors.sql")
+#   if (!is.null(ssid)) {
+#     .q <- inject_filter("AND S.SURVEY_SERIES_ID IN", ssid,
+#       sql_code = .q,
+#       search_flag = "-- insert ssid here", conversion_func = I
+#     )
+#   }
+#   .d <- run_sql("GFBioSQL", .q)
+#   .d
+# }
 
 #' @export
 #' @param join_sample_ids If `TRUE` then the sample IDs will be joined in. This
