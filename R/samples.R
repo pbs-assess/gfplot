@@ -123,6 +123,17 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat$n_plot[dat$n_plot == 0] <- NA
   dat <- filter(dat, year >= min(year_range), year <= max(year_range))
 
+  dat <- dat %>%
+    mutate(type = gsub("Ageing structure", "Age structures", type)) %>%
+    mutate(type = factor(type,
+      levels = rev(c(
+        "# Length",
+        "# Weight",
+        "# Maturity",
+        "# Age",
+        "# Age structures"
+      ))))
+
   ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
     theme_pbs() +
