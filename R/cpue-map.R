@@ -57,8 +57,11 @@ plot_cpue_spatial <-
              min_cells = 10,
              percent_excluded_xy = NULL,
              percent_excluded_text = "Fishing events excluded due to Privacy Act") {
+
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
+    pre_footprint_dat <- filter(dat, year < start_year)
+    # pre_footprint_dat <- dat
     dat <- filter(dat, year >= start_year)
     plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
 
@@ -75,57 +78,19 @@ plot_cpue_spatial <-
     )
 
     dat <- rename(dat, X = .data$lon, Y = .data$lat)
+    pre_footprint_dat <- rename(pre_footprint_dat, X = .data$lon, Y = .data$lat)
 
     if (plot_hexagons) {
       dat <- ll2utm(dat, utm_zone = utm_zone)
+      pre_footprint_dat <- ll2utm(pre_footprint_dat, utm_zone = utm_zone)
 
-      # count unique vessels per hexagon cell for privacy:
-      g_count <- ggplot(dat, aes_string("X", "Y")) +
-        coord_equal(xlim = xlim, ylim = ylim) +
-        stat_summary_hex(aes_string(
-          x = "X", y = "Y",
-          z = "vessel_registration_number"
-        ),
-        data = dat, binwidth = bin_width,
-        fun = function(x) length(unique(x))
-        )
+      privacy_out <- enact_privacy_rule(dat, bin_width = bin_width,
+        n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim)
+      gdat <- privacy_out$data
 
-      # count fishing events per hexagon cell to keep track of how many not shown:
-      g_fe_id_count <- ggplot(dat, aes_string("X", "Y")) +
-        coord_equal(xlim = xlim, ylim = ylim) +
-        stat_summary_hex(aes_string(
-          x = "X", y = "Y",
-          z = "fishing_event_id"
-        ),
-          data = dat, binwidth = bin_width,
-          fun = function(x) length(unique(x))
-        )
-
-      # the actual CPUE hexagon binning:
-      g <- ggplot(dat, aes_string("X", "Y")) +
-        coord_equal(xlim = xlim, ylim = ylim) +
-        stat_summary_hex(
-          aes_string(x = "X", y = "Y", z = "cpue"),
-          data = dat, binwidth = bin_width,
-          fun = function(x) exp(mean(log(x), na.rm = FALSE))
-        )
-
-      # enact the privacy rule:
-      gdat <- ggplot2::ggplot_build(g)$data[[1]]
-      gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
-      gdat_fe_id_count <- ggplot2::ggplot_build(g_fe_id_count)$data[[1]]
-
-      # sanity check:
-      stopifnot(identical(nrow(gdat), nrow(gdat_count)))
-      stopifnot(identical(nrow(gdat), nrow(gdat_fe_id_count)))
-      # Number of hexagon cells for vessel count and CPUE didn't match.
-      # Stopping because the privacy rule might not remain valid in this case.
-
-      gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
-
-      lost_fe_id_df <- gdat_fe_id_count[gdat_count$value < n_minimum_vessels, , drop = FALSE]
-      lost_fe_ids <- sum(lost_fe_id_df$value)
-      total_fe_ids <- sum(gdat_fe_id_count$value)
+      privacy_out_historical <- enact_privacy_rule(pre_footprint_dat,
+        bin_width = bin_width,
+        n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim)
 
       if (return_data) {
         return(gdat)
@@ -133,15 +98,9 @@ plot_cpue_spatial <-
         if (nrow(gdat) < min_cells) {
           plot_hexagons <- FALSE
         } else {
-          # compute hexagon x-y coordinates for geom_polygon()
-          dx <- ggplot2::resolution(gdat$x, FALSE)
-          dy <- ggplot2::resolution(gdat$y, FALSE) / 2 * 1.15
-          public_dat <- lapply(seq_len(nrow(gdat)), function(i)
-            data.frame(
-              hex_id = i, cpue = gdat[i, "value"],
-              hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy)
-            )) %>%
-            bind_rows()
+          public_dat <- compute_hexagon_xy(gdat)
+          public_dat_historical <-
+            compute_hexagon_xy(privacy_out_historical$data)
         }
       }
     }
@@ -153,13 +112,18 @@ plot_cpue_spatial <-
     g <- ggplot()
 
     if (plot_hexagons) {
-      public_dat$X <- public_dat$x
-      public_dat$Y <- public_dat$y
       public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
-      g <- g + geom_polygon(data = public_dat, aes_string(
-        x = "X", y = "Y",
-        fill = "cpue", colour = "cpue", group = "hex_id"
-      ), inherit.aes = FALSE) + fill_scale + colour_scale
+      public_dat_historical <- rotate_df(public_dat_historical,
+        rotation_angle, rotation_center)
+      g <- g +
+        geom_polygon(data = public_dat_historical, aes_string(
+          x = "X", y = "Y", group = "hex_id"
+        ), inherit.aes = FALSE, fill = "grey55", colour = "grey58", lwd = 0.2) +
+        geom_polygon(data = public_dat, aes_string(
+          x = "X", y = "Y",
+          fill = "cpue", colour = "cpue", group = "hex_id"
+        ), inherit.aes = FALSE, lwd = 0.2) + fill_scale + colour_scale
+
     }
 
     suppressWarnings({
@@ -176,7 +140,7 @@ plot_cpue_spatial <-
     g <- g + geom_polygon(
       data = coastline_utm,
       aes_string(x = "X", y = "Y", group = "PID"),
-      inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70"
+      inherit.aes = FALSE, lwd = 0.2, fill = "grey90", col = "grey70"
     ) +
       coord_equal(xlim = xlim, ylim = ylim) +
       theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
@@ -184,7 +148,8 @@ plot_cpue_spatial <-
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 
     if (!is.null(percent_excluded_xy) && plot_hexagons) {
-      excluded_fe <- round(lost_fe_ids/total_fe_ids * 100, 0)
+      excluded_fe <- round(
+        privacy_out$lost_fe_ids/privacy_out$total_fe_ids * 100, 0)
       if (excluded_fe == 0) excluded_fe <- "< 0.5%"
       g <- g + ggplot2::annotate("text",
         x = min(xlim) + percent_excluded_xy[1] * diff(range(xlim)),
@@ -273,4 +238,82 @@ rotate_df <- function(df, rotation_angle, rotation_center) {
   df$X <- r$x
   df$Y <- r$y
   df
+}
+
+enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
+  # count unique vessels per hexagon cell for privacy:
+
+  # Fake data to make sure that the hexagons overlap perfectly.
+  # This extends the X and Y to extreme but identical limits every time.
+  fake_rows <- dat[1:2, , drop = FALSE]
+  fake_rows$fishing_event_id <- c(-999L, -998L)
+  fake_rows$vessel_registration_number <- c(-999L, -998L)
+  fake_rows$X <- c(-1000, 20000)
+  fake_rows$Y <- c(-1000, 20000)
+  dat <- bind_rows(dat, fake_rows)
+
+  g_count <- ggplot(dat, aes_string("X", "Y")) +
+    coord_equal(xlim = xlim, ylim = ylim) +
+    stat_summary_hex(aes_string(
+      x = "X", y = "Y",
+      z = "vessel_registration_number"
+    ),
+      data = dat, binwidth = bin_width,
+      fun = function(x) length(unique(x))
+    )
+
+  # count fishing events per hexagon cell to keep track of how many not shown:
+  g_fe_id_count <- ggplot(dat, aes_string("X", "Y")) +
+    coord_equal(xlim = xlim, ylim = ylim) +
+    stat_summary_hex(aes_string(
+      x = "X", y = "Y",
+      z = "fishing_event_id"
+    ),
+      data = dat, binwidth = bin_width,
+      fun = function(x) length(unique(x))
+    )
+
+  # the actual CPUE hexagon binning:
+  g <- ggplot(dat, aes_string("X", "Y")) +
+    coord_equal(xlim = xlim, ylim = ylim) +
+    stat_summary_hex(
+      aes_string(x = "X", y = "Y", z = "cpue"),
+      data = dat, binwidth = bin_width,
+      fun = function(x) exp(mean(log(x), na.rm = FALSE))
+    )
+
+  # enact the privacy rule:
+  gdat <- ggplot2::ggplot_build(g)$data[[1]]
+  gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
+  gdat_fe_id_count <- ggplot2::ggplot_build(g_fe_id_count)$data[[1]]
+
+  # sanity check:
+  stopifnot(identical(nrow(gdat), nrow(gdat_count)))
+  stopifnot(identical(nrow(gdat), nrow(gdat_fe_id_count)))
+  # Number of hexagon cells for vessel count and CPUE didn't match.
+  # Stopping because the privacy rule might not remain valid in this case.
+
+  gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
+
+  lost_fe_id_df <- gdat_fe_id_count[gdat_count$value < n_minimum_vessels, ,
+    drop = FALSE]
+  lost_fe_ids <- sum(lost_fe_id_df$value)
+  total_fe_ids <- sum(gdat_fe_id_count$value)
+
+  list(data = gdat, lost_fe_ids = lost_fe_ids, total_fe_ids = total_fe_ids)
+}
+
+compute_hexagon_xy <- function(gdat) {
+  # compute hexagon x-y coordinates for geom_polygon()
+  dx <- ggplot2::resolution(gdat$x, FALSE)
+  dy <- ggplot2::resolution(gdat$y, FALSE) / 2 * 1.15
+  public_dat <- lapply(seq_len(nrow(gdat)), function(i)
+    data.frame(
+      hex_id = i, cpue = gdat[i, "value"],
+      hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy)
+    )) %>%
+    bind_rows()
+  public_dat$X <- public_dat$x
+  public_dat$Y <- public_dat$y
+  public_dat
 }
