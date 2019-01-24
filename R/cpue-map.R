@@ -17,6 +17,8 @@
 #' @param rotation_center The center in UTM coordinates around which to rotate
 #'   the coast if it is rotated at all.
 #' @param fill_lab Label for the color legend.
+#' @param show_historical Should the historical extent of fishing (before
+#'   `start_year`) be shown?
 #' @param return_data Logical for whether to return the data instead of the plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
@@ -53,6 +55,7 @@ plot_cpue_spatial <-
              rotation_angle = 0,
              rotation_center = c(500, 5700),
              fill_lab = "CPUE (kg/hr)",
+             show_historical = FALSE,
              return_data = FALSE,
              min_cells = 10,
              percent_excluded_xy = NULL,
@@ -115,11 +118,12 @@ plot_cpue_spatial <-
       public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
       public_dat_historical <- rotate_df(public_dat_historical,
         rotation_angle, rotation_center)
-      g <- g +
-        geom_polygon(data = public_dat_historical, aes_string(
+      if (show_historical) {
+      g <- g + geom_polygon(data = public_dat_historical, aes_string(
           x = "X", y = "Y", group = "hex_id"
-        ), inherit.aes = FALSE, fill = "grey55", colour = "grey58", lwd = 0.2) +
-        geom_polygon(data = public_dat, aes_string(
+        ), inherit.aes = FALSE, fill = "grey95", colour = "grey45", lwd = 0.2)
+      }
+      g <- g + geom_polygon(data = public_dat, aes_string(
           x = "X", y = "Y",
           fill = "cpue", colour = "cpue", group = "hex_id"
         ), inherit.aes = FALSE, lwd = 0.2) + fill_scale + colour_scale

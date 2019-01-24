@@ -10,8 +10,8 @@ plot_cpue_spatial(dat, start_year = 2013, bin_width = 7,
   fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option =
   "D"), colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt",
   option = "D"), rotation_angle = 0, rotation_center = c(500, 5700),
-  fill_lab = "CPUE (kg/hr)", return_data = FALSE, min_cells = 10,
-  percent_excluded_xy = NULL,
+  fill_lab = "CPUE (kg/hr)", show_historical = FALSE,
+  return_data = FALSE, min_cells = 10, percent_excluded_xy = NULL,
   percent_excluded_text = "Fishing events excluded due to Privacy Act")
 }
 \arguments{
@@ -44,6 +44,9 @@ report to rotate the coast 40 degrees to fit more plots on the page.}
 the coast if it is rotated at all.}
 
 \item{fill_lab}{Label for the color legend.}
+
+\item{show_historical}{Should the historical extent of fishing (before
+\code{start_year}) be shown?}
 
 \item{return_data}{Logical for whether to return the data instead of the plot.}
 
