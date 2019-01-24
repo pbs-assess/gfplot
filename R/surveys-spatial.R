@@ -60,7 +60,6 @@ interp_survey_bathymetry <- function(dat, utm_zone = 9) {
   xo <- sort(unique(.dat$X))
   yo <- sort(unique(.dat$Y))
 
-  message("Interpolating depth to fill in missing data if needed...")
   ii <- suppressWarnings(akima::interp(
     x = bath$X,
     y = bath$Y,
