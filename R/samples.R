@@ -37,6 +37,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
   out <- group_by(dat, species_common_name, year) %>%
     summarise(
       age = sum(!is.na(age) & age > 0),
+      ageing_structure = sum(!is.na(age_specimen_collected) & age_specimen_collected == 1),
       length = sum(!is.na(length) & length > 0),
       weight = sum(!is.na(weight) & weight > 0),
       maturity = sum(!is.na(maturity_code) & maturity_code > 0)
@@ -104,6 +105,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- paste("#", firstup(as.character(dat$type)))
+  dat$type <- gsub("_", " ", dat$type)
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
