@@ -649,11 +649,6 @@ get_commercial_samples <- function(species, unsorted_only = TRUE,
   as_tibble(.d)
 }
 
-get_comm_samples <- function(...) {
-  warning("Depreciated: please use get_commercial_samples() instead.")
-  get_commercial_samples(...)
-}
-
 #' @export
 #' @rdname get_data
 get_catch <- function(species) {
