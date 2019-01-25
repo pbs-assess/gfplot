@@ -645,7 +645,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
         data = filter(raw_dat, present == 0),
         aes_string(x = "X", y = "Y"),
         col = if (show_model_predictions) bin_pt_col else "grey50",
-        pch = 4, size = 2
+        pch = 4, size = 1.55
       ) +
       geom_point(
         data = filter(raw_dat, present == 1),
