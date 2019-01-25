@@ -34,6 +34,8 @@ tidy_sample_avail <- function(dat, year_range = NULL,
     dat <- filter(dat, ageing_method %in% ageing_method_codes)
   }
 
+  if (!"age_specimen_collected" %in% names(dat))
+    dat <- mutate(dat, age_specimen_collected = NA)
   out <- group_by(dat, species_common_name, year) %>%
     summarise(
       age = sum(!is.na(age) & age > 0),
