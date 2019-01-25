@@ -610,7 +610,13 @@ get_commercial_samples <- function(species, unsorted_only = TRUE,
   .d$species_common_name <- tolower(.d$species_common_name)
   .d$species_science_name <- tolower(.d$species_science_name)
   .d <- mutate(.d, year = lubridate::year(trip_start_date))
-  assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
+  duplicate_specimen_ids <- sum(duplicated(.d$specimen_id))
+  if (duplicate_specimen_ids > 0) {
+    warning(duplicate_specimen_ids, " duplicate specimen IDs detected for",
+      species, " . Removing them.")
+    .d <- .d[!duplicated(.d$specimen_id), , drop = FALSE]
+  }
+  # assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
 
   if (unsorted_only) {
     .d <- filter(.d, sampling_desc == 'UNSORTED')
