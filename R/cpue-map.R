@@ -64,9 +64,10 @@ plot_cpue_spatial <-
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
     pre_footprint_dat <- filter(dat, year < start_year)
+    if (nrow(dat) <= 1) show_historical <- FALSE
     # pre_footprint_dat <- dat
     dat <- filter(dat, year >= start_year)
-    plot_hexagons <- if (nrow(dat) == 0) FALSE else TRUE
+    plot_hexagons <- if (nrow(dat) <= 1) FALSE else TRUE
 
     ll_range <- utm2ll(cbind(X = xlim, Y = ylim))
     coastline_utm <- load_coastline(
@@ -85,15 +86,20 @@ plot_cpue_spatial <-
 
     if (plot_hexagons) {
       dat <- ll2utm(dat, utm_zone = utm_zone)
-      pre_footprint_dat <- ll2utm(pre_footprint_dat, utm_zone = utm_zone)
+
+      if (show_historical)
+        pre_footprint_dat <- ll2utm(pre_footprint_dat, utm_zone = utm_zone)
 
       privacy_out <- enact_privacy_rule(dat, bin_width = bin_width,
         n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim)
       gdat <- privacy_out$data
 
-      privacy_out_historical <- enact_privacy_rule(pre_footprint_dat,
-        bin_width = bin_width,
-        n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim)
+      if (show_historical) {
+        privacy_out_historical <- enact_privacy_rule(pre_footprint_dat,
+          bin_width = bin_width,
+          n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim)
+        if (nrow(privacy_out_historical$data) <= 1) show_historical <- FALSE
+      }
 
       if (return_data) {
         return(gdat)
@@ -102,8 +108,9 @@ plot_cpue_spatial <-
           plot_hexagons <- FALSE
         } else {
           public_dat <- compute_hexagon_xy(gdat)
-          public_dat_historical <-
-            compute_hexagon_xy(privacy_out_historical$data)
+          if (show_historical)
+            public_dat_historical <-
+              compute_hexagon_xy(privacy_out_historical$data)
         }
       }
     }
@@ -116,17 +123,18 @@ plot_cpue_spatial <-
 
     if (plot_hexagons) {
       public_dat <- rotate_df(public_dat, rotation_angle, rotation_center)
-      public_dat_historical <- rotate_df(public_dat_historical,
-        rotation_angle, rotation_center)
+
       if (show_historical) {
-      g <- g + geom_polygon(data = public_dat_historical, aes_string(
+        public_dat_historical <- rotate_df(public_dat_historical,
+          rotation_angle, rotation_center)
+        g <- g + geom_polygon(data = public_dat_historical, aes_string(
           x = "X", y = "Y", group = "hex_id"
         ), inherit.aes = FALSE, fill = "grey95", colour = "grey45", lwd = 0.2)
       }
       g <- g + geom_polygon(data = public_dat, aes_string(
-          x = "X", y = "Y",
-          fill = "cpue", colour = "cpue", group = "hex_id"
-        ), inherit.aes = FALSE, lwd = 0.2) + fill_scale + colour_scale
+        x = "X", y = "Y",
+        fill = "cpue", colour = "cpue", group = "hex_id"
+      ), inherit.aes = FALSE, lwd = 0.2) + fill_scale + colour_scale
 
     }
 
