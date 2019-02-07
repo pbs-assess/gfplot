@@ -57,12 +57,13 @@ plot_cpue_spatial <-
              fill_lab = "CPUE (kg/hr)",
              show_historical = FALSE,
              return_data = FALSE,
-             min_cells = 10,
+             min_cells = 1,
              percent_excluded_xy = NULL,
              percent_excluded_text = "Fishing events excluded due to Privacy Act") {
 
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
+
     pre_footprint_dat <- filter(dat, year < start_year)
     if (nrow(dat) <= 1) show_historical <- FALSE
     # pre_footprint_dat <- dat
@@ -107,10 +108,10 @@ plot_cpue_spatial <-
         if (nrow(gdat) < min_cells) {
           plot_hexagons <- FALSE
         } else {
-          public_dat <- compute_hexagon_xy(gdat)
+          public_dat <- compute_hexagon_xy(privacy_out$data, bin_width = bin_width)
           if (show_historical)
             public_dat_historical <-
-              compute_hexagon_xy(privacy_out_historical$data)
+              compute_hexagon_xy(privacy_out_historical$data, bin_width = bin_width)
         }
       }
     }
@@ -159,7 +160,7 @@ plot_cpue_spatial <-
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 
-    if (!is.null(percent_excluded_xy) && plot_hexagons) {
+    if (!is.null(percent_excluded_xy) && exists("privacy_out")) {
       excluded_fe <- round(
         privacy_out$lost_fe_ids/privacy_out$total_fe_ids * 100, 0)
       if (excluded_fe == 0) excluded_fe <- "< 0.5%"
@@ -299,6 +300,8 @@ enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
   gdat_count <- ggplot2::ggplot_build(g_count)$data[[1]]
   gdat_fe_id_count <- ggplot2::ggplot_build(g_fe_id_count)$data[[1]]
 
+  # resolution <- c(ggplot2::resolution(gdat$x, FALSE), ggplot2::resolution(gdat$y, FALSE))
+
   # sanity check:
   stopifnot(identical(nrow(gdat), nrow(gdat_count)))
   stopifnot(identical(nrow(gdat), nrow(gdat_fe_id_count)))
@@ -315,10 +318,14 @@ enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
   list(data = gdat, lost_fe_ids = lost_fe_ids, total_fe_ids = total_fe_ids)
 }
 
-compute_hexagon_xy <- function(gdat) {
+compute_hexagon_xy <- function(gdat, bin_width) {
   # compute hexagon x-y coordinates for geom_polygon()
-  dx <- ggplot2::resolution(gdat$x, FALSE)
-  dy <- ggplot2::resolution(gdat$y, FALSE) / 2 * 1.15
+
+  # dx <- resolution[1]
+  # dy <- resolution[2] / 2 * 1.15
+
+  dx <- bin_width/2
+  dy <- bin_width/2
   public_dat <- lapply(seq_len(nrow(gdat)), function(i)
     data.frame(
       hex_id = i, cpue = gdat[i, "value"],
