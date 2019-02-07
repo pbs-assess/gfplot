@@ -287,7 +287,12 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   # )
 
   if (!survey %in% c("HBLL OUT N", "HBLL OUT S", "HBLL", "HBLL OUT", "IPHC FISS")) {
-    .d_interp <- interp_survey_bathymetry(.d_tidy)
+    if (sum(is.na(.d_tidy$depth)) > 0L) { # any interpolation needed?
+      .d_interp <- interp_survey_bathymetry(.d_tidy)
+    } else {
+      .d_interp <- list()
+      .d_interp$data <- .d_tidy
+    }
     .d_scaled <- scale_survey_predictors(.d_interp$data)
     pg <- make_prediction_grid(.d_scaled,
       survey = survey, cell_width = cell_width,
