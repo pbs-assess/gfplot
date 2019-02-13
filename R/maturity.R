@@ -10,8 +10,8 @@
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
 #' @param usability_codes An optional vector of usability codes.
-#'   All usability codes not in this vector will be omitted. Leave
-#'   as `NULL` to include all samples.
+#'   All usability codes not in this vector will be omitted.
+#'   Set to `NULL` to include all samples.
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples

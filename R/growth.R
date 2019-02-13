@@ -27,8 +27,8 @@
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes. See
 #'   [get_age_methods()].
 #' @param usability_codes An optional vector of usability codes.
-#'   All usability codes not in this vector will be omitted. Leave
-#'   as `NULL` to include all samples.
+#'   All usability codes not in this vector will be omitted.
+#'   Set to `NULL` to include all samples.
 #' @param ... Any other arguments to pass on to [rstan::sampling()] or
 #'   [rstan::optimizing()].
 #' @importFrom stats median quantile rlnorm runif median
@@ -197,8 +197,8 @@ fit_vb <- function(dat,
 #' @param too_high_quantile A quantile above which to discard weights and
 #'   lengths. Can be useful for outliers. Defaults to including all data.
 #' @param usability_codes An optional vector of usability codes.
-#'   All usability codes not in this vector will be omitted. Leave
-#'   as `NULL` to include all samples.
+#'   All usability codes not in this vector will be omitted.
+#'   Set to `NULL` to include all samples.
 #' @param scale_weight A value to multiply all weights by. Useful for changing
 #'   units.
 #'

@@ -8,8 +8,8 @@ NULL
 #'   data from [tidy_maturity_months()].
 #' @param months A vector of months to include. Defaults to all.
 #' @param usability_codes An optional vector of usability codes.
-#'   All usability codes not in this vector will be omitted. Leave
-#'   as `NULL` to include all samples.
+#'   All usability codes not in this vector will be omitted.
+#'   Set to `NULL` to include all samples.
 #' @export
 #' @rdname plot_maturity_months
 tidy_maturity_months <- function(dat, months = seq(1, 12),

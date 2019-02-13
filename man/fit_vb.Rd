@@ -50,8 +50,8 @@ on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
 \code{\link[=get_age_methods]{get_age_methods()}}.}
 
 \item{usability_codes}{An optional vector of usability codes.
-All usability codes not in this vector will be omitted. Leave
-as \code{NULL} to include all samples.}
+All usability codes not in this vector will be omitted.
+Set to \code{NULL} to include all samples.}
 
 \item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
 \code{\link[rstan:optimizing]{rstan::optimizing()}}.}

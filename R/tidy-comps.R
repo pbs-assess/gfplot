@@ -22,8 +22,8 @@
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
 #' @param usability_codes An optional vector of usability codes.
-#'   All usability codes not in this vector will be omitted. Leave
-#'   as `NULL` to include all samples.
+#'   All usability codes not in this vector will be omitted.
+#'   Set to `NULL` to include all samples.
 #' @param bin_size Bin size for length binning.
 #' @param age_length Should the function operate on ages or lengths?
 #' @param sample_type Are the samples from a commercial or survey source?

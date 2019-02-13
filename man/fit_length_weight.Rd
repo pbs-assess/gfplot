@@ -27,8 +27,8 @@ want to fit with MCMC for testing purposes.}
 lengths. Can be useful for outliers. Defaults to including all data.}
 
 \item{usability_codes}{An optional vector of usability codes.
-All usability codes not in this vector will be omitted. Leave
-as \code{NULL} to include all samples.}
+All usability codes not in this vector will be omitted.
+Set to \code{NULL} to include all samples.}
 
 \item{scale_weight}{A value to multiply all weights by. Useful for changing
 units.}
