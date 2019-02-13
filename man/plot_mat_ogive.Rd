@@ -7,7 +7,7 @@
 \usage{
 fit_mat_ogive(dat, type = c("age", "length"), sample_id_re = FALSE,
   months = seq(1, 12), ageing_method_codes = NULL,
-  usability_codes = c(1, 2, 6))
+  usability_codes = c(0, 1, 2, 6))
 
 plot_mat_ogive(object, xlab = if (object$type[[1]] == "age")
   "Age (years)" else "Length (cm)", title = if (object$type[[1]] ==

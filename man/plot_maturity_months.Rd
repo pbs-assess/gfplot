@@ -5,8 +5,8 @@
 \alias{tidy_maturity_months}
 \title{Plot maturity frequency by month}
 \usage{
-tidy_maturity_months(dat, months = seq(1, 12), usability_codes = c(1,
-  2, 6))
+tidy_maturity_months(dat, months = seq(1, 12), usability_codes = c(0,
+  1, 2, 6))
 
 plot_maturity_months(dat, max_size = 9, sex_gap = 0.2, fill_col = c(M
   = "grey70", F = "black"), line_col = c(M = "grey70", F = "black"),

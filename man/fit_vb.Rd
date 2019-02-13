@@ -9,7 +9,7 @@ fit_vb(dat, sex = c("female", "male", "all"), method = c("mpd",
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
   uniform_priors = FALSE, ageing_method_codes = NULL,
-  usability_codes = c(1, 2, 6), ...)
+  usability_codes = c(0, 1, 2, 6), ...)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
