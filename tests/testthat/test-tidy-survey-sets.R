@@ -4,7 +4,8 @@ test_that("get_* data functions work at PBS", {
   skip_on_travis()
   skip_on_appveyor()
 
-  if (!is_dfo() || !is_windows()) skip("Not a DFO computer")
+  tryCatch(get_ssids(), error = function(e) skip("No database access"))
+
   d <- get_survey_sets("lingcod", 3)
   expect_type(d$year, "integer")
 
