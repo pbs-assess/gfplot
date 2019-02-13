@@ -13,7 +13,7 @@ NULL
 #' @export
 #' @rdname plot_maturity_months
 tidy_maturity_months <- function(dat, months = seq(1, 12),
-  usability_codes = c(1, 2, 6)) {
+  usability_codes = c(0, 1, 2, 6)) {
 
   if (!is.null(usability_codes))
     dat <- filter(dat, .data$usability_code %in% usability_codes)

@@ -75,7 +75,7 @@ fit_vb <- function(dat,
                    too_high_quantile = 1.0,
                    uniform_priors = FALSE,
                    ageing_method_codes = NULL,
-                   usability_codes = c(1, 2, 6),
+                   usability_codes = c(0, 1, 2, 6),
                    ...) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) > 1L) {
@@ -217,7 +217,7 @@ fit_length_weight <- function(dat,
                               min_samples = 50L,
                               method = c("rlm", "lm"),
                               too_high_quantile = 1.0,
-                              usability_codes = c(1, 2, 6),
+                              usability_codes = c(0, 1, 2, 6),
                               scale_weight = 1 / 1000) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) != 1L) {

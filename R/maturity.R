@@ -34,7 +34,7 @@ fit_mat_ogive <- function(dat,
                           sample_id_re = FALSE,
                           months = seq(1, 12),
                           ageing_method_codes = NULL,
-                          usability_codes = c(1, 2, 6)) {
+                          usability_codes = c(0, 1, 2, 6)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
 
   dat <- dat %>% filter(maturity_convention_code != 9)
