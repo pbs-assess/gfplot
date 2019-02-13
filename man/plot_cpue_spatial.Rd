@@ -11,7 +11,7 @@ plot_cpue_spatial(dat, start_year = 2013, bin_width = 7,
   "D"), colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt",
   option = "D"), rotation_angle = 0, rotation_center = c(500, 5700),
   fill_lab = "CPUE (kg/hr)", show_historical = FALSE,
-  return_data = FALSE, min_cells = 10, percent_excluded_xy = NULL,
+  return_data = FALSE, min_cells = 1, percent_excluded_xy = NULL,
   percent_excluded_text = "Fishing events excluded due to Privacy Act")
 }
 \arguments{

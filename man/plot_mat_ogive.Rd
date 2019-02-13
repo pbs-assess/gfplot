@@ -6,7 +6,8 @@
 \title{Fit and plot maturity ogives}
 \usage{
 fit_mat_ogive(dat, type = c("age", "length"), sample_id_re = FALSE,
-  months = seq(1, 12), ageing_method_codes = NULL)
+  months = seq(1, 12), ageing_method_codes = NULL,
+  usability_codes = c(1, 2, 6))
 
 plot_mat_ogive(object, xlab = if (object$type[[1]] == "age")
   "Age (years)" else "Length (cm)", title = if (object$type[[1]] ==
@@ -28,6 +29,10 @@ fitting the maturity ogive. Defaults to all months.}
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to \code{NULL}, which brings in all valid ageing codes.
 See \code{\link[=get_age_methods]{get_age_methods()}}.}
+
+\item{usability_codes}{An optional vector of usability codes.
+All usability codes not in this vector will be omitted. Leave
+as \code{NULL} to include all samples.}
 
 \item{object}{Output from \code{\link[=fit_mat_ogive]{fit_mat_ogive()}}.}
 

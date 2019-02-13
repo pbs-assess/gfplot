@@ -8,7 +8,8 @@ fit_vb(dat, sex = c("female", "male", "all"), method = c("mpd",
   "mcmc"), downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
-  uniform_priors = FALSE, ageing_method_codes = NULL, ...)
+  uniform_priors = FALSE, ageing_method_codes = NULL,
+  usability_codes = c(1, 2, 6), ...)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
@@ -47,6 +48,10 @@ lengths. Can be useful for outliers. Defaults to including all data.}
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
 \code{\link[=get_age_methods]{get_age_methods()}}.}
+
+\item{usability_codes}{An optional vector of usability codes.
+All usability codes not in this vector will be omitted. Leave
+as \code{NULL} to include all samples.}
 
 \item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
 \code{\link[rstan:optimizing]{rstan::optimizing()}}.}

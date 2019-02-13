@@ -21,6 +21,9 @@
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
+#' @param usability_codes An optional vector of usability codes.
+#'   All usability codes not in this vector will be omitted. Leave
+#'   as `NULL` to include all samples.
 #' @param bin_size Bin size for length binning.
 #' @param age_length Should the function operate on ages or lengths?
 #' @param sample_type Are the samples from a commercial or survey source?
@@ -125,6 +128,7 @@ tidy_comps <- function(dat,
                        spp_cat_code = 1,
                        area_grep_pattern = "*",
                        ageing_method_codes = NULL,
+                       usability_codes = c(1, 2, 6),
                        bin_size = 2,
                        age_length = c("age", "length"),
                        sample_type = c("survey", "commercial"),
@@ -167,6 +171,12 @@ tidy_comps <- function(dat,
 
   if (is.null(year_range)) year_range <- c(min(dat$year), max(dat$year))
   dat <- filter(dat, year >= min(year_range), year <= max(year_range))
+
+  # -------------------------------------------
+  # Filter down usability codes:
+  if (!is.null(usability_codes)) {
+    dat <- filter(dat, .data$usability_code %in% usability_codes)
+  }
 
   # -------------------------------------------
   # Filter down data (commercial):

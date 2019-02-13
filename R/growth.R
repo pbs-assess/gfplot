@@ -26,6 +26,9 @@
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes. See
 #'   [get_age_methods()].
+#' @param usability_codes An optional vector of usability codes.
+#'   All usability codes not in this vector will be omitted. Leave
+#'   as `NULL` to include all samples.
 #' @param ... Any other arguments to pass on to [rstan::sampling()] or
 #'   [rstan::optimizing()].
 #' @importFrom stats median quantile rlnorm runif median
@@ -72,6 +75,7 @@ fit_vb <- function(dat,
                    too_high_quantile = 1.0,
                    uniform_priors = FALSE,
                    ageing_method_codes = NULL,
+                   usability_codes = c(1, 2, 6),
                    ...) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) > 1L) {
@@ -81,6 +85,10 @@ fit_vb <- function(dat,
         call. = FALSE
       )
     }
+  }
+
+  if (!is.null(usability_codes)) {
+    dat <- filter(dat, .data$usability_code %in% usability_codes)
   }
 
   if (!is.null(ageing_method_codes)) {
@@ -188,6 +196,9 @@ fit_vb <- function(dat,
 #' @param method `"rlm"` for [MASS::rlm()] or `"lm"` for [stats::lm()].
 #' @param too_high_quantile A quantile above which to discard weights and
 #'   lengths. Can be useful for outliers. Defaults to including all data.
+#' @param usability_codes An optional vector of usability codes.
+#'   All usability codes not in this vector will be omitted. Leave
+#'   as `NULL` to include all samples.
 #' @param scale_weight A value to multiply all weights by. Useful for changing
 #'   units.
 #'
@@ -206,6 +217,7 @@ fit_length_weight <- function(dat,
                               min_samples = 50L,
                               method = c("rlm", "lm"),
                               too_high_quantile = 1.0,
+                              usability_codes = c(1, 2, 6),
                               scale_weight = 1 / 1000) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) != 1L) {
@@ -215,6 +227,10 @@ fit_length_weight <- function(dat,
         call. = FALSE
       )
     }
+  }
+
+  if (!is.null(usability_codes)) {
+    dat <- filter(dat, .data$usability_code %in% usability_codes)
   }
 
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE]

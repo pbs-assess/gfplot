@@ -6,7 +6,8 @@
 \usage{
 fit_length_weight(dat, sex = c("female", "male", "all"),
   downsample = Inf, min_samples = 50L, method = c("rlm", "lm"),
-  too_high_quantile = 1, scale_weight = 1/1000)
+  too_high_quantile = 1, usability_codes = c(1, 2, 6),
+  scale_weight = 1/1000)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
@@ -24,6 +25,10 @@ want to fit with MCMC for testing purposes.}
 
 \item{too_high_quantile}{A quantile above which to discard weights and
 lengths. Can be useful for outliers. Defaults to including all data.}
+
+\item{usability_codes}{An optional vector of usability codes.
+All usability codes not in this vector will be omitted. Leave
+as \code{NULL} to include all samples.}
 
 \item{scale_weight}{A value to multiply all weights by. Useful for changing
 units.}

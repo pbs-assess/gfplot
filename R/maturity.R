@@ -9,6 +9,9 @@
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes.
 #'   See [get_age_methods()].
+#' @param usability_codes An optional vector of usability codes.
+#'   All usability codes not in this vector will be omitted. Leave
+#'   as `NULL` to include all samples.
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples
@@ -30,7 +33,8 @@ fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,
                           months = seq(1, 12),
-                          ageing_method_codes = NULL) {
+                          ageing_method_codes = NULL,
+                          usability_codes = c(1, 2, 6)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
 
   dat <- dat %>% filter(maturity_convention_code != 9)
@@ -38,6 +42,9 @@ fit_mat_ogive <- function(dat,
   if ("maturity_convention_maxvalue" %in% names(dat)) {
     dat <- dat %>%
       filter(maturity_code <= maturity_convention_maxvalue)
+  }
+  if (!is.null(usability_codes)) {
+    dat <- filter(dat, .data$usability_code %in% usability_codes)
   }
 
   type <- match.arg(type)
