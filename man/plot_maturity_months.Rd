@@ -5,7 +5,8 @@
 \alias{tidy_maturity_months}
 \title{Plot maturity frequency by month}
 \usage{
-tidy_maturity_months(dat, months = seq(1, 12))
+tidy_maturity_months(dat, months = seq(1, 12), usability_codes = c(1,
+  2, 6))
 
 plot_maturity_months(dat, max_size = 9, sex_gap = 0.2, fill_col = c(M
   = "grey70", F = "black"), line_col = c(M = "grey70", F = "black"),
@@ -18,6 +19,10 @@ or \code{\link[=get_commercial_samples]{get_commercial_samples()}} or \code{\lin
 data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 
 \item{months}{A vector of months to include. Defaults to all.}
+
+\item{usability_codes}{An optional vector of usability codes.
+All usability codes not in this vector will be omitted. Leave
+as \code{NULL} to include all samples.}
 
 \item{max_size}{The maximum size of the circles.}
 

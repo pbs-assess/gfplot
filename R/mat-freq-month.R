@@ -7,9 +7,17 @@ NULL
 #'   or [get_commercial_samples()] or [bind_samples()]. For [plot_maturity_months()],
 #'   data from [tidy_maturity_months()].
 #' @param months A vector of months to include. Defaults to all.
+#' @param usability_codes An optional vector of usability codes.
+#'   All usability codes not in this vector will be omitted. Leave
+#'   as `NULL` to include all samples.
 #' @export
 #' @rdname plot_maturity_months
-tidy_maturity_months <- function(dat, months = seq(1, 12)) {
+tidy_maturity_months <- function(dat, months = seq(1, 12),
+  usability_codes = c(1, 2, 6)) {
+
+  if (!is.null(usability_codes))
+    dat <- filter(dat, .data$usability_code %in% usability_codes)
+
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
   dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE] # critical!
