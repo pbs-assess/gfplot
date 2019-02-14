@@ -240,7 +240,7 @@ fit_length_weight <- function(dat,
                               downsample = Inf,
                               min_samples = 50L,
                               method = c("tmb", "rlm", "lm"),
-                              df = 2,
+                              df = 3,
                               too_high_quantile = 1.0,
                               usability_codes = c(0, 1, 2, 6),
                               scale_weight = 1 / 1000) {
@@ -315,7 +315,7 @@ fit_length_weight <- function(dat,
   }
 
   pred <- tibble(length = seq(min(dat$length), max(dat$length), length.out = 200L))
-  pred$weight <- exp(pars$log_a + pars$b * pred$length)
+  pred$weight <- exp(pars$log_a + pars$b * log(pred$length))
 
   list(predictions = pred, pars = pars, data = as_tibble(dat), model = m)
 }

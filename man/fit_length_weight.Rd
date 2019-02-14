@@ -6,7 +6,7 @@
 \usage{
 fit_length_weight(dat, sex = c("female", "male", "all"),
   downsample = Inf, min_samples = 50L, method = c("tmb", "rlm",
-  "lm"), df = 2, too_high_quantile = 1, usability_codes = c(0, 1, 2,
+  "lm"), df = 3, too_high_quantile = 1, usability_codes = c(0, 1, 2,
   6), scale_weight = 1/1000)
 }
 \arguments{
