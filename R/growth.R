@@ -182,7 +182,7 @@ fit_vb <- function(dat,
     }
     data <- list(len = dat$length, age = dat$age)
     parameters <- list(k = 0.2, linf = 40, log_sigma = -1.5, t0 = -1)
-    obj <- TMB::MakeADFun(data, parameters, DLL = "vb")
+    obj <- TMB::MakeADFun(data, parameters, DLL = "vb", silent = TRUE)
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
     if (opt$convergence != 0L)
       stop("VB growth model did not converge!")
@@ -306,8 +306,8 @@ fit_length_weight <- function(dat,
     }
     data <- list(len = log(dat$length), weight = log(dat$weight), df = df)
     parameters <- list(log_a = 0, b = 0, log_sigma = 0)
-    obj <- TMB::MakeADFun(data, parameters, DLL = "lw")
-    opt <- stats::nlminb(obj$par, obj$fn, obj$gr, silent = TRUE)
+    obj <- TMB::MakeADFun(data, parameters, DLL = "lw", silent = TRUE)
+    opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
     if (opt$convergence != 0L)
       stop("Length-weight model did not converge!")
     pars <- as.list(opt$par)
