@@ -181,7 +181,8 @@ fit_vb <- function(dat,
       dyn.load(TMB::dynlib(gsub(".cpp", "", .f)))
     }
     data <- list(len = dat$length, age = dat$age)
-    parameters <- list(k = 0.2, linf = 40, log_sigma = -1.5, t0 = -1)
+
+    parameters <- list(k = 0.2, linf = 40, log_sigma = log(0.1), t0 = -1)
     obj <- TMB::MakeADFun(data, parameters, DLL = "vb", silent = TRUE)
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
     if (opt$convergence != 0L)
