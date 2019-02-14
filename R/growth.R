@@ -212,6 +212,12 @@ fit_vb <- function(dat,
 #'   want to fit with MCMC for testing purposes.
 #' @param min_samples The minimum number of fish before a model will be fit.
 #' @param method `"rlm"` for [MASS::rlm()] or `"lm"` for [stats::lm()].
+#'   `"tmb"` for a regression fit with TMB that uses Student-t errors with
+#'   a degrees of freedom defined by the argument `df`.
+#' @param df The fixed degrees of freedom to use if `method = "tmb"`. Large
+#'   values (say over 100) are effectively the normal distribution. Small
+#'   values make the distribution more robust to outliers. The model may
+#'   become unstable if `df < 2`.
 #' @param too_high_quantile A quantile above which to discard weights and
 #'   lengths. Can be useful for outliers. Defaults to including all data.
 #' @param usability_codes An optional vector of usability codes.
@@ -233,7 +239,8 @@ fit_length_weight <- function(dat,
                               sex = c("female", "male", "all"),
                               downsample = Inf,
                               min_samples = 50L,
-                              method = c("rlm", "lm"),
+                              method = c("tmb", "rlm", "lm"),
+                              df = 2,
                               too_high_quantile = 1.0,
                               usability_codes = c(0, 1, 2, 6),
                               scale_weight = 1 / 1000) {
@@ -276,17 +283,39 @@ fit_length_weight <- function(dat,
     ))
   }
 
-  m <- switch(method[[1]],
-    "rlm" = MASS::rlm(log(weight) ~ log(length), data = dat),
-    "lm" = stats::lm(log(weight) ~ log(length), data = dat),
-    stop("`method` argument must be 'rlm' or 'lm'.", call. = FALSE)
-  )
+  method <- match.arg(method)
+
+  if (method == "rlm") {
+    m <- MASS::rlm(log(weight) ~ log(length), data = dat)
+    pars <- as.list(coef(m))
+    pars <- stats::setNames(pars, c("log_a", "b"))
+  }
+
+  if (method == 'lm') {
+    m <- stats::lm(log(weight) ~ log(length), data = dat)
+    pars <- as.list(coef(m))
+    pars <- stats::setNames(pars, c("log_a", "b"))
+  }
+
+  if (method == "tmb") {
+    dlls <- getLoadedDLLs()
+    if (!any(vapply(dlls, function(x) x[["name"]] == "lw", FUN.VALUE = TRUE))) {
+      .f <- system.file("tmb", "lw.cpp", package = "gfplot")
+      TMB::compile(.f)
+      dyn.load(TMB::dynlib(gsub(".cpp", "", .f)))
+    }
+    data <- list(len = log(dat$length), weight = log(dat$weight), df = df)
+    parameters <- list(log_a = 0, b = 0, log_sigma = 0)
+    obj <- TMB::MakeADFun(data, parameters, DLL = "lw")
+    opt <- stats::nlminb(obj$par, obj$fn, obj$gr, silent = TRUE)
+    if (opt$convergence != 0L)
+      stop("Length-weight model did not converge!")
+    pars <- as.list(opt$par)
+    m <- obj
+  }
 
   pred <- tibble(length = seq(min(dat$length), max(dat$length), length.out = 200L))
-  pred$weight <- exp(predict(m, newdata = pred))
-
-  pars <- as.list(coef(m))
-  pars <- stats::setNames(pars, c("log_a", "b"))
+  pred$weight <- exp(pars$log_a + pars$b * pred$length)
 
   list(predictions = pred, pars = pars, data = as_tibble(dat), model = m)
 }

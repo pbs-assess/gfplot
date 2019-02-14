@@ -5,9 +5,9 @@
 \title{Fit a length-weight model}
 \usage{
 fit_length_weight(dat, sex = c("female", "male", "all"),
-  downsample = Inf, min_samples = 50L, method = c("rlm", "lm"),
-  too_high_quantile = 1, usability_codes = c(0, 1, 2, 6),
-  scale_weight = 1/1000)
+  downsample = Inf, min_samples = 50L, method = c("tmb", "rlm",
+  "lm"), df = 2, too_high_quantile = 1, usability_codes = c(0, 1, 2,
+  6), scale_weight = 1/1000)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
@@ -21,7 +21,14 @@ want to fit with MCMC for testing purposes.}
 
 \item{min_samples}{The minimum number of fish before a model will be fit.}
 
-\item{method}{\code{"rlm"} for \code{\link[MASS:rlm]{MASS::rlm()}} or \code{"lm"} for \code{\link[stats:lm]{stats::lm()}}.}
+\item{method}{\code{"rlm"} for \code{\link[MASS:rlm]{MASS::rlm()}} or \code{"lm"} for \code{\link[stats:lm]{stats::lm()}}.
+\code{"tmb"} for a regression fit with TMB that uses Student-t errors with
+a degrees of freedom defined by the argument \code{df}.}
+
+\item{df}{The fixed degrees of freedom to use if \code{method = "tmb"}. Large
+values (say over 100) are effectively the normal distribution. Small
+values make the distribution more robust to outliers. The model may
+become unstable if \code{df < 2}.}
 
 \item{too_high_quantile}{A quantile above which to discard weights and
 lengths. Can be useful for outliers. Defaults to including all data.}
