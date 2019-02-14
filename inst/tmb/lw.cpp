@@ -17,8 +17,7 @@ Type objective_function<Type>::operator() ()
 
   for(int i = 0; i < n; i++){
     eta(i) = log_a + b * len(i);
-    // nll -= log(Type(1.0) / exp(log_sigma) * dt((weight(i) - eta(i)) / exp(log_sigma), df, false));
-    // from metRology::dt.scaled
+    // from metRology::dt.scaled:
     // stats::dt((x - mean)/sd, df, ncp = ncp, log = TRUE) - log(sd)
     nll -= dt((weight(i) - eta(i))/exp(log_sigma), df, true) - log_sigma;
   }
