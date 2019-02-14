@@ -4,7 +4,7 @@
 \alias{fit_vb}
 \title{Fit a von Bertalanffy growth model}
 \usage{
-fit_vb(dat, sex = c("female", "male", "all"), method = c("mpd",
+fit_vb(dat, sex = c("female", "male", "all"), method = c("tmb", "mpd",
   "mcmc"), downsample = Inf, chains = 4L, iter = 1000L,
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
@@ -19,7 +19,7 @@ fit_vb(dat, sex = c("female", "male", "all"), method = c("mpd",
 
 \item{method}{\code{"mpd"} for the mode of the posterior distribution (with
 \code{\link[rstan:optimizing]{rstan::optimizing()}}) or \code{"mcmc"} for full MCMC sampling with Stan (with
-\code{\link[rstan:sampling]{rstan::sampling()}}).}
+\code{\link[rstan:sampling]{rstan::sampling()}}). \code{"tmb"} for a TMB model.}
 
 \item{downsample}{If not \code{Inf} this represents a number of fish specimens to
 sample prior to model fitting. Can be useful for large data sets that you

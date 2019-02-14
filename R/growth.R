@@ -7,7 +7,7 @@
 #' @param sex Either "male" or "female".
 #' @param method `"mpd"` for the mode of the posterior distribution (with
 #'   [rstan::optimizing()]) or `"mcmc"` for full MCMC sampling with Stan (with
-#'   [rstan::sampling()]).
+#'   [rstan::sampling()]). `"tmb"` for a TMB model.
 #' @param downsample If not `Inf` this represents a number of fish specimens to
 #'   sample prior to model fitting. Can be useful for large data sets that you
 #'   want to fit with MCMC for testing purposes.
@@ -64,7 +64,7 @@
 
 fit_vb <- function(dat,
                    sex = c("female", "male", "all"),
-                   method = c("mpd", "mcmc"),
+                   method = c("tmb", "mpd", "mcmc"),
                    downsample = Inf,
                    chains = 4L,
                    iter = 1000L,
@@ -86,6 +86,8 @@ fit_vb <- function(dat,
       )
     }
   }
+
+  method <- match.arg(method)
 
   if (!is.null(usability_codes)) {
     dat <- filter(dat, .data$usability_code %in% usability_codes)
@@ -131,11 +133,11 @@ fit_vb <- function(dat,
     dat <- dat[sample(seq_len(nrow(dat)), downsample), , drop = FALSE]
   }
 
-  if (method[[1]] == "mpd") {
+  if (method == "mpd") {
     mpd_init <- list()
-    mpd_init$K <- 0.1 # wild guess
+    mpd_init$K <- 0.2 # wild guess
     mpd_init$Linf <- 40 # wild guess
-    mpd_init$t0 <- -5 # wild guess
+    mpd_init$t0 <- -1 # wild guess
     mpd_init$sigma <- 0.1
 
     m <- suppressMessages(rstan::optimizing(vb_mod_gfplot,
@@ -147,12 +149,12 @@ fit_vb <- function(dat,
     ))
 
     if (m$return_code != 0L) {
-      warning("VB growth model did not converge!")
+      stop("VB growth model did not converge!")
     }
 
     pars <- as.list(m$par)
   }
-  if (method[[1]] == "mcmc") {
+  if (method == "mcmc") {
     if (nrow(dat) > 50000 & !allow_slow_mcmc) {
       stop("There are > 50,000 aged fish. ",
         "MCMC sampling may take a long time. Set `allow_slow_mcmc = TRUE` ",
@@ -170,6 +172,22 @@ fit_vb <- function(dat,
     )
 
     pars <- lapply(rstan::extract(m), est_method)
+  }
+  if (method == "tmb") {
+    dlls <- getLoadedDLLs()
+    if (!any(vapply(dlls, function(x) x[["name"]] == "vb", FUN.VALUE = TRUE))) {
+      .f <- system.file("tmb", "vb.cpp", package = "gfplot")
+      TMB::compile(.f)
+      dyn.load(TMB::dynlib(gsub(".cpp", "", .f)))
+    }
+    data <- list(len = dat$length, age = dat$age)
+    parameters <- list(k = 0.2, linf = 40, log_sigma = -1.5, t0 = -1)
+    obj <- TMB::MakeADFun(data, parameters, DLL = "vb")
+    opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
+    if (opt$convergence != 0L)
+      stop("VB growth model did not converge!")
+    pars <- as.list(opt$par)
+    m <- obj
   }
 
   vb <- function(ages, linf, k, t0) linf * (1 - exp(-k * (ages - t0)))
