@@ -119,18 +119,19 @@ fit_vb <- function(dat,
     ))
   }
 
-  rstan::rstan_options(auto_write = TRUE)
-  if (uniform_priors) {
-    model_file <- system.file("stan", "vb-nopriors.stan", package = "gfplot")
-  } else {
-    model_file <- system.file("stan", "vb.stan", package = "gfplot")
-  }
-
-  vb_mod_gfplot <- rstan::stan_model(model_file)
-  assign("vb_mod_gfplot", vb_mod_gfplot, envir = globalenv())
-
   if (nrow(dat) > downsample) {
     dat <- dat[sample(seq_len(nrow(dat)), downsample), , drop = FALSE]
+  }
+
+  if (method %in% c('mpd', 'mcmc')) {
+    rstan::rstan_options(auto_write = TRUE)
+    if (uniform_priors) {
+      model_file <- system.file("stan", "vb-nopriors.stan", package = "gfplot")
+    } else {
+      model_file <- system.file("stan", "vb.stan", package = "gfplot")
+    }
+    vb_mod_gfplot <- rstan::stan_model(model_file)
+    assign("vb_mod_gfplot", vb_mod_gfplot, envir = globalenv())
   }
 
   if (method == "mpd") {
@@ -155,14 +156,13 @@ fit_vb <- function(dat,
     pars <- as.list(m$par)
   }
   if (method == "mcmc") {
-    if (nrow(dat) > 50000 & !allow_slow_mcmc) {
+    if (nrow(dat) > 50000 && !allow_slow_mcmc) {
       stop("There are > 50,000 aged fish. ",
         "MCMC sampling may take a long time. Set `allow_slow_mcmc = TRUE` ",
         "if you still want to sample from the posterior.",
         call. = FALSE
       )
     }
-
     m <- rstan::sampling(vb_mod_gfplot,
       data = list(
         N = nrow(dat), age = dat$age, length = dat$length,
@@ -173,6 +173,7 @@ fit_vb <- function(dat,
 
     pars <- lapply(rstan::extract(m), est_method)
   }
+
   if (method == "tmb") {
     dlls <- getLoadedDLLs()
     if (!any(vapply(dlls, function(x) x[["name"]] == "vb", FUN.VALUE = TRUE))) {
