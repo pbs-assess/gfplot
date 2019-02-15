@@ -433,7 +433,7 @@ trawl <- run_sql("GFBioSQL", "SELECT
 #' @param usability A vector of usability codes to include. Defaults to all.
 #'   IPHC codes may be different to other surveys.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE, usability = NULL) {
+  unsorted_only = TRUE, usability = NULL, inside = NULL) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -441,6 +441,10 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
       sql_code = .q,
       search_flag = "-- insert ssid here", conversion_func = I
     )
+  }
+  if (!is.null(inside)){
+    .q <- inject_filter("AND CASE WHEN SM.MAJOR_STAT_AREA_CODE ='01' THEN 1 ELSE 0 END IN", inside, .q,
+      search_flag = "-- insert inside here", conversion_func = I)
   }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
@@ -799,9 +803,16 @@ get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
 
 #' @export
 #' @rdname get_data
-get_age_precision <- function(species) {
+#' @param inside To select only the inside population (Strait of Georgia, area
+#'  4B only), set inside = 1. To select only the outside population, set inside
+#'   = 0.
+get_age_precision <- function(species, inside = NULL) {
   .q <- read_sql("get-age-precision.sql")
-  .q <- inject_filter("AND C.SPECIES_CODE IN", species, .q)
+  .q <- inject_filter("AND SM.SPECIES_CODE IN", species, .q)
+  if (!is.null(inside)){
+    .q <- inject_filter("AND CASE WHEN MAJOR_STAT_AREA_CODE ='01' THEN 1 ELSE 0 END IN", inside, .q,
+      search_flag = "-- insert inside here", conversion_func = I)
+  }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)

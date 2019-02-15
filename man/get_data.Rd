@@ -75,7 +75,7 @@ get_cpue_spatial_ll(species)
 
 get_cpue_index(gear = "bottom trawl", min_cpue_year = 1996)
 
-get_age_precision(species)
+get_age_precision(species, inside = NULL)
 
 get_survey_index(species, ssid = NULL)
 
@@ -125,6 +125,10 @@ uppercase. Run \code{\link[=get_gear_types]{get_gear_types()}} for a look-up tab
 gear types to select from.}
 
 \item{min_cpue_year}{Minimum year for the CPUE data.}
+
+\item{inside}{To select only the inside population (Strait of Georgia, area
+4B only), set inside = 1. To select only the outside population, set inside
+= 0.}
 
 \item{species_group}{Species group code(s) to include (see lookup table
 \code{\link[=get_species_groups]{get_species_groups()}}). Defaults to all.}
