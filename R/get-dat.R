@@ -816,6 +816,7 @@ get_age_precision <- function(species, inside = NULL) {
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$species_common_name <- tolower(.d$species_common_name)
+  .d <- .d %>% select(-inside)
   as_tibble(.d)
 }
 
