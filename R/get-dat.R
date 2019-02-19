@@ -271,8 +271,8 @@ get_other_surveys <- function() {
   .q <- read_sql("get-other-surveys.sql")
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
-  .d <- .d %>% filter(count_surveys_since_2008 >1) %>%
-    select(survey_series_desc, count_surveys_since_2008)
+  .d <- .d %>% filter(surveys_conducted_since_2008 >1) %>%
+    select(survey, surveys_conducted_since_2008)
   .d
 }
 
