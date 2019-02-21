@@ -837,6 +837,27 @@ get_survey_index <- function(species, ssid = NULL) {
   as_tibble(.d)
 }
 
+#' @param ssid
+#' @param attribute
+#' @export
+#' @rdname get_data
+get_sensor_data <- function(ssid = NULL, attribute = NULL){
+  .q <- read_sql("get-sensor-data.sql")
+  if (!is.null(ssid)) {
+    .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
+      search_flag = "-- insert ssid here", conversion_func = I
+    )
+  }
+  if (!is.null(attribute)) {
+    .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", attribute, .q,
+      search_flag = "-- insert attribute here", conversion_func = I
+    )
+  }
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  as_tibble(.d)
+}
+
 #' @param species_group Species group code(s) to include (see lookup table
 #'   [get_species_groups()]). Defaults to all.
 #' @param fishery The fishery_id code(s) (see lookup table [get_fishery_ids()])

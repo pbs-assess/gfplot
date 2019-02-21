@@ -25,6 +25,7 @@
 \alias{get_cpue_index}
 \alias{get_age_precision}
 \alias{get_survey_index}
+\alias{get_sensor_data}
 \alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
@@ -53,7 +54,7 @@ get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
   join_sample_ids = FALSE, verbose = FALSE)
 
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE, usability = NULL)
+  unsorted_only = TRUE, usability = NULL, inside = NULL)
 
 get_iphc_sets(species, usability = NULL)
 
@@ -78,6 +79,8 @@ get_cpue_index(gear = "bottom trawl", min_cpue_year = 1996)
 get_age_precision(species, inside = NULL)
 
 get_survey_index(species, ssid = NULL)
+
+get_sensor_data(ssid = NULL, attribute = NULL)
 
 get_management(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL)
@@ -120,15 +123,15 @@ and unknown). Default = TRUE.}
 \item{usability}{A vector of usability codes to include. Defaults to all.
 IPHC codes may be different to other surveys.}
 
+\item{inside}{To select only the inside population (Strait of Georgia, area
+4B only), set inside = 1. To select only the outside population, set inside
+= 0.}
+
 \item{gear}{The gear type(s) to include for CPUE. Will be converted to
 uppercase. Run \code{\link[=get_gear_types]{get_gear_types()}} for a look-up table of available
 gear types to select from.}
 
 \item{min_cpue_year}{Minimum year for the CPUE data.}
-
-\item{inside}{To select only the inside population (Strait of Georgia, area
-4B only), set inside = 1. To select only the outside population, set inside
-= 0.}
 
 \item{species_group}{Species group code(s) to include (see lookup table
 \code{\link[=get_species_groups]{get_species_groups()}}). Defaults to all.}
