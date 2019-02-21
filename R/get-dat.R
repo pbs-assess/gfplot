@@ -855,6 +855,7 @@ get_sensor_data <- function(ssid = NULL, attribute = NULL){
   }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
+  .d <- unique(.d)
   as_tibble(.d)
 }
 
