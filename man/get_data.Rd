@@ -133,6 +133,9 @@ gear types to select from.}
 
 \item{min_cpue_year}{Minimum year for the CPUE data.}
 
+\item{attribute}{A character vector of sensor attributes to filter for.
+Possible values are \code{c("Depth", "Dissolved", "Oxygen", "Salinity", "Temperature")}.}
+
 \item{species_group}{Species group code(s) to include (see lookup table
 \code{\link[=get_species_groups]{get_species_groups()}}). Defaults to all.}
 

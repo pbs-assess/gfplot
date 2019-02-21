@@ -837,8 +837,8 @@ get_survey_index <- function(species, ssid = NULL) {
   as_tibble(.d)
 }
 
-#' @param ssid
-#' @param attribute
+#' @param attribute A character vector of sensor attributes to filter for.
+#'   Possible values are `c("Depth", "Dissolved", "Oxygen", "Salinity", "Temperature")`.
 #' @export
 #' @rdname get_data
 get_sensor_data <- function(ssid = NULL, attribute = NULL){
