@@ -842,7 +842,7 @@ get_survey_index <- function(species, ssid = NULL) {
 #' @export
 #' @rdname get_data
 get_sensor_data <- function(ssid = NULL, attribute = NULL){
-  .q <- read_sql("get-sensor-data.sql")
+  .q <- read_sql("get-sensor-data-trawl.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
       search_flag = "-- insert ssid here", conversion_func = I
