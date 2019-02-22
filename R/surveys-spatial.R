@@ -22,7 +22,7 @@ tidy_survey_sets <- function(dat, survey, years, utm_zone = 9,
 
   names(dat)[names(dat) %in% density_column] <- "density"
 
-  dat <- select(dat, year, longitude, latitude, depth_m, density) %>%
+  dat <- select(dat, year, longitude, latitude, depth_m, density, fishing_event_id) %>%
     rename(X = longitude, Y = latitude) %>%
     rename(depth = depth_m)
   dat <- mutate(dat, present = ifelse(density > 0, 1, 0))
