@@ -25,7 +25,7 @@
 \alias{get_cpue_index}
 \alias{get_age_precision}
 \alias{get_survey_index}
-\alias{get_sensor_data}
+\alias{get_sensor_data_trawl}
 \alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
@@ -80,7 +80,8 @@ get_age_precision(species, inside = NULL)
 
 get_survey_index(species, ssid = NULL)
 
-get_sensor_data(ssid = NULL, attribute = NULL)
+get_sensor_data_trawl(ssid = c(1, 3, 4, 16), attribute = c(1, 2, 3, 4),
+  unit = c(1, 2, 5, 7))
 
 get_management(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL)
