@@ -841,21 +841,24 @@ get_survey_index <- function(species, ssid = NULL) {
 #'   Possible values are `c("Depth", "Dissolved", "Oxygen", "Salinity", "Temperature")`.
 #' @export
 #' @rdname get_data
-get_sensor_data_trawl <- function(ssid = c(1,3,4,16), attribute = c(1,2,3,4),
+get_sensor_data_trawl <- function(ssid = c(1,3,4,16), attribute = c(NULL),
   unit = c(1,2,5,7)){
   .q <- read_sql("get-sensor-data-trawl.sql")
   .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
     search_flag = "-- insert ssid here", conversion_func = I
     )
-  .q <- inject_filter("AND SD.SENSOR_DATA_ATTRIBUTE_CODE IN", attribute, .q,
+  if (!is.null(attribute)) {
+    .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", attribute, .q,
     search_flag = "-- insert attribute here", conversion_func = I
     )
+  }
   .q <- inject_filter("AND SD.SENSOR_DATA_UNIT_CODE IN", unit, .q,
     search_flag = "-- insert unit here", conversion_func = I
   )
 
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
+  .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
   as_tibble(.d)
 }
