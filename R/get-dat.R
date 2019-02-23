@@ -854,11 +854,14 @@ get_survey_index <- function(species, ssid = NULL) {
 #'   Run `get_sensor_attributes()` for a look-up table of available attributes.
 #' @export
 #' @rdname get_data
-get_sensor_data_trawl <- function(ssid = NULL, attribute = NULL){
+get_sensor_data_trawl <- function(ssid = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity")){
   .q <- read_sql("get-sensor-data-trawl.sql")
-  .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
+  if (!is.null(ssid)) {
+    .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
     search_flag = "-- insert ssid here", conversion_func = I
     )
+  }
   if (!is.null(attribute)) {
     .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
     search_flag = "-- insert attribute here", conversion_func = I
@@ -874,11 +877,14 @@ get_sensor_data_trawl <- function(ssid = NULL, attribute = NULL){
 
 #' @export
 #' @rdname get_data
-get_sensor_data_ll_hook_sensors <- function(ssid = NULL, attribute = NULL){
+get_sensor_data_ll_hook_sensors <- function(ssid = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity")){
   .q <- read_sql("get-sensor-data-ll-hook-sensors.sql")
-  .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
-    search_flag = "-- insert ssid here", conversion_func = I
-  )
+  if (!is.null(ssid)) {
+    .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
+      search_flag = "-- insert ssid here", conversion_func = I
+    )
+  }
   if (!is.null(attribute)) {
     .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
       search_flag = "-- insert attribute here", conversion_func = I
@@ -894,11 +900,14 @@ get_sensor_data_ll_hook_sensors <- function(ssid = NULL, attribute = NULL){
 
 #' @export
 #' @rdname get_data
-get_sensor_data_ll_ctd <- function(ssid = NULL, attribute = NULL){
+get_sensor_data_ll_ctd <- function(ssid = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity")){
   .q <- read_sql("get-sensor-data-ll-ctd.sql")
-  .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
-    search_flag = "-- insert ssid here", conversion_func = I
-  )
+  if (!is.null(ssid)) {
+    .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
+      search_flag = "-- insert ssid here", conversion_func = I
+    )
+  }
   if (!is.null(attribute)) {
     .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
       search_flag = "-- insert attribute here", conversion_func = I
