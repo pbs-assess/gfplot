@@ -112,6 +112,13 @@ firstup <- function(x) {
   x
 }
 
+first_cap <- function(s, strict = FALSE) {
+  cap <- function(s) paste(toupper(substring(s, 1, 1)),
+    {s <- substring(s, 2); if(strict) tolower(s) else s},
+    sep = "", collapse = " " )
+  sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
+}
+
 read_sql <- function(x) {
   if (file.exists(system.file("sql", x, package = "gfplot"))) {
     readLines(system.file("sql", x, package = "gfplot"))
