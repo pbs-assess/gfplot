@@ -267,6 +267,19 @@ get_survey_ids <- function(ssid) {
 
 #' @export
 #' @rdname get_data
+get_sensor_attributes <- function() {
+  .d <- run_sql(
+    "GFBioSQL",
+    "SELECT SENSOR_DATA_ATTRIBUTE_DESC
+    FROM SENSOR_DATA_ATTRIBUTE"
+  )
+  names(.d) <- tolower(names(.d))
+  .d$sensor_data_attribute_desc <- tolower(.d$sensor_data_attribute_desc)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
 get_other_surveys <- function() {
   .q <- read_sql("get-other-surveys.sql")
   .d <- run_sql("GFBioSQL", .q)
@@ -838,10 +851,10 @@ get_survey_index <- function(species, ssid = NULL) {
 }
 
 #' @param attribute A character vector of sensor attributes to filter for.
-#'   Possible values are `c("depth", "dissolved oxygen", "salinity", "temperature")`.
+#'   Run `get_sensor_attributes()` for a look-up table of available attributes.
 #' @export
 #' @rdname get_data
-get_sensor_data_trawl <- function(ssid = c(1,3,4,16), attribute = NULL){
+get_sensor_data_trawl <- function(ssid = NULL, attribute = NULL){
   .q <- read_sql("get-sensor-data-trawl.sql")
   .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
     search_flag = "-- insert ssid here", conversion_func = I
@@ -849,6 +862,46 @@ get_sensor_data_trawl <- function(ssid = c(1,3,4,16), attribute = NULL){
   if (!is.null(attribute)) {
     .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
     search_flag = "-- insert attribute here", conversion_func = I
+    )
+  }
+
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d$attribute <- tolower(.d$attribute)
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
+get_sensor_data_ll_hook_sensors <- function(ssid = NULL, attribute = NULL){
+  .q <- read_sql("get-sensor-data-ll-hook-sensors.sql")
+  .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
+    search_flag = "-- insert ssid here", conversion_func = I
+  )
+  if (!is.null(attribute)) {
+    .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
+      search_flag = "-- insert attribute here", conversion_func = I
+    )
+  }
+
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d$attribute <- tolower(.d$attribute)
+  .d <- unique(.d)
+  as_tibble(.d)
+}
+
+#' @export
+#' @rdname get_data
+get_sensor_data_ll_ctd <- function(ssid = NULL, attribute = NULL){
+  .q <- read_sql("get-sensor-data-ll-ctd.sql")
+  .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
+    search_flag = "-- insert ssid here", conversion_func = I
+  )
+  if (!is.null(attribute)) {
+    .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
+      search_flag = "-- insert attribute here", conversion_func = I
     )
   }
 

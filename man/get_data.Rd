@@ -10,6 +10,7 @@
 \alias{get_gear_types}
 \alias{get_age_methods}
 \alias{get_species}
+\alias{get_sensor_attributes}
 \alias{get_other_surveys}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
@@ -26,6 +27,8 @@
 \alias{get_age_precision}
 \alias{get_survey_index}
 \alias{get_sensor_data_trawl}
+\alias{get_sensor_data_ll_hook_sensors}
+\alias{get_sensor_data_ll_ctd}
 \alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
@@ -47,6 +50,8 @@ get_gear_types()
 get_age_methods()
 
 get_species()
+
+get_sensor_attributes()
 
 get_other_surveys()
 
@@ -80,8 +85,11 @@ get_age_precision(species, inside = NULL)
 
 get_survey_index(species, ssid = NULL)
 
-get_sensor_data_trawl(ssid = c(1, 3, 4, 16), attribute = c(1, 2, 3, 4),
-  unit = c(1, 2, 5, 7))
+get_sensor_data_trawl(ssid = NULL, attribute = NULL)
+
+get_sensor_data_ll_hook_sensors(ssid = NULL, attribute = NULL)
+
+get_sensor_data_ll_ctd(ssid = NULL, attribute = NULL)
 
 get_management(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL)
@@ -135,7 +143,7 @@ gear types to select from.}
 \item{min_cpue_year}{Minimum year for the CPUE data.}
 
 \item{attribute}{A character vector of sensor attributes to filter for.
-Possible values are \code{c("Depth", "Dissolved", "Oxygen", "Salinity", "Temperature")}.}
+Run \code{get_sensor_attributes()} for a look-up table of available attributes.}
 
 \item{species_group}{Species group code(s) to include (see lookup table
 \code{\link[=get_species_groups]{get_species_groups()}}). Defaults to all.}
