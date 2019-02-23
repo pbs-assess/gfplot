@@ -4,6 +4,8 @@
 -- Attribute values are averaged over all measurments recorded between 
 -- the beginning and end of gear bottom contact.
 
+
+--need to look at where/why there are 2 different temperatures coming in per feid in some cases
 SELECT YEAR(FE_BEGIN_RETRIEVAL_TIME) AS YEAR, 
 	SURVEY_SERIES_ID AS SSID,
 	SURVEY_DESC,

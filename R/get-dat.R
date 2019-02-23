@@ -895,6 +895,14 @@ get_sensor_data_ll_hook_sensors <- function(ssid = NULL,
   names(.d) <- tolower(names(.d))
   .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
+  .d$unit[.d$unit =="Degrees Centigrade"] <- "C"
+  .d$unit[.d$unit =="Meters"] <- "M"
+  .d$unit[.d$unit =="Millilitres per Litre"] <- "mL/L"
+  .d$unit[.d$unit =="Practical Salinity Units"] <- "PSU"
+
+  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>% select(-unit)
+  .d <- .d %>% gather(min_value, avg_value, max_value, key = "parameter", value = "value")
+  .d <- .d %>% spread(key = attribute, value = value)
   as_tibble(.d)
 }
 
