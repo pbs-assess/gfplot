@@ -856,7 +856,7 @@ get_survey_index <- function(species, ssid = NULL) {
 #' @rdname get_data
 get_sensor_data_trawl <- function(ssid = NULL,
   attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
-  sensor_min_max = TRUE){
+  sensor_min_max = FALSE){
   .q <- read_sql("get-sensor-data-trawl.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -889,7 +889,8 @@ get_sensor_data_trawl <- function(ssid = NULL,
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_hook_sensors <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity")){
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_min_max = FALSE){
   .q <- read_sql("get-sensor-data-ll-hook-sensors.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -906,21 +907,23 @@ get_sensor_data_ll_hook_sensors <- function(ssid = NULL,
   names(.d) <- tolower(names(.d))
   .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
-  .d$unit[.d$unit =="Degrees Centigrade"] <- "C"
-  .d$unit[.d$unit =="Meters"] <- "M"
-  .d$unit[.d$unit =="Millilitres per Litre"] <- "mL/L"
-  .d$unit[.d$unit =="Practical Salinity Units"] <- "PSU"
 
-  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>% select(-unit)
-  .d <- .d %>% gather(min_value, avg_value, max_value, key = "parameter", value = "value")
-  .d <- .d %>% spread(key = attribute, value = value)
+  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+    select(-unit)
+
+  if (!sensor_min_max){
+    .d <- .d %>% select(-min_value, -max_value)
+    .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
+    .d <- .d %>% tidyr::spread(key = attribute, value = value)
+  }
   as_tibble(.d)
 }
 
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_ctd <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity")){
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_min_max = FALSE){
   .q <- read_sql("get-sensor-data-ll-ctd.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -937,6 +940,15 @@ get_sensor_data_ll_ctd <- function(ssid = NULL,
   names(.d) <- tolower(names(.d))
   .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
+
+  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+    select(-unit)
+
+  if (!sensor_min_max){
+    .d <- .d %>% select(-min_value, -max_value)
+    .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
+    .d <- .d %>% tidyr::spread(key = attribute, value = value)
+  }
   as_tibble(.d)
 }
 
