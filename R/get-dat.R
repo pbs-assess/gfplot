@@ -873,10 +873,11 @@ get_sensor_data_trawl <- function(ssid = NULL,
   names(.d) <- tolower(names(.d))
   .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
+  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+    select(-unit)
 
   if (!sensor_min_max){
     .d <- .d %>% select(-min_value, -max_value)
-    .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>% select(-unit)
     .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
     .d <- .d %>% tidyr::spread(key = attribute, value = value)
   }
