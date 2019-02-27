@@ -851,7 +851,7 @@ get_survey_index <- function(species, ssid = NULL) {
 }
 
 #' @param attribute A character vector of sensor attributes to filter for.
-#'   Run `get_sensor_attributes()` for a look-up table of available attributes.
+#' Run `get_sensor_attributes()` for a look-up table of available attributes.
 #' @export
 #' @rdname get_data
 get_sensor_data_trawl <- function(ssid = NULL,
@@ -885,7 +885,10 @@ get_sensor_data_trawl <- function(ssid = NULL,
   as_tibble(.d)
 }
 
-
+#' @param sensor_min_max Allows for user to choose whether data are output in
+#'   wide format (= TRUE) with min and max values for each attribute for each
+#'   fishing event, or in long format (= FALSE) with only mean values for each
+#'   attribute and fishing event.
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_hook_sensors <- function(ssid = NULL,

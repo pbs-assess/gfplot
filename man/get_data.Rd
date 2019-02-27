@@ -85,11 +85,15 @@ get_age_precision(species, inside = NULL)
 
 get_survey_index(species, ssid = NULL)
 
-get_sensor_data_trawl(ssid = NULL, attribute = NULL)
+get_sensor_data_trawl(ssid = NULL, attribute = c("temperature",
+  "depth", "dissolved oxygen", "salinity"), sensor_min_max = FALSE)
 
-get_sensor_data_ll_hook_sensors(ssid = NULL, attribute = NULL)
+get_sensor_data_ll_hook_sensors(ssid = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_min_max = FALSE)
 
-get_sensor_data_ll_ctd(ssid = NULL, attribute = NULL)
+get_sensor_data_ll_ctd(ssid = NULL, attribute = c("temperature",
+  "depth", "dissolved oxygen", "salinity"), sensor_min_max = FALSE)
 
 get_management(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL)
