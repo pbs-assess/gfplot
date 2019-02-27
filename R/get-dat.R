@@ -892,7 +892,7 @@ get_sensor_data_trawl <- function(ssid = NULL,
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_hook_sensors <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  attribute = c("temperature", "depth"),
   sensor_min_max = FALSE){
   .q <- read_sql("get-sensor-data-ll-hook-sensors.sql")
   if (!is.null(ssid)) {
