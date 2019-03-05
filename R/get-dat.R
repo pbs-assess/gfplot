@@ -891,10 +891,10 @@ get_sensor_data_trawl <- function(ssid = NULL,
 #'   attribute and fishing event.
 #' @export
 #' @rdname get_data
-get_sensor_data_ll_hook_sensors <- function(ssid = NULL,
+get_sensor_data_ll_td <- function(ssid = NULL,
   attribute = c("temperature", "depth"),
   sensor_min_max = FALSE){
-  .q <- read_sql("get-sensor-data-ll-hook-sensors.sql")
+  .q <- read_sql("get-sensor-data-ll-td.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
       search_flag = "-- insert ssid here", conversion_func = I
