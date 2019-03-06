@@ -855,7 +855,7 @@ get_survey_index <- function(species, ssid = NULL) {
 #' @export
 #' @rdname get_data
 get_sensor_data_trawl <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  attribute = c("temperature", "depth", "do", "salinity"),
   sensor_min_max = FALSE){
   .q <- read_sql("get-sensor-data-trawl.sql")
   if (!is.null(ssid)) {
