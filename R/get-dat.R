@@ -855,8 +855,8 @@ get_survey_index <- function(species, ssid = NULL) {
 #' @export
 #' @rdname get_data
 get_sensor_data_trawl <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "do", "salinity"),
-  sensor_min_max = FALSE){
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  spread_attributes = FALSE){
   .q <- read_sql("get-sensor-data-trawl.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -872,15 +872,16 @@ get_sensor_data_trawl <- function(ssid = NULL,
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
   .d$attribute <- tolower(.d$attribute)
+  .d$attribute <- gsub("dissolved oxygen", "do", .d$attribute)
   .d <- unique(.d)
   .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
     select(-unit)
 
-  if (!sensor_min_max){
-    .d <- .d %>% select(-min_value, -max_value)
-    .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
-    .d <- .d %>% tidyr::spread(key = attribute, value = value)
-  }
+  if (spread_attributes){
+    .d <- .d %>% tidyr::gather(min, avg, max, key = "parameter", value = "value")
+    .d <- .d %>% tidyr::unite(temp, attribute, parameter)
+    .d <- .d %>% tidyr::spread(key = temp, value = value)
+    }
 
   as_tibble(.d)
 }
