@@ -27,7 +27,7 @@
 \alias{get_age_precision}
 \alias{get_survey_index}
 \alias{get_sensor_data_trawl}
-\alias{get_sensor_data_ll_hook_sensors}
+\alias{get_sensor_data_ll_td}
 \alias{get_sensor_data_ll_ctd}
 \alias{get_management}
 \alias{get_sara_dat}
@@ -86,11 +86,10 @@ get_age_precision(species, inside = NULL)
 get_survey_index(species, ssid = NULL)
 
 get_sensor_data_trawl(ssid = NULL, attribute = c("temperature",
-  "depth", "dissolved oxygen", "salinity"), sensor_min_max = FALSE)
+  "depth", "dissolved oxygen", "salinity"), spread_attributes = FALSE)
 
-get_sensor_data_ll_hook_sensors(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
-  sensor_min_max = FALSE)
+get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
+  "depth"), sensor_min_max = FALSE)
 
 get_sensor_data_ll_ctd(ssid = NULL, attribute = c("temperature",
   "depth", "dissolved oxygen", "salinity"), sensor_min_max = FALSE)
@@ -148,6 +147,11 @@ gear types to select from.}
 
 \item{attribute}{A character vector of sensor attributes to filter for.
 Run \code{get_sensor_attributes()} for a look-up table of available attributes.}
+
+\item{sensor_min_max}{Allows for user to choose whether data are output in
+wide format (= TRUE) with min and max values for each attribute for each
+fishing event, or in long format (= FALSE) with only mean values for each
+attribute and fishing event.}
 
 \item{species_group}{Species group code(s) to include (see lookup table
 \code{\link[=get_species_groups]{get_species_groups()}}). Defaults to all.}
