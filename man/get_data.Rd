@@ -27,6 +27,7 @@
 \alias{get_age_precision}
 \alias{get_survey_index}
 \alias{get_sensor_data_trawl}
+\alias{get_sensor_data_fe}
 \alias{get_sensor_data_ll_td}
 \alias{get_sensor_data_ll_ctd}
 \alias{get_management}
@@ -88,6 +89,10 @@ get_survey_index(species, ssid = NULL)
 get_sensor_data_trawl(ssid = NULL, attribute = c("temperature",
   "depth", "dissolved oxygen", "salinity"), spread_attributes = FALSE)
 
+get_sensor_data_fe(fishing_event_id = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_name = NULL)
+
 get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
   "depth"), sensor_min_max = FALSE)
 
@@ -147,6 +152,10 @@ gear types to select from.}
 
 \item{attribute}{A character vector of sensor attributes to filter for.
 Run \code{get_sensor_attributes()} for a look-up table of available attributes.}
+
+\item{fishing_event_id}{A vector of fishing events to filter for}
+
+\item{sensor_name}{A character vector of sensor names to filter for.}
 
 \item{sensor_min_max}{Allows for user to choose whether data are output in
 wide format (= TRUE) with min and max values for each attribute for each
