@@ -959,7 +959,7 @@ get_sensor_data_ll_td <- function(ssid = NULL,
 #' @rdname get_data
 get_sensor_data_ll_ctd <- function(ssid = NULL,
   attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
-  sensor_min_max = FALSE){
+  spread_attributes = FALSE){
   .q <- read_sql("get-sensor-data-ll-ctd.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -980,10 +980,10 @@ get_sensor_data_ll_ctd <- function(ssid = NULL,
   .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
     select(-unit)
 
-  if (!sensor_min_max){
-    .d <- .d %>% select(-min_value, -max_value)
-    .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
-    .d <- .d %>% tidyr::spread(key = attribute, value = value)
+  if (spread_attributes){
+    .d <- .d %>% select(-min, -max)
+    .d <- .d %>% tidyr::gather(avg, key = "parameter", value = "value")
+    .d <- .d %>% tidyr::spread(key = attribute, value = value) %>% select(-parameter)
   }
   as_tibble(.d)
 }
