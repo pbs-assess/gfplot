@@ -27,7 +27,7 @@
 \alias{get_age_precision}
 \alias{get_survey_index}
 \alias{get_sensor_data_trawl}
-\alias{get_sensor_data_fe}
+\alias{get_sensor_data_fe_trawl}
 \alias{get_sensor_data_ll_td}
 \alias{get_sensor_data_ll_ctd}
 \alias{get_management}
@@ -89,7 +89,7 @@ get_survey_index(species, ssid = NULL)
 get_sensor_data_trawl(ssid = NULL, attribute = c("temperature",
   "depth", "dissolved oxygen", "salinity"), spread_attributes = FALSE)
 
-get_sensor_data_fe(fishing_event_id = NULL,
+get_sensor_data_fe_trawl(fishing_event_id = NULL,
   attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
   sensor_name = NULL)
 
@@ -97,7 +97,7 @@ get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
   "depth"), sensor_min_max = FALSE)
 
 get_sensor_data_ll_ctd(ssid = NULL, attribute = c("temperature",
-  "depth", "dissolved oxygen", "salinity"), sensor_min_max = FALSE)
+  "depth", "dissolved oxygen", "salinity"), spread_attributes = FALSE)
 
 get_management(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL)

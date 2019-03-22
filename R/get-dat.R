@@ -891,7 +891,7 @@ get_sensor_data_trawl <- function(ssid = NULL,
 #'
 #' @export
 #' @rdname get_data
-get_sensor_data_fe <- function(fishing_event_id = NULL,
+get_sensor_data_fe_trawl <- function(fishing_event_id = NULL,
   attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
   sensor_name = NULL){
   .q <- read_sql("get-sensor-data-fe.sql")
@@ -906,6 +906,28 @@ get_sensor_data_fe <- function(fishing_event_id = NULL,
   if (!is.null(sensor_name)) {
     .q <- inject_filter("AND SENSOR_NAME IN", sensor_name, .q,
       search_flag = "-- insert sensor name here", conversion_func = I
+    )
+  }
+
+  .d <- run_sql("GFBioSQL", .q)
+  names(.d) <- tolower(names(.d))
+  .d$attribute <- tolower(.d$attribute)
+  .d$attribute <- gsub("dissolved oxygen", "do", .d$attribute)
+  .d <- unique(.d)
+  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+    select(-unit)
+}
+
+get_sensor_data_fe_ctd <- function(fishing_event_id = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_name = NULL){
+  .q <- read_sql("get-sensor-data-fe-ctd.sql")
+  .q <- inject_filter("AND FE.FISHING_EVENT_ID IN", fishing_event_id, .q,
+    search_flag = "-- insert fishing event id here", conversion_func = I
+  )
+  if (!is.null(attribute)) {
+    .q <- inject_filter("AND SENSOR_DATA_ATTRIBUTE_DESC IN", first_cap(attribute), .q,
+      search_flag = "-- insert attribute here", conversion_func = I
     )
   }
 
