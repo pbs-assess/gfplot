@@ -8,7 +8,7 @@ clean_localities <- function(x) {
 #' or an "arithmetic" CPUE where the catch and effort are summed each year and
 #' divided.
 #'
-#' @param dat Data from [get_cpue_historic()].
+#' @param dat Data from [get_cpue_historical()].
 #' @param species_common A species common name in lowercase.
 #' @param year_range A range of years to include. Can go up to current year but
 #'   note the management changes, particularly in 1996.

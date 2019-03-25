@@ -14,10 +14,6 @@
 \alias{get_other_surveys}
 \alias{get_survey_sets}
 \alias{get_survey_samples}
-\alias{get_iphc_sets}
-\alias{get_iphc_sets_info}
-\alias{get_iphc_skates_info}
-\alias{get_iphc_hooks}
 \alias{get_commercial_samples}
 \alias{get_catch}
 \alias{get_hake_catch}
@@ -32,7 +28,6 @@
 \alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
-\alias{cache_pbs_data_iphc}
 \title{Get PBS data}
 \usage{
 get_ssids()
@@ -60,14 +55,6 @@ get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
 
 get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
   unsorted_only = TRUE, usability = NULL, inside = NULL)
-
-get_iphc_sets(species, usability = NULL)
-
-get_iphc_sets_info()
-
-get_iphc_skates_info()
-
-get_iphc_hooks(species, usability = NULL)
 
 get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
@@ -100,11 +87,8 @@ get_management(species = NULL, species_group = NULL, fishery = NULL,
 get_sara_dat()
 
 cache_pbs_data(species, file_name = NULL, path = ".",
-  compress = FALSE, unsorted_only = TRUE, historic_cpue = FALSE,
+  compress = FALSE, unsorted_only = TRUE, historical_cpue = FALSE,
   survey_sets = FALSE, verbose = TRUE)
-
-cache_pbs_data_iphc(species, file_name = NULL, path = ".",
-  compress = FALSE)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
@@ -148,6 +132,9 @@ gear types to select from.}
 \item{attribute}{A character vector of sensor attributes to filter for.
 Run \code{get_sensor_attributes()} for a look-up table of available attributes.}
 
+\item{spread_attributes}{Logical for whether the attributes should be
+returned in a wider format.}
+
 \item{sensor_min_max}{Allows for user to choose whether data are output in
 wide format (= TRUE) with min and max values for each attribute for each
 fishing event, or in long format (= FALSE) with only mean values for each
@@ -173,7 +160,7 @@ same as the \code{species} argument.}
 \item{compress}{Compress the \code{.rds} file? Defaults to \code{FALSE} for faster
 reading and writing at the expense of disk space.}
 
-\item{historic_cpue}{Logical for whether historical CPUE should be included.}
+\item{historical_cpue}{Logical for whether historical CPUE should be included.}
 
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
@@ -187,13 +174,6 @@ containing a data frame from a \code{get_*} function. The element name of the li
 reflects the function name with the \code{get_} part removed. For example, the
 output from \code{\link[=get_survey_samples]{get_survey_samples()}} is in a list element named
 \code{survey_samples()}.
-
-The \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}} function returns a data frame.
-The \code{\link[=cache_pbs_data_iphc]{cache_pbs_data_iphc()}}
-function writes an \code{.rds} file to \code{path} for each specified species. A data
-object for a single species is a named list object with one element
-containing the data frame from \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}}.
-The element name of the list is \code{set_counts}.
 }
 \description{
 Automates fisheries and research survey data extraction from DFO Pacific
@@ -230,7 +210,7 @@ GFFOS.GF_D_OFFICIAL_CATCH for the groundfish trawl fishery
 GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 \item \code{get_cpue_index()} extracts catch and effort data from
 GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
-\item \code{\link[=get_cpue_historical]{get_cpue_historical()}} extracts historical catch and effort data back into
+\item \code{get_cpue_historical()} extracts historical catch and effort data back into
 the 1950s. It's help file is on a separate page; see the link.
 \item \code{get_age_precision()} extracts age readings from biological samples for a
 given species where there is a second ('precision') age reading
@@ -238,24 +218,9 @@ given species where there is a second ('precision') age reading
 status and listings
 \item \code{get_survey_index()} extracts survey catch data for given species
 and survey series IDs
-\item \code{get_iphc_sets()} extracts IPHC survey data at the set level for given
-species, from 2003 to present (excluding 2013 which is not in database)
-\item \code{get_iphc_sets_info()} extracts IPHC survey data regarding each set, with no
-species information, to give one unique row (with lat, lon etc.) for each
-set, from 2003 to present (excluding 2013 which is not in database)
-\item \code{get_iphc_skates_info()} extracts IPHC survey data regarding each skate,
-with no species information, to give one unique row (with lat, lon etc.)
-for each set, from 2003 to present (excluding 2013 which is not in database);
-needed for the hooks per skate
-\item \code{get_iphc_hooks()} extracts IPHC survey data at the hook level for given
-species, from 2003 to present (excluding 2013 which is not in database).
-If species is 'hook with bait' then it returns the hooks that were returned
-with bait.
 \item \code{cache_pbs_data()} runs all 'get' functions in the gfplot package
 (except those specific to IPHC data) and caches extracted data to a given
 folder
-\item \code{cache_pbs_data_iphc()} runs \code{get_all_iphc_set_counts} for a given species
-and caches extracted data to a give folder
 }
 
 This \code{\link[=cache_pbs_data]{cache_pbs_data()}} function caches data from
@@ -267,11 +232,8 @@ This \code{\link[=cache_pbs_data]{cache_pbs_data()}} function caches data from
 \item \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}
 \item \code{\link[=get_survey_index]{get_survey_index()}}
 \item \code{\link[=get_age_precision]{get_age_precision()}}
-\item and optionally from \code{\link[=get_survey_sets]{get_survey_sets()}} and \code{\link[=get_cpue_historic]{get_cpue_historic()}}
+\item and optionally from \code{\link[=get_survey_sets]{get_survey_sets()}} and \code{\link[=get_cpue_historical]{get_cpue_historical()}}
 }
-
-This \code{\link[=cache_pbs_data_iphc]{cache_pbs_data_iphc()}} function caches the data for the given
-species from \code{\link[=get_all_iphc_set_counts]{get_all_iphc_set_counts()}}
 }
 \section{Authentication}{
 
@@ -290,7 +252,7 @@ username and password, see the details section in \code{\link[=run_sql]{run_sql(
 get_survey_sets(species = "lingcod", ssid = 1)
 
 ## Import survey or commercial biological data for various plots
-(eg. length frequency, growth, age frequency, maturity, etc.)
+## (e.g. length frequency, growth, age frequency, maturity, etc.)
 get_survey_samples(species = 442, ssid = c(1, 3, 4, 16))
 
 get_commercial_samples(c(442, 397))
@@ -313,10 +275,4 @@ get_cpue_index(gear = "bottom trawl", min_cpue_year = 2012)
 get_survey_index("pacific cod", ssid = c(1, 3, 4, 16))
 }
 
-\dontrun{
-cache_pbs_data_iphc("redbanded rockfish")
-cache_pbs_data_iphc(c("redbanded rockfish",
-                      "pacific ocean perch",
-                      "made up species") )
-}
 }

@@ -166,7 +166,11 @@ if (getRversion() >= "2.15.1") {
     # historical CPUE tidy
     "best_depth_m", "locality", "locality_description", "mean_depth",
 
-    "species_ageing_group"
+    "species_ageing_group",
+
+    "avg_value", "min_value", "max_value", "parameter", "type",
+    "each_specimen_collected",
+    "temp"
 
   ))
 }

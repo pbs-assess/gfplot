@@ -96,6 +96,15 @@ collapse_filters <- function(x) {
   paste0("'", paste(x, collapse = "','"), "'")
 }
 
+#' gfplot utilities
+#'
+#' @param sql_precode SQL go to inject before a species list etc.
+#' @param species A vector of species or similar objects.
+#' @param sql_code The SQL go to operate on.
+#' @param search_flag What to search for in terms of where to inject the code.
+#' @param conversion_func A conversion function to apply to the species or
+#'   related vector.
+#' @export
 inject_filter <- function(sql_precode, species, sql_code,
                           search_flag = "-- insert species here",
                           conversion_func = common2codes) {

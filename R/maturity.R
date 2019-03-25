@@ -140,6 +140,25 @@ fit_mat_ogive <- function(dat,
   )
 }
 
+delta_method <- function(g, mean, cov) {
+  # simplified from msm::deltamethod
+  cov <- as.matrix(cov)
+  n <- length(mean)
+  g <- list(g)
+  syms <- paste0("x", seq_len(n))
+  for (i in seq_len(n)) assign(syms[i], mean[i])
+  gdashmu <- t(sapply(g, function(form) {
+    as.numeric(attr(eval(stats::deriv(form, syms)), "gradient"))
+  }))
+  new.covar <- gdashmu %*% cov %*% t(gdashmu)
+  sqrt(diag(new.covar))
+}
+
+sd2cv <- function(.sd) {
+  sqrt(exp(.sd^2) - 1)
+}
+
+
 #' @param object Output from [fit_mat_ogive()].
 #' @param xlab X axis label.
 #' @param title Title for the plot.

@@ -47,7 +47,7 @@ Imports:
     sdmTMB (>= 0.0.0.9001),
     ggrepel,
     boot  
-Remotes: github::pbs-software/pbs-data/PBSdata, github::seananderson/sdmTMB
+Remotes: github::pbs-software/pbs-data/PBSdata, github::pbs-assess/sdmTMB
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests:

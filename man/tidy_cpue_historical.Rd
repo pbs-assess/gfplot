@@ -14,7 +14,7 @@ tidy_cpue_historical(dat, species_common, year_range = c(1956, 1995),
 tidy_cpue_historic(...)
 }
 \arguments{
-\item{dat}{Data from \code{\link[=get_cpue_historic]{get_cpue_historic()}}.}
+\item{dat}{Data from \code{\link[=get_cpue_historical]{get_cpue_historical()}}.}
 
 \item{species_common}{A species common name in lowercase.}
 

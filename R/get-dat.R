@@ -33,7 +33,7 @@
 #'    GFFOS.GF_D_OFFICIAL_CATCH for the longline fishery
 #' * `get_cpue_index()` extracts catch and effort data from
 #'    GFFOS.GF_MERGED_CATCH for the groundfish trawl fishery since 1996.
-#' * [get_cpue_historical()] extracts historical catch and effort data back into
+#' * `get_cpue_historical()` extracts historical catch and effort data back into
 #'    the 1950s. It's help file is on a separate page; see the link.
 #' * `get_age_precision()` extracts age readings from biological samples for a
 #'    given species where there is a second ('precision') age reading
@@ -41,24 +41,9 @@
 #'    status and listings
 #' * `get_survey_index()` extracts survey catch data for given species
 #'    and survey series IDs
-#' * `get_iphc_sets()` extracts IPHC survey data at the set level for given
-#'    species, from 2003 to present (excluding 2013 which is not in database)
-#' * `get_iphc_sets_info()` extracts IPHC survey data regarding each set, with no
-#'    species information, to give one unique row (with lat, lon etc.) for each
-#'    set, from 2003 to present (excluding 2013 which is not in database)
-#' * `get_iphc_skates_info()` extracts IPHC survey data regarding each skate,
-#'    with no species information, to give one unique row (with lat, lon etc.)
-#'    for each set, from 2003 to present (excluding 2013 which is not in database);
-#'    needed for the hooks per skate
-#' * `get_iphc_hooks()` extracts IPHC survey data at the hook level for given
-#'    species, from 2003 to present (excluding 2013 which is not in database).
-#'    If species is 'hook with bait' then it returns the hooks that were returned
-#'    with bait.
 #' * `cache_pbs_data()` runs all 'get' functions in the gfplot package
 #'    (except those specific to IPHC data) and caches extracted data to a given
 #'    folder
-#' * `cache_pbs_data_iphc()` runs `get_all_iphc_set_counts` for a given species
-#'    and caches extracted data to a give folder
 #'
 #' @section Authentication:
 #' `get_*` functions only extract data when performed on a computer connected to
@@ -75,7 +60,7 @@
 #' get_survey_sets(species = "lingcod", ssid = 1)
 #'
 #' ## Import survey or commercial biological data for various plots
-#' (eg. length frequency, growth, age frequency, maturity, etc.)
+#' ## (e.g. length frequency, growth, age frequency, maturity, etc.)
 #' get_survey_samples(species = 442, ssid = c(1, 3, 4, 16))
 #'
 #' get_commercial_samples(c(442, 397))
@@ -223,7 +208,7 @@ get_sample_trips <- function() {
 
 #' @export
 #' @rdname get_data
-get_species <- function()  {
+get_species <- function() {
   species <- DBI::dbGetQuery(
     db_connection(database = "GFBioSQL"),
     "SELECT * FROM SPECIES"
@@ -284,22 +269,11 @@ get_other_surveys <- function() {
   .q <- read_sql("get-other-surveys.sql")
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
-  .d <- .d %>% filter(surveys_conducted_since_2008 >1) %>%
-    select(survey, surveys_conducted_since_2008)
+  .d <- .d %>%
+    filter(.data$surveys_conducted_since_2008 > 1) %>%
+    select(.data$survey, .data$surveys_conducted_since_2008)
   .d
 }
-
-# get_survey_sensors <- function(ssid = c(1, 3, 4, 16)) {
-#   .q <- read_sql("get-survey-sensors.sql")
-#   if (!is.null(ssid)) {
-#     .q <- inject_filter("AND S.SURVEY_SERIES_ID IN", ssid,
-#       sql_code = .q,
-#       search_flag = "-- insert ssid here", conversion_func = I
-#     )
-#   }
-#   .d <- run_sql("GFBioSQL", .q)
-#   .d
-# }
 
 #' @export
 #' @param join_sample_ids If `TRUE` then the sample IDs will be joined in. This
@@ -309,9 +283,9 @@ get_other_surveys <- function() {
 #'   extraction. Useful to monitor progress.
 #' @rdname get_data
 get_survey_sets <- function(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
-  join_sample_ids = FALSE, verbose = FALSE) {
-# Just to pull out up to date list of ssids associated with trawl/ll gear type.
-trawl <- run_sql("GFBioSQL", "SELECT
+                            join_sample_ids = FALSE, verbose = FALSE) {
+  # Just to pull out up to date list of ssids associated with trawl/ll gear type.
+  trawl <- run_sql("GFBioSQL", "SELECT
     S.SURVEY_SERIES_ID
     FROM SURVEY_SERIES SS
     LEFT JOIN SURVEY S ON S.SURVEY_SERIES_ID = SS.SURVEY_SERIES_ID
@@ -379,8 +353,10 @@ trawl <- run_sql("GFBioSQL", "SELECT
 
       k <- k + 1
       if (verbose) {
-        message("extracting data for survey ID ", survey_ids$SURVEY_ID[j],
-          " and species code ", species_codes[i])
+        message(
+          "extracting data for survey ID ", survey_ids$SURVEY_ID[j],
+          " and species code ", species_codes[i]
+        )
       }
       d_survs[[k]] <- DBI::dbGetQuery(
         db_connection(database = "GFBioSQL"),
@@ -393,8 +369,9 @@ trawl <- run_sql("GFBioSQL", "SELECT
   }
   .d <- bind_rows(d_survs)
 
-  if (nrow(.d) < 1)
+  if (nrow(.d) < 1) {
     stop("No survey set data for selected species.")
+  }
 
   .d <- inner_join(.d,
     unique(select(
@@ -433,9 +410,12 @@ trawl <- run_sql("GFBioSQL", "SELECT
   )
 
   missing_species <- setdiff(species_codes, .d$species_code)
-  if (length(missing_species) > 0)
-    warning("The following species codes do not have survey set data in GFBio.",
-      paste(missing_species, collapse = ", "))
+  if (length(missing_species) > 0) {
+    warning(
+      "The following species codes do not have survey set data in GFBio.",
+      paste(missing_species, collapse = ", ")
+    )
+  }
   as_tibble(.d)
 }
 
@@ -446,7 +426,7 @@ trawl <- run_sql("GFBioSQL", "SELECT
 #' @param usability A vector of usability codes to include. Defaults to all.
 #'   IPHC codes may be different to other surveys.
 get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE, usability = NULL, inside = NULL) {
+                               unsorted_only = TRUE, usability = NULL, inside = NULL) {
   .q <- read_sql("get-survey-samples.sql")
   .q <- inject_filter("AND SP.SPECIES_CODE IN", species, sql_code = .q)
   if (!is.null(ssid)) {
@@ -455,9 +435,10 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
       search_flag = "-- insert ssid here", conversion_func = I
     )
   }
-  if (!is.null(inside)){
+  if (!is.null(inside)) {
     .q <- inject_filter("AND CASE WHEN SM.MAJOR_STAT_AREA_CODE ='01' THEN 1 ELSE 0 END IN", inside, .q,
-      search_flag = "-- insert inside here", conversion_func = I)
+      search_flag = "-- insert inside here", conversion_func = I
+    )
   }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
@@ -465,7 +446,7 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   .d$species_science_name <- tolower(.d$species_science_name)
 
   if (unsorted_only) {
-    .d <- filter(.d, sampling_desc == 'UNSORTED')
+    .d <- filter(.d, sampling_desc == "UNSORTED")
   }
 
   if (!is.null(usability)) {
@@ -483,143 +464,53 @@ get_survey_samples <- function(species, ssid = NULL, remove_bad_data = TRUE,
   }
 
   # remove ages from unaccepted ageing methods:
-  file <- system.file("extdata", "ageing_methods.csv",
-    package = "gfplot"
-  )
+  file <- system.file("extdata", "ageing_methods.csv", package = "gfplot")
 
   ageing_methods <- readr::read_csv(file,
     col_types = readr::cols(
-      species_code = readr::col_character()))
+      species_code = readr::col_character()
+    )
+  )
 
   .d <- left_join(.d,
     select(ageing_methods, species_code, species_ageing_group),
-    by = "species_code")
+    by = "species_code"
+  )
 
   .d <- .d %>%
-      mutate(
-        age = case_when(
-          species_ageing_group == "rockfish_flatfish_hake" & ageing_method_code %in% c(1, 3, 16, 17) ~.d$age,
-          species_ageing_group == "sharks_skates" & ageing_method_code %in% c(12) ~.d$age,
-          species_ageing_group == "dogfish" & ageing_method_code %in% c(11) ~.d$age,
-          species_ageing_group == "pcod_lingcod" & ageing_method_code %in% c(6) ~.d$age,
-          species_ageing_group == "pollock" & ageing_method_code %in% c(7) ~.d$age,
-          species_ageing_group == "shortraker_thornyheads" & ageing_method_code %in% c(1, 3, 4, 16, 17) ~.d$age,
-          is.na(species_ageing_group) ~NA_real_
-          )
+    mutate(
+      age = case_when(
+        species_ageing_group == "rockfish_flatfish_hake" & ageing_method_code %in% c(1, 3, 16, 17) ~ .d$age,
+        species_ageing_group == "sharks_skates" & ageing_method_code %in% c(12) ~ .d$age,
+        species_ageing_group == "dogfish" & ageing_method_code %in% c(11) ~ .d$age,
+        species_ageing_group == "pcod_lingcod" & ageing_method_code %in% c(6) ~ .d$age,
+        species_ageing_group == "pollock" & ageing_method_code %in% c(7) ~ .d$age,
+        species_ageing_group == "shortraker_thornyheads" & ageing_method_code %in% c(1, 3, 4, 16, 17) ~ .d$age,
+        is.na(species_ageing_group) ~ NA_real_
       )
+    )
 
   if (remove_bad_data) {
     .d <- .d[!(.d$length > 600 &
-        .d$species_common_name == "north pacific spiny dogfish"), ]
+      .d$species_common_name == "north pacific spiny dogfish"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "big skate"), ]
     .d <- .d[!(.d$length > 600 & .d$species_common_name == "longnose skate"), ]
     .d <- .d[!(.d$length > 60 & .d$species_common_name == "pacific tomcod"), ]
     .d <- .d[!(.d$length > 50 &
-        .d$species_common_name == "quillback-rockfish"), ]
+      .d$species_common_name == "quillback-rockfish"), ]
     .d <- .d[!(.d$length < 10 & .d$weight / 1000 > 1.0 &
-        .d$species_common_name == "pacific flatnose"), ]
+      .d$species_common_name == "pacific flatnose"), ]
   }
 
   as_tibble(.d)
 }
-
-
-#' @export
-#' @rdname get_data
-get_iphc_sets <- function(species, usability = NULL) {
-  .q <- read_sql("get-iphc-set-level.sql")
-  .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
-  .d <- run_sql("GFBioSQL", .q)
-  .d$species <- tolower(.d$species)
-#
-#    if (!is.null(usability)) {
-#     .d <- filter(.d, usability_code %in% usability)
-#   }
-  as_tibble(.d)
-}
-
-##' @rdname get_data
-##' @export
-get_iphc_sets_info <- function() {
-  .q <- read_sql("get-iphc-set-info.sql")
-  .d <- run_sql("GFBioSQL", .q)
-  .d <- mutate(.d, usable = ifelse(iphcUsabilityCode %in% c(1, 52),
-                                   "Y", "N"))
-  as_tibble(.d)
-}
-
-##' @rdname get_data
-##' @export
-get_iphc_skates_info <- function() {
-  .q <- read_sql("get-iphc-skate-info.sql")
-  .d <- run_sql("GFBioSQL", .q)
-  # Calculating here:
-  # lastHook - hook number of final hook on that skate
-  # firstHook - hook number of 1st hook on that skate
-  # hook20 - hook number of 20th hook on that skate
-  # lastHookTemp needed since need before firstHook, but want to re-order
-  # chum... are just the chum-bait ones
-  # Hook numbering starts at 1 for each set until 2006 (and so goes 1-800ish),
-  #  then resets at 1 for each skate for each skate for 2007 onwards (and so
-  #  goes 1-100ish). Hence the <2006.5 in lastHookTemp.
-  .d <- mutate(group_by(.d, setID),
-               lastHookTemp = cumsum(deplHooksPerSkate) * (year < 2006.5) +
-                              deplHooksPerSkate * (year > 2006.5),
-               firstHook = lastHookTemp - deplHooksPerSkate + 1,
-               lastHook = lastHookTemp,
-               hook20 = firstHook +
-                        (deplHooksPerSkate < 19.5) * deplHooksPerSkate +
-                        (deplHooksPerSkate > 19.5) * 20 - 1,
-               chumDeplHooksPerSkate = deplHooksPerSkate * (bait == 110),
-               chumObsHooksPerSkate = obsHooksPerSkate * (bait == 110),
-               obsHooksPerSkate20 = 20,  # **Remove this line when Elise updates
-                                         #  sql query, Issue #40
-               chumObsHooksPerSkate20 = obsHooksPerSkate20 * (bait == 110)
-               ) %>%
-               select(-lastHookTemp)
-  as_tibble(.d)
-}
-
-
-#' @export
-#' @rdname get_data
-get_iphc_hooks <- function(species, usability = NULL) {
-  if(species != "hook with bait"){
-    .q <- read_sql("get-iphc-hook-level.sql")
-    .q <- inject_filter("AND C.SPECIES_CODE IN", species, sql_code = .q)
-    .d <- run_sql("GFBioSQL", .q)
-    .d$species <- tolower(.d$species)
-    if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
-                                     # No data, give NA's
-    return(as_tibble(.d))} else
-  {
-    .q <- read_sql("get-iphc-hook-level-bait-on-hook.sql")
-    .d <- run_sql("GFBioSQL", .q)
-    # .d$species <- tolower(.d$species)
-    .d <- mutate(.d,
-                 speciesCode = NA,
-                 species = "hook with bait",
-                 numOnHook = 1,
-                 hookCondCode = NA) %>%   # that code unlikely to be useful
-          select(year:hook,
-                 .data$speciesCode,
-                 .data$species,
-                 .data$numOnHook,
-                 .data$hookYieldCode,
-                 .data$hookCondCode)            # return same order as for species
-    if(dim(.d)[1] == 0) { .d[1,] = c(2003, rep(NA, dim(.d)[2]-1)) }
-                                     # No data, give NA's
-    return(as_tibble(.d))
-  }
-}
-
 
 #' @export
 #' @param unsorted_only Remove sorted biological data ('keepers' and 'discards'
 #'  and unknown). Default = TRUE.
 #' @rdname get_data
 get_commercial_samples <- function(species, unsorted_only = TRUE,
-  usability = NULL) {
+                                   usability = NULL) {
   .q <- read_sql("get-comm-samples.sql")
   .q <- inject_filter("AND SM.SPECIES_CODE IN", species, sql_code = .q)
   .d <- run_sql("GFBioSQL", .q)
@@ -629,14 +520,16 @@ get_commercial_samples <- function(species, unsorted_only = TRUE,
   .d <- mutate(.d, year = lubridate::year(trip_start_date))
   duplicate_specimen_ids <- sum(duplicated(.d$specimen_id))
   if (duplicate_specimen_ids > 0) {
-    warning(duplicate_specimen_ids, " duplicate specimen IDs detected for",
-      species, " . Removing them.")
+    warning(
+      duplicate_specimen_ids, " duplicate specimen IDs detected for",
+      species, " . Removing them."
+    )
     .d <- .d[!duplicated(.d$specimen_id), , drop = FALSE]
   }
   # assertthat::assert_that(sum(duplicated(.d$specimen_id)) == 0)
 
   if (unsorted_only) {
-    .d <- filter(.d, sampling_desc == 'UNSORTED')
+    .d <- filter(.d, sampling_desc == "UNSORTED")
   }
 
   if (!is.null(usability)) {
@@ -650,22 +543,25 @@ get_commercial_samples <- function(species, unsorted_only = TRUE,
 
   ageing_methods <- readr::read_csv(file,
     col_types = readr::cols(
-      species_code = readr::col_character()))
+      species_code = readr::col_character()
+    )
+  )
 
   .d <- left_join(.d,
     select(ageing_methods, species_code, .data$species_ageing_group),
-    by = "species_code")
+    by = "species_code"
+  )
 
   .d <- .d %>%
     mutate(
       age = case_when(
-        species_ageing_group == "rockfish_flatfish_hake" & ageing_method_code %in% c(1, 3, 16, 17) ~.d$age,
-        species_ageing_group == "sharks_skates" & ageing_method_code %in% c(12) ~.d$age,
-        species_ageing_group == "dogfish" & ageing_method_code %in% c(11) ~.d$age,
-        species_ageing_group == "pcod_lingcod" & ageing_method_code %in% c(6) ~.d$age,
-        species_ageing_group == "pollock" & ageing_method_code %in% c(7) ~.d$age,
-        species_ageing_group == "shortraker_thornyheads" & ageing_method_code %in% c(1, 3, 4, 16, 17) ~.d$age,
-        is.na(species_ageing_group) ~NA_real_
+        species_ageing_group == "rockfish_flatfish_hake" & ageing_method_code %in% c(1, 3, 16, 17) ~ .d$age,
+        species_ageing_group == "sharks_skates" & ageing_method_code %in% c(12) ~ .d$age,
+        species_ageing_group == "dogfish" & ageing_method_code %in% c(11) ~ .d$age,
+        species_ageing_group == "pcod_lingcod" & ageing_method_code %in% c(6) ~ .d$age,
+        species_ageing_group == "pollock" & ageing_method_code %in% c(7) ~ .d$age,
+        species_ageing_group == "shortraker_thornyheads" & ageing_method_code %in% c(1, 3, 4, 16, 17) ~ .d$age,
+        is.na(species_ageing_group) ~ NA_real_
       )
     )
 
@@ -700,16 +596,7 @@ get_hake_catch <- function() {
   as_tibble(.d)
 }
 
-#' @param ... Other arguments to pass.
-#' @rdname get_cpue_historical
-#' @export
-get_cpue_historic <- function(...) {
-  warning("get_cpue_historic() is depreciated. Please use the grammatically",
-    "correct get_cpue_historical() instead.")
-  get_cpue_historical(...)
-}
-
-#' Get all fishing catch and effort to calculate historic commercial CPUE
+#' Get all fishing catch and effort to calculate historical commercial CPUE
 #'
 #' @param species Species to filter for positive fishing events. Leave as `NULL`
 #'   to include all fishing events. One or more species common names (e.g.
@@ -728,11 +615,12 @@ get_cpue_historic <- function(...) {
 #' @param end_year Specify the last calendar year to be extracted.
 #' @export
 get_cpue_historical <- function(species = NULL,
-  alt_year_start_date = "04-01", areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
-  end_year = NULL) {
+                                alt_year_start_date = "04-01", areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
+                                end_year = NULL) {
   .q <- read_sql("get-cpue-historic.sql")
-  if (!is.null(species))
+  if (!is.null(species)) {
     .q <- inject_filter("AND MC.SPECIES_CODE IN", species, sql_code = .q)
+  }
   .d <- run_sql(database = c("GFFOS", "GFCatch", "PacHarvest"), .q)
   .d$SPECIES_COMMON_NAME[.d$SPECIES_COMMON_NAME == "SPINY DOGFISH"] <-
     toupper("north pacific spiny dogfish") # to match GFBioSQL
@@ -745,15 +633,17 @@ get_cpue_historical <- function(species = NULL,
 
 
   # Filter out fishing records after last year required
-  if (!is.null(end_year)){
+  if (!is.null(end_year)) {
     .d <- .d %>% filter(year <= end_year)
   }
 
   # Create possibly alternate starting date:
 
   if (alt_year_start_date != "01-01") {
-    .d <- dplyr::mutate(.d, .year_start_date =
-        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+    .d <- dplyr::mutate(.d,
+      .year_start_date =
+        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00"))
+    )
     .d <- dplyr::mutate(.d, .time_diff = best_date - .year_start_date)
     .d <- dplyr::mutate(.d, alt_year = ifelse(.time_diff > 0, year, year - 1L))
     .d <- dplyr::select(.d, -.time_diff, -.year_start_date)
@@ -761,7 +651,8 @@ get_cpue_historical <- function(species = NULL,
 
   .d$area <- assign_areas(.d$major_stat_area_description, areas)
   .d$specific_area <- assign_areas(.d$major_stat_area_description,
-    area_regex = c("3C", "3D", "5A", "5B", "5C", "5D", "5E"))
+    area_regex = c("3C", "3D", "5A", "5B", "5C", "5D", "5E")
+  )
 
   as_tibble(.d)
 }
@@ -822,9 +713,10 @@ get_cpue_index <- function(gear = "bottom trawl", min_cpue_year = 1996) {
 get_age_precision <- function(species, inside = NULL) {
   .q <- read_sql("get-age-precision.sql")
   .q <- inject_filter("AND SM.SPECIES_CODE IN", species, .q)
-  if (!is.null(inside)){
+  if (!is.null(inside)) {
     .q <- inject_filter("AND CASE WHEN MAJOR_STAT_AREA_CODE ='01' THEN 1 ELSE 0 END IN", inside, .q,
-      search_flag = "-- insert inside here", conversion_func = I)
+      search_flag = "-- insert inside here", conversion_func = I
+    )
   }
   .d <- run_sql("GFBioSQL", .q)
   names(.d) <- tolower(names(.d))
@@ -852,11 +744,13 @@ get_survey_index <- function(species, ssid = NULL) {
 
 #' @param attribute A character vector of sensor attributes to filter for.
 #' Run `get_sensor_attributes()` for a look-up table of available attributes.
+#' @param spread_attributes Logical for whether the attributes should be
+#'   returned in a wider format.
 #' @export
 #' @rdname get_data
 get_sensor_data_trawl <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
-  spread_attributes = FALSE){
+                                  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+                                  spread_attributes = FALSE) {
   .q <- read_sql("get-sensor-data-trawl.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -874,14 +768,16 @@ get_sensor_data_trawl <- function(ssid = NULL,
   .d$attribute <- tolower(.d$attribute)
   .d$attribute <- gsub("dissolved oxygen", "do", .d$attribute)
   .d <- unique(.d)
-  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+  .d <- .d %>%
+    mutate(attribute = paste0(attribute, "_", unit)) %>%
     select(-unit)
 
-  if (spread_attributes){
-    .d <- .d %>% tidyr::gather(min, avg, max, key = "parameter", value = "value")
-    .d <- .d %>% tidyr::unite(temp, attribute, parameter)
-    .d <- .d %>% tidyr::spread(key = temp, value = value)
-    }
+  if (spread_attributes) {
+    .d <- .d %>% tidyr::gather(.data$min, .data$avg, .data$max,
+      key = "parameter", value = "value")
+    .d <- .d %>% tidyr::unite(.data$temp, .data$attribute, .data$parameter)
+    .d <- .d %>% tidyr::spread(key = .data$temp, value = .data$value)
+  }
 
   as_tibble(.d)
 }
@@ -893,8 +789,8 @@ get_sensor_data_trawl <- function(ssid = NULL,
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_td <- function(ssid = NULL,
-  attribute = c("temperature", "depth"),
-  sensor_min_max = FALSE){
+                                  attribute = c("temperature", "depth"),
+                                  sensor_min_max = FALSE) {
   .q <- read_sql("get-sensor-data-ll-td.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -912,10 +808,11 @@ get_sensor_data_ll_td <- function(ssid = NULL,
   .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
 
-  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+  .d <- .d %>%
+    mutate(attribute = paste0(attribute, "_", unit)) %>%
     select(-unit)
 
-  if (!sensor_min_max){
+  if (!sensor_min_max) {
     .d <- .d %>% select(-min_value, -max_value)
     .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
     .d <- .d %>% tidyr::spread(key = attribute, value = value)
@@ -926,8 +823,8 @@ get_sensor_data_ll_td <- function(ssid = NULL,
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_ctd <- function(ssid = NULL,
-  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
-  sensor_min_max = FALSE){
+                                   attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+                                   sensor_min_max = FALSE) {
   .q <- read_sql("get-sensor-data-ll-ctd.sql")
   if (!is.null(ssid)) {
     .q <- inject_filter("AND SURVEY_SERIES_ID IN", ssid, .q,
@@ -945,10 +842,11 @@ get_sensor_data_ll_ctd <- function(ssid = NULL,
   .d$attribute <- tolower(.d$attribute)
   .d <- unique(.d)
 
-  .d <- .d %>% mutate(attribute = paste0(attribute, "_", unit)) %>%
+  .d <- .d %>%
+    mutate(attribute = paste0(attribute, "_", unit)) %>%
     select(-unit)
 
-  if (!sensor_min_max){
+  if (!sensor_min_max) {
     .d <- .d %>% select(-min_value, -max_value)
     .d <- .d %>% tidyr::gather(avg_value, key = "parameter", value = "value")
     .d <- .d %>% tidyr::spread(key = attribute, value = value)
@@ -967,7 +865,7 @@ get_sensor_data_ll_ctd <- function(ssid = NULL,
 #' @export
 #' @rdname get_data
 get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
-  area = NULL, start_year = NULL) {
+                           area = NULL, start_year = NULL) {
   .q <- read_sql("get-management.sql")
   if (!is.null(species)) {
     .q <- inject_filter("AND Species_Code IN", species, .q,
@@ -1026,7 +924,7 @@ get_sara_dat <- function() {
 #' @param path The folder where the cached data will be saved.
 #' @param compress Compress the `.rds` file? Defaults to `FALSE` for faster
 #'   reading and writing at the expense of disk space.
-#' @param historic_cpue Logical for whether historical CPUE should be included.
+#' @param historical_cpue Logical for whether historical CPUE should be included.
 #' @param survey_sets Logical for whether the survey set data should be
 #'   extracted. You might set this to `FALSE` if you don't need these data and
 #'   you want to substantially speed up data extraction.
@@ -1047,100 +945,45 @@ get_sara_dat <- function() {
 #' * [get_cpue_spatial_ll()]
 #' * [get_survey_index()]
 #' * [get_age_precision()]
-#' * and optionally from [get_survey_sets()] and [get_cpue_historic()]
+#' * and optionally from [get_survey_sets()] and [get_cpue_historical()]
 
 #' @rdname get_data
 cache_pbs_data <- function(species, file_name = NULL, path = ".",
-  compress = FALSE, unsorted_only = TRUE, historic_cpue = FALSE,
-  survey_sets = FALSE, verbose = TRUE) {
-
-  # if (!sql_server_accessible()) {
-  #   stop("SQL server is not accessible. Either you are not on the DFO network or your",
-  #        " Rprofile file does not contain the required variables options pbs.ip,",
-  #        " pbs.uid, and pbs.pwd. On Windows, this file is located at",
-  #        " C:\\R\\etc\\Rprofile.site")
-  # }
+                           compress = FALSE, unsorted_only = TRUE, historical_cpue = FALSE,
+                           survey_sets = FALSE, verbose = TRUE) {
   dir.create(path, showWarnings = FALSE)
-
-  for (sp_i in seq_along(species)) {
-    this_sp <- species[[sp_i]]
-
-    if (is.null(file_name))
-      this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
-    else
-      this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
-
-    message("Extracting data for ", this_sp)
-
-    out <- list()
-    if (survey_sets){
-      out$survey_sets      <- get_survey_sets(this_sp, join_sample_ids = TRUE,
-        verbose = verbose)
-    }
-    if (historic_cpue) {
-      out$cpue_historic    <- get_cpue_historic(this_sp)
-    }
-    out$survey_samples     <- get_survey_samples(this_sp)
-    out$commercial_samples <- get_commercial_samples(this_sp, unsorted_only = unsorted_only)
-    out$catch              <- get_catch(this_sp)
-    out$cpue_spatial       <- get_cpue_spatial(this_sp)
-    out$cpue_spatial_ll    <- get_cpue_spatial_ll(this_sp)
-    out$survey_index       <- get_survey_index(this_sp)
-    # out$management         <- get_management(this_sp)
-    out$age_precision      <- get_age_precision(this_sp)
-
-    saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
-      compress = compress)
-  }
-
-  message("All data extracted and saved in the folder `", path, "`.")
-}
-
-#' @export
-#' @return The [get_all_iphc_set_counts()] function returns a data frame.
-#'  The [cache_pbs_data_iphc()]
-#' function writes an `.rds` file to `path` for each specified species. A data
-#' object for a single species is a named list object with one element
-#' containing the data frame from [get_all_iphc_set_counts()].
-#' The element name of the list is `set_counts`.
-#' @details
-#' This [cache_pbs_data_iphc()] function caches the data for the given
-#'   species from [get_all_iphc_set_counts()]
-#' @rdname get_data
-#' @examples
-#' \dontrun{
-#' cache_pbs_data_iphc("redbanded rockfish")
-#' cache_pbs_data_iphc(c("redbanded rockfish",
-#'                       "pacific ocean perch",
-#'                       "made up species") )
-#' }
-cache_pbs_data_iphc <- function(species, file_name = NULL, path = ".",
-  compress = FALSE) {
-
-  # if (!sql_server_accessible()) {
-  #   stop("SQL server is not accessible. Either you are not on the DFO network or your",
-  #        " Rprofile file does not contain the required variables options pbs.ip,",
-  #        " pbs.uid, and pbs.pwd. On Windows, this file is located at",
-  #        " C:\\R\\etc\\Rprofile.site")
-  # }
-  dir.create(path, showWarnings = FALSE)
-
   for (sp_i in seq_along(species)) {
     this_sp <- species[[sp_i]]
 
     if (is.null(file_name)) {
-        this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
+      this_sp_clean <- gsub("/", "-", gsub(" ", "-", this_sp))
     } else {
-        this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
-    }      # Not sure why Sean's works in cache_pbs_data without the { }
-
-    message("Extracting IPHC data for ", this_sp)
-
+      this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
+    }
+    message("Extracting data for ", this_sp)
     out <- list()
-    out$set_counts <- get_all_iphc_set_counts(this_sp)
-
-    saveRDS(out, file = paste0(file.path(path, this_sp_clean), ".rds"),
-      compress = compress)
+    if (survey_sets) {
+      out$survey_sets <- get_survey_sets(this_sp,
+        join_sample_ids = TRUE,
+        verbose = verbose
+      )
+    }
+    if (historical_cpue) {
+      out$cpue_historical <- get_cpue_historical(this_sp)
+    }
+    out$survey_samples <- get_survey_samples(this_sp)
+    out$commercial_samples <- get_commercial_samples(this_sp,
+      unsorted_only = unsorted_only)
+    out$catch <- get_catch(this_sp)
+    out$cpue_spatial <- get_cpue_spatial(this_sp)
+    out$cpue_spatial_ll <- get_cpue_spatial_ll(this_sp)
+    out$survey_index <- get_survey_index(this_sp)
+    # out$management         <- get_management(this_sp)
+    out$age_precision <- get_age_precision(this_sp)
+    saveRDS(out,
+      file = paste0(file.path(path, this_sp_clean), ".rds"),
+      compress = compress
+    )
   }
-  message("All IPHC data extracted and saved in the folder `", path, "`.")
+  message("All data extracted and saved in the folder `", path, "`.")
 }
