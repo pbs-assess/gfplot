@@ -2,9 +2,12 @@
 % Please edit documentation in R/cpue-index-tweedie.R
 \name{fit_cpue_index_glmmtmb}
 \alias{fit_cpue_index_glmmtmb}
+\alias{predict_cpue_index_tweedie}
 \title{Fit CPUE with glmmTMB}
 \usage{
 fit_cpue_index_glmmtmb(dat, formula = cpue ~ year_factor, ...)
+
+predict_cpue_index_tweedie(object, center = FALSE)
 }
 \arguments{
 \item{dat}{Data}
@@ -12,6 +15,11 @@ fit_cpue_index_glmmtmb(dat, formula = cpue ~ year_factor, ...)
 \item{formula}{Formula}
 
 \item{...}{Other arguments to \code{\link[glmmTMB:glmmTMB]{glmmTMB::glmmTMB()}}}
+
+\item{object}{Output from \code{\link[=fit_cpue_index_glmmtmb]{fit_cpue_index_glmmtmb()}}.}
+
+\item{center}{Should the predictions be centered by dividing by the geometric
+mean?}
 }
 \description{
 Fit CPUE with glmmTMB

@@ -162,12 +162,3 @@ tidy_cpue_historical <- function(dat,
     dplyr::as_tibble(cpue_arith)
   }
 }
-
-#' @param ... Arguments to pass to [tidy_cpue_historical()].
-#' @export
-#' @rdname tidy_cpue_historical
-tidy_cpue_historic <- function(...) {
-  warning("Depreciated: Please use the grammatically correct ",
-    "version tidy_cpue_historical()")
-  tidy_cpue_historical(...)
-}

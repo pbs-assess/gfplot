@@ -255,3 +255,7 @@ tidy_cpue_index <- function(dat, species_common,
   arrange(d_retained, .data$year, .data$vessel) %>%
     dplyr::as_tibble()
 }
+
+get_most_common_level <- function(x) {
+  rev(names(sort(table(x))))[[1]]
+}

@@ -2,7 +2,6 @@
 % Please edit documentation in R/tidy-cpue-historical.R
 \name{tidy_cpue_historical}
 \alias{tidy_cpue_historical}
-\alias{tidy_cpue_historic}
 \title{Tidy historical CPUE data}
 \usage{
 tidy_cpue_historical(dat, species_common, year_range = c(1956, 1995),
@@ -10,8 +9,6 @@ tidy_cpue_historical(dat, species_common, year_range = c(1956, 1995),
   depth_band_width = 25, depth_bin_quantiles = c(0.001, 0.999),
   min_bin_prop = 0.001, type = c("trip-level-data", "arithmetic-cpue"),
   max_fe_hours = 5)
-
-tidy_cpue_historic(...)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_historical]{get_cpue_historical()}}.}
@@ -46,8 +43,6 @@ specific catch and all effort is summed each year and then divided.)}
 (e.g. per trawl). Fishing events that are longer than this will be removed.
 This can be used to remove erroneous fishing events. Only affects data in
 1991 and after when the data are recorded as fishing events.}
-
-\item{...}{Arguments to pass to \code{\link[=tidy_cpue_historical]{tidy_cpue_historical()}}.}
 }
 \value{
 A (tibble) data frame.

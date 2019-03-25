@@ -320,10 +320,6 @@ enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
 
 compute_hexagon_xy <- function(gdat, bin_width) {
   # compute hexagon x-y coordinates for geom_polygon()
-
-  # dx <- resolution[1]
-  # dy <- resolution[2] / 2 * 1.15
-
   dx <- bin_width/2
   dy <- bin_width/2
   public_dat <- lapply(seq_len(nrow(gdat)), function(i)
