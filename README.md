@@ -36,55 +36,50 @@ Functions specific to PBS:
 ``` r
 fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
-#>  [1] "get_age_methods"        "get_age_precision"     
-#>  [3] "get_catch"              "get_commercial_samples"
-#>  [5] "get_cpue_historical"    "get_cpue_index"        
-#>  [7] "get_cpue_spatial"       "get_cpue_spatial_ll"   
-#>  [9] "get_fishery_ids"        "get_gear_types"        
-#> [11] "get_hake_catch"         "get_major_areas"       
-#> [13] "get_management"         "get_management_areas"  
-#> [15] "get_most_common_level"  "get_other_surveys"     
-#> [17] "get_sara_dat"           "get_sensor_attributes" 
-#> [19] "get_sensor_data_ll_ctd" "get_sensor_data_ll_td" 
-#> [21] "get_sensor_data_trawl"  "get_species"           
-#> [23] "get_species_groups"     "get_ssids"             
-#> [25] "get_survey_index"       "get_survey_samples"    
-#> [27] "get_survey_sets"
+#>  [1] "get_age_methods"          "get_age_precision"       
+#>  [3] "get_catch"                "get_commercial_samples"  
+#>  [5] "get_cpue_historical"      "get_cpue_index"          
+#>  [7] "get_cpue_spatial"         "get_cpue_spatial_ll"     
+#>  [9] "get_fishery_ids"          "get_gear_types"          
+#> [11] "get_hake_catch"           "get_major_areas"         
+#> [13] "get_management"           "get_management_areas"    
+#> [15] "get_other_surveys"        "get_sara_dat"            
+#> [17] "get_sensor_attributes"    "get_sensor_data_fe_trawl"
+#> [19] "get_sensor_data_ll_td"    "get_sensor_data_trawl"   
+#> [21] "get_species"              "get_species_groups"      
+#> [23] "get_ssids"                "get_survey_index"        
+#> [25] "get_survey_samples"       "get_survey_sets"
 ```
 
 Generic functions for any similarly formatted data:
 
 ``` r
 sort(fns[grepl("tidy", fns)])
-#>  [1] "tidy_age_precision"            "tidy_ages_raw"                
-#>  [3] "tidy_ages_weighted"            "tidy_catch"                   
-#>  [5] "tidy_comps"                    "tidy_comps_commercial"        
-#>  [7] "tidy_comps_survey"             "tidy_cpue_historic"           
-#>  [9] "tidy_cpue_historical"          "tidy_cpue_index"              
-#> [11] "tidy_cpue_index_coefs"         "tidy_cpue_index_coefs_tweedie"
-#> [13] "tidy_lengths_raw"              "tidy_lengths_weighted"        
-#> [15] "tidy_maturity_months"          "tidy_sample_avail"            
-#> [17] "tidy_survey_index"             "tidy_survey_sets"
+#>  [1] "tidy_age_precision"    "tidy_ages_raw"        
+#>  [3] "tidy_ages_weighted"    "tidy_catch"           
+#>  [5] "tidy_comps"            "tidy_comps_commercial"
+#>  [7] "tidy_comps_survey"     "tidy_cpue_historical" 
+#>  [9] "tidy_cpue_index"       "tidy_lengths_raw"     
+#> [11] "tidy_lengths_weighted" "tidy_maturity_months" 
+#> [13] "tidy_sample_avail"     "tidy_survey_index"    
+#> [15] "tidy_survey_sets"
 ```
 
 ``` r
 sort(fns[grepl("fit", fns)])
-#> [1] "fit_cpue_index"         "fit_cpue_index_glmmtmb"
-#> [3] "fit_cpue_index_tweedie" "fit_length_weight"     
-#> [5] "fit_mat_ogive"          "fit_survey_sets"       
-#> [7] "fit_vb"
+#> [1] "fit_cpue_index_glmmtmb" "fit_length_weight"     
+#> [3] "fit_mat_ogive"          "fit_survey_sets"       
+#> [5] "fit_vb"
 ```
 
 ``` r
 sort(fns[grepl("plot", fns)])
 #>  [1] "plot_age_precision"     "plot_ages"             
-#>  [3] "plot_catch"             "plot_cpue_index"       
-#>  [5] "plot_cpue_index_coefs"  "plot_cpue_index_jk"    
-#>  [7] "plot_cpue_spatial"      "plot_growth"           
-#>  [9] "plot_length_weight"     "plot_lengths"          
-#> [11] "plot_mat_ogive"         "plot_maturity_months"  
-#> [13] "plot_predictor_bubbles" "plot_qres_histogram"   
-#> [15] "plot_qres_qq"           "plot_sample_avail"     
-#> [17] "plot_survey_index"      "plot_survey_sets"      
-#> [19] "plot_vb"
+#>  [3] "plot_catch"             "plot_cpue_spatial"     
+#>  [5] "plot_growth"            "plot_length_weight"    
+#>  [7] "plot_lengths"           "plot_mat_ogive"        
+#>  [9] "plot_maturity_months"   "plot_predictor_bubbles"
+#> [11] "plot_qres_histogram"    "plot_qres_qq"          
+#> [13] "plot_sample_avail"      "plot_survey_index"     
+#> [15] "plot_survey_sets"       "plot_vb"
 ```
