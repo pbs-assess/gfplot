@@ -874,10 +874,6 @@ get_sensor_data_ll_td <- function(ssid = NULL,
   as_tibble(.d)
 }
 
-#' @param sensor_min_max Allows for user to choose whether data are output in
-#'   wide format (= TRUE) with min and max values for each attribute for each
-#'   fishing event, or in long format (= FALSE) with only mean values for each
-#'   attribute and fishing event.
 #' @export
 #' @rdname get_data
 get_sensor_data_ll_td <- function(ssid = NULL,

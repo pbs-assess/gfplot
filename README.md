@@ -38,21 +38,18 @@ fns <- ls("package:gfplot")
 sort(fns[grepl("get", fns)])
 #>  [1] "get_age_methods"        "get_age_precision"     
 #>  [3] "get_catch"              "get_commercial_samples"
-#>  [5] "get_cpue_historic"      "get_cpue_historical"   
-#>  [7] "get_cpue_index"         "get_cpue_spatial"      
-#>  [9] "get_cpue_spatial_ll"    "get_fishery_ids"       
-#> [11] "get_gear_types"         "get_hake_catch"        
-#> [13] "get_iphc_1995"          "get_iphc_1996to2002"   
-#> [15] "get_iphc_2013"          "get_iphc_hooks"        
-#> [17] "get_iphc_sets"          "get_iphc_sets_info"    
-#> [19] "get_iphc_skates_info"   "get_iphc_spp_name"     
-#> [21] "get_major_areas"        "get_management"        
-#> [23] "get_management_areas"   "get_most_common_level" 
-#> [25] "get_other_surveys"      "get_sara_dat"          
-#> [27] "get_species"            "get_species_groups"    
-#> [29] "get_ssids"              "get_survey_index"      
-#> [31] "get_survey_samples"     "get_survey_sets"       
-#> [33] "iphc_get_calc_plot"
+#>  [5] "get_cpue_historical"    "get_cpue_index"        
+#>  [7] "get_cpue_spatial"       "get_cpue_spatial_ll"   
+#>  [9] "get_fishery_ids"        "get_gear_types"        
+#> [11] "get_hake_catch"         "get_major_areas"       
+#> [13] "get_management"         "get_management_areas"  
+#> [15] "get_most_common_level"  "get_other_surveys"     
+#> [17] "get_sara_dat"           "get_sensor_attributes" 
+#> [19] "get_sensor_data_ll_ctd" "get_sensor_data_ll_td" 
+#> [21] "get_sensor_data_trawl"  "get_species"           
+#> [23] "get_species_groups"     "get_ssids"             
+#> [25] "get_survey_index"       "get_survey_samples"    
+#> [27] "get_survey_sets"
 ```
 
 Generic functions for any similarly formatted data:
@@ -65,10 +62,9 @@ sort(fns[grepl("tidy", fns)])
 #>  [7] "tidy_comps_survey"             "tidy_cpue_historic"           
 #>  [9] "tidy_cpue_historical"          "tidy_cpue_index"              
 #> [11] "tidy_cpue_index_coefs"         "tidy_cpue_index_coefs_tweedie"
-#> [13] "tidy_iphc_survey"              "tidy_lengths_raw"             
-#> [15] "tidy_lengths_weighted"         "tidy_maturity_months"         
-#> [17] "tidy_sample_avail"             "tidy_survey_index"            
-#> [19] "tidy_survey_sets"
+#> [13] "tidy_lengths_raw"              "tidy_lengths_weighted"        
+#> [15] "tidy_maturity_months"          "tidy_sample_avail"            
+#> [17] "tidy_survey_index"             "tidy_survey_sets"
 ```
 
 ``` r
@@ -81,14 +77,14 @@ sort(fns[grepl("fit", fns)])
 
 ``` r
 sort(fns[grepl("plot", fns)])
-#>  [1] "iphc_get_calc_plot"     "plot_age_precision"    
-#>  [3] "plot_ages"              "plot_catch"            
-#>  [5] "plot_cpue_index"        "plot_cpue_index_coefs" 
-#>  [7] "plot_cpue_index_jk"     "plot_cpue_spatial"     
-#>  [9] "plot_growth"            "plot_length_weight"    
-#> [11] "plot_lengths"           "plot_mat_ogive"        
-#> [13] "plot_maturity_months"   "plot_predictor_bubbles"
-#> [15] "plot_qres_histogram"    "plot_qres_qq"          
-#> [17] "plot_sample_avail"      "plot_survey_index"     
-#> [19] "plot_survey_sets"       "plot_vb"
+#>  [1] "plot_age_precision"     "plot_ages"             
+#>  [3] "plot_catch"             "plot_cpue_index"       
+#>  [5] "plot_cpue_index_coefs"  "plot_cpue_index_jk"    
+#>  [7] "plot_cpue_spatial"      "plot_growth"           
+#>  [9] "plot_length_weight"     "plot_lengths"          
+#> [11] "plot_mat_ogive"         "plot_maturity_months"  
+#> [13] "plot_predictor_bubbles" "plot_qres_histogram"   
+#> [15] "plot_qres_qq"           "plot_sample_avail"     
+#> [17] "plot_survey_index"      "plot_survey_sets"      
+#> [19] "plot_vb"
 ```

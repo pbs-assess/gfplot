@@ -173,11 +173,6 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
-
-\item{sensor_min_max}{Allows for user to choose whether data are output in
-wide format (= TRUE) with min and max values for each attribute for each
-fishing event, or in long format (= FALSE) with only mean values for each
-attribute and fishing event.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
