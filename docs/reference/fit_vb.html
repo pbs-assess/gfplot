@@ -221,8 +221,8 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt;     }
 #&gt;     res
 #&gt; }
-#&gt; &lt;bytecode: 0x7fb942cdced0&gt;
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;bytecode: 0x7feb29a70998&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; 
 #&gt; $gr
 #&gt; function (x = last.par, ...) 
@@ -232,8 +232,8 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt;         cat("outer mgc: ", max(abs(ans)), "\n")
 #&gt;     ans
 #&gt; }
-#&gt; &lt;bytecode: 0x7fb942cde1e8&gt;
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;bytecode: 0x7feb29a6fa48&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; 
 #&gt; $he
 #&gt; function (x = last.par, atomic = usingAtomics()) 
@@ -245,8 +245,8 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt;             reportenv, PACKAGE = DLL)
 #&gt;     f(x, type = "ADGrad", order = 1)
 #&gt; }
-#&gt; &lt;bytecode: 0x7fb942ce0c30&gt;
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;bytecode: 0x7feb29a6f348&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; 
 #&gt; $hessian
 #&gt; [1] FALSE
@@ -335,11 +335,11 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt;     delayedAssign("spHess", sparseHessianFun(env, skipFixedEffects = skipFixedEffects), 
 #&gt;         assign.env = env)
 #&gt; }
-#&gt; &lt;bytecode: 0x7fb94285cdf8&gt;
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;bytecode: 0x7feb29b05948&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; 
 #&gt; $env
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; 
 #&gt; $report
 #&gt; function (par = last.par) 
@@ -347,8 +347,8 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt;     f(par, order = 0, type = "double")
 #&gt;     as.list(reportenv)
 #&gt; }
-#&gt; &lt;bytecode: 0x7fb942cdb598&gt;
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;bytecode: 0x7feb128e1cf0&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; 
 #&gt; $simulate
 #&gt; function (par = last.par, complete = FALSE) 
@@ -364,8 +364,8 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt;     }
 #&gt;     ans
 #&gt; }
-#&gt; &lt;bytecode: 0x7fb942cdabc0&gt;
-#&gt; &lt;environment: 0x7fb942d11d20&gt;
+#&gt; &lt;bytecode: 0x7feb128e1938&gt;
+#&gt; &lt;environment: 0x7feb29a765e0&gt;
 #&gt; </div><div class='input'><span class='no'>model_f</span>$<span class='no'>predictions</span></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 200 x 2</span><span>
 #&gt;      age length
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -388,8 +388,8 @@ Set to <code>NULL</code> to include all samples.</p></td>
   <span class='kw'>chains</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>iter</span> <span class='kw'>=</span> <span class='fl'>800</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>) <span class='co'># just for a fast example</span></div><div class='output co'>#&gt; 
 #&gt; SAMPLING FOR MODEL 'vb' NOW (CHAIN 1).
 #&gt; Chain 1: 
-#&gt; Chain 1: Gradient evaluation took 0.000202 seconds
-#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.02 seconds.
+#&gt; Chain 1: Gradient evaluation took 0.000229 seconds
+#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.29 seconds.
 #&gt; Chain 1: Adjust your expectations accordingly!
 #&gt; Chain 1: 
 #&gt; Chain 1: 
@@ -406,9 +406,9 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt; Chain 1: Iteration: 720 / 800 [ 90%]  (Sampling)
 #&gt; Chain 1: Iteration: 800 / 800 [100%]  (Sampling)
 #&gt; Chain 1: 
-#&gt; Chain 1:  Elapsed Time: 0.67439 seconds (Warm-up)
-#&gt; Chain 1:                0.660487 seconds (Sampling)
-#&gt; Chain 1:                1.33488 seconds (Total)
+#&gt; Chain 1:  Elapsed Time: 0.680185 seconds (Warm-up)
+#&gt; Chain 1:                0.665635 seconds (Sampling)
+#&gt; Chain 1:                1.34582 seconds (Total)
 #&gt; Chain 1: </div><div class='input'><span class='no'>x</span>$<span class='no'>pars</span></div><div class='output co'>#&gt; $k
 #&gt; [1] 0.162283
 #&gt; 
@@ -470,7 +470,7 @@ Set to <code>NULL</code> to include all samples.</p></td>
 #&gt; t0      -0.66    0.01 0.11   -0.88   -0.73   -0.66   -0.59   -0.45   145 1.02
 #&gt; lp__  3093.29    0.14 1.54 3090.12 3092.49 3093.68 3094.35 3095.12   125 1.01
 #&gt; 
-#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 25 11:53:41 2019.
+#&gt; Samples were drawn using NUTS(diag_e) at Mon Mar 25 12:00:45 2019.
 #&gt; For each parameter, n_eff is a crude measure of effective sample size,
 #&gt; and Rhat is the potential scale reduction factor on split chains (at 
 #&gt; convergence, Rhat=1).</div><div class='input'><span class='no'>posterior</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>rstan</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/rstan/topics/stanfit-method-extract'>extract</a></span>(<span class='no'>x</span>$<span class='no'>model</span>)

@@ -90,47 +90,42 @@
 <p>Functions specific to PBS:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">fns &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/ls">ls</a></span>(<span class="st">"package:gfplot"</span>)</a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sort">sort</a></span>(fns[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"get"</span>, fns)])</a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="co">#&gt;  [1] "get_age_methods"        "get_age_precision"     </span></a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="co">#&gt;  [3] "get_catch"              "get_commercial_samples"</span></a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="co">#&gt;  [5] "get_cpue_historical"    "get_cpue_index"        </span></a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt;  [7] "get_cpue_spatial"       "get_cpue_spatial_ll"   </span></a>
-<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt;  [9] "get_fishery_ids"        "get_gear_types"        </span></a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="co">#&gt; [11] "get_hake_catch"         "get_major_areas"       </span></a>
-<a class="sourceLine" id="cb3-9" title="9"><span class="co">#&gt; [13] "get_management"         "get_management_areas"  </span></a>
-<a class="sourceLine" id="cb3-10" title="10"><span class="co">#&gt; [15] "get_most_common_level"  "get_other_surveys"     </span></a>
-<a class="sourceLine" id="cb3-11" title="11"><span class="co">#&gt; [17] "get_sara_dat"           "get_sensor_attributes" </span></a>
-<a class="sourceLine" id="cb3-12" title="12"><span class="co">#&gt; [19] "get_sensor_data_ll_ctd" "get_sensor_data_ll_td" </span></a>
-<a class="sourceLine" id="cb3-13" title="13"><span class="co">#&gt; [21] "get_sensor_data_trawl"  "get_species"           </span></a>
-<a class="sourceLine" id="cb3-14" title="14"><span class="co">#&gt; [23] "get_species_groups"     "get_ssids"             </span></a>
-<a class="sourceLine" id="cb3-15" title="15"><span class="co">#&gt; [25] "get_survey_index"       "get_survey_samples"    </span></a>
-<a class="sourceLine" id="cb3-16" title="16"><span class="co">#&gt; [27] "get_survey_sets"</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co">#&gt;  [1] "get_age_methods"          "get_age_precision"       </span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co">#&gt;  [3] "get_catch"                "get_commercial_samples"  </span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">#&gt;  [5] "get_cpue_historical"      "get_cpue_index"          </span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt;  [7] "get_cpue_spatial"         "get_cpue_spatial_ll"     </span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt;  [9] "get_fishery_ids"          "get_gear_types"          </span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="co">#&gt; [11] "get_hake_catch"           "get_major_areas"         </span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co">#&gt; [13] "get_management"           "get_management_areas"    </span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co">#&gt; [15] "get_other_surveys"        "get_sara_dat"            </span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="co">#&gt; [17] "get_sensor_attributes"    "get_sensor_data_fe_trawl"</span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="co">#&gt; [19] "get_sensor_data_ll_td"    "get_sensor_data_trawl"   </span></a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="co">#&gt; [21] "get_species"              "get_species_groups"      </span></a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="co">#&gt; [23] "get_ssids"                "get_survey_index"        </span></a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="co">#&gt; [25] "get_survey_samples"       "get_survey_sets"</span></a></code></pre></div>
 <p>Generic functions for any similarly formatted data:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sort">sort</a></span>(fns[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"tidy"</span>, fns)])</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="co">#&gt;  [1] "tidy_age_precision"            "tidy_ages_raw"                </span></a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt;  [3] "tidy_ages_weighted"            "tidy_catch"                   </span></a>
-<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt;  [5] "tidy_comps"                    "tidy_comps_commercial"        </span></a>
-<a class="sourceLine" id="cb4-5" title="5"><span class="co">#&gt;  [7] "tidy_comps_survey"             "tidy_cpue_historic"           </span></a>
-<a class="sourceLine" id="cb4-6" title="6"><span class="co">#&gt;  [9] "tidy_cpue_historical"          "tidy_cpue_index"              </span></a>
-<a class="sourceLine" id="cb4-7" title="7"><span class="co">#&gt; [11] "tidy_cpue_index_coefs"         "tidy_cpue_index_coefs_tweedie"</span></a>
-<a class="sourceLine" id="cb4-8" title="8"><span class="co">#&gt; [13] "tidy_lengths_raw"              "tidy_lengths_weighted"        </span></a>
-<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt; [15] "tidy_maturity_months"          "tidy_sample_avail"            </span></a>
-<a class="sourceLine" id="cb4-10" title="10"><span class="co">#&gt; [17] "tidy_survey_index"             "tidy_survey_sets"</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co">#&gt;  [1] "tidy_age_precision"    "tidy_ages_raw"        </span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt;  [3] "tidy_ages_weighted"    "tidy_catch"           </span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt;  [5] "tidy_comps"            "tidy_comps_commercial"</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co">#&gt;  [7] "tidy_comps_survey"     "tidy_cpue_historical" </span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="co">#&gt;  [9] "tidy_cpue_index"       "tidy_lengths_raw"     </span></a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="co">#&gt; [11] "tidy_lengths_weighted" "tidy_maturity_months" </span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="co">#&gt; [13] "tidy_sample_avail"     "tidy_survey_index"    </span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt; [15] "tidy_survey_sets"</span></a></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sort">sort</a></span>(fns[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"fit"</span>, fns)])</a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="co">#&gt; [1] "fit_cpue_index"         "fit_cpue_index_glmmtmb"</span></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt; [3] "fit_cpue_index_tweedie" "fit_length_weight"     </span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt; [5] "fit_mat_ogive"          "fit_survey_sets"       </span></a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt; [7] "fit_vb"</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-2" title="2"><span class="co">#&gt; [1] "fit_cpue_index_glmmtmb" "fit_length_weight"     </span></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt; [3] "fit_mat_ogive"          "fit_survey_sets"       </span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt; [5] "fit_vb"</span></a></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sort">sort</a></span>(fns[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"plot"</span>, fns)])</a>
 <a class="sourceLine" id="cb6-2" title="2"><span class="co">#&gt;  [1] "plot_age_precision"     "plot_ages"             </span></a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="co">#&gt;  [3] "plot_catch"             "plot_cpue_index"       </span></a>
-<a class="sourceLine" id="cb6-4" title="4"><span class="co">#&gt;  [5] "plot_cpue_index_coefs"  "plot_cpue_index_jk"    </span></a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="co">#&gt;  [7] "plot_cpue_spatial"      "plot_growth"           </span></a>
-<a class="sourceLine" id="cb6-6" title="6"><span class="co">#&gt;  [9] "plot_length_weight"     "plot_lengths"          </span></a>
-<a class="sourceLine" id="cb6-7" title="7"><span class="co">#&gt; [11] "plot_mat_ogive"         "plot_maturity_months"  </span></a>
-<a class="sourceLine" id="cb6-8" title="8"><span class="co">#&gt; [13] "plot_predictor_bubbles" "plot_qres_histogram"   </span></a>
-<a class="sourceLine" id="cb6-9" title="9"><span class="co">#&gt; [15] "plot_qres_qq"           "plot_sample_avail"     </span></a>
-<a class="sourceLine" id="cb6-10" title="10"><span class="co">#&gt; [17] "plot_survey_index"      "plot_survey_sets"      </span></a>
-<a class="sourceLine" id="cb6-11" title="11"><span class="co">#&gt; [19] "plot_vb"</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co">#&gt;  [3] "plot_catch"             "plot_cpue_spatial"     </span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="co">#&gt;  [5] "plot_growth"            "plot_length_weight"    </span></a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="co">#&gt;  [7] "plot_lengths"           "plot_mat_ogive"        </span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co">#&gt;  [9] "plot_maturity_months"   "plot_predictor_bubbles"</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co">#&gt; [11] "plot_qres_histogram"    "plot_qres_qq"          </span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="co">#&gt; [13] "plot_sample_avail"      "plot_survey_index"     </span></a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="co">#&gt; [15] "plot_survey_sets"       "plot_vb"</span></a></code></pre></div>
 </div>
   </div>
 
