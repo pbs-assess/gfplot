@@ -23,8 +23,8 @@
 \alias{get_age_precision}
 \alias{get_survey_index}
 \alias{get_sensor_data_trawl}
+\alias{get_sensor_data_fe_trawl}
 \alias{get_sensor_data_ll_td}
-\alias{get_sensor_data_ll_ctd}
 \alias{get_management}
 \alias{get_sara_dat}
 \alias{cache_pbs_data}
@@ -75,11 +75,15 @@ get_survey_index(species, ssid = NULL)
 get_sensor_data_trawl(ssid = NULL, attribute = c("temperature",
   "depth", "dissolved oxygen", "salinity"), spread_attributes = FALSE)
 
+get_sensor_data_fe_trawl(fishing_event_id = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_name = NULL)
+
 get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
   "depth"), sensor_min_max = FALSE)
 
-get_sensor_data_ll_ctd(ssid = NULL, attribute = c("temperature",
-  "depth", "dissolved oxygen", "salinity"), sensor_min_max = FALSE)
+get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
+  "depth"), sensor_min_max = FALSE)
 
 get_management(species = NULL, species_group = NULL, fishery = NULL,
   area = NULL, start_year = NULL)
@@ -135,6 +139,10 @@ Run \code{get_sensor_attributes()} for a look-up table of available attributes.}
 \item{spread_attributes}{Logical for whether the attributes should be
 returned in a wider format.}
 
+\item{fishing_event_id}{A vector of fishing events to filter for}
+
+\item{sensor_name}{A character vector of sensor names to filter for.}
+
 \item{sensor_min_max}{Allows for user to choose whether data are output in
 wide format (= TRUE) with min and max values for each attribute for each
 fishing event, or in long format (= FALSE) with only mean values for each
@@ -165,6 +173,11 @@ reading and writing at the expense of disk space.}
 \item{survey_sets}{Logical for whether the survey set data should be
 extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
+
+\item{sensor_min_max}{Allows for user to choose whether data are output in
+wide format (= TRUE) with min and max values for each attribute for each
+fishing event, or in long format (= FALSE) with only mean values for each
+attribute and fishing event.}
 }
 \value{
 The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
