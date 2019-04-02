@@ -81,7 +81,7 @@ codes2common <- function(spp_code) {
     order_by = seq_along(spp_code), stringsAsFactors = FALSE
   )
   common_df <- data.frame(
-    SPECIES_CODE = spp_code,
+    SPECIES_CODE = as.character(spp_code),
     order_by = seq_along(spp_code), stringsAsFactors = FALSE
   )
   .d <- filter(species, SPECIES_CODE %in% spp_code)
