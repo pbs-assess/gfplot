@@ -17,8 +17,6 @@ run_sql <- function(database, query) {
   DBI::dbGetQuery(db_connection(database = database), query)
 }
 
-#' Database connection
-#' @export
 db_connection <- function(server = "DFBCV9TWVASP001",
                           database = "GFBioSQL") {
 
