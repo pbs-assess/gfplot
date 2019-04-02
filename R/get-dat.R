@@ -1014,7 +1014,7 @@ cache_pbs_data <- function(species, file_name = NULL, path = ".",
     } else {
       this_sp_clean <- gsub("/", "-", gsub(" ", "-", file_name[[sp_i]]))
     }
-    message("Extracting data for ", this_sp)
+    message("Extracting data for ", codes2common(this_sp))
     out <- list()
     if (survey_sets) {
       out$survey_sets <- get_survey_sets(this_sp,
