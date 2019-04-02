@@ -1,19 +1,29 @@
 Package: gfplot
 Title: Data Extraction and Plotting for DFO PBS Groundfish Stocks
 Version: 0.1.4
-Authors@R: c(person(c("Sean", "C."), "Anderson",
-    email = "sean.anderson@dfo-mpo.gc.ca", role = c("aut", "cre")),
-    person(c("Elise", "A."), "Keppel", role = "aut"),
-    person(c("Andrew", "M."), "Edwards", role = "aut"),
-    person("Chris", "Grandin", role = "aut"))
-Description: Facilitates groundfish data extraction at the Canadian Department
-    of Fisheries and Oceans (DFO) Pacific Biological Station (PBS), data
-    tidying, model fitting, and plotting.
-Encoding: UTF-8
-Depends: R (>= 3.4.0),
-    Rcpp (>= 0.12.0)
+Authors@R: 
+    c(person(given = c("Sean", "C."),
+             family = "Anderson",
+             role = c("aut", "cre"),
+             email = "sean.anderson@dfo-mpo.gc.ca"),
+      person(given = c("Elise", "A."),
+             family = "Keppel",
+             role = "aut"),
+      person(given = c("Andrew", "M."),
+             family = "Edwards",
+             role = "aut"),
+      person(given = "Chris",
+             family = "Grandin",
+             role = "aut"))
+Description: Facilitates groundfish data extraction at the
+    Canadian Department of Fisheries and Oceans (DFO) Pacific Biological
+    Station (PBS), data tidying, model fitting, and plotting.
 License: GPL (>=2)
-LazyData: true
+URL: https://github.com/pbs-assess/gfplot
+BugReports: https://github.com/pbs-assess/gfplot/issues
+Depends: 
+    R (>= 3.4.0),
+    Rcpp (>= 0.12.0)
 Imports:
     DBI,
     MASS,
@@ -46,17 +56,20 @@ Imports:
     tweedie,
     sdmTMB (>= 0.0.0.9001),
     ggrepel,
-    boot  
-Remotes: github::pbs-software/pbs-data/PBSdata, github::pbs-assess/sdmTMB
-RoxygenNote: 6.1.1
-Roxygen: list(markdown = TRUE)
+    boot
 Suggests:
     knitr,
     rmarkdown,
     testthat,
     rgdal,
     scales
-VignetteBuilder: knitr
-URL: https://github.com/pbs-assess/gfplot
-BugReports: https://github.com/pbs-assess/gfplot/issues
+VignetteBuilder: 
+    knitr
+Remotes: 
+    github::pbs-software/pbs-data/PBSdata,
+    github::pbs-assess/sdmTMB
 Additional_repositories: https://inla.r-inla-download.org/R/stable
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
