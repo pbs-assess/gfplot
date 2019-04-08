@@ -26,3 +26,7 @@ r_github_packages:
   - pbs-software/pbs-data/PBSdata
   - andrewzm/INLA
   - seananderson/sdmTMB
+
+env:
+  global:
+  - R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
