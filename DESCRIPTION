@@ -35,7 +35,6 @@ Imports:
     assertthat,
     dplyr (>= 0.7.0),
     forcats,
-    gfdata,
     ggplot2 (>= 3.0.0),
     glmmTMB,
     grid,
