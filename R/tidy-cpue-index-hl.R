@@ -48,9 +48,9 @@ tidy_cpue_index_hl <- function(dat, species_common,
                             year_range = c(1980, as.numeric(format(Sys.Date(), "%Y")) - 1),
                             alt_year_start_date = "04-01",
                             use_alt_year = FALSE,
-                            min_positive_trips = 5,
+                            min_positive_annual_trips = 5,
                             min_yrs_with_trips = 5,
-                            major_areas = c('03', '04', '05', '06', '07', '08', '09'),
+                            area_grep_pattern = "^3C|^3D|^5A|^5B|^5C|^5D|^5E",
                             # lat_band_width = 0.1,
                             # depth_band_width = 25,
                             clean_bins = TRUE,
@@ -60,28 +60,30 @@ tidy_cpue_index_hl <- function(dat, species_common,
                             method = "by_trip"
   ) {
 
-  pbs_areas <- gfplot::pbs_areas %>%
-    filter(major_stat_area_code %in% major_areas)
+  pbs_areas <- gfplot::pbs_areas[grep(
+    area_grep_pattern,
+    gfplot::pbs_areas$major_stat_area_description
+  ), ]
   names(dat) <- tolower(names(dat))
   dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
 
   dat <- dat %>% mutate(year = lubridate::year(best_date)) %>%
     mutate(month = lubridate::month(best_date))
 
-  # create possibly alternate starting date:
-  if (alt_year_start_date != "01-01") {
-    dat <- dplyr::mutate(dat, .year_start_date =
-        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
-    dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
-    dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
-    dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
-  }
+# create possibly alternate starting date:
+if (alt_year_start_date != "01-01") {
+  dat <- dplyr::mutate(dat, .year_start_date =
+      lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+  dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
+  dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+  dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
+}
 
-  if (use_alt_year) {
-    dat$year <- NULL
-    dat$year <- dat$alt_year
-    dat$alt_year <- NULL
-  }
+if (use_alt_year) {
+  dat$year <- NULL
+  dat$year <- dat$alt_year
+  dat$alt_year <- NULL
+}
 #
 #   dat$locality_code <- paste(dat$major_stat_area_code,
 #     dat$minor_stat_area_code, dat$locality_code, sep = "-")
@@ -89,24 +91,32 @@ tidy_cpue_index_hl <- function(dat, species_common,
 # basic filtering:
   catch <- dat %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
-    mutate(catch = landed_kg + discarded_kg)
+    mutate(catch = landed_kg + discarded_kg) %>%
+    filter(catch >0) %>% # why are there sometimes rows with a species name but 0 catch? Remove these to avoid erroneous pos_catch below.
+    filter(!is.na(vessel_registration_number))
 
   # filtering if using effort based on trip level data (vessel, area)
-if (method = "by_trip"){
+if (method == "by_trip"){
   catch <- catch %>%
     group_by(fishery_sector,
+      trip_id,
+      vessel_registration_number) %>%
+    mutate(year = min(year),
+      #alt_year = min(alt_year),
+      month = min(month)) %>%
+    group_by(fishery_sector,
+      trip_id,
       year,
       month,
-      alt_year,
-      trip_id,
-      vessel_name,
       vessel_registration_number,
       species_code,
       species_scientific_name,
       species_common_name) %>%
-    summarize(catch = sum(catch),
+    summarize(
+      catch = sum(catch),
       landed_kg = sum(landed_kg),
-      discarded_kg = sum(discarded_kg))
+      discarded_kg = sum(discarded_kg)) %>%
+    ungroup()
 }
 #   # filtering if using effort based on fishing event id level instead
 #   # of trip level data
@@ -121,27 +131,22 @@ if (method = "by_trip"){
 #     filter(n_date < Inf) %>%
 #     select(-n_date) %>% # remove FE_IDs with multiple dates
 #     ungroup()
-#   catch <- dat %>%
-#
-# trip-level catch for target spp:
-  if (method = "by_trip"){
+  #   catch <- dat %>%
+  #
+  # trip-level catch for target spp:
+  if (method == "by_trip"){
     catch <- group_by(
-    catch, trip_id, month, vessel_registration_number,
-    vessel_name, year, trip_id, hours_fished
-  ) %>%
-    mutate(
-      spp_in_fe = toupper(species_common) %in% species_common_name,
-      spp_in_row = species_common_name == toupper(species_common)
+      catch, fishery_sector, year, month, vessel_registration_number, trip_id
     ) %>%
-    summarise(
-      pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
-      # hours_fished = mean(hours_fished, na.rm = TRUE),
-      spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
-      best_depth = mean(best_depth, na.rm = TRUE),
-      latitude = mean(latitude, na.rm = TRUE)
-    ) %>%
-    ungroup()
-
+      mutate(
+        spp_in_row = species_common_name == toupper(species_common)
+      ) %>%
+      summarise(
+        # hours_fished = mean(hours_fished, na.rm = TRUE),
+        spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
+        pos_catch = ifelse(spp_catch > 0, 1, 0))
+      ungroup()
+  }
 #   # fe-level catch for target spp:
 #   catch <- group_by(
 #     catch, fishing_event_id, best_date, month, locality_code,
@@ -160,7 +165,29 @@ if (method = "by_trip"){
 #     ) %>%
 #     ungroup()
 #
-#   # figure out which vessels should be considered part of the spp. fleet
+# trip-level: figure out which vessels should be considered part of the spp. fleet
+  fleet <- catch %>%
+    group_by(vessel_registration_number, year) %>%
+    mutate(annual_positive_trips = sum(pos_catch)) %>%
+    filter(annual_positive_trips >= min_positive_annual_trips) %>%
+    ## threshold
+    #filter(spp_catch > 0) %>% # not necessary - 0 catch removed in basic filtering
+    # group_by(year, vessel_registration_number, trip_id) %>%
+    # summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
+    # filter(sum_catch > 0) %>%
+    group_by(vessel_registration_number) %>%
+    mutate(n_years = length(unique(year))) %>%
+    # for speed (filter early known cases):
+    filter(n_years >= min_yrs_with_trips) %>%
+    ungroup()
+
+  fleet_catch <- semi_join(catch, select(fleet, vessel_registration_number)) %>%
+      summarise(catch = sum(spp_catch))
+
+  all_sr_catch <- catch %>%
+    summarise(catch = sum(spp_catch))
+#
+#   # fe-level: figure out which vessels should be considered part of the spp. fleet
 #   fleet <- catch %>%
 #     group_by(vessel_name) %>%
 #     mutate(total_positive_tows = sum(pos_catch)) %>%
@@ -183,6 +210,7 @@ if (method = "by_trip"){
 #     summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
 #     filter(trips_over_thresh >= min_yrs_with_trips) %>%
 #     ungroup()
+#
 #
 #   # retain the data from our "fleet"
 #   d_retained <- semi_join(catch, fleet, by = "vessel_name")
