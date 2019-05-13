@@ -94,6 +94,7 @@ tidy_cpue_index <- function(dat, species_common,
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
     filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
     filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
+    filter(fe_start_date < fe_end_date) %>%
     filter(!is.na(latitude), !is.na(longitude), !is.na(best_depth)) %>%
     filter(gear %in% toupper(gear)) %>%
     filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
