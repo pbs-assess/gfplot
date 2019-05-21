@@ -105,10 +105,14 @@ tidy_cpue_index <- function(dat, species_common,
     ) %>%
     filter(hours_fished > 0) %>%
     mutate(catch = landed_kg + discarded_kg) %>%
+    # to avoid erroneous 'pos_catch' results below
+    filter(catch  > 0) %>%
+    # this would need to be grouped by trip and fe_id since older trips recycled
+    # fe_id #'s
     group_by(fishing_event_id) %>%
-    mutate(n_date = length(unique(best_date))) %>%
-    filter(n_date < Inf) %>%
-    select(-n_date) %>% # remove FE_IDs with multiple dates
+    mutate(n_date = length(unique(best_date))) %>%  #
+    filter(n_date < Inf) %>%                        #
+    select(-n_date) %>% # remove FE_IDs with multiple dates (currently does nothing)
     ungroup()
 
   # catch for target spp:
@@ -133,11 +137,11 @@ tidy_cpue_index <- function(dat, species_common,
   fleet <- catch %>%
     group_by(vessel_name) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
-    filter(total_positive_tows >= min_positive_tows) %>%
-    filter(spp_catch > 0) %>%
+    filter(total_positive_tows >= min_positive_tows) %>% # filters for only vessels with > 100 positive tows
+    filter(spp_catch > 0) %>% # filters for positive tows only
     group_by(year, vessel_name, trip_id) %>%
-    summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
-    filter(sum_catch > 0) %>%
+    summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>% # roll up catch by trip
+    # filter(sum_catch > 0) %>% # redundant - already filtered for spp_catch>0 for all fe_id's
     group_by(vessel_name) %>%
     mutate(n_years = length(unique(year))) %>%
     # for speed (filter early known cases):
