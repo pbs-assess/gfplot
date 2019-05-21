@@ -67,12 +67,7 @@ tidy_cpue_index_hl <- function(dat, species_common,
   names(dat) <- tolower(names(dat))
   dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
 
-  dat <- dat %>% mutate(year = lubridate::year(best_date)) %>%
-    mutate(month = lubridate::month(best_date))
-
-
   if (use_alt_year) {
-
 
     # create possibly alternate starting date:
     if (alt_year_start_date != "01-01") {
