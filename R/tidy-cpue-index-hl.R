@@ -70,20 +70,23 @@ tidy_cpue_index_hl <- function(dat, species_common,
   dat <- dat %>% mutate(year = lubridate::year(best_date)) %>%
     mutate(month = lubridate::month(best_date))
 
-# create possibly alternate starting date:
-if (alt_year_start_date != "01-01") {
-  dat <- dplyr::mutate(dat, .year_start_date =
-      lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
-  dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
-  dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
-  dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
-}
 
-if (use_alt_year) {
-  dat$year <- NULL
-  dat$year <- dat$alt_year
-  dat$alt_year <- NULL
-}
+  if (use_alt_year) {
+
+
+    # create possibly alternate starting date:
+    if (alt_year_start_date != "01-01") {
+      dat <- dplyr::mutate(dat, .year_start_date =
+          lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
+      dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
+      dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+      dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
+    }
+
+    dat$year <- NULL
+    dat$year <- dat$alt_year
+    dat$alt_year <- NULL
+  }
 #
 #   dat$locality_code <- paste(dat$major_stat_area_code,
 #     dat$minor_stat_area_code, dat$locality_code, sep = "-")
