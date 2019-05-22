@@ -29,8 +29,6 @@ In addition to the help available through the R console, a [web version of the d
 The gfplot package can be installed and loaded with:
 
 ```{r, eval=FALSE}
-install.packages("INLA", repos = c(getOption("repos"), 
-  INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
 # install.packages("devtools")
 devtools::install_github("pbs-assess/gfplot")
 ```
