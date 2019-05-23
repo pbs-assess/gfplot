@@ -65,6 +65,14 @@ tidy_cpue_index <- function(dat, species_common,
 
   gear <- match.arg(gear)
 
+  if (gear == "bottom trawl" & year_range[[1]] < 1996){
+    stop("Start year for bottom trawl cpue must be 1996 or later.")
+  }
+
+  if (gear == "hook and line" & year_range[[1]] < 2008){
+    stop("Start year for hook and line cpue must be 2008 or later.")
+  }
+
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
     gfplot::pbs_areas$major_stat_area_description
