@@ -21,8 +21,6 @@ available](https://pbs-assess.github.io/gfplot/index.html).
 The gfplot package can be installed and loaded with:
 
 ``` r
-install.packages("INLA", repos = c(getOption("repos"), 
-  INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
 # install.packages("devtools")
 devtools::install_github("pbs-assess/gfplot")
 ```
