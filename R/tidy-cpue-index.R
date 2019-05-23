@@ -14,7 +14,8 @@
 #'   is set to `TRUE` then the `year` column will be replaced with the
 #'   `alt_year` column.
 #' @param lat_range The range of latitudes to include.
-#' @param min_positive_tows The minimum number of positive tows over all years.
+#' @param min_positive_fe The minimum number of positive tows (trawl) or
+#'   hook and line sets over all years.
 #' @param min_positive_trips The minimum number of annual positive trips.
 #' @param min_yrs_with_trips The number of years in which the
 #'   `min_positive_trips` criteria needs to be met.
@@ -50,17 +51,19 @@ tidy_cpue_index <- function(dat, species_common,
                             alt_year_start_date = "04-01",
                             use_alt_year = FALSE,
                             lat_range = c(48, Inf),
-                            min_positive_tows = 100,
+                            min_positive_fe = 100,
                             min_positive_trips = 5,
                             min_yrs_with_trips = 5,
-                            area_grep_pattern = "5[CDE]+",
+                            area_grep_pattern = "^3C|^3D|^5A|^5B|^5C|^5D|^5E",
                             lat_band_width = 0.1,
                             depth_band_width = 25,
                             clean_bins = TRUE,
                             depth_bin_quantiles = c(0.001, 0.999),
                             min_bin_prop = 0.001,
                             lat_bin_quantiles = c(0, 1),
-                            gear = "bottom trawl") {
+                            gear = c("bottom trawl", "hook and line")) {
+
+  gear <- match.arg(gear)
 
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
@@ -137,7 +140,7 @@ tidy_cpue_index <- function(dat, species_common,
   fleet <- catch %>%
     group_by(vessel_name) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
-    filter(total_positive_tows >= min_positive_tows) %>% # filters for only vessels with > 100 positive tows
+    filter(total_positive_tows >= min_positive_fe) %>% # filters for only vessels with > 100 positive tows
     filter(spp_catch > 0) %>% # filters for positive tows only
     group_by(year, vessel_name, trip_id) %>%
     summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>% # roll up catch by trip

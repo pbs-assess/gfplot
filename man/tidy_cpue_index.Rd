@@ -7,7 +7,7 @@
 tidy_cpue_index(dat, species_common, year_range = c(1996,
   as.numeric(format(Sys.Date(), "\%Y")) - 1),
   alt_year_start_date = "04-01", use_alt_year = FALSE,
-  lat_range = c(48, Inf), min_positive_tows = 100,
+  lat_range = c(48, Inf), min_positive_fe = 100,
   min_positive_trips = 5, min_yrs_with_trips = 5,
   area_grep_pattern = "5[CDE]+", lat_band_width = 0.1,
   depth_band_width = 25, clean_bins = TRUE,
@@ -32,7 +32,7 @@ is set to \code{TRUE} then the \code{year} column will be replaced with the
 
 \item{lat_range}{The range of latitudes to include.}
 
-\item{min_positive_tows}{The minimum number of positive tows over all years.}
+\item{min_positive_fe}{The minimum number of positive tows over all years.}
 
 \item{min_positive_trips}{The minimum number of annual positive trips.}
 

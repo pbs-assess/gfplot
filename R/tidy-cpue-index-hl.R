@@ -189,7 +189,7 @@ if (method == "by_trip"){
 #   fleet <- catch %>%
 #     group_by(vessel_name) %>%
 #     mutate(total_positive_tows = sum(pos_catch)) %>%
-#     filter(total_positive_tows >= min_positive_tows) %>%
+#     filter(total_positive_tows >= min_positive_fe) %>%
 #     filter(spp_catch > 0) %>%
 #     group_by(year, vessel_name, trip_id) %>%
 #     summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
