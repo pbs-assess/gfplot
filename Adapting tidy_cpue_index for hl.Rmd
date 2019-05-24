@@ -1,0 +1,88 @@
+# Adapting tidy_cpue_index for use with hook and line data in addition to trawl.
+
+Extracting raw data
+```{r}
+trawl <- gfdata::get_cpue_index()
+hl <- gfdata::get_cpue_index(gear = "hook and line")
+
+
+dat <- trawl
+dat2 <- hl
+```
+
+- Changed min_positive_tows to min_positive_fe for consistency throughout the
+code. Applied this throughout gfplot, gfsynopsis and cpue_reports. Not sure if
+there are other packages to adapt.
+- Separated out filters that apply to both trawl and hl from gear-type-specific
+filters
+- Changed "hours fished" to "effort"
+- Moved creation of alt_year to within the if use_alt_year statement to save 
+computation time
+- Removed/comemnted out code which was either redundant or did nothing
+- 
+
+Testing function
+```{r}
+tidy <- tidy_cpue_index(trawl, "yelloweye rockfish")
+tidy2 <- tidy_cpue_index(hl, "yelloweye rockfish")
+```
+
+Set arguments in order to step through function:
+```{r}
+species_common = "yelloweye rockfish"
+year_range = c(1996, as.numeric(format(Sys.Date(), "%Y")) - 1)
+alt_year_start_date = "04-01"
+use_alt_year = FALSE
+lat_range = c(48, Inf)
+min_positive_fe = 100
+min_positive_trips = 5
+min_yrs_with_trips = 5
+area_grep_pattern = "^3C|^3D|^5A|^5B|^5C|^5D|^5E"
+lat_band_width = 0.1
+depth_band_width = 25
+clean_bins = TRUE
+depth_bin_quantiles = c(0.001, 0.999)
+min_bin_prop = 0.001
+lat_bin_quantiles = c(0, 1)
+gear = c("bottom trawl", "hook and line")
+```
+
+```{r}
+glimpse(tidy2)
+```
+
+How many rows of data are lost for hook and line data for those removed due
+to NA's?
+Total rows:
+```{r}
+nrow(dat)
+```
+1982888
+
+Count of NA's for various columns that may be filtered on:
+```{r}
+dat_short <- dat %>% 
+  select(vessel_name, vessel_registration_number, fe_start_date, fe_end_date, best_depth, latitude, longitude)
+dat_short <- dat_short[!duplicated(dat_short, , drop = FALSE)]
+colSums(is.na(dat_short))
+```
+vessel_name   vessel_registration_number   fe_start_date  fe_end_date   best_depth  latitude    longitude 
+    8857                4497               495052         495050        198928      196644        196670    
+    
+We lose about 10% of records (note that these numbers are species catch records,
+not individual fe's - there are about 230,000 unique fe_id's)
+by eliminating records with no lat/long or depth,
+25% of records by filtering out those with no fe start or end date,
+0.25% for those with no vessel reg numer.
+
+Filtering out records without fe dates has been moved to just trawl data
+filtering in the function since it is dependent on dates for effort
+calculation.
+
+
+# Hooks per fe for hook and line effort
+
+Longline gear specs are different in GFFOS than GFBio, so code from IPHC data
+extraction for effort cannot be used. Many hook data are missing, on the order
+of 350,000 out of 500,000 records in the gear specs table, out of 
+approximately 2,000,000 records
