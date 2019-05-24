@@ -78,7 +78,8 @@ tidy_cpue_index <- function(dat, species_common,
     gfplot::pbs_areas$major_stat_area_description
   ), ]
   names(dat) <- tolower(names(dat))
-  dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
+  dat <- dat %>% mutate(year = lubridate::year(best_date)) %>%
+    mutate(month = lubridate::month(best_date))
 
 
 
@@ -109,13 +110,14 @@ tidy_cpue_index <- function(dat, species_common,
     filter(gear %in% toupper(gear)) %>%
     filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
     # to avoid erroneous 'pos_catch' results below
-    filter(catch > 0) # %>%
-  # the below bit currently doesn't work - would need to be grouped by trip and fe_id
+    filter(catch_kg > 0) # %>%
+  # Legacy code that was used to remove FE_IDs with multiple dates
+  # Currently doesn't work - would need to be grouped by trip and fe_id
   # since older trips recycled fe_id #'s
     # group_by(fishing_event_id) %>%
     # mutate(n_date = length(unique(best_date))) %>%  #
     # filter(n_date < Inf) %>%                        #
-    # select(-n_date) %>% # remove FE_IDs with multiple dates
+    # select(-n_date) %>%
     # ungroup()
 
   # additional filtering for trawl cpue only:
@@ -141,7 +143,7 @@ tidy_cpue_index <- function(dat, species_common,
   # catch for target spp:
   catch <- group_by(
     catch, fishing_event_id, best_date, month, locality_code,
-    vessel_name, year, trip_id, hours_fished
+    vessel_name, year, trip_id, effort
   ) %>%
     mutate(
       spp_in_fe = toupper(species_common) %in% species_common_name,
@@ -150,7 +152,7 @@ tidy_cpue_index <- function(dat, species_common,
     summarise(
       pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
       # hours_fished = mean(hours_fished, na.rm = TRUE),
-      spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
+      spp_catch = sum(ifelse(spp_in_row, catch_kg, 0), na.rm = TRUE),
       best_depth = mean(best_depth, na.rm = TRUE),
       latitude = mean(latitude, na.rm = TRUE)
     ) %>%
@@ -273,7 +275,7 @@ tidy_cpue_index <- function(dat, species_common,
 
   d_retained <- droplevels(d_retained)
 
-  d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$hours_fished)
+  d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$effort)
 
   # make sure unique:
   d_retained <- mutate(d_retained,
