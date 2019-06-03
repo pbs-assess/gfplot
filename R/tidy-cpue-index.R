@@ -110,7 +110,7 @@ tidy_cpue_index <- function(dat, species_common,
     filter(gear %in% toupper(gear)) %>%
     filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
     # to avoid erroneous 'pos_catch' results below
-    filter(catch_kg > 0) # %>%
+    filter(.data$catch_kg > 0) # %>%
   # Legacy code that was used to remove FE_IDs with multiple dates
   # Currently doesn't work - would need to be grouped by trip and fe_id
   # since older trips recycled fe_id #'s
@@ -129,7 +129,7 @@ tidy_cpue_index <- function(dat, species_common,
         effort =
           as.numeric(difftime(fe_end_date, fe_start_date, units = "hours"))
       ) %>%
-      filter(effort > 0)
+      filter(.data$effort > 0)
   }
 
   # # additional filtering for hook and line cpue only:

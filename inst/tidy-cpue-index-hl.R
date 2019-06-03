@@ -3,7 +3,7 @@
 #' This function determines the qualifying "fleet" for CPUE analyses. It is
 #' meant to be used with modern data available at the fishing event level.
 #'
-#' @param dat An input data frame from [get_cpue_index_hl()].
+#' @param dat An input data frame from [gfdata::get_cpue_index_hl()].
 #' @param species_common The species common name.
 #' @param year_range The range of years to include.
 #' @param alt_year_start_date Alternative year starting date specified as a
@@ -96,7 +96,7 @@ tidy_cpue_index_hl <- function(dat, species_common,
   # filtering if using effort based on trip level data (vessel, area)
 if (method == "by_trip"){
   catch <- catch %>%
-    group_by(fishery_sector,
+    group_by(.data$fishery_sector,
       trip_id,
       vessel_registration_number) %>%
     mutate(year = min(year),
@@ -108,9 +108,9 @@ if (method == "by_trip"){
       month,
       vessel_registration_number,
       species_code,
-      species_scientific_name,
+      .data$species_scientific_name,
       species_common_name) %>%
-    summarize(
+    dplyr::summarize(
       catch = sum(catch),
       landed_kg = sum(landed_kg),
       discarded_kg = sum(discarded_kg)) %>%
@@ -167,7 +167,7 @@ if (method == "by_trip"){
   fleet <- catch %>%
     group_by(vessel_registration_number, year) %>%
     mutate(annual_positive_trips = sum(pos_catch)) %>%
-    filter(annual_positive_trips >= min_positive_annual_trips) %>%
+    filter(.data$annual_positive_trips >= min_positive_annual_trips) %>%
     ## threshold
     #filter(spp_catch > 0) %>% # not necessary - 0 catch removed in basic filtering
     # group_by(year, vessel_registration_number, trip_id) %>%
