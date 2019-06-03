@@ -143,7 +143,7 @@ tidy_cpue_index <- function(dat, species_common,
   # catch for target spp:
   catch <- group_by(
     catch, fishing_event_id, best_date, month, locality_code,
-    vessel_registration_number, year, trip_id, effort
+    vessel_registration_number, year, trip_id, .data$effort
   ) %>%
     mutate(
       spp_in_fe = toupper(species_common) %in% species_common_name,
@@ -152,7 +152,7 @@ tidy_cpue_index <- function(dat, species_common,
     summarise(
       pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
       # hours_fished = mean(hours_fished, na.rm = TRUE),
-      spp_catch = sum(ifelse(spp_in_row, catch_kg, 0), na.rm = TRUE),
+      spp_catch = sum(ifelse(spp_in_row, .data$catch_kg, 0), na.rm = TRUE),
       best_depth = mean(best_depth, na.rm = TRUE),
       latitude = mean(latitude, na.rm = TRUE)
     ) %>%

@@ -62,3 +62,10 @@
 #'
 #' @format A data frame
 "survey_boundaries"
+
+#' Synoptic grid
+#'
+#' The official synoptic survey grid.
+#'
+#' @format A data frame
+"synoptic_grid"
