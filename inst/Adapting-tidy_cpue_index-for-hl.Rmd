@@ -63,8 +63,8 @@ Count of NA's for various columns that may be filtered on:
 ```{r}
 dat_short <- dat %>% 
   select(vessel_name, vessel_registration_number, fe_start_date, fe_end_date, best_depth, latitude, longitude)
-dat_short <- dat_short[!duplicated(dat_short, , drop = FALSE)]
-colSums(is.na(dat_short))
+dat_short <- dat_short[!duplicated(dat_short, drop = FALSE)]
+# colSums(is.na(dat_short))
 ```
 vessel_name   vessel_registration_number   fe_start_date  fe_end_date   best_depth  latitude    longitude 
     8857                4497               495052         495050        198928      196644        196670    
@@ -86,3 +86,47 @@ Longline gear specs are different in GFFOS than GFBio, so code from IPHC data
 extraction for effort cannot be used. Many hook data are missing, on the order
 of 350,000 out of 500,000 records in the gear specs table, out of 
 approximately 2,000,000 records
+
+How many hl fe's?
+
+181,819 hl fe's in merged catch table 2008+ with associated longline spec's (and so potential number of hooks per set)
+62,545 of these fe's have no number of hooks per set
+
+Note these numbers change as data are updated in database
+Can we use average hooks/skate and average skates/set or skate length and hook spacing by vessel to estimate this?
+Sean will look at modelling missing values with vessel, depth, fishery, gear subtype, locality, lat, long...
+
+
+# How clean are the data?
+
+What is a reasonable range for:
+-# skates/set - usually < 20, some very large numbers 100+ (perhaps these are meant to be numbers of hooks rather than skates)
+-# hooks/skate
+-skate length
+-hook spacing
+
+hooks <- get_commercial_hooks_per_fe()
+hooks_sum <- hooks %>% summarise(min_sk = min(skates_obs, na.rm = TRUE), mean_sk = mean(skates_obs, na.rm = TRUE), max_sk = max(skates_obs, na.rm = TRUE))
+hist(hooks$skates_obs)
+hooks2 = hooks %>% filter(skates_obs > 100) 
+hist(hooks2$skates_obs)
+hist(hooks$ft_per_hook, breaks = seq(0,400,10), xlim = c(0,100))
+hist(hooks$hooks_per_skate, breaks = seq(0, 16000, 100), xlim = c(0,3000))
+hooks3 <- hooks %>% filter(!fishery_sector %in% c('HALIBUT', 'HALIBUT AND SABLEFISH'))
+hist(hooks3$hooks_per_skate, breaks = seq(0, 22000, 5), xlim = c(0, 2000))
+
+For modelling the hooks per skate:
+Filter out skate_obs over 20.
+Filter out ft_per_hook over 20
+Filter out less than 1200 on skate_ft
+Filter out over 300 hooks per skate
+
+Can probably clean up the data with:
+- skate_obs > ~150 actually hooks/set
+- skate_obs btw ~20 & 150 not useful
+- ft_per_hook over 20 = ?
+- skate_ft < 1200 @~600 and 900 probably metric and could possibly be converted; others not sure can conclude reasoning and fix
+- hooks per skate > 300 unreasonable, investigate whether reporting overall hooks for the set
+
+
+
