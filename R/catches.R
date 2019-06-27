@@ -111,7 +111,7 @@ tidy_catch <- function(dat, areas = NULL) {
 plot_catch <-
   function(
              dat,
-             ylab = "Catch", xlim = c(1954, 2017),
+             ylab = en2fr("Catch", french), xlim = c(1954, 2017),
              units = NULL,
              unreliable = c(1996, 2006),
              blank_plot = FALSE) {
@@ -190,13 +190,15 @@ plot_catch <-
 
     g <- g +
       theme_pbs() +
-      scale_fill_manual(values = pal, drop = FALSE, breaks = gears) +
-      scale_colour_manual(values = pal, drop = FALSE, breaks = gears) +
+      scale_fill_manual(values = pal, drop = FALSE, breaks = gears,
+        labels = en2fr(gears, french)) +
+      scale_colour_manual(values = pal, drop = FALSE, breaks = gears,
+        labels = en2fr(gears, french)) +
       coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
       xlab("") + ylab(ylab_gg) +
       ggplot2::theme(legend.position = "bottom") +
       ggplot2::labs(fill = "", colour = "") +
-      labs(title = "Commercial catch") +
+      labs(title = en2fr("Commercial catch", french)) +
       # ggplot2::theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
       ggplot2::theme(legend.background = element_rect(fill = "#FFFFFF99"))
 

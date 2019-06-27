@@ -129,7 +129,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    labs(title = "Age frequencies", colour = "Sex", fill = "Sex") +
+    labs(title = en2fr("Age frequencies", french), colour = en2fr("Sex", french), fill = "Sex") +
     geom_vline(
       xintercept = seq(year_range[1], year_range[2], 1),
       col = grid_col, lwd = 0.4
