@@ -55,7 +55,8 @@ Imports:
     tweedie,
     sdmTMB (>= 0.0.0.9001),
     ggrepel,
-    boot
+    boot,
+    rosettafish
 Suggests:
     knitr,
     rmarkdown,
@@ -66,7 +67,8 @@ VignetteBuilder:
     knitr
 Remotes: 
     github::pbs-software/pbs-data/PBSdata,
-    github::pbs-assess/sdmTMB
+    github::pbs-assess/sdmTMB,
+    github::pbs-assess/rosettafish
 Additional_repositories: https://inla.r-inla-download.org/R/stable
 Encoding: UTF-8
 LazyData: true
