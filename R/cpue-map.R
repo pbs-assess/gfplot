@@ -59,7 +59,7 @@ plot_cpue_spatial <-
              return_data = FALSE,
              min_cells = 1,
              percent_excluded_xy = NULL,
-             percent_excluded_text = "Fishing events excluded due to Privacy Act") {
+             percent_excluded_text = en2fr("Fishing events excluded due to Privacy Act", french)) {
 
     dat <- filter(dat, !is.na(.data$cpue))
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule

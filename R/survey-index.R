@@ -141,8 +141,8 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       mean_cv = sprintf("%.2f", round(mean(mean_cv, na.rm = TRUE), 2)),
       mean_num_pos_sets = sprintf("%.0f", round(mean(num_pos_sets, na.rm = TRUE), 0)),
       mean_num_sets = sprintf("%.0f", round(mean(num_sets, na.rm = TRUE), 0))) %>%
-    mutate(sets = paste0("Mean +ve sets: ", mean_num_pos_sets, "/", mean_num_sets)) %>%
-    mutate(cv = paste0("Mean CV: ", mean_cv)) %>%
+    mutate(sets = paste0(en2fr("Mean +ve sets", french), ": ", mean_num_pos_sets, "/", mean_num_sets)) %>%
+    mutate(cv = paste0(en2fr("Mean", french), " CV: ", mean_cv)) %>%
     mutate(cv = ifelse(mean_cv == "NaN", "", cv)) %>%
     mutate(sets = ifelse(mean_num_pos_sets == "NaN", "", sets)) %>%
     mutate(mean_cv = as.numeric(mean_cv)) %>%
