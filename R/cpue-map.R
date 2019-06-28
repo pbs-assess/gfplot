@@ -22,6 +22,7 @@
 #' @param return_data Logical for whether to return the data instead of the plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
+#' @param french Logical for French or English.
 #' @param percent_excluded_xy If not `NULL`, should be a numeric vector of length 2
 #'   corresponding to the x and y location (as fraction from the bottom left)
 #'   of text describing the percentage of fishing events excluded due to the privacy rule.
@@ -58,6 +59,7 @@ plot_cpue_spatial <-
              show_historical = FALSE,
              return_data = FALSE,
              min_cells = 1,
+             french = FALSE,
              percent_excluded_xy = NULL,
              percent_excluded_text = en2fr("Fishing events excluded due to Privacy Act", french)) {
 

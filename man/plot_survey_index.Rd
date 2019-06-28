@@ -7,7 +7,8 @@
 \usage{
 tidy_survey_index(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS",
   "SYN WCVI", "HBLL OUT N", "HBLL OUT S", "HBLL INS N", "HBLL INS S",
-  "MSA HS", "IPHC FISS"), min_years = 3, year_range = NULL)
+  "MSA HS", "IPHC FISS"), min_years = 3, year_range = NULL,
+  french = FALSE)
 
 plot_survey_index(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   max_cv = 0.4, max_set_fraction = 0.05, xlim = NULL,
@@ -25,6 +26,8 @@ included.}
 
 \item{year_range}{If not \code{NULL}, a numeric vector of length 2 giving the
 range of years to plot.}
+
+\item{french}{Logical for French or English.}
 
 \item{col}{A vector of two colours for the lines and shading.}
 

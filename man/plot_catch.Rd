@@ -7,8 +7,9 @@
 \usage{
 tidy_catch(dat, areas = NULL)
 
-plot_catch(dat, ylab = "Catch", xlim = c(1954, 2017), units = NULL,
-  unreliable = c(1996, 2006), blank_plot = FALSE)
+plot_catch(dat, french = FALSE, ylab = en2fr("Catch", french),
+  xlim = c(1954, 2017), units = NULL, unreliable = c(1996, 2006),
+  blank_plot = FALSE)
 }
 \arguments{
 \item{dat}{Input data frame. For \code{tidy_catch()} should be from
@@ -19,6 +20,8 @@ formatted similarly. See details.}
 3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
 with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B")} or
 \code{c("5[CDE]+", "5[AB]+")}.}
+
+\item{french}{Logical for French or English.}
 
 \item{ylab}{Y axis label.}
 

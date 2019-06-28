@@ -29,6 +29,7 @@
 #' @importFrom boot boot.ci boot
 #' @importFrom stats t.test
 #' @importFrom utils read.csv
+#' @importFrom rosettafish en2fr
 #' @import Rcpp
 # avoid R CMD check warning; import something:
 #' @importFrom PBSdata .PBSdataEnv

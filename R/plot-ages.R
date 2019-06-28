@@ -19,6 +19,7 @@
 #' @param ylab Y axis label.
 #' @param year_range If not `NULL`, a the range of years to plot. Defaults to
 #'   all years included in original data.
+#' @param french Logical for French or English.
 #' @param line_col A named character vector of colors for male and females.
 #' @param survey_cols If not `NULL`, a named character vector for different
 #'   colors for the various surveys.
@@ -65,6 +66,7 @@
 #' @export
 plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
                       ylab = "Age (years)", year_range = NULL,
+                      french = FALSE,
                       line_col = c("M" = "#666666", "F" = "#f44256"),
                       survey_cols = NULL, alpha = 0.2, grid_col = "grey95",
                       diagonal_lines = seq(-2100, -1850, 10),

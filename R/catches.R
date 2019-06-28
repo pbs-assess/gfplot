@@ -16,6 +16,7 @@
 #'  3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
 #'  with descriptions. Enter as a regular expression. For example, `c("5A", "5B")` or
 #'  `c("5[CDE]+", "5[AB]+")`.
+#' @param french Logical for French or English.
 #' @param ylab Y axis label.
 #' @param xlim X axis limits in years.
 #' @param units A named character vector with names referring to text that will
@@ -111,6 +112,7 @@ tidy_catch <- function(dat, areas = NULL) {
 plot_catch <-
   function(
              dat,
+             french = FALSE,
              ylab = en2fr("Catch", french), xlim = c(1954, 2017),
              units = NULL,
              unreliable = c(1996, 2006),

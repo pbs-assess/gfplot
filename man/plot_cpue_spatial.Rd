@@ -11,8 +11,10 @@ plot_cpue_spatial(dat, start_year = 2013, bin_width = 7,
   "D"), colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt",
   option = "D"), rotation_angle = 0, rotation_center = c(500, 5700),
   fill_lab = "CPUE (kg/hr)", show_historical = FALSE,
-  return_data = FALSE, min_cells = 1, percent_excluded_xy = NULL,
-  percent_excluded_text = "Fishing events excluded due to Privacy Act")
+  return_data = FALSE, min_cells = 1, french = FALSE,
+  percent_excluded_xy = NULL,
+  percent_excluded_text = en2fr("Fishing events excluded due to Privacy Act",
+  french))
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
@@ -52,6 +54,8 @@ the coast if it is rotated at all.}
 
 \item{min_cells}{The minimum number of cells needed before the hexagons are
 shown.}
+
+\item{french}{Logical for French or English.}
 
 \item{percent_excluded_xy}{If not \code{NULL}, should be a numeric vector of length 2
 corresponding to the x and y location (as fraction from the bottom left)

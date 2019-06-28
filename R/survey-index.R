@@ -15,6 +15,7 @@
 #'   included.
 #' @param year_range If not `NULL`, a numeric vector of length 2 giving the
 #'   range of years to plot.
+#' @param french Logical for French or English.
 #' @rdname plot_survey_index
 #' @export
 tidy_survey_index <- function(dat,
@@ -24,7 +25,8 @@ tidy_survey_index <- function(dat,
                                 "HBLL OUT S", "HBLL INS N", "HBLL INS S",
                                 "MSA HS", "IPHC FISS"
                               ),
-                              min_years = 3, year_range = NULL) {
+                              min_years = 3, year_range = NULL,
+                              french = FALSE) {
   if (is.null(year_range)) {
     year_range <- range(dat$year, na.rm = TRUE)
   }
