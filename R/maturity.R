@@ -64,7 +64,7 @@ fit_mat_ogive <- function(dat,
   dat <- dat %>%
     select(
       species_common_name,
-      year, age, length, weight,
+      age, length, weight,
       maturity_code, sex,
       maturity_convention_desc,
       specimen_id, sample_id, trip_start_date
