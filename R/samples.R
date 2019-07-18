@@ -137,6 +137,14 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
         "# Age structures"
       ))))
 
+  if(french){
+     levels(dat$type)[levels(dat$type)=="# Length"] <- "# Longeuer"
+     levels(dat$type)[levels(dat$type)=="# Weight"] <- "# Poids"
+     levels(dat$type)[levels(dat$type)=="# Maturity"] <- "# Maturité"
+     levels(dat$type)[levels(dat$type)=="# Age"] <- "# Âge"
+     levels(dat$type)[levels(dat$type)=="# Age structures"] <- "# Structure par âge"
+  }
+
   ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
     theme_pbs() +
