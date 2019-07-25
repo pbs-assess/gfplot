@@ -108,8 +108,11 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
                               palette = "Greys", trans = sqrt, french = FALSE) {
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
-  dat$type <- paste("#", firstup(as.character(dat$type)))
-  dat$type <- gsub("_", " ", dat$type)
+  dat$type <- firstup(as.character(gsub("_", " ", dat$type)))
+  dat <- dat %>% mutate(type = gsub("Ageing structure", "Age structures", type))
+  dat$type <- en2fr(dat$type, french)
+  dat$type <- paste("#", dat$type, sep = " ")
+
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
@@ -127,25 +130,27 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat$n_plot[dat$n_plot == 0] <- NA
   dat <- filter(dat, year >= min(year_range), year <= max(year_range))
 
-  dat <- dat %>%
-    mutate(type = gsub("Ageing structure", "Age structures", type)) %>%
-    mutate(type = factor(type,
-      levels = rev(c(
+    if(!french){
+      dat <- dat %>%
+        mutate(type = factor(type,
+        levels = rev(c(
         "# Length",
         "# Weight",
         "# Maturity",
         "# Age",
         "# Age structures"
       ))))
-
-  if(french){
-     levels(dat$type)[levels(dat$type)=="# Length"] <- "# Longeuer"
-     levels(dat$type)[levels(dat$type)=="# Weight"] <- "# Poids"
-     levels(dat$type)[levels(dat$type)=="# Maturity"] <- "# Maturité"
-     levels(dat$type)[levels(dat$type)=="# Age"] <- "# Âge"
-     levels(dat$type)[levels(dat$type)=="# Age structures"] <- "# Structure par âge"
-  }
-
+    } else {
+      dat <- dat %>%
+        mutate(type = factor(type,
+        levels = rev(c(
+          "# Longueur",
+          "# Poids",
+          "# Maturité",
+          "# Âge",
+          "# Structure par âge"
+        ))))
+    }
   ggplot(dat, aes_string("year", "type")) +
     ggplot2::geom_tile(aes_string(fill = "n_plot"), colour = "grey90") +
     theme_pbs() +
