@@ -10,10 +10,11 @@ NULL
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
+#' @param french Logical for French or English.
 #' @export
 #' @rdname plot_maturity_months
 tidy_maturity_months <- function(dat, months = seq(1, 12),
-  usability_codes = c(0, 1, 2, 6)) {
+  usability_codes = c(0, 1, 2, 6), french = FALSE) {
 
   if (!is.null(usability_codes))
     dat <- filter(dat, .data$usability_code %in% usability_codes)
@@ -79,9 +80,19 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
   ))
 
   mat_levels <- mat_levels[mat_levels %in% unique(dat$maturity_name_short)]
-  dat$maturity_name_short <- factor(dat$maturity_name_short,
-    levels = mat_levels
-  )
+  dat <- dat[!is.na(dat$maturity_name_short), , drop = FALSE]
+
+  if (french) {
+    dat$maturity_name_short[!is.na(dat$maturity_name_short)] <-
+      rosettafish::en2fr(dat$maturity_name_short[!is.na(dat$maturity_name_short)])
+    dat$maturity_name_short <- factor(dat$maturity_name_short,
+      levels = rosettafish::en2fr(mat_levels)
+    )
+  } else {
+    dat$maturity_name_short <- factor(dat$maturity_name_short,
+      levels = mat_levels
+    )
+  }
 
   dat <- select(
     dat, species_common_name, month,

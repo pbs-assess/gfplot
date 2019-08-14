@@ -131,6 +131,12 @@ plot_catch <-
       "Discarded"
     )
 
+    if (french) {
+      gears <- rosettafish::en2fr(gears)
+      dat$gear <- as.character(dat$gear)
+      dat$gear <- rosettafish::en2fr(dat$gear)
+    }
+
     pal <- c(RColorBrewer::brewer.pal(
       n = length(gears) - 2,
       "Paired"
@@ -193,18 +199,23 @@ plot_catch <-
     g <- g +
       theme_pbs() +
       scale_fill_manual(values = pal, drop = FALSE, breaks = gears,
-        labels = en2fr(gears, french)) +
+        labels = gears) +
       scale_colour_manual(values = pal, drop = FALSE, breaks = gears,
-        labels = en2fr(gears, french)) +
+        labels = gears) +
       coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
       xlab("") + ylab(ylab_gg) +
       ggplot2::theme(legend.position = "bottom") +
       ggplot2::labs(fill = "", colour = "") +
       labs(title = en2fr("Commercial catch", french)) +
       # ggplot2::theme(legend.justification = c(0, 1), legend.position = c(0, 1)) +
-      ggplot2::theme(legend.background = element_rect(fill = "#FFFFFF99"))
+      ggplot2::theme(legend.background = ggplot2::element_rect(fill = "#FFFFFF99"))
 
-    if (!all(dat$area == "Coastwide")) {
+    if (french) {
+      g <- g + ggplot2::theme(legend.text =
+          ggplot2::element_text(size = ggplot2::rel(0.6), colour = "grey20"))
+    }
+
+    if (!all(dat$area == "Coastwide") && !all(dat$area == rosettafish::en2fr("Coastwide"))) {
       g <- g + facet_wrap(~ area, ncol = 1)
     }
 

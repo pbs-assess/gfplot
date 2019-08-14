@@ -6,7 +6,7 @@
 \title{Plot maturity frequency by month}
 \usage{
 tidy_maturity_months(dat, months = seq(1, 12), usability_codes = c(0,
-  1, 2, 6))
+  1, 2, 6), french = FALSE)
 
 plot_maturity_months(dat, max_size = 9, sex_gap = 0.2, fill_col = c(M
   = "grey70", F = "black"), line_col = c(M = "grey70", F = "black"),
@@ -23,6 +23,8 @@ data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
 Set to \code{NULL} to include all samples.}
+
+\item{french}{Logical for French or English.}
 
 \item{max_size}{The maximum size of the circles.}
 
