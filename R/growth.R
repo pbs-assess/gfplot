@@ -29,6 +29,7 @@
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
+#' @param check_convergence_tmb Logical.
 #' @param ... Any other arguments to pass on to [rstan::sampling()] or
 #'   [rstan::optimizing()].
 #' @importFrom stats median quantile rlnorm runif median
@@ -76,6 +77,7 @@ fit_vb <- function(dat,
                    uniform_priors = FALSE,
                    ageing_method_codes = NULL,
                    usability_codes = c(0, 1, 2, 6),
+                   check_convergence_tmb = TRUE,
                    ...) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) > 1L) {
@@ -149,7 +151,7 @@ fit_vb <- function(dat,
       init = mpd_init, hessian = TRUE, ...
     ))
 
-    if (m$return_code != 0L) {
+    if (m$return_code != 0L && check_convergence_tmb) {
       stop("VB growth model did not converge!")
     }
 
@@ -186,7 +188,7 @@ fit_vb <- function(dat,
     parameters <- list(k = 0.2, linf = 40, log_sigma = log(0.1), t0 = -1)
     obj <- TMB::MakeADFun(data, parameters, DLL = "vb", silent = TRUE)
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
-    if (opt$convergence != 0L)
+    if (opt$convergence != 0L && check_convergence_tmb)
       stop("VB growth model did not converge!")
     pars <- as.list(opt$par)
     m <- obj

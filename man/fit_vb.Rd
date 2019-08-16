@@ -9,7 +9,7 @@ fit_vb(dat, sex = c("female", "male", "all"), method = c("tmb", "mpd",
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
   uniform_priors = FALSE, ageing_method_codes = NULL,
-  usability_codes = c(0, 1, 2, 6), ...)
+  usability_codes = c(0, 1, 2, 6), check_convergence_tmb = TRUE, ...)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
@@ -52,6 +52,8 @@ on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
 Set to \code{NULL} to include all samples.}
+
+\item{check_convergence_tmb}{Logical.}
 
 \item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
 \code{\link[rstan:optimizing]{rstan::optimizing()}}.}
