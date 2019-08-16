@@ -182,7 +182,7 @@ tidy_cpue_index <- function(dat, species_common,
     ungroup()
 
   # retain the data from our "fleet"
-  d_retained <- semi_join(catch, fleet, by = "vessel_name")
+  d_retained <- semi_join(catch, fleet, by = "vessel_registration_number")
 
   if (nrow(d_retained) == 0) {
     warning("No vessels passed the fleet conditions.")
