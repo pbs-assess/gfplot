@@ -67,7 +67,7 @@ plot_cpue_spatial <-
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
 
     pre_footprint_dat <- filter(dat, year < start_year)
-    if (nrow(dat) <= 1) show_historical <- FALSE
+    if (nrow(pre_footprint_dat) <= 1) show_historical <- FALSE
     # pre_footprint_dat <- dat
     dat <- filter(dat, year >= start_year)
     plot_hexagons <- if (nrow(dat) <= 1) FALSE else TRUE
