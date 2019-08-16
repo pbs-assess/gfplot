@@ -5,7 +5,7 @@
 \title{Plot sample availability}
 \usage{
 plot_sample_avail(dat, year_range = NULL, title = "Biological samples",
-  palette = "Greys", trans = sqrt)
+  palette = "Greys", trans = sqrt, french = FALSE)
 }
 \arguments{
 \item{dat}{An input data frame from, for example,
@@ -26,6 +26,8 @@ capitalizing the first letter.}
 
 \item{trans}{A function to transform the counts before applying the color
 scale. E.g. \code{sqrt} or \code{log} or \code{I} if you don't want any transformation.}
+
+\item{french}{Logical.}
 }
 \description{
 Plot sample availability

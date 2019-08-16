@@ -36,6 +36,7 @@
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' # with `rstan::optimizing()` for the mode of the posterior density:
 #' model_f <- fit_vb(pop_samples, sex = "female")
 #' model_m <- fit_vb(pop_samples, sex = "male")
@@ -62,6 +63,7 @@
 #' # plot_vb() will correctly parse and produce an empty plot:
 #' obj <- fit_vb(pop_samples[1:2,])
 #' plot_vb(obj, obj)
+#' }
 
 fit_vb <- function(dat,
                    sex = c("female", "male", "all"),
@@ -232,7 +234,7 @@ fit_vb <- function(dat,
 #'
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' d <- get_survey_samples("pacific ocean perch")
 #' model_f <- fit_length_weight(d, sex = "female")
 #' model_m <- fit_length_weight(d, sex = "male")

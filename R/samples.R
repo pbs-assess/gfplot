@@ -81,6 +81,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @param palette A palette to pass to [ggplot2::scale_fill_distiller()].
 #' @param trans A function to transform the counts before applying the color
 #'   scale. E.g. `sqrt` or `log` or `I` if you don't want any transformation.
+#' @param french Logical.
 #'
 #' @examples
 #' set.seed(1)
@@ -104,7 +105,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @export
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
-                              palette = "Greys", trans = sqrt) {
+                              palette = "Greys", trans = sqrt, french = FALSE) {
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- paste("#", firstup(as.character(dat$type)))
