@@ -83,8 +83,7 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
   dat <- dat[!is.na(dat$maturity_name_short), , drop = FALSE]
 
   if (french) {
-    dat$maturity_name_short[!is.na(dat$maturity_name_short)] <-
-      rosettafish::en2fr(dat$maturity_name_short[!is.na(dat$maturity_name_short)])
+    dat$maturity_name_short <- rosettafish::en2fr(dat$maturity_name_short)
     dat$maturity_name_short <- factor(dat$maturity_name_short,
       levels = rosettafish::en2fr(mat_levels)
     )
