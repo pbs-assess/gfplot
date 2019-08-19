@@ -9,7 +9,9 @@ fit_vb(dat, sex = c("female", "male", "all"), method = c("tmb", "mpd",
   cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
   est_method = median, min_samples = 50L, too_high_quantile = 1,
   uniform_priors = FALSE, ageing_method_codes = NULL,
-  usability_codes = c(0, 1, 2, 6), check_convergence_tmb = TRUE, ...)
+  usability_codes = c(0, 1, 2, 6), check_convergence_tmb = TRUE,
+  tmb_inits = list(k = 0.5, linf = 40, log_sigma = log(0.1), t0 = -1),
+  ...)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
@@ -54,6 +56,8 @@ All usability codes not in this vector will be omitted.
 Set to \code{NULL} to include all samples.}
 
 \item{check_convergence_tmb}{Logical.}
+
+\item{tmb_inits}{A named list of initial parameter values for the TMB model.}
 
 \item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
 \code{\link[rstan:optimizing]{rstan::optimizing()}}.}

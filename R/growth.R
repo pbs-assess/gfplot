@@ -30,6 +30,7 @@
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
 #' @param check_convergence_tmb Logical.
+#' @param tmb_inits A named list of initial parameter values for the TMB model.
 #' @param ... Any other arguments to pass on to [rstan::sampling()] or
 #'   [rstan::optimizing()].
 #' @importFrom stats median quantile rlnorm runif median
@@ -80,6 +81,7 @@ fit_vb <- function(dat,
                    ageing_method_codes = NULL,
                    usability_codes = c(0, 1, 2, 6),
                    check_convergence_tmb = TRUE,
+                   tmb_inits = list(k = 0.5, linf = 40, log_sigma = log(0.1), t0 = -1),
                    ...) {
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) > 1L) {
@@ -187,8 +189,7 @@ fit_vb <- function(dat,
     }
     data <- list(len = dat$length, age = dat$age)
 
-    parameters <- list(k = 0.2, linf = 40, log_sigma = log(0.1), t0 = -1)
-    obj <- TMB::MakeADFun(data, parameters, DLL = "vb", silent = TRUE)
+    obj <- TMB::MakeADFun(data, tmb_inits, DLL = "vb", silent = TRUE)
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
     if (opt$convergence != 0L && check_convergence_tmb)
       stop("VB growth model did not converge!")
@@ -342,7 +343,7 @@ fit_length_weight <- function(dat,
 #' @param lab_x_gap Horizontal gap between text labels.
 #' @param lab_y_gap The vertical gap between text labels.
 #' @param col A named character vector declaring the colors for female and male
-#'   fish.
+#' @param french Logical.
 #'
 #' @details You can include `object_female` and/or `object_male` or `object_all`
 #' depending on whether the model was fit to female, male, or both sexes
@@ -376,7 +377,8 @@ plot_growth <- function(object_female, object_male,
                         lab_y = 0.3,
                         lab_x_gap = 0.3,
                         lab_y_gap = 0.06,
-                        col = c("Female" = "black", "Male" = "grey40")) {
+                        col = c("Female" = "black", "Male" = "grey40"),
+                        french = FALSE) {
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
 
@@ -426,7 +428,7 @@ plot_growth <- function(object_female, object_male,
     scale_colour_manual(values = col, labels = labs) +
     ggplot2::scale_linetype_manual(values = c(1, 2), labels = labs) +
     theme_pbs() + xlab(xlab) + ylab(ylab) +
-    ggplot2::labs(colour = "Sex", lty = "Sex")
+    ggplot2::labs(colour = en2fr("Sex", french), lty = en2fr("Sex", french))
 
   if (!no_pts) {
     if (!no_lines) {
@@ -454,7 +456,7 @@ plot_growth <- function(object_female, object_male,
 
   if (missing(object_all)) {
     if (!is.na(object_female$pars[[1]])) {
-      g <- ann_func(g, object_female$pars, "Females", col[["Female"]],
+      g <- ann_func(g, object_female$pars, en2fr("Females", french), col[["Female"]],
         x = lab_x * max(xlim),
         y = lab_y * max(ylim),
         gap = lab_y_gap * max(ylim)
@@ -462,7 +464,7 @@ plot_growth <- function(object_female, object_male,
     }
 
     if (!is.na(object_male$pars[[1]])) {
-      g <- ann_func(g, object_male$pars, "Males", col[["Male"]],
+      g <- ann_func(g, object_male$pars, en2fr("Males", french), col[["Male"]],
         x = (lab_x + lab_x_gap) * max(xlim),
         y = lab_y * max(ylim),
         gap = lab_y_gap * max(ylim)

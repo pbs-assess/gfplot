@@ -10,7 +10,7 @@ plot_growth(object_female, object_male, object_all, type = c("vb",
   "length-weight"), downsample = 2000L, pt_alpha = 0.2,
   xlab = "Age (years)", ylab = "Length (cm)", seed = 42,
   lab_x = 0.45, lab_y = 0.3, lab_x_gap = 0.3, lab_y_gap = 0.06,
-  col = c(Female = "black", Male = "grey40"))
+  col = c(Female = "black", Male = "grey40"), french = FALSE)
 
 plot_vb(..., type = "vb")
 
@@ -44,8 +44,9 @@ plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
 
 \item{lab_y_gap}{The vertical gap between text labels.}
 
-\item{col}{A named character vector declaring the colors for female and male
-fish.}
+\item{col}{A named character vector declaring the colors for female and male}
+
+\item{french}{Logical.}
 
 \item{...}{Arguments to pass to \code{\link[=plot_growth]{plot_growth()}}.}
 }
