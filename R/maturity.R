@@ -66,7 +66,7 @@ fit_mat_ogive <- function(dat,
       species_common_name,
       age, length, weight,
       maturity_code, sex,
-      maturity_convention_desc,
+      maturity_convention_code,
       specimen_id, sample_id, trip_start_date
     )
 
@@ -83,7 +83,7 @@ fit_mat_ogive <- function(dat,
     )
   )
 
-  dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_desc"))
+  dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_code"))
   dat <- mutate(dat, mature = maturity_code >= mature_at)
 
   type <- match.arg(type)
