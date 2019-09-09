@@ -77,19 +77,19 @@ setwd("../../../")
 hbll_s_grid <- list(grid = hbll_grid, cell_area = 2.0)
 usethis::use_data(hbll_s_grid, internal = FALSE, overwrite = TRUE)
 
-# Inside HBLL N:
-setwd("inst/extdata/HBLL-inside/")
-shape <- rgdal::readOGR(
-  dsn = ".",
-  layer = "HBLL_INS_active_2019", verbose = FALSE)
-# plot(shape)
-hbll_ins_ngrid <- select(shape@data, LONGITUDE, LATITUDE, DEPTH_M) %>%
-  rename(X = LONGITUDE, Y = LATITUDE, depth = DEPTH_M)
-hbll_grid <- mutate(hbll_grid, depth = -depth) %>%
-  filter(depth > 0)
-setwd("../../../")
-hbll_s_grid <- list(grid = hbll_grid, cell_area = 2.0)
-usethis::use_data(hbll_s_grid, internal = FALSE, overwrite = TRUE)
+# # Inside HBLL N:
+# setwd("inst/extdata/HBLL-inside/")
+# shape <- rgdal::readOGR(
+#   dsn = ".",
+#   layer = "HBLL_INS_active_2019", verbose = FALSE)
+# # plot(shape)
+# hbll_ins_ngrid <- select(shape@data, LONGITUDE, LATITUDE, DEPTH_M) %>%
+#   rename(X = LONGITUDE, Y = LATITUDE, depth = DEPTH_M)
+# hbll_grid <- mutate(hbll_grid, depth = -depth) %>%
+#   filter(depth > 0)
+# setwd("../../../")
+# hbll_s_grid <- list(grid = hbll_grid, cell_area = 2.0)
+# usethis::use_data(hbll_s_grid, internal = FALSE, overwrite = TRUE)
 
 
 #
@@ -103,3 +103,28 @@ usethis::use_data(hbll_s_grid, internal = FALSE, overwrite = TRUE)
 # head(shape@data)
 # x <- filter(shape@data, PHMA_NS_Zo == "N") %>% pull(Centroid)
 # x <- mutate(x, lat = gsub("[0-9 "))
+
+# HBLL inside:
+
+setwd("inst/extdata/HBLL_inside_survey/")
+shape <- rgdal::readOGR(
+  dsn = ".",
+  layer = "HBLL_Inside_North", verbose = TRUE)
+plot(shape)
+pts <- rgeos::gCentroid(shape, byid = TRUE)
+hbll_inside_n_grid <- as.data.frame(pts) %>%
+  rename(X = x, Y = y)
+hbll_inside_n_grid <- list(grid = hbll_inside_n_grid, cell_area = 2.0)
+usethis::use_data(hbll_inside_n_grid, internal = FALSE, overwrite = TRUE)
+
+shape <- rgdal::readOGR(
+  dsn = ".",
+  layer = "HBLL_Inside_South", verbose = TRUE)
+plot(shape)
+pts <- rgeos::gCentroid(shape, byid = TRUE)
+hbll_inside_s_grid <- as.data.frame(pts) %>%
+  rename(X = x, Y = y)
+hbll_inside_s_grid <- list(grid = hbll_inside_s_grid, cell_area = 2.0)
+usethis::use_data(hbll_inside_s_grid, internal = FALSE, overwrite = TRUE)
+
+setwd("../../../")

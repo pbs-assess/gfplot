@@ -45,15 +45,25 @@
 #' @format Data
 "hbll_grid"
 
-#' A 2km x 2km grid for the HBLL North survey
+#' A 2km x 2km grid for the HBLL Outside North survey
 #'
 #' @format Data
 "hbll_n_grid"
 
-#' A 2km x 2km grid for the HBLL South survey
+#' A 2km x 2km grid for the HBLL Outside South survey
 #'
 #' @format Data
 "hbll_s_grid"
+
+#' A 2km x 2km grid for the HBLL Inside North survey
+#'
+#' @format Data
+"hbll_inside_n_grid"
+
+#' A 2km x 2km grid for the HBLL Inside South survey
+#'
+#' @format Data
+"hbll_inside_s_grid"
 
 #' Survey boundaries
 #'

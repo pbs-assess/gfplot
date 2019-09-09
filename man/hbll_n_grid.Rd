@@ -3,12 +3,12 @@
 \docType{data}
 \name{hbll_n_grid}
 \alias{hbll_n_grid}
-\title{A 2km x 2km grid for the HBLL North survey}
+\title{A 2km x 2km grid for the HBLL Outside North survey}
 \format{Data}
 \usage{
 hbll_n_grid
 }
 \description{
-A 2km x 2km grid for the HBLL North survey
+A 2km x 2km grid for the HBLL Outside North survey
 }
 \keyword{datasets}
