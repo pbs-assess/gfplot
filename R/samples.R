@@ -139,11 +139,11 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
       ))))
 
   if(french){
-     levels(dat$type)[levels(dat$type)=="# Length"] <- "# Longeuer"
-     levels(dat$type)[levels(dat$type)=="# Weight"] <- "# Poids"
-     levels(dat$type)[levels(dat$type)=="# Maturity"] <- "# Maturité"
-     levels(dat$type)[levels(dat$type)=="# Age"] <- "# Âge"
-     levels(dat$type)[levels(dat$type)=="# Age structures"] <- "# Structure par âge"
+     levels(dat$type)[levels(dat$type)=="# Length"] <- paste("#", en2fr("Length"))
+     levels(dat$type)[levels(dat$type)=="# Weight"] <- paste("#", en2fr("Weight"))
+     levels(dat$type)[levels(dat$type)=="# Maturity"] <- paste("#", en2fr("Maturity"))
+     levels(dat$type)[levels(dat$type)=="# Age"] <- paste("#", en2fr("Age"))
+     levels(dat$type)[levels(dat$type)=="# Age structures"] <- paste("#", en2fr("Age structures"))
   }
 
   ggplot(dat, aes_string("year", "type")) +
