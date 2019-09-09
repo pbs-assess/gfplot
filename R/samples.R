@@ -105,11 +105,14 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @export
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
-                              palette = "Greys", trans = sqrt, french = FALSE) {
+                              palette = "Greys", trans = sqrt, french = translate) {
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
-  dat$type <- paste("#", firstup(as.character(dat$type)))
-  dat$type <- gsub("_", " ", dat$type)
+  dat$type <- firstup(as.character(gsub("_", " ", dat$type)))
+  dat <- dat %>% mutate(type = gsub("Ageing structure", "Age structures", type))
+  dat$type <- en2fr(dat$type, french)
+  dat$type <- paste("#", dat$type, sep = " ")
+
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
@@ -128,7 +131,6 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat <- filter(dat, year >= min(year_range), year <= max(year_range))
 
   dat <- dat %>%
-    mutate(type = gsub("Ageing structure", "Age structures", type)) %>%
     mutate(type = factor(type,
       levels = rev(c(
         "# Length",
@@ -138,12 +140,12 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
         "# Age structures"
       ))))
 
-  if(french){
-     levels(dat$type)[levels(dat$type)=="# Length"] <- paste("#", en2fr("Length"))
-     levels(dat$type)[levels(dat$type)=="# Weight"] <- paste("#", en2fr("Weight"))
-     levels(dat$type)[levels(dat$type)=="# Maturity"] <- paste("#", en2fr("Maturity"))
-     levels(dat$type)[levels(dat$type)=="# Age"] <- paste("#", en2fr("Age"))
-     levels(dat$type)[levels(dat$type)=="# Age structures"] <- paste("#", en2fr("Age structures"))
+  if (french){
+    levels(dat$type)[levels(dat$type)=="# Length"] <- paste("#", en2fr("Length"))
+    levels(dat$type)[levels(dat$type)=="# Weight"] <- paste("#", en2fr("Weight"))
+    levels(dat$type)[levels(dat$type)=="# Maturity"] <- paste("#", en2fr("Maturity"))
+    levels(dat$type)[levels(dat$type)=="# Age"] <- paste("#", en2fr("Age"))
+    levels(dat$type)[levels(dat$type)=="# Age structures"] <- paste("#", en2fr("Age structures"))
   }
 
   ggplot(dat, aes_string("year", "type")) +
@@ -167,5 +169,5 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
       size = 2.1, alpha = 1
     ) +
     ggplot2::scale_y_discrete(position = "left") +
-    ggplot2::ggtitle(title)
+    ggplot2::ggtitle(en2fr(title, french))
 }

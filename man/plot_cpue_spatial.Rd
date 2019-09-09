@@ -13,8 +13,7 @@ plot_cpue_spatial(dat, start_year = 2013, bin_width = 7,
   fill_lab = "CPUE (kg/hr)", show_historical = FALSE,
   return_data = FALSE, min_cells = 1, french = FALSE,
   percent_excluded_xy = NULL,
-  percent_excluded_text = en2fr("Fishing events excluded due to Privacy Act",
-  french))
+  percent_excluded_text = "Fishing events excluded due to Privacy Act")
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}

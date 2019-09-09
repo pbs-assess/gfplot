@@ -112,7 +112,7 @@ tidy_catch <- function(dat, areas = NULL) {
 plot_catch <-
   function(
              dat,
-             french = FALSE,
+             french = translate,
              ylab = en2fr("Catch", french), xlim = c(1954, 2017),
              units = NULL,
              unreliable = c(1996, 2006),

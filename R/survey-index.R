@@ -100,7 +100,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               survey_cols = NULL,
                               scale = TRUE,
                               year_increment = 5,
-                              french = FALSE,
+                              french = translate,
                               hide_y_axis = FALSE) {
 
   if (scale) {
@@ -184,7 +184,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     scale_fill_manual(values = fill_col) +
     scale_colour_manual(values = line_col) +
     xlab("") +
-    ylab("Relative biomass") +
+    ylab(en2fr("Survey relative biomass indices", french)) +
     theme(
       strip.background = element_blank(),
       strip.text.x = element_blank()
