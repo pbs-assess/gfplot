@@ -14,6 +14,8 @@
 #' @export
 run_sql <- function(database, query) {
   query <- paste(query, collapse = "\n")
+  con <- db_connection(database = database)
+  on.exit(DBI::dbDisconnect(con))
   DBI::dbGetQuery(db_connection(database = database), query)
 }
 
