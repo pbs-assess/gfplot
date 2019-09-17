@@ -110,9 +110,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat$n_text <- round_nice(dat$n)
   dat$type <- firstup(as.character(gsub("_", " ", dat$type)))
   dat <- dat %>% mutate(type = gsub("Ageing structure", "Age structures", type))
-  dat$type <- en2fr(dat$type, french)
   dat$type <- paste("#", dat$type, sep = " ")
-
 
   year_min <- min(dat$year, na.rm = TRUE)
   year_max <- max(dat$year, na.rm = TRUE)
