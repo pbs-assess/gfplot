@@ -5,7 +5,7 @@
 \title{Plot sample availability}
 \usage{
 plot_sample_avail(dat, year_range = NULL, title = "Biological samples",
-  palette = "Greys", trans = sqrt, french = FALSE)
+  palette = "Greys", trans = sqrt, french = translate)
 }
 \arguments{
 \item{dat}{An input data frame from, for example,
