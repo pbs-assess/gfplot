@@ -105,7 +105,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @export
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
-                              palette = "Greys", trans = sqrt, french = translate) {
+                              palette = "Greys", trans = sqrt, french = FALSE) {
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- firstup(as.character(gsub("_", " ", dat$type)))
