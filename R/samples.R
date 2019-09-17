@@ -169,5 +169,5 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
       size = 2.1, alpha = 1
     ) +
     ggplot2::scale_y_discrete(position = "left") +
-    ggplot2::ggtitle(en2fr(title, french))
+    ggplot2::ggtitle(title)
 }
