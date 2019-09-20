@@ -44,8 +44,6 @@ bin.}
 
 \item{min_fish}{The minimum number of fish for the circles to be plotted for
 a given month.}
-
-\item{french}{Logical for French.}
 }
 \description{
 Plot maturity frequency by month

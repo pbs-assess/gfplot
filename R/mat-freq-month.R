@@ -114,7 +114,6 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 #'   bin.
 #' @param min_fish The minimum number of fish for the circles to be plotted for
 #'   a given month.
-#' @param french Logical for French.
 #'
 #' @export
 #' @rdname plot_maturity_months
