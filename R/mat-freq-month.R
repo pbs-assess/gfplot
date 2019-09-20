@@ -114,6 +114,7 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 #'   bin.
 #' @param min_fish The minimum number of fish for the circles to be plotted for
 #'   a given month.
+#' @param french Logical for French.
 #'
 #' @export
 #' @rdname plot_maturity_months
@@ -136,7 +137,8 @@ plot_maturity_months <- function(dat,
                                  alpha = 0.8,
                                  title = "Maturity frequencies",
                                  n_label_pos = c(0.7, 1.3),
-                                 min_fish = 0) {
+                                 min_fish = 0,
+                                 french = FALSE) {
   dat <- dat %>%
     filter(!is.na(maturity)) %>%
     mutate(
@@ -161,7 +163,8 @@ plot_maturity_months <- function(dat,
 
   g <- ggplot(dat, aes_string("month_jitter", "maturity")) +
     ylab("") + xlab("") +
-    scale_x_continuous(breaks = seq(1, 12), labels = month.abb, limits = c(1, 12)) +
+    scale_x_continuous(breaks = seq(1, 12),
+      labels = rosettafish::en2fr(month.abb, french), limits = c(1, 12)) +
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     theme(panel.spacing = unit(-0.1, "lines")) +
