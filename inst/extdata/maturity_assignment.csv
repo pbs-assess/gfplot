@@ -7,8 +7,8 @@ maturity_convention_code,maturity_convention_desc,sex,maturity_convention_maxval
 2,HAKE (1977+),2,12,3
 3,SABLEFISH (1983+),1,12,3
 3,SABLEFISH (1983+),2,12,3
-4,FLATFISH (1978+),1,7,3
-4,FLATFISH (1978+),2,7,3
+4,FLATFISH,1,7,3
+4,FLATFISH,2,7,3
 5,HAKE (AMR simplified),1,12,4
 5,HAKE (AMR simplified),2,12,4
 6,PACIFIC COD (1973-75),1,4,2
