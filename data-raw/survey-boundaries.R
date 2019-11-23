@@ -135,41 +135,54 @@ setwd("inst/extdata/dogfish")
 
 library(sf)
 library(ggplot2)
+library(dplyr)
 
-# read nc polygon data and transform to UTM
-nc <- st_read(".") %>%
+# read dogfish polygon data and transform to UTM
+dogfish <- st_read(".") %>%
   st_transform(26909)
 
-# # random sample of 5 points
-# pts <- st_sample(nc, size = 5) %>% st_sf
+## Select boundary box based on survey area
+minLat2 <- st_bbox(dogfish)[[2]]
+maxLat2 <- st_bbox(dogfish)[[4]]
+minLong2 <- st_bbox(dogfish)[[1]]
+maxLong2 <- st_bbox(dogfish)[[3]]
 
-# create 1km grid
-grid_2 <- st_make_grid(nc, cellsize = c(1000, 1000)) %>%
-  st_sf(grid_id = 1:length(.))
+library(raster)
+library(fasterize)
+# First generate grid for entire area that just excludes landmass
+projCRS <- "+proj=utm +zone=9 +datum=WGS84"
+coast <- rnaturalearth::ne_states("Canada", returnclass = "sf")
+coastUTM <- st_transform(coast, crs = projCRS)
+cropR <- raster(extent(minLong2, maxLong2, minLat2, maxLat2),
+  crs = projCRS, res = 500 # meters
+)
+g <- fasterize(coastUTM, cropR)
 
-# create labels for each grid_id
-grid_lab <- st_centroid(grid_2) %>% cbind(st_coordinates(.))
+## fast conversion pixel to polygons
+p <- spex::polygonize(!is.na(g))
+p <- p %>% st_transform(26909)
 
-# view the polygons and grid
-# ggplot() +
-#   geom_sf(data = nc, fill = 'white', lwd = 0.05) +
-#   # geom_sf(data = pts, color = 'red', size = 1.7) +
-#   geom_sf(data = grid_2, fill = 'transparent', lwd = 0.3) +
-#   # geom_text(data = grid_lab, aes(x = X, y = Y, label = grid_id), size = 2) +
-#   coord_sf(datum = NA)  +
-#   labs(x = "") +
-#   labs(y = "")
+## layer is whether we are on land or not
+# plot(subset(p, !layer)$geometry)
+# plot(coastUTM$geometry, add = TRUE)
 
-# which grid square is each point in?
-.inside <- nc %>% st_join(grid_2, join = st_intersects) %>% as.data.frame
+st_crs(dogfish)
+st_crs(p)
 
-dogfish_grid <- grid_2[.inside$grid_id,] %>%
-  st_coordinates() %>%
-  as.data.frame() %>%
-  select(X, Y) %>%
-  mutate(X = X/1000, Y = Y/1000)
+fullGrid <- subset(p, !layer)$geometry %>%
+  st_sf(ID = seq(1, length(.), by = 1))
 
-dogfish_grid <- list(grid = dogfish_grid, cell_area = 1)
+inside <- fullGrid %>% st_join(dogfish, join = st_intersects, left = FALSE)
+plot(st_geometry(inside))
+
+dogfish_grid <- inside %>%
+  st_coordinates(.)
+gridOut <- data.frame(
+  X = dogfish_grid[, "X"],
+  Y = dogfish_grid[, "Y"]
+)
+
+dogfish_grid <- list(grid = gridOut, cell_area = 0.5)
 usethis::use_data(dogfish_grid, internal = FALSE, overwrite = TRUE)
 
 setwd("../../../")
