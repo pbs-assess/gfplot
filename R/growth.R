@@ -183,13 +183,17 @@ fit_vb <- function(dat,
   if (method == "tmb") {
     dlls <- getLoadedDLLs()
     if (!any(vapply(dlls, function(x) x[["name"]] == "vb", FUN.VALUE = TRUE))) {
-      .f <- system.file("tmb", "vb.cpp", package = "gfplot")
+      lib.f <- system.file("tmb", "vb.cpp", package = "gfplot")
+      .f <- "vb_gfplot.cpp"
+      if (!file.exists(.f)) {
+        file.copy(lib.f, to = .f)
+      }
       TMB::compile(.f)
-      dyn.load(TMB::dynlib(gsub(".cpp", "", .f)))
+      dyn.load(TMB::dynlib("vb_gfplot"))
     }
     data <- list(len = dat$length, age = dat$age)
 
-    obj <- TMB::MakeADFun(data, tmb_inits, DLL = "vb", silent = TRUE)
+    obj <- TMB::MakeADFun(data, tmb_inits, DLL = "vb_gfplot", silent = TRUE)
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
     if (opt$convergence != 0L && check_convergence_tmb)
       stop("VB growth model did not converge!")
