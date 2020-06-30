@@ -4,7 +4,9 @@
 \name{pop_surv}
 \alias{pop_surv}
 \title{Example Pacific Ocean Perch survey data from QCS in 2015}
-\format{A data frame}
+\format{
+A data frame
+}
 \usage{
 pop_surv
 }

@@ -4,8 +4,7 @@
 \alias{plot_predictor_bubbles}
 \title{Make predictor level bubble plots}
 \usage{
-plot_predictor_bubbles(dat, variable, group_id = "fishing_event_id",
-  ncol = 2)
+plot_predictor_bubbles(dat, variable, group_id = "fishing_event_id", ncol = 2)
 }
 \arguments{
 \item{dat}{A data frame with the columns area, year}

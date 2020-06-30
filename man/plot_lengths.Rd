@@ -4,10 +4,17 @@
 \alias{plot_lengths}
 \title{Plot length frequency data}
 \usage{
-plot_lengths(dat, xlab = "Length (cm)",
-  ylab = "Relative length frequency", fill_col = c(M = "grey80", F =
-  "#FF000010"), line_col = c(M = "grey40", F = "red"),
-  survey_cols = NULL, alpha = 0.24, bin_size = 2, min_total = 20)
+plot_lengths(
+  dat,
+  xlab = "Length (cm)",
+  ylab = "Relative length frequency",
+  fill_col = c(M = "grey80", F = "#FF000010"),
+  line_col = c(M = "grey40", F = "red"),
+  survey_cols = NULL,
+  alpha = 0.24,
+  bin_size = 2,
+  min_total = 20
+)
 }
 \arguments{
 \item{dat}{A data frame from \code{\link[=tidy_lengths_raw]{tidy_lengths_raw()}} or \code{\link[=tidy_lengths_weighted]{tidy_lengths_weighted()}}
@@ -31,7 +38,7 @@ various surveys.}
 
 \item{alpha}{Transparency for the fill color in the histograms.}
 
-\item{bin_size}{Bin size. Should match the bin size used with the \code{tidy_*()}
+\item{bin_size}{Bin size. Should match the bin size used with the \verb{tidy_*()}
 function.}
 
 \item{min_total}{Minimum number of fish for a given survey and year needed

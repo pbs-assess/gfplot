@@ -4,11 +4,13 @@
 \name{pbs_areas}
 \alias{pbs_areas}
 \title{PBS groundfish areas}
-\format{A data frame:
+\format{
+A data frame:
 \describe{
 \item{major_stat_area_code}{major statistical area code}
 \item{major_stat_area_description}{major statistical area description}
-}}
+}
+}
 \usage{
 pbs_areas
 }

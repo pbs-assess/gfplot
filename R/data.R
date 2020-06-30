@@ -79,3 +79,8 @@
 #'
 #' @format A data frame
 "synoptic_grid"
+
+#' A grid for dogfish survey
+#'
+#' @format Data
+"dogfish_grid"

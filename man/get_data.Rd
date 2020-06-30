@@ -50,11 +50,21 @@ get_sensor_attributes()
 
 get_other_surveys()
 
-get_survey_sets(species, ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
-  join_sample_ids = FALSE, verbose = FALSE)
+get_survey_sets(
+  species,
+  ssid = c(1, 3, 4, 16, 2, 14, 22, 36),
+  join_sample_ids = FALSE,
+  verbose = FALSE
+)
 
-get_survey_samples(species, ssid = NULL, remove_bad_data = TRUE,
-  unsorted_only = TRUE, usability = NULL, inside = NULL)
+get_survey_samples(
+  species,
+  ssid = NULL,
+  remove_bad_data = TRUE,
+  unsorted_only = TRUE,
+  usability = NULL,
+  inside = NULL
+)
 
 get_commercial_samples(species, unsorted_only = TRUE, usability = NULL)
 
@@ -72,31 +82,54 @@ get_age_precision(species, inside = NULL)
 
 get_survey_index(species, ssid = NULL)
 
-get_sensor_data_trawl(ssid = NULL, attribute = c("temperature",
-  "depth", "dissolved oxygen", "salinity"), spread_attributes = FALSE)
-
-get_sensor_data_fe_trawl(fishing_event_id = NULL,
+get_sensor_data_trawl(
+  ssid = NULL,
   attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
-  sensor_name = NULL)
+  spread_attributes = FALSE
+)
 
-get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
-  "depth"), sensor_min_max = FALSE)
+get_sensor_data_fe_trawl(
+  fishing_event_id = NULL,
+  attribute = c("temperature", "depth", "dissolved oxygen", "salinity"),
+  sensor_name = NULL
+)
 
-get_sensor_data_ll_td(ssid = NULL, attribute = c("temperature",
-  "depth"), sensor_min_max = FALSE)
+get_sensor_data_ll_td(
+  ssid = NULL,
+  attribute = c("temperature", "depth"),
+  sensor_min_max = FALSE
+)
 
-get_management(species = NULL, species_group = NULL, fishery = NULL,
-  area = NULL, start_year = NULL)
+get_sensor_data_ll_td(
+  ssid = NULL,
+  attribute = c("temperature", "depth"),
+  sensor_min_max = FALSE
+)
+
+get_management(
+  species = NULL,
+  species_group = NULL,
+  fishery = NULL,
+  area = NULL,
+  start_year = NULL
+)
 
 get_sara_dat()
 
-cache_pbs_data(species, file_name = NULL, path = ".",
-  compress = FALSE, unsorted_only = TRUE, historical_cpue = FALSE,
-  survey_sets = FALSE, verbose = TRUE)
+cache_pbs_data(
+  species,
+  file_name = NULL,
+  path = ".",
+  compress = FALSE,
+  unsorted_only = TRUE,
+  historical_cpue = FALSE,
+  survey_sets = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{species}{One or more species common names (e.g. \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species codes can be
-specified as numeric vectors \code{c(396, 442}) or characters \code{c("396", "442")}.
+specified as numeric vectors \verb{c(396, 442}) or characters \code{c("396", "442")}.
 Numeric values shorter than 3 digits will be expanded to 3 digits and
 converted to character objects (\code{1} turns into \code{"001"}). Species common
 names and species codes should not be mixed. If any element is missing a
@@ -175,10 +208,10 @@ extracted. You might set this to \code{FALSE} if you don't need these data and
 you want to substantially speed up data extraction.}
 }
 \value{
-The \code{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
+The \verb{get_*} functions return a data frame. The \code{\link[=cache_pbs_data]{cache_pbs_data()}}
 function writes an \code{.rds} file to \code{path} for each specified species. A data
 object for a single species is a named list object with each element
-containing a data frame from a \code{get_*} function. The element name of the list
+containing a data frame from a \verb{get_*} function. The element name of the list
 reflects the function name with the \code{get_} part removed. For example, the
 output from \code{\link[=get_survey_samples]{get_survey_samples()}} is in a list element named
 \code{survey_samples()}.
@@ -245,7 +278,7 @@ This \code{\link[=cache_pbs_data]{cache_pbs_data()}} function caches data from
 }
 \section{Authentication}{
 
-\code{get_*} functions only extract data when performed on a computer connected to
+\verb{get_*} functions only extract data when performed on a computer connected to
 the Pacific Biological Station DFO network. By default, the functions assume
 that you are on an authorized DFO Windows computer where authentication with
 the databases happens automatically. If instead, you wish to connect by

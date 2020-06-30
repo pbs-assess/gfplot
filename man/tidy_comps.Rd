@@ -16,14 +16,23 @@ tidy_lengths_raw(...)
 
 tidy_lengths_weighted(...)
 
-tidy_comps(dat, survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
-  "HBLL OUT N", "HBLL OUT S", "IPHC FISS"), year_range = NULL,
-  spp_cat_code = 1, area_grep_pattern = "*",
-  ageing_method_codes = NULL, usability_codes = c(0, 1, 2, 6),
-  bin_size = 2, age_length = c("age", "length"),
-  sample_type = c("survey", "commercial"), frequency_type = c("raw",
-  "weighted"), dat_survey_sets = NULL, dat_catch = NULL,
-  remove_unsexed = TRUE)
+tidy_comps(
+  dat,
+  survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI", "HBLL OUT N", "HBLL OUT S",
+    "IPHC FISS"),
+  year_range = NULL,
+  spp_cat_code = 1,
+  area_grep_pattern = "*",
+  ageing_method_codes = NULL,
+  usability_codes = c(0, 1, 2, 6),
+  bin_size = 2,
+  age_length = c("age", "length"),
+  sample_type = c("survey", "commercial"),
+  frequency_type = c("raw", "weighted"),
+  dat_survey_sets = NULL,
+  dat_catch = NULL,
+  remove_unsexed = TRUE
+)
 }
 \arguments{
 \item{...}{Arguments to pass to \code{tidy_comps()}.}

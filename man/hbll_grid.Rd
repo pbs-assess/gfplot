@@ -4,7 +4,9 @@
 \name{hbll_grid}
 \alias{hbll_grid}
 \title{A 2km x 2km grid for the HBLL survey}
-\format{Data}
+\format{
+Data
+}
 \usage{
 hbll_grid
 }

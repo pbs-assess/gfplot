@@ -4,9 +4,13 @@
 \alias{inject_filter}
 \title{gfplot utilities}
 \usage{
-inject_filter(sql_precode, species, sql_code,
+inject_filter(
+  sql_precode,
+  species,
+  sql_code,
   search_flag = "-- insert species here",
-  conversion_func = common2codes)
+  conversion_func = common2codes
+)
 }
 \arguments{
 \item{sql_precode}{SQL go to inject before a species list etc.}

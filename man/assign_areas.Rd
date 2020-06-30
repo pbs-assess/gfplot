@@ -4,8 +4,10 @@
 \alias{assign_areas}
 \title{Assign areas}
 \usage{
-assign_areas(major_stat_area_description, area_regex = c("3[CD]+",
-  "5[AB]+", "5[CDE]+"))
+assign_areas(
+  major_stat_area_description,
+  area_regex = c("3[CD]+", "5[AB]+", "5[CDE]+")
+)
 }
 \arguments{
 \item{major_stat_area_description}{A vector of major statistical area

@@ -4,16 +4,25 @@
 \alias{tidy_cpue_index}
 \title{Tidy commercial PBS CPUE data}
 \usage{
-tidy_cpue_index(dat, species_common, year_range = c(1996,
-  as.numeric(format(Sys.Date(), "\%Y")) - 1),
-  alt_year_start_date = "04-01", use_alt_year = FALSE,
-  lat_range = c(48, Inf), min_positive_fe = 100,
-  min_positive_trips = 5, min_yrs_with_trips = 5,
+tidy_cpue_index(
+  dat,
+  species_common,
+  year_range = c(1996, as.numeric(format(Sys.Date(), "\%Y")) - 1),
+  alt_year_start_date = "04-01",
+  use_alt_year = FALSE,
+  lat_range = c(48, Inf),
+  min_positive_fe = 100,
+  min_positive_trips = 5,
+  min_yrs_with_trips = 5,
   area_grep_pattern = "^3C|^3D|^5A|^5B|^5C|^5D|^5E",
-  lat_band_width = 0.1, depth_band_width = 25, clean_bins = TRUE,
-  depth_bin_quantiles = c(0.001, 0.999), min_bin_prop = 0.001,
-  lat_bin_quantiles = c(0, 1), gear = c("bottom trawl",
-  "hook and line"))
+  lat_band_width = 0.1,
+  depth_band_width = 25,
+  clean_bins = TRUE,
+  depth_bin_quantiles = c(0.001, 0.999),
+  min_bin_prop = 0.001,
+  lat_bin_quantiles = c(0, 1),
+  gear = c("bottom trawl", "hook and line")
+)
 }
 \arguments{
 \item{dat}{An input data frame from \code{\link[=get_cpue_index]{get_cpue_index()}}.}

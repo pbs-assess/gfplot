@@ -3,7 +3,6 @@
 \docType{package}
 \name{gfplot}
 \alias{gfplot}
-\alias{gfplot-package}
 \title{gfplot package}
 \description{
 gfplot package

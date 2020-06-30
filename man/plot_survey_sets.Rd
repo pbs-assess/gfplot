@@ -4,20 +4,37 @@
 \alias{plot_survey_sets}
 \title{Plot the output from a geostatistical model of survey data}
 \usage{
-plot_survey_sets(pred_dat, raw_dat, fill_column = c("combined", "bin",
-  "pos"), fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt",
-  option = "C"), colour_scale = ggplot2::scale_colour_viridis_c(trans =
-  "sqrt", option = "C"), pos_pt_col = "#FFFFFF60",
-  bin_pt_col = "#FFFFFF40", pos_pt_fill = "#FFFFFF05",
-  pt_size_range = c(0.5, 9), show_legend = TRUE,
-  extrapolate_depth = TRUE, extrapolation_buffer = 0,
-  show_model_predictions = TRUE, show_raw_data = TRUE, utm_zone = 9,
+plot_survey_sets(
+  pred_dat,
+  raw_dat,
+  fill_column = c("combined", "bin", "pos"),
+  fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option = "C"),
+  colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "C"),
+  pos_pt_col = "#FFFFFF60",
+  bin_pt_col = "#FFFFFF40",
+  pos_pt_fill = "#FFFFFF05",
+  pt_size_range = c(0.5, 9),
+  show_legend = TRUE,
+  extrapolate_depth = TRUE,
+  extrapolation_buffer = 0,
+  show_model_predictions = TRUE,
+  show_raw_data = TRUE,
+  utm_zone = 9,
   fill_label = "Predicted\\nbiomass\\ndensity (kg/m^2)",
-  pt_label = "Tow density (kg/km^2)", rotation_angle = 0,
-  rotation_center = c(500, 5700), show_axes = TRUE, xlim = NULL,
-  ylim = NULL, x_buffer = c(-5, 5), y_buffer = c(-5, 5),
-  north_symbol = FALSE, north_symbol_coord = c(130, 5975),
-  north_symbol_length = 30, cell_size = 2, circles = FALSE)
+  pt_label = "Tow density (kg/km^2)",
+  rotation_angle = 0,
+  rotation_center = c(500, 5700),
+  show_axes = TRUE,
+  xlim = NULL,
+  ylim = NULL,
+  x_buffer = c(-5, 5),
+  y_buffer = c(-5, 5),
+  north_symbol = FALSE,
+  north_symbol_coord = c(130, 5975),
+  north_symbol_length = 30,
+  cell_size = 2,
+  circles = FALSE
+)
 }
 \arguments{
 \item{pred_dat}{The \code{predictions} element of the output from
@@ -29,9 +46,9 @@ plot_survey_sets(pred_dat, raw_dat, fill_column = c("combined", "bin",
 for the combined model, \code{"bin"} for the binary component model, or \code{"pos"}
 for the positive component model.}
 
-\item{fill_scale}{A ggplot \code{scale_fill_*} object.}
+\item{fill_scale}{A ggplot \verb{scale_fill_*} object.}
 
-\item{colour_scale}{A ggplot \code{scale_colour_*} object. You likely want this to
+\item{colour_scale}{A ggplot \verb{scale_colour_*} object. You likely want this to
 match \code{fill_scale} unless you want the map to look strange.}
 
 \item{pos_pt_col}{The color for positive set location points.}

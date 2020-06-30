@@ -4,12 +4,14 @@
 \name{pbs_species}
 \alias{pbs_species}
 \title{PBS groundfish species}
-\format{A data frame:
+\format{
+A data frame:
 \describe{
 \item{species_code}{species code}
 \item{species_scientific_name}{species scientific name}
 \item{species_common_name}{species common name}
-}}
+}
+}
 \usage{
 pbs_species
 }

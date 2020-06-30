@@ -4,7 +4,9 @@
 \name{pop_samples}
 \alias{pop_samples}
 \title{Example Pacific Ocean Perch biological samples from QCS.}
-\format{A data frame}
+\format{
+A data frame
+}
 \usage{
 pop_samples
 }

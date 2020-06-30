@@ -6,16 +6,35 @@
 \alias{plot_length_weight}
 \title{Plot von Bertalanffy or length-weight fits}
 \usage{
-plot_growth(object_female, object_male, object_all, type = c("vb",
-  "length-weight"), downsample = 2000L, pt_alpha = 0.2,
-  xlab = "Age (years)", ylab = "Length (cm)", seed = 42,
-  lab_x = 0.45, lab_y = 0.3, lab_x_gap = 0.3, lab_y_gap = 0.06,
-  col = c(Female = "black", Male = "grey40"), french = FALSE)
+plot_growth(
+  object_female,
+  object_male,
+  object_all,
+  type = c("vb", "length-weight"),
+  downsample = 2000L,
+  pt_alpha = 0.2,
+  xlab = "Age (years)",
+  ylab = "Length (cm)",
+  seed = 42,
+  lab_x = 0.45,
+  lab_y = 0.3,
+  lab_x_gap = 0.3,
+  lab_y_gap = 0.06,
+  col = c(Female = "black", Male = "grey40"),
+  french = FALSE
+)
 
 plot_vb(..., type = "vb")
 
-plot_length_weight(..., type = "length-weight", xlab = "Length (cm)",
-  ylab = "Weight (kg)", lab_x = 0.1, lab_y = 0.9, lab_x_gap = 0.35)
+plot_length_weight(
+  ...,
+  type = "length-weight",
+  xlab = "Length (cm)",
+  ylab = "Weight (kg)",
+  lab_x = 0.1,
+  lab_y = 0.9,
+  lab_x_gap = 0.35
+)
 }
 \arguments{
 \item{object_female}{Output from \code{\link[=fit_length_weight]{fit_length_weight()}} or \code{\link[=fit_vb]{fit_vb()}}.}

@@ -4,16 +4,27 @@
 \alias{plot_cpue_spatial}
 \title{Plot a map of commercial CPUE}
 \usage{
-plot_cpue_spatial(dat, start_year = 2013, bin_width = 7,
-  n_minimum_vessels = 3, xlim = c(122, 890), ylim = c(5373, 6027),
-  utm_zone = 9, bath = c(100, 200, 500),
-  fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option =
-  "D"), colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt",
-  option = "D"), rotation_angle = 0, rotation_center = c(500, 5700),
-  fill_lab = "CPUE (kg/hr)", show_historical = FALSE,
-  return_data = FALSE, min_cells = 1, french = FALSE,
+plot_cpue_spatial(
+  dat,
+  start_year = 2013,
+  bin_width = 7,
+  n_minimum_vessels = 3,
+  xlim = c(122, 890),
+  ylim = c(5373, 6027),
+  utm_zone = 9,
+  bath = c(100, 200, 500),
+  fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option = "D"),
+  colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
+  rotation_angle = 0,
+  rotation_center = c(500, 5700),
+  fill_lab = "CPUE (kg/hr)",
+  show_historical = FALSE,
+  return_data = FALSE,
+  min_cells = 1,
+  french = FALSE,
   percent_excluded_xy = NULL,
-  percent_excluded_text = "Fishing events excluded due to Privacy Act")
+  percent_excluded_text = "Fishing events excluded due to Privacy Act"
+)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
@@ -33,9 +44,9 @@ shown. Defaults to 3 to satisfy privacy requirements.}
 
 \item{bath}{A numeric vector of depths to show bathymetry countours at.}
 
-\item{fill_scale}{A ggplot \code{scale_fill_*} function to control colour shading.}
+\item{fill_scale}{A ggplot \verb{scale_fill_*} function to control colour shading.}
 
-\item{colour_scale}{A ggplot \code{scale_colour_*} function to control border of
+\item{colour_scale}{A ggplot \verb{scale_colour_*} function to control border of
 hexagon colours. This should likely match \code{fill_scale}.}
 
 \item{rotation_angle}{Angle to rotate the entire map. Used in the synopsis

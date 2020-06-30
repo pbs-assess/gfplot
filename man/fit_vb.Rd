@@ -4,14 +4,25 @@
 \alias{fit_vb}
 \title{Fit a von Bertalanffy growth model}
 \usage{
-fit_vb(dat, sex = c("female", "male", "all"), method = c("tmb", "mpd",
-  "mcmc"), downsample = Inf, chains = 4L, iter = 1000L,
-  cores = parallel::detectCores(), allow_slow_mcmc = FALSE,
-  est_method = median, min_samples = 50L, too_high_quantile = 1,
-  uniform_priors = FALSE, ageing_method_codes = NULL,
-  usability_codes = c(0, 1, 2, 6), check_convergence_tmb = TRUE,
+fit_vb(
+  dat,
+  sex = c("female", "male", "all"),
+  method = c("tmb", "mpd", "mcmc"),
+  downsample = Inf,
+  chains = 4L,
+  iter = 1000L,
+  cores = parallel::detectCores(),
+  allow_slow_mcmc = FALSE,
+  est_method = median,
+  min_samples = 50L,
+  too_high_quantile = 1,
+  uniform_priors = FALSE,
+  ageing_method_codes = NULL,
+  usability_codes = c(0, 1, 2, 6),
+  check_convergence_tmb = TRUE,
   tmb_inits = list(k = 0.5, linf = 40, log_sigma = log(0.1), t0 = -1),
-  ...)
+  ...
+)
 }
 \arguments{
 \item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or

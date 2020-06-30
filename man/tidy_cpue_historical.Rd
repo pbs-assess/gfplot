@@ -4,11 +4,18 @@
 \alias{tidy_cpue_historical}
 \title{Tidy historical CPUE data}
 \usage{
-tidy_cpue_historical(dat, species_common, year_range = c(1956, 1995),
-  area_grep_pattern = c("3[CD]+", "5[ABCDE]+"), use_alt_year = FALSE,
-  depth_band_width = 25, depth_bin_quantiles = c(0.001, 0.999),
-  min_bin_prop = 0.001, type = c("trip-level-data", "arithmetic-cpue"),
-  max_fe_hours = 5)
+tidy_cpue_historical(
+  dat,
+  species_common,
+  year_range = c(1956, 1995),
+  area_grep_pattern = c("3[CD]+", "5[ABCDE]+"),
+  use_alt_year = FALSE,
+  depth_band_width = 25,
+  depth_bin_quantiles = c(0.001, 0.999),
+  min_bin_prop = 0.001,
+  type = c("trip-level-data", "arithmetic-cpue"),
+  max_fe_hours = 5
+)
 }
 \arguments{
 \item{dat}{Data from \code{\link[=get_cpue_historical]{get_cpue_historical()}}.}

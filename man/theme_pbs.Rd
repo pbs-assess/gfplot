@@ -4,8 +4,12 @@
 \alias{theme_pbs}
 \title{A ggplot2 theme}
 \usage{
-theme_pbs(base_size = 11, base_family = "", text_col = "grey20",
-  panel_border_col = "grey70")
+theme_pbs(
+  base_size = 11,
+  base_family = "",
+  text_col = "grey20",
+  panel_border_col = "grey70"
+)
 }
 \arguments{
 \item{base_size}{Base font size.}

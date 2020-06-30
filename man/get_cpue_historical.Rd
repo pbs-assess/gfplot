@@ -4,14 +4,18 @@
 \alias{get_cpue_historical}
 \title{Get all fishing catch and effort to calculate historical commercial CPUE}
 \usage{
-get_cpue_historical(species = NULL, alt_year_start_date = "04-01",
-  areas = c("3[CD]+", "5[AB]+", "5[CDE]+"), end_year = NULL)
+get_cpue_historical(
+  species = NULL,
+  alt_year_start_date = "04-01",
+  areas = c("3[CD]+", "5[AB]+", "5[CDE]+"),
+  end_year = NULL
+)
 }
 \arguments{
 \item{species}{Species to filter for positive fishing events. Leave as \code{NULL}
 to include all fishing events. One or more species common names (e.g.
 \code{"pacific ocean perch"}) or one or more species codes (e.g. \code{396}). Species
-codes can be specified as numeric vectors \code{c(396, 442}) or characters
+codes can be specified as numeric vectors \verb{c(396, 442}) or characters
 \code{c("396", "442")}. Numeric values shorter than 3 digits will be expanded to
 3 digits and converted to character objects (\code{1} turns into \code{"001"}).
 Species common names and species codes should not be mixed. If any element

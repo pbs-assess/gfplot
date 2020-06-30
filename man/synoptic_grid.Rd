@@ -4,7 +4,9 @@
 \name{synoptic_grid}
 \alias{synoptic_grid}
 \title{Synoptic grid}
-\format{A data frame}
+\format{
+A data frame
+}
 \usage{
 synoptic_grid
 }

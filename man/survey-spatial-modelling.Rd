@@ -4,14 +4,30 @@
 \alias{fit_survey_sets}
 \title{Spatial modeling of survey data}
 \usage{
-fit_survey_sets(dat, years, survey = NULL,
-  density_column = "density_kgpm2", chains = 4, iter = 1000,
-  max_knots = 20, adapt_delta = 0.95, thin = 1,
-  mcmc_posterior_samples = 150, required_obs_percent = 0.05,
-  utm_zone = 9, model = c("inla", "sdmTMB", "glmmfields"),
-  include_depth = TRUE, survey_boundary = NULL, premade_grid = NULL,
-  tmb_knots = 200, inla_knots_pos = 75, inla_knots_bin = 100,
-  gamma_scaling = 1000, cell_width = 2, ...)
+fit_survey_sets(
+  dat,
+  years,
+  survey = NULL,
+  density_column = "density_kgpm2",
+  chains = 4,
+  iter = 1000,
+  max_knots = 20,
+  adapt_delta = 0.95,
+  thin = 1,
+  mcmc_posterior_samples = 150,
+  required_obs_percent = 0.05,
+  utm_zone = 9,
+  model = c("inla", "sdmTMB", "glmmfields"),
+  include_depth = TRUE,
+  survey_boundary = NULL,
+  premade_grid = NULL,
+  tmb_knots = 200,
+  inla_knots_pos = 75,
+  inla_knots_bin = 100,
+  gamma_scaling = 1000,
+  cell_width = 2,
+  ...
+)
 }
 \arguments{
 \item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}

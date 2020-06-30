@@ -4,7 +4,9 @@
 \name{survey_boundaries}
 \alias{survey_boundaries}
 \title{Survey boundaries}
-\format{A data frame}
+\format{
+A data frame
+}
 \usage{
 survey_boundaries
 }

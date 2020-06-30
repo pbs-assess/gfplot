@@ -4,8 +4,13 @@
 \alias{tidy_survey_sets}
 \title{Tidy the survey set data for use in modeling}
 \usage{
-tidy_survey_sets(dat, survey, years, utm_zone = 9,
-  density_column = "density_kgpm2")
+tidy_survey_sets(
+  dat,
+  survey,
+  years,
+  utm_zone = 9,
+  density_column = "density_kgpm2"
+)
 }
 \arguments{
 \item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}

@@ -35,7 +35,7 @@ yourself and as a place to hold documentation about the weighting schemes.
 These functions weight age or length frequencies. \code{tidy_comps_commercial()}
 and \code{tidy_comps_survey()} join the necessary data for commercial or survey
 samples, respectively, and format it for weighting. \code{weight_comps()} does the
-actual weighting based on the output from the \code{tidy_*} functions.
+actual weighting based on the output from the \verb{tidy_*} functions.
 }
 \details{
 The input data frame to \code{weight_comps()} must have columns in the
