@@ -307,13 +307,17 @@ fit_length_weight <- function(dat,
   if (method == "tmb") {
     dlls <- getLoadedDLLs()
     if (!any(vapply(dlls, function(x) x[["name"]] == "lw", FUN.VALUE = TRUE))) {
-      .f <- system.file("tmb", "lw.cpp", package = "gfplot")
+      lib.f <- system.file("tmb", "lw.cpp", package = "gfplot")
+      .f <- "lw_gfplot.cpp"
+      if (!file.exists(.f)) {
+        file.copy(lib.f, to = .f)
+      }
       TMB::compile(.f)
-      dyn.load(TMB::dynlib(gsub(".cpp", "", .f)))
+      dyn.load(TMB::dynlib("lw_gfplot"))
     }
     data <- list(len = log(dat$length), weight = log(dat$weight), df = df)
     parameters <- list(log_a = 0, b = 0, log_sigma = 0)
-    obj <- TMB::MakeADFun(data, parameters, DLL = "lw", silent = TRUE)
+    obj <- TMB::MakeADFun(data, parameters, DLL = "lw_gfplot", silent = TRUE)
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
     if (opt$convergence != 0L)
       stop("Length-weight model did not converge!")
