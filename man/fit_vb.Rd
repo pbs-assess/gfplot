@@ -31,8 +31,8 @@ fit_vb(
 \item{sex}{Either "male" or "female".}
 
 \item{method}{\code{"mpd"} for the mode of the posterior distribution (with
-\code{\link[rstan:optimizing]{rstan::optimizing()}}) or \code{"mcmc"} for full MCMC sampling with Stan (with
-\code{\link[rstan:sampling]{rstan::sampling()}}). \code{"tmb"} for a TMB model.}
+\code{\link[rstan:stanmodel-method-optimizing]{rstan::optimizing()}}) or \code{"mcmc"} for full MCMC sampling with Stan (with
+\code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}}). \code{"tmb"} for a TMB model.}
 
 \item{downsample}{If not \code{Inf} this represents a number of fish specimens to
 sample prior to model fitting. Can be useful for large data sets that you
@@ -70,8 +70,8 @@ Set to \code{NULL} to include all samples.}
 
 \item{tmb_inits}{A named list of initial parameter values for the TMB model.}
 
-\item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
-\code{\link[rstan:optimizing]{rstan::optimizing()}}.}
+\item{...}{Any other arguments to pass on to \code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}} or
+\code{\link[rstan:stanmodel-method-optimizing]{rstan::optimizing()}}.}
 }
 \description{
 For use with data for a single species.

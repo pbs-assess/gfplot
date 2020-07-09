@@ -26,7 +26,14 @@ In addition to the help available through the R console, a [web version of the d
 
 # Installation
 
-The gfplot package can be installed and loaded with:
+First, install INLA:
+
+```{r, eval=FALSE}
+install.packages("INLA", repos = c(getOption("repos"), 
+  INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
+```
+
+The gfplot package can then be installed and loaded with:
 
 ```{r, eval=FALSE}
 # install.packages("devtools")

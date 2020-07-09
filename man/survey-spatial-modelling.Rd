@@ -51,11 +51,11 @@ approximation in the glmmfields model. If this number is larger than the
 number of data points then the number of knots is set to the number of data
 points minus 2. Only applies to the glmmfields model.}
 
-\item{adapt_delta}{Value to pass to \code{\link[rstan:sampling]{rstan::sampling()}}. Values closer to 1
+\item{adapt_delta}{Value to pass to \code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}}. Values closer to 1
 make smaller steps in the Hamiltonian MCMC at the expense of speed. Only
 applies to the glmmfields model.}
 
-\item{thin}{Value to pass to \code{\link[rstan:sampling]{rstan::sampling()}} to thin the MCMC samples.
+\item{thin}{Value to pass to \code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}} to thin the MCMC samples.
 Only applies to the glmmfields model.}
 
 \item{mcmc_posterior_samples}{Number of final MCMC samples to return. Applies

@@ -21,6 +21,7 @@ addons:
     packages:
       - libgdal-dev
       - libproj-dev
+      - libnode-dev
 
 r_github_packages:
   - pbs-software/pbs-data/PBSdata

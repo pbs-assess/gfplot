@@ -24,7 +24,7 @@ plot_ages(
 \item{dat}{Input data frame. Should be from \code{\link[=tidy_ages_raw]{tidy_ages_raw()}} or
 \code{\link[=tidy_ages_weighted]{tidy_ages_weighted()}} or be formatted similarly. See details.}
 
-\item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size_area]{ggplot2::scale_size_area()}}).}
+\item{max_size}{Maximum dot size (passed to \code{\link[ggplot2:scale_size]{ggplot2::scale_size_area()}}).}
 
 \item{sex_gap}{Horizontal gap between male and female bubbles.}
 
