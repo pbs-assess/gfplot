@@ -146,8 +146,8 @@ tidy_cpue_index <- function(dat, species_common,
     vessel_registration_number, year, trip_id, .data$effort
   ) %>%
     mutate(
-      spp_in_fe = toupper(species_common) %in% species_common_name,
-      spp_in_row = species_common_name == toupper(species_common)
+      spp_in_fe = toupper(species_common) %in% toupper(species_common_name),
+      spp_in_row = toupper(species_common_name) == toupper(species_common)
     ) %>%
     summarise(
       pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
