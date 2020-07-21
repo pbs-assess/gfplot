@@ -14,8 +14,7 @@
 #'   is set to `TRUE` then the `year` column will be replaced with the
 #'   `alt_year` column.
 #' @param lat_range The range of latitudes to include.
-#' @param min_positive_fe The minimum number of positive tows (trawl) or
-#'   hook and line sets over all years.
+#' @param min_positive_tows The minimum number of positive tows over all years.
 #' @param min_positive_trips The minimum number of annual positive trips.
 #' @param min_yrs_with_trips The number of years in which the
 #'   `min_positive_trips` criteria needs to be met.
@@ -43,116 +42,95 @@
 #' \dontrun{
 #' d <- get_cpue_index(gear = "bottom trawl")
 #' walleye <- tidy_cpue_index(d, "walleye pollock",
-#'   area_grep_pattern = "5[CDE]+")
+#'   area_grep_pattern = "5[CDE]+"
+#' )
 #' }
-
+#'
 tidy_cpue_index <- function(dat, species_common,
                             year_range = c(1996, as.numeric(format(Sys.Date(), "%Y")) - 1),
                             alt_year_start_date = "04-01",
                             use_alt_year = FALSE,
                             lat_range = c(48, Inf),
-                            min_positive_fe = 100,
+                            min_positive_tows = 100,
                             min_positive_trips = 5,
                             min_yrs_with_trips = 5,
-                            area_grep_pattern = "^3C|^3D|^5A|^5B|^5C|^5D|^5E",
+                            area_grep_pattern = "5[CDE]+",
                             lat_band_width = 0.1,
                             depth_band_width = 25,
                             clean_bins = TRUE,
                             depth_bin_quantiles = c(0.001, 0.999),
                             min_bin_prop = 0.001,
                             lat_bin_quantiles = c(0, 1),
-                            gear = c("bottom trawl", "hook and line")) {
-
-  gear <- match.arg(gear)
-
-  if (gear == "bottom trawl" & year_range[[1]] < 1996){
-    stop("Please select a start year of 1996 or later for bottom trawl cpue.")
-  }
-
-  if (gear == "hook and line" & year_range[[1]] < 2008){
-    stop("Please select a start year of 2008 or later for hook and line cpue.")
-  }
-
+                            gear = "bottom trawl") {
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
     gfplot::pbs_areas$major_stat_area_description
   ), ]
   names(dat) <- tolower(names(dat))
-  dat <- dat %>% mutate(year = lubridate::year(best_date)) %>%
-    mutate(month = lubridate::month(best_date))
 
+  if (!"species_common_name" %in% names(dat)) {
+    dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
+  }
 
+  dat <- dat %>% mutate(year = lubridate::year(best_date))
+
+  # create possibly alternate starting date:
+  if (alt_year_start_date != "01-01") {
+    dat <- dplyr::mutate(dat,
+      .year_start_date =
+        lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00"))
+    )
+    dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
+    dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
+    dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
+  }
 
   if (use_alt_year) {
-
-    # create possibly alternate starting date:
-    if (alt_year_start_date != "01-01") {
-      dat <- dplyr::mutate(dat, .year_start_date =
-          lubridate::ymd_hms(paste0(year, "-", alt_year_start_date, " 00:00:00")))
-      dat <- dplyr::mutate(dat, .time_diff = best_date - .year_start_date)
-      dat <- dplyr::mutate(dat, alt_year = ifelse(.time_diff > 0, year, year - 1L))
-      dat <- dplyr::select(dat, -.time_diff, -.year_start_date)
-    }
-
     dat$year <- NULL
     dat$year <- dat$alt_year
     dat$alt_year <- NULL
   }
 
   dat$locality_code <- paste(dat$major_stat_area_code,
-    dat$minor_stat_area_code, dat$locality_code, sep = "-")
+    dat$minor_stat_area_code, dat$locality_code,
+    sep = "-"
+  )
 
   # basic filtering:
   catch <- dat %>%
     inner_join(pbs_areas, by = "major_stat_area_code") %>%
     filter(year >= year_range[[1]] & year <= year_range[[2]]) %>%
+    filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
+    filter(fe_start_date < fe_end_date) %>%
     filter(!is.na(latitude), !is.na(longitude), !is.na(best_depth)) %>%
     filter(gear %in% toupper(gear)) %>%
     filter(latitude >= lat_range[[1]] & latitude <= lat_range[[2]]) %>%
-    # to avoid erroneous 'pos_catch' results below
-    filter(.data$catch_kg > 0) # %>%
-  # Legacy code that was used to remove FE_IDs with multiple dates
-  # Currently doesn't work - would need to be grouped by trip and fe_id
-  # since older trips recycled fe_id #'s
-    # group_by(fishing_event_id) %>%
-    # mutate(n_date = length(unique(best_date))) %>%  #
-    # filter(n_date < Inf) %>%                        #
-    # select(-n_date) %>%
-    # ungroup()
-
-  # additional filtering for trawl cpue only:
-  if (gear == "bottom trawl"){
-    catch <- catch %>%
-      filter(!is.na(fe_start_date), !is.na(fe_end_date)) %>%
-      filter(fe_start_date < fe_end_date) %>%
-      mutate(
-        effort =
-          as.numeric(difftime(fe_end_date, fe_start_date, units = "hours"))
-      ) %>%
-      filter(.data$effort > 0)
-  }
-
-  # # additional filtering for hook and line cpue only:
-  # if (gear == "hook and line"){
-  #   catch <- catch %>%
-  #     group_by(year, month, trip_id, fishing_event_id) %>%
-  #     mutate(effort = hooks_per_set) %>%
-  #     filter(effort > 0)
-  # }
+    mutate(month = lubridate::month(best_date)) %>%
+    mutate(
+      hours_fished =
+        as.numeric(difftime(fe_end_date, fe_start_date, units = "hours"))
+    ) %>%
+    filter(hours_fished > 0) %>%
+    mutate(catch = landed_kg + discarded_kg) %>%
+    group_by(fishing_event_id) %>%
+    mutate(n_date = length(unique(best_date))) %>%
+    filter(n_date < Inf) %>%
+    select(-n_date) %>% # remove FE_IDs with multiple dates
+    ungroup()
 
   # catch for target spp:
   catch <- group_by(
     catch, fishing_event_id, best_date, month, locality_code,
-    vessel_registration_number, year, trip_id, .data$effort
+    vessel_name, year, trip_id, hours_fished
   ) %>%
     mutate(
-      spp_in_fe = toupper(species_common) %in% toupper(species_common_name),
-      spp_in_row = toupper(species_common_name) == toupper(species_common)
+      spp_in_fe = toupper(species_common) %in% species_common_name,
+      spp_in_row = species_common_name == toupper(species_common)
     ) %>%
     summarise(
       pos_catch = ifelse(spp_in_fe[[1]], 1, 0),
       # hours_fished = mean(hours_fished, na.rm = TRUE),
-      spp_catch = sum(ifelse(spp_in_row, .data$catch_kg, 0), na.rm = TRUE),
+      spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
       best_depth = mean(best_depth, na.rm = TRUE),
       latitude = mean(latitude, na.rm = TRUE)
     ) %>%
@@ -160,29 +138,30 @@ tidy_cpue_index <- function(dat, species_common,
 
   # figure out which vessels should be considered part of the spp. fleet
   fleet <- catch %>%
-    group_by(vessel_registration_number) %>%
+    group_by(vessel_name) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
-    filter(total_positive_tows >= min_positive_fe) %>% # filters for only vessels with > 100 positive tows
-    filter(spp_catch > 0) %>% # filters for positive tows only
-    group_by(year, vessel_registration_number, trip_id) %>%
-    summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>% # roll up catch by trip
-    group_by(vessel_registration_number) %>%
+    filter(total_positive_tows >= min_positive_tows) %>%
+    filter(spp_catch > 0) %>%
+    group_by(year, vessel_name, trip_id) %>%
+    summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
+    filter(sum_catch > 0) %>%
+    group_by(vessel_name) %>%
     mutate(n_years = length(unique(year))) %>%
     # for speed (filter early known cases):
     filter(n_years >= min_yrs_with_trips) %>%
-    group_by(year, vessel_registration_number) %>%
+    group_by(year, vessel_name) %>%
     summarise(n_trips_per_year = length(unique(trip_id))) %>%
     mutate(
       trips_over_treshold_this_year =
         n_trips_per_year >= min_positive_trips
     ) %>%
-    group_by(vessel_registration_number) %>%
+    group_by(vessel_name) %>%
     summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
     filter(trips_over_thresh >= min_yrs_with_trips) %>%
     ungroup()
 
   # retain the data from our "fleet"
-  d_retained <- semi_join(catch, fleet, by = "vessel_registration_number")
+  d_retained <- semi_join(catch, fleet, by = "vessel_name")
 
   if (nrow(d_retained) == 0) {
     warning("No vessels passed the fleet conditions.")
@@ -218,7 +197,7 @@ tidy_cpue_index <- function(dat, species_common,
     filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
     mutate(
       depth = factor_bin_clean(best_depth, depth_bands),
-      vessel = as.factor(vessel_registration_number),
+      vessel = as.factor(vessel_name),
       latitude = factor_bin_clean(latitude, lat_bands),
       locality = as.factor(locality_code),
       year_factor = factor_clean(year),
@@ -239,14 +218,16 @@ tidy_cpue_index <- function(dat, species_common,
 
   # retain depth bins with enough data:
   tb <- table(pos_catch_fleet$depth)
-  too_deep <- names(tb)[cumsum(tb)/sum(tb) > depth_bin_quantiles[2]]
-  too_shallow <- names(tb)[cumsum(tb)/sum(tb) < depth_bin_quantiles[1]]
-  d_retained <- filter(d_retained,
-    !.data$depth %in% union(too_deep, too_shallow))
+  too_deep <- names(tb)[cumsum(tb) / sum(tb) > depth_bin_quantiles[2]]
+  too_shallow <- names(tb)[cumsum(tb) / sum(tb) < depth_bin_quantiles[1]]
+  d_retained <- filter(
+    d_retained,
+    !.data$depth %in% union(too_deep, too_shallow)
+  )
 
   too_few <- function(x) {
     tb <- table(pos_catch_fleet[[x]])
-    names(tb)[tb/sum(tb) < min_bin_prop]
+    names(tb)[tb / sum(tb) < min_bin_prop]
   }
 
   # not enough pos. data in bins?
@@ -256,30 +237,36 @@ tidy_cpue_index <- function(dat, species_common,
   d_retained <- filter(d_retained, !.data$locality %in% too_few("locality"))
   # vessel already known
 
-  base_month      <- get_most_common_level(pos_catch_fleet$month)
-  base_depth      <- get_most_common_level(pos_catch_fleet$depth)
-  base_lat        <- get_most_common_level(pos_catch_fleet$latitude)
-  base_vessel     <- get_most_common_level(pos_catch_fleet$vessel)
-  base_locality   <- get_most_common_level(pos_catch_fleet$locality)
+  base_month <- get_most_common_level(pos_catch_fleet$month)
+  base_depth <- get_most_common_level(pos_catch_fleet$depth)
+  base_lat <- get_most_common_level(pos_catch_fleet$latitude)
+  base_vessel <- get_most_common_level(pos_catch_fleet$vessel)
+  base_locality <- get_most_common_level(pos_catch_fleet$locality)
 
-  d_retained$locality  <- stats::relevel(as.factor(d_retained$locality),
-    ref = base_locality)
-  d_retained$depth     <- stats::relevel(as.factor(d_retained$depth),
-    ref = base_depth)
-  d_retained$latitude  <- stats::relevel(as.factor(d_retained$latitude),
-    ref = base_lat)
-  d_retained$vessel    <- stats::relevel(as.factor(d_retained$vessel),
-    ref = base_vessel)
-  d_retained$month     <- stats::relevel(as.factor(d_retained$month),
-    ref = base_month)
+  d_retained$locality <- stats::relevel(as.factor(d_retained$locality),
+    ref = base_locality
+  )
+  d_retained$depth <- stats::relevel(as.factor(d_retained$depth),
+    ref = base_depth
+  )
+  d_retained$latitude <- stats::relevel(as.factor(d_retained$latitude),
+    ref = base_lat
+  )
+  d_retained$vessel <- stats::relevel(as.factor(d_retained$vessel),
+    ref = base_vessel
+  )
+  d_retained$month <- stats::relevel(as.factor(d_retained$month),
+    ref = base_month
+  )
 
   d_retained <- droplevels(d_retained)
 
-  d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$effort)
+  d_retained <- mutate(d_retained, cpue = .data$spp_catch / .data$hours_fished)
 
   # make sure unique:
   d_retained <- mutate(d_retained,
-    fishing_event_id = paste(year, trip_id, fishing_event_id, sep = "-"))
+    fishing_event_id = paste(year, trip_id, fishing_event_id, sep = "-")
+  )
 
   arrange(d_retained, .data$year, .data$vessel) %>%
     dplyr::as_tibble()
