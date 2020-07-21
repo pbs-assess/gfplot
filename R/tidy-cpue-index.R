@@ -121,7 +121,7 @@ tidy_cpue_index <- function(dat, species_common,
   # catch for target spp:
   catch <- group_by(
     catch, fishing_event_id, best_date, month, locality_code,
-    vessel_name, year, trip_id, hours_fished
+    vessel_registration_number, year, trip_id, hours_fished
   ) %>%
     mutate(
       spp_in_fe = toupper(species_common) %in% species_common_name,
@@ -138,30 +138,30 @@ tidy_cpue_index <- function(dat, species_common,
 
   # figure out which vessels should be considered part of the spp. fleet
   fleet <- catch %>%
-    group_by(vessel_name) %>%
+    group_by(vessel_registration_number) %>%
     mutate(total_positive_tows = sum(pos_catch)) %>%
     filter(total_positive_tows >= min_positive_tows) %>%
     filter(spp_catch > 0) %>%
-    group_by(year, vessel_name, trip_id) %>%
+    group_by(year, vessel_registration_number, trip_id) %>%
     summarise(sum_catch = sum(spp_catch, na.rm = TRUE)) %>%
     filter(sum_catch > 0) %>%
-    group_by(vessel_name) %>%
+    group_by(vessel_registration_number) %>%
     mutate(n_years = length(unique(year))) %>%
     # for speed (filter early known cases):
     filter(n_years >= min_yrs_with_trips) %>%
-    group_by(year, vessel_name) %>%
+    group_by(year, vessel_registration_number) %>%
     summarise(n_trips_per_year = length(unique(trip_id))) %>%
     mutate(
       trips_over_treshold_this_year =
         n_trips_per_year >= min_positive_trips
     ) %>%
-    group_by(vessel_name) %>%
+    group_by(vessel_registration_number) %>%
     summarise(trips_over_thresh = sum(trips_over_treshold_this_year)) %>%
     filter(trips_over_thresh >= min_yrs_with_trips) %>%
     ungroup()
 
   # retain the data from our "fleet"
-  d_retained <- semi_join(catch, fleet, by = "vessel_name")
+  d_retained <- semi_join(catch, fleet, by = "vessel_registration_number")
 
   if (nrow(d_retained) == 0) {
     warning("No vessels passed the fleet conditions.")
@@ -197,7 +197,7 @@ tidy_cpue_index <- function(dat, species_common,
     filter(best_depth >= min(depth_bands) & best_depth <= max(depth_bands)) %>%
     mutate(
       depth = factor_bin_clean(best_depth, depth_bands),
-      vessel = as.factor(vessel_name),
+      vessel = as.factor(vessel_registration_number),
       latitude = factor_bin_clean(latitude, lat_bands),
       locality = as.factor(locality_code),
       year_factor = factor_clean(year),
