@@ -479,7 +479,7 @@ plot_growth <- function(object_female, object_male,
       )
     }
   } else {
-    g <- ann_func(g, object_all$pars, "Both sexes", col[[1]],
+    g <- ann_func(g, object_all$pars, en2fr("Both sexes", french, allow_missing=TRUE), col[[1]],
       x = lab_x * max(xlim),
       y = lab_y * max(ylim),
       gap = lab_y_gap * max(ylim)
@@ -505,10 +505,11 @@ plot_vb <- function(..., type = "vb") {
 plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)",
                                ylab = "Weight (kg)",
                                lab_x = 0.1, lab_y = 0.9,
-                               lab_x_gap = 0.35) {
+                               lab_x_gap = 0.35,
+                               french=FALSE) {
   plot_growth(...,
     type = type, xlab = xlab,
-    ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap
+    ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap, french=french
   ) +
     ggplot2::ggtitle("Length-weight relationship")
 }
