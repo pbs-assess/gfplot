@@ -133,10 +133,17 @@ fit_vb <- function(dat,
     rstan::rstan_options(auto_write = TRUE)
     if (uniform_priors) {
       model_file <- system.file("stan", "vb-nopriors.stan", package = "gfplot")
+      .f <- "vb-nopriors.stan"
     } else {
       model_file <- system.file("stan", "vb.stan", package = "gfplot")
+      .f <- "vb.stan"
     }
-    vb_mod_gfplot <- rstan::stan_model(model_file)
+
+    if (!file.exists(.f)) {
+      file.copy(model_file, to = .f)
+    }
+
+    vb_mod_gfplot <- rstan::stan_model(.f)
     assign("vb_mod_gfplot", vb_mod_gfplot, envir = globalenv())
   }
 
