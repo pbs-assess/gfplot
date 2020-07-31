@@ -33,7 +33,8 @@ plot_length_weight(
   ylab = "Weight (kg)",
   lab_x = 0.1,
   lab_y = 0.9,
-  lab_x_gap = 0.35
+  lab_x_gap = 0.35,
+  french = FALSE
 )
 }
 \arguments{
