@@ -37,6 +37,7 @@ take a while to plot.}
 Quantile residuals for a Tweedie GLMM fit with glmmTMB
 }
 \examples{
+\dontrun{
 m <- glmmTMB::glmmTMB(cpue ~ 1,
   data = data.frame(cpue =
       tweedie::rtweedie(1000, mu = 2, phi = 5, power = 1.5)),
@@ -44,4 +45,5 @@ m <- glmmTMB::glmmTMB(cpue ~ 1,
 qr <- qres_tweedie(m, "cpue")
 plot_qres_qq(qr)
 plot_qres_histogram(qr)
+}
 }
