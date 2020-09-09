@@ -245,7 +245,8 @@ plot_mat_ogive <- function(object,
   if (object$type[[1]] == "age") {
     labs <- mutate(labs,
       label =
-        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), en2fr("y",translate=french,allow_missing=TRUE))
+        paste0(sex, " ", p, " = ",
+          sprintf("%.1f", round(value, 1L)), en2fr("y", translate = french))
     )
   } else {
     labs <- mutate(labs,
