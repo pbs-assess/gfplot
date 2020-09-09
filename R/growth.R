@@ -486,7 +486,7 @@ plot_growth <- function(object_female, object_male,
       )
     }
   } else {
-    g <- ann_func(g, object_all$pars, en2fr("Both sexes", french, allow_missing =TRUE), col[[1]],
+    g <- ann_func(g, object_all$pars, en2fr("Both sexes", french), col[[1]],
       x = lab_x * max(xlim),
       y = lab_y * max(ylim),
       gap = lab_y_gap * max(ylim)
