@@ -21,7 +21,8 @@ plot_mat_ogive(
   rug = TRUE,
   rug_n = 1500,
   x_max = 1.75,
-  prediction_type = c("all", "male", "female", "none")
+  prediction_type = c("all", "male", "female", "none"),
+  french = FALSE
 )
 }
 \arguments{
@@ -57,6 +58,8 @@ Set to \code{NULL} to include all samples.}
 
 \item{prediction_type}{The prediction lines to show. Useful if you only want
 to show model fits when you have sufficient data.}
+
+\item{french}{Translate to French?}
 }
 \description{
 Fit and plot maturity ogives

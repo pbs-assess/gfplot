@@ -167,6 +167,7 @@ sd2cv <- function(.sd) {
 #' @param x_max Used in determining the right axis limit.
 #' @param prediction_type The prediction lines to show. Useful if you only want
 #'   to show model fits when you have sufficient data.
+#' @param french Translate to French?
 #'
 #' @importFrom stats binomial plogis predict
 #' @export
