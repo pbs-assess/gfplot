@@ -177,7 +177,8 @@ plot_mat_ogive <- function(object,
                            title =
                              if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
                            rug = TRUE, rug_n = 1500, x_max = 1.75,
-                           prediction_type = c("all", "male", "female", "none")) {
+                           prediction_type = c("all", "male", "female", "none"),
+                           french = FALSE) {
   nd_re <- object$pred_data
 
   if (object$sample_id_re) {
@@ -244,7 +245,7 @@ plot_mat_ogive <- function(object,
   if (object$type[[1]] == "age") {
     labs <- mutate(labs,
       label =
-        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "y")
+        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), en2fr("y",translate=french,allow_missing=TRUE))
     )
   } else {
     labs <- mutate(labs,
