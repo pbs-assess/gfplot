@@ -676,7 +676,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     ) +
     guides(shape = FALSE, colour = FALSE) +
     labs(size = pt_label, fill = fill_label) +
-    ylab("Northing") + xlab("Easting")
+    ylab(en2fr("Northing", translate=french)) + xlab(en2fr("Easting", translate=french))
 
   if (!show_legend) {
     g <- g + theme(legend.position = "none")

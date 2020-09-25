@@ -24,7 +24,7 @@
 # # %>% dplyr::top_n(30)
 
 plot_dfo_localities <- function(localities = "all",
-                                xlim = c(-134, -124), ylim = c(48, 55)) {
+                                xlim = c(-134, -124), ylim = c(48, 55), french=FALSE) {
   data("locality", package = "PBSdata", envir = environment())
   x <- attributes(locality)$PolyData
   x$name_lower <- tolower(x$name)
@@ -68,7 +68,7 @@ plot_dfo_localities <- function(localities = "all",
     ggplot2::coord_equal(xlim = utm_range$X, ylim = utm_range$Y) +
     ggplot2::scale_fill_manual(na.value = "white", values = rep("grey60", 1e3)) +
     theme_pbs() + ggplot2::guides(fill = FALSE, colour = FALSE) +
-    ggplot2::labs(y = "Northing", x = "Easting")
+    ggplot2::labs(y = en2fr("Northing", translate=french), x = en2fr("Easting", translate=french))
 
   if (localities[[1]] != "all") {
     g <- g + ggrepel::geom_text_repel(
