@@ -71,7 +71,7 @@ plot_dfo_localities <- function(localities = "all",
     ggplot2::labs(y = en2fr("Northing", translate=french), x = en2fr("Easting", translate=french))
 
   if (localities[[1]] != "all") {
-    label_type <- if (french) "locality" else "name"
+    label_type <- if (french) "unique_locality_code" else "name"
     g <- g + ggrepel::geom_text_repel(
       data = x_utm,
       ggplot2::aes_string("X", "Y", label = label_type),
