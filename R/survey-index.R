@@ -151,6 +151,10 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     mutate(mean_num_pos_sets = as.numeric(mean_num_pos_sets),
       mean_num_sets = as.numeric(mean_num_sets))
 
+  if (french) {
+    stats_df$cv <- gsub("\\.", ",", stats_df$cv)
+  }
+
   uncertain <- stats_df %>%
     mutate(uncertain = mean_cv > max_cv |
         mean_num_pos_sets / mean_num_sets < max_set_fraction |
