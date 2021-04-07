@@ -442,7 +442,7 @@ plot_growth <- function(object_female, object_male,
   g <- ggplot() +
     scale_colour_manual(values = col, labels = labs) +
     ggplot2::scale_linetype_manual(values = c(1, 2), labels = labs) +
-    theme_pbs() + xlab(xlab) + ylab(ylab) +
+    theme_pbs() + xlab(en2fr(xlab, french)) + ylab(en2fr(ylab, french)) +
     ggplot2::labs(colour = en2fr("Sex", french), lty = en2fr("Sex", french))
 
   if (!no_pts) {
@@ -518,7 +518,7 @@ plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)"
     type = type, xlab = xlab,
     ylab = ylab, lab_x = lab_x, lab_y = lab_y, lab_x_gap = lab_x_gap, french = french
   ) +
-    ggplot2::ggtitle("Length-weight relationship")
+    ggplot2::ggtitle(en2fr("Length-weight relationship", french))
 }
 
 # annotation helpers:

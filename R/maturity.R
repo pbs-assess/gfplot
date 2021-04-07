@@ -295,14 +295,14 @@ plot_mat_ogive <- function(object,
   g <- g + scale_colour_manual(values = c("M" = "grey50", "F" = "black"),
     breaks = c("F", "M"), drop = FALSE) +
     ggplot2::scale_linetype_discrete(breaks = c('F', 'M'), drop = FALSE) +
-    xlab(xlab) + ylab("Probability mature") +
+    xlab(en2fr(xlab, french)) + ylab(en2fr("Probability mature", french)) +
     theme_pbs() +
     coord_cartesian(
       expand = FALSE, ylim = c(-0.005, 1.005),
       xlim = c(0, max_x)
     ) +
-    labs(colour = "Sex", lty = "Sex") +
-    ggplot2::ggtitle(title)
+    labs(colour = en2fr("Sex", french), lty = en2fr("Sex")) +
+    ggplot2::ggtitle(en2fr(title, french))
 
   if (rug) {
     if (nrow(object$data) > rug_n) {
