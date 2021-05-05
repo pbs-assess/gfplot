@@ -26,6 +26,8 @@
 #'   function.
 #' @param min_total Minimum number of fish for a given survey and year needed
 #'   before a histogram is shown.
+#' @param show_year Which years to show a label for. Can be one of 'even' or 'odd'. Any
+#'   other value will enable labels for all years.
 #'
 #' @export
 #'
@@ -64,7 +66,9 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
                          fill_col = c("M" = "grey80", "F" = "#FF000010"),
                          line_col = c("M" = "grey40", "F" = "red"),
                          survey_cols = NULL, alpha = 0.24,
-                         bin_size = 2, min_total = 20) {
+                         bin_size = 2, min_total = 20,
+                         show_year = "even") {
+
   if (!is.null(survey_cols)) {
     survey_col_names <- names(survey_cols)
     col <- stats::setNames(survey_cols, paste("F", survey_col_names))
@@ -100,8 +104,6 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
       aes_string(colour = "sex", fill = "sex"), size = 0.3,
       position = position_identity()
     ) +
-    facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
-      labeller = ggplot2::labeller(.rows = is_even), drop = FALSE) +
     theme_pbs() +
     scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
     scale_colour_manual(values = line_col, breaks = c("M", "F")) +
@@ -124,6 +126,19 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     labs(title = "Length frequencies") +
     theme(panel.grid.major.x = ggplot2::element_line(colour = "grey93"))
 
+  if(show_year == "even"){
+    g <- g +
+      facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
+                 labeller = ggplot2::labeller(.rows = is_even), drop = FALSE)
+  }else if(show_year == "odd"){
+    g <- g +
+      facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
+                 labeller = ggplot2::labeller(.rows = is_odd), drop = FALSE)
+  }else{
+    g <- g +
+      facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
+                 labeller = ggplot2::labeller(.rows = is_all), drop = FALSE)
+  }
   if (!is.null(survey_cols)) {
     g <- g + guides(fill = FALSE, colour = FALSE)
   }
@@ -134,4 +149,13 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
 is_even <- function(x) {
   ie <- as.numeric(as.character(x)) %% 2 == 0
   ifelse(ie, x, "")
+}
+
+is_odd <- function(x) {
+  ie <- as.numeric(as.character(x)) %% 2 == 1
+  ifelse(ie, x, "")
+}
+
+is_all <- function(x) {
+  x
 }
