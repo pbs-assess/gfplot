@@ -173,11 +173,14 @@ split_catch_maturity <- function(survey_sets, fish,
       }
     }
 
+    # model mass of fish with only length data
     f_fish <- mutate(f_fish,
       adult = if_else(length >= threshold, 1, 0, missing = NULL),
       model_mass = exp(f_mass$pars$log_a + f_mass$pars$b * (log(length))) * 1000,
       new_mass = weight
     )
+
+    # only apply simulated mass when below chosen cutoff_quantile
     max_model <- quantile(f_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
     f_fish$model_mass[f_fish$model_mass > max_model] <- max_model
     f_fish$new_mass[is.na(f_fish$weight)] <- f_fish$model_mass[is.na(f_fish$weight)]
@@ -187,10 +190,12 @@ split_catch_maturity <- function(survey_sets, fish,
       model_mass = exp(m_mass$pars$log_a + m_mass$pars$b * (log(length))) * 1000,
       new_mass = weight
     )
+
     max_model_m <- quantile(m_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
     m_fish$model_mass[m_fish$model_mass > max_model_m] <- max_model_m
     m_fish$new_mass[is.na(m_fish$weight)] <- m_fish$model_mass[is.na(m_fish$weight)]
 
+    # combine dataframes of female and male fish
     fish_maturity <- rbind(f_fish, m_fish) %>% mutate(sex = ifelse(sex == 2, "F", "M"))
 
     set_maturity <- fish_maturity %>%
@@ -206,11 +211,15 @@ split_catch_maturity <- function(survey_sets, fish,
       mutate(
         est_sample_mass = sum(new_mass, na.rm = TRUE),
         mass_ratio = maturity_mass / est_sample_mass,
-        measured_weight = sum(weight)
+        measured_weight = sum(weight),
+        n_weights = sum(!is.na(weight))
       ) %>%
       filter(adult == 1) %>%
-      rename(mass_ratio_mature = mass_ratio, n_mature = count, sample_n = n) %>%
-      select(fishing_event_id, est_sample_mass, mass_ratio_mature, n_mature, sample_n, measured_weight) %>%
+      rename(mass_ratio_mature = mass_ratio, n_mature = count, n_sampled = n) %>%
+      select(fishing_event_id,
+        est_sample_mass, # needed for perc_sampled data check below
+        measured_weight, n_weights, n_mature, n_sampled, # these are optional data checks
+        mass_ratio_mature) %>%
       unique()
 
 
@@ -227,13 +236,18 @@ split_catch_maturity <- function(survey_sets, fish,
     sets_w_ratio$mass_ratio_mature[is.na(sets_w_ratio$mass_ratio_mature)] <- na_value
 
     # add column to check for discrepencies between total catch weight and biological sample weights
-    # est_sample_mass is in g while catch_weight is in kg?
-    sets_w_ratio$errors <- sets_w_ratio$est_sample_mass - sets_w_ratio$catch_weight * 1000
+    # est_sample_mass is in g while catch_weight is in kg
+
+    sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_weight - sets_w_ratio$est_sample_mass/1000), 2)
+    sets_w_ratio$perc_sampled <- round((sets_w_ratio$est_sample_mass/1000)/sets_w_ratio$catch_weight, 2)*100
 
     sets_w_ratio$split_dens_type <- sets_w_ratio[[split_dens_type]]
 
     data <- sets_w_ratio %>%
-      mutate(adult_density = split_dens_type * mass_ratio_mature, imm_density = split_dens_type * (1 - mass_ratio_mature))
+      mutate(
+        adult_density = split_dens_type * mass_ratio_mature,
+        imm_density = split_dens_type * (1 - mass_ratio_mature)
+        )
 
     data$split_dens_type <- split_dens_type
 
@@ -257,8 +271,8 @@ split_catch_maturity <- function(survey_sets, fish,
     return(list(data = survey_sets, model = NULL))
   }
   if (plot) {
-  list(data = data, model = m, maturity_plot = maturity_plot, mass_plot = mass_plot)
+  list(data = data, m = m, maturity_plot = maturity_plot, mass_plot = mass_plot)
   } else {
-  list(data = data, model = m)
+  list(data = data, m = m)
   }
 }
