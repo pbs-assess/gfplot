@@ -1,20 +1,24 @@
 #' Split catch densities by mass ratio of maturity classes
 #'
-#' @param survey_sets Data from get_survey_sets.
-#' @param fish Data from get_survey_samples.
-#' @param split_dens_type Which density type will be split and saved as a column providing units for adult_density and imm_density columns.
+#' @param survey_sets Data from [get_survey_sets()].
+#' @param fish Data from [get_survey_samples()].
+#' @param split_dens_type Which density type will be split and saved as a column providing units for
+#'     adult_density and imm_density columns.
 #' @param survey List of survey abbreviations.
 #' @param years List of years. Default 'NULL' includes all years.
-#' @param cutoff_quantile Set max cutoff for mass modeled from lengths.
+#' @param cutoff_quantile Set max cutoff quantile for mass modeled from lengths.
 #' @param p_threshold Probability of maturity to split at. Default = 0.5. Alternatives are 0.05 or 0.95.
-#' @param use_median_ratio If TRUE, uses median proportion mature (if FALSE uses mean proportion mature) when catch too small to have biological samples collected.
+#' @param use_median_ratio If TRUE, uses median proportion mature (if FALSE uses mean proportion mature)
+#'    when catch too small to have biological samples collected.
+#' @param sample_id_re If `TRUE` then the model will include random intercepts
+#'    for sample ID.
 #' @param year_re Option to have lengths at maturity vary by year, but this requires the gfvelocities package.
 #' @param plot Logical for whether to produce plots
 #'    (length-weight and length-at-maturity relationships).
-#'
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' d_survey_sets <- gfdata::get_survey_sets("pacific cod")
 #' d_survey_samples <- gfdata::get_survey_samples("pacific cod")
 #'
@@ -23,7 +27,7 @@
 #' years = NULL,
 #' cutoff_quantile = 0.5,
 #' plot = TRUE
-#' )
+#' )}
 split_catch_maturity <- function(survey_sets, fish,
                                  split_dens_type = "density_kgpm2",
                                  survey = c("SYN HS", "SYN QCS"),
