@@ -130,7 +130,7 @@ fit_mat_ogive <- function(dat,
   nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
     b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
 
-  mat_perc <- extract_maturity_perc(stats::coef(m))
+  mat_perc <- extract_maturity_perc(b)
   se_l50 <- tryCatch({delta_method(~ -(log((1/0.5) - 1) + x1 + x3) / (x2 + x4),
     mean = stats::coef(m), cov = stats::vcov(m))}, error = function(e) NA)
 
