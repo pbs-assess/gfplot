@@ -127,7 +127,7 @@ split_catch_maturity <- function(survey_sets, fish,
       }
     } else {
       if (year_re) {
-      m <- gfvelocities::fit_mat_ogive_re(fish, type = "length", sample_id_re = FALSE, year_re = TRUE)
+      m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re, year_re = TRUE)
       if(p_threshold == 0.5) {
       f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.5)
       m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.5)

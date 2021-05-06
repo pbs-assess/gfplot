@@ -4,6 +4,8 @@
 #' @param type Should this be an age or length fit?
 #' @param sample_id_re If `TRUE` then the model will include random intercepts
 #'   for sample ID.
+#' @param year_re If `TRUE` the model will include random intercepts
+#'   for year.
 #' @param months A numeric vector indicating which months to include when
 #'   fitting the maturity ogive. Defaults to all months.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
@@ -23,7 +25,6 @@
 #'
 #' m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE)
 #' plot_mat_ogive(m)
-#'
 #' \dontrun{
 #' ## with random intercepts for sample ID:
 #' m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
@@ -32,6 +33,7 @@
 fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,
+                          year_re = FALSE,
                           months = seq(1, 12),
                           ageing_method_codes = NULL,
                           usability_codes = c(0, 1, 2, 6)) {
@@ -64,9 +66,11 @@ fit_mat_ogive <- function(dat,
   dat <- dat %>%
     select(
       species_common_name,
+      year,
       age, length, weight,
       maturity_code, sex,
       maturity_convention_code,
+      # survey_series_id,
       specimen_id, sample_id, trip_start_date
     )
 
@@ -90,7 +94,7 @@ fit_mat_ogive <- function(dat,
   .d <- switch(type,
     age = filter(dat, !is.na(mature), !is.na(age), !is.na(sex)) %>%
       rename(age_or_length = age),
-    length = filter(dat, !is.na(mature), !is.na(length), !is.na(sex)) %>%
+    length = filter(dat, !is.na(mature), !is.na(length), !is.na(sex), !is.na(year)) %>%
       rename(age_or_length = length)
   )
   .d <- mutate(.d, female = ifelse(sex == 2L, 1L, 0L))
@@ -100,15 +104,37 @@ fit_mat_ogive <- function(dat,
   }
 
   if (sample_id_re) {
-    m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
-      data = .d, family = binomial
-    )
-    b <- glmmTMB::fixef(m)[[1L]]
+    if (year_re) {
+      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female   +
+          (1 | sample_id) +
+          # (1 | survey_series_id) +
+          (1 | year),
+        data = .d, family = binomial
+      )
+      b <- glmmTMB::fixef(m)[[1L]]
+      ranef <- glmmTMB::ranef(m)
+      re <- ranef$cond$year
+    } else {
+      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
+        data = .d, family = binomial
+      )
+
+      b <- glmmTMB::fixef(m)[[1L]]
+    }
   } else {
-    m <- stats::glm(mature ~ age_or_length * female,
-      data = .d, family = binomial
-    )
-    b <- stats::coef(m)
+    if (year_re) {
+      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | year),
+        data = .d, family = binomial
+      )
+      b <- glmmTMB::fixef(m)[[1L]]
+      ranef <- glmmTMB::ranef(m)
+      re <- ranef$cond$year
+    } else {
+      m <- stats::glm(mature ~ age_or_length * female,
+        data = .d, family = binomial
+      )
+      b <- stats::coef(m)
+    }
   }
 
   if (length(unique(.d$sample_id)) > 100L) {
@@ -120,22 +146,45 @@ fit_mat_ogive <- function(dat,
   age_or_length <- seq(min(.d$age_or_length), max(.d$age_or_length),
     length.out = 300L
   )
+
+  year <- unique(.d$year)
+
   nd <- expand.grid(
     age_or_length = age_or_length, sample_id = s_ids,
+    year = year, #survey_series_id = unique(.d$survey_series_id),
     female = c(0L, 1L), stringsAsFactors = FALSE
   )
+
   if (sample_id_re) {
     nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
   }
+
+  if (year_re) {
+    year_f <- as.character(nd$year)
+    nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
+    nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
+      b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+  }
+
   nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
     b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
 
-  mat_perc <- extract_maturity_perc(b)
-  se_l50 <- tryCatch({delta_method(~ -(log((1/0.5) - 1) + x1 + x3) / (x2 + x4),
-    mean = stats::coef(m), cov = stats::vcov(m))}, error = function(e) NA)
+  if (year_re) {
+    mat_perc <- extract_maturity_perc_re(b, re)
+  } else {
+    mat_perc <- extract_maturity_perc(b)
+  }
+
+
+  se_l50 <- tryCatch({
+    delta_method(~ -(log((1 / 0.5) - 1) + x1 + x3) / (x2 + x4),
+      mean = stats::coef(m), cov = stats::vcov(m)
+    )
+  }, error = function(e) NA)
 
   list(
     data = .d, pred_data = nd, model = m, sample_id_re = sample_id_re,
+    year_re = year_re,
     type = type, mat_perc = mat_perc, se_50 = se_l50
   )
 }
@@ -180,16 +229,29 @@ plot_mat_ogive <- function(object,
                            rug = TRUE, rug_n = 1500, x_max = 1.75,
                            prediction_type = c("all", "male", "female", "none"),
                            french = FALSE) {
-  nd_re <- object$pred_data
 
   if (object$sample_id_re) {
-    b <- glmmTMB::fixef(object$model)[[1L]]
+    if (object$year_re) {
+      b <- glmmTMB::fixef(object$model)[[1L]]
+      ranef <- glmmTMB::ranef(object$model)
+      re <- ranef$cond$year
+    } else {
+      b <- glmmTMB::fixef(object$model)[[1L]]
+    }
   } else {
-    b <- stats::coef(object$model)
+    if (object$year_re) {
+      b <- glmmTMB::fixef(object$model)[[1L]]
+      ranef <- glmmTMB::ranef(object$model)
+      re <- ranef$cond$year
+    } else {
+      b <- stats::coef(object$model)
+    }
   }
 
-  nd_fe <- filter(nd_re, sample_id == nd_re$sample_id[[1L]]) # fake; all same
-  nd_fe$glmm_re <- NULL # also may not exist if no random effects
+  nd_re <- object$pred_data
+  nd_fe <- object$pred_data
+  # nd_fe <- filter(nd_re, year == nd_re$year[[1L]]) # fake; all same
+  # nd_fe$glmm_re <- NULL # also may not exist if no random effects
 
   prediction_type <- match.arg(prediction_type)
   if (prediction_type == "male") {
@@ -198,40 +260,77 @@ plot_mat_ogive <- function(object,
   if (prediction_type == "female") {
     nd_fe <- filter(nd_fe, female == 1L)
   }
+
   # if (prediction_type == "none") {
   #   nd_fe <- filter(nd_fe, !female %in% c(0L, 1L)) # i.e. nothing
   # }
 
-  m_perc <- data.frame(p0.5 = logit_perc(a = b[[1]], b = b[[2]], perc = 0.5))
-  m_perc$p0.95 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.95)
-  m_perc$p0.05 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.05)
+  if (object$year_re) {
+    labs_year <- list()
+    for (i in (unique(as.character(nd_re$year)))) {
+      m_perc <- data.frame(
+        p0.5 = logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5)
+      )
+      m_perc$p0.95 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95)
+      m_perc$p0.05 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05)
 
-  f_perc <- data.frame(
-    p0.5 = logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.5)
-  )
-  f_perc$p0.95 <- logit_perc(
-    a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.95
-  )
-  f_perc$p0.05 <- logit_perc(
-    a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.05
-  )
+      f_perc <- data.frame(
+        p0.5 = logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5)
+      )
+      f_perc$p0.95 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95)
+      f_perc$p0.05 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05)
 
-  labs_f <- tibble(
-    p = c("05", "50", "95"),
-    value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
-    x = 0.75 * max(nd_re$age_or_length), # re-calculated below
-    y = seq(0.75, 0.6, length.out = 3L), sex = "F"
-  )
+      labs_f <- tibble(
+        p = c("05", "50", "95"),
+        value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
+        x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+        y = seq(0.75, 0.6, length.out = 3L),
+        sex = "F",
+        year = i
+      )
 
-  labs_m <- tibble(
-    p = c("05", "50", "95"),
-    value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
-    x = 0.75 * max(nd_re$age_or_length), # re-calculated below
-    y = seq(0.4, 0.25, length.out = 3), sex = "M"
-  )
+      labs_m <- tibble(
+        p = c("05", "50", "95"),
+        value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
+        x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+        y = seq(0.4, 0.25, length.out = 3),
+        sex = "M",
+        year = i
+      )
+      labs_year[[i]] <- bind_rows(labs_m, labs_f)
+    }
+    labs <- do.call(rbind, labs_year)
+  } else {
+    m_perc <- data.frame(
+      p0.5 = logit_perc(a = b[[1]], b = b[[2]], perc = 0.5)
+    )
+    m_perc$p0.95 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.95)
+    m_perc$p0.05 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.05)
 
+    f_perc <- data.frame(
+      p0.5 = logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.5)
+    )
+    f_perc$p0.95 <- logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.95)
+    f_perc$p0.05 <- logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.05)
 
-  labs <- bind_rows(labs_m, labs_f)
+    labs_f <- tibble(
+      p = c("05", "50", "95"),
+      value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
+      x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+      y = seq(0.75, 0.6, length.out = 3L),
+      sex = "F"
+    )
+
+    labs_m <- tibble(
+      p = c("05", "50", "95"),
+      value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
+      x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+      y = seq(0.4, 0.25, length.out = 3),
+      sex = "M"
+    )
+    labs <- bind_rows(labs_m, labs_f)
+  }
+
   if (prediction_type == "male") {
     labs <- filter(labs, sex == "M")
   }
@@ -325,7 +424,6 @@ plot_mat_ogive <- function(object,
 
   g
 }
-
 extract_maturity_perc <- function(object) {
   m.p0.5 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.5)
   m.p0.95 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.95)
@@ -339,4 +437,29 @@ extract_maturity_perc <- function(object) {
     b = object[[2]] + object[[4]], perc = 0.05)
   list(m.p0.5 = m.p0.5, m.p0.95 = m.p0.95, m.p0.05 = m.p0.05, f.p0.5 = f.p0.5,
     f.p0.95 = f.p0.95, f.p0.05 = f.p0.05)
+}
+
+extract_maturity_perc_re <- function(betas, random_intercepts) {
+  b <- betas
+  re <- random_intercepts
+  out <- list()
+  for (i in rownames(re)) {
+    m.p0.5 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5)
+    m.p0.95 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95)
+    m.p0.05 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05)
+
+    f.p0.5 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5)
+    f.p0.95 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95)
+    f.p0.05 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05)
+    out[[i]] <- list(
+      m.p0.5 = m.p0.5, m.p0.95 = m.p0.95, m.p0.05 = m.p0.05,
+      f.p0.5 = f.p0.5, f.p0.95 = f.p0.95, f.p0.05 = f.p0.05
+    )
+  }
+  m.mean.p0.5 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.5)
+  f.mean.p0.5 <- logit_perc(a = b[[1]] + b[[3]],
+    b = b[[2]] + b[[4]], perc = 0.5)
+  #nrow(re) + 1
+  out[["mean"]] <- list(m.mean.p0.5 = m.mean.p0.5, f.mean.p0.5 = f.mean.p0.5)
+  out
 }
