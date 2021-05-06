@@ -254,7 +254,7 @@ split_catch_maturity <- function(survey_sets, fish,
     if (plot) {
       try(
         maturity_plot <- plot_mat_ogive(m) +
-          ggtitle(paste("Length at maturity for", species, "surveys", ssid_string, ""))
+          ggplot2::ggtitle(paste("Length at maturity for", species, "surveys", ssid_string, ""))
         )
       try(
         mass_plot <- ggplot(fish_maturity, aes(length, new_mass, colour = as.factor(sex))) +
@@ -263,7 +263,7 @@ split_catch_maturity <- function(survey_sets, fish,
           scale_color_viridis_d(begin = 0.1, end = 0.6) +
           facet_wrap(~year) + gfplot::theme_pbs() +
           xlab("") + ylab("Weight (open circles are estimates)") + labs(colour = "Sex") +
-          ggtitle(paste("Length-weight relationship for", species, "surveys", ssid_string, ""))
+          ggplot2::ggtitle(paste("Length-weight relationship for", species, "surveys", ssid_string, ""))
         )
     }
 

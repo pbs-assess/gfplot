@@ -84,6 +84,7 @@ d_split <- split_catch_maturity(d_survey_sets, d_survey_samples,
   p_threshold = 0.5,
   plot = TRUE
 )
+print(d_split$maturity_plot)
 ```
 
 
@@ -93,12 +94,7 @@ Underlying biological data and model details are saved in object m
 d_split$m$model
 ```
 
-```{r}
-print(d_split$maturity_plot)
-```
-
-
-
+Both year and sample id as random effects
 ```{r}
 d_split_re <- split_catch_maturity(d_survey_sets, d_survey_samples, 
   survey = c("SYN HS", "SYN QCS"),
@@ -108,6 +104,7 @@ d_split_re <- split_catch_maturity(d_survey_sets, d_survey_samples,
   p_threshold = 0.5,
   plot = TRUE
 )
+print(d_split_re$maturity_plot)
 ```
 
 ```{r}
@@ -115,10 +112,32 @@ d_split_re$m$model
 ```
 
 
+Just year as a random effect
 ```{r}
-print(d_split_re$maturity_plot)
+d_split_yr <- split_catch_maturity(d_survey_sets, d_survey_samples, 
+  survey = c("SYN HS", "SYN QCS"),
+  years = NULL, 
+  sample_id_re = FALSE, 
+  year_re = TRUE,
+  p_threshold = 0.5,
+  plot = TRUE
+)
+
+print(d_split_yr$maturity_plot)
 ```
 
+
+```{r}
+d_split_sa <- split_catch_maturity(d_survey_sets, d_survey_samples, 
+  survey = c("SYN HS", "SYN QCS"),
+  years = NULL, 
+  sample_id_re = TRUE, 
+  # year_re = TRUE,
+  p_threshold = 0.5,
+  plot = TRUE
+)
+print(d_split_sa$maturity_plot)
+```
 
 The "data" element contains the original d_survey_sets dataframe with the addition of:
 
