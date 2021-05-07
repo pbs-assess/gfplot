@@ -176,8 +176,8 @@ fit_mat_ogive <- function(dat,
     if (year_re) {
       year_f <- as.character(nd$year)
       nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
-      # nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
-      #   b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+      nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
+        b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
     }
   }
 
@@ -346,8 +346,9 @@ plot_mat_ogive <- function(object,
         data = nd_re,
         aes_string("age_or_length", "glmm_re",
           group = "paste(sample_id, sex)",
-          colour = "sex"
-        ), inherit.aes = FALSE, alpha = 0.05
+          colour = "sex", lty = "sex"
+        ), inherit.aes = FALSE, alpha = 0.05,
+        show.legend = FALSE
       )
     } else {
       if (object$year_re) {
@@ -355,20 +356,23 @@ plot_mat_ogive <- function(object,
           data = nd_re,
           aes_string("age_or_length", "glmm_re",
             group = "paste(year, sex)",
-            colour = "sex"
-          ), inherit.aes = FALSE, alpha = 0.05
+            colour = "sex", lty = "sex"
+          ), inherit.aes = FALSE, alpha = 0.05,
+          show.legend = FALSE
         )
       }
     }
   }
 
   if (prediction_type != "none") {
+
+    g <- g + geom_line(size = 1.0)
     g <- g + geom_vline(
       data = filter(labs, p == "50"),
       aes_string(xintercept = "value", colour = "sex", lty = "sex"), lwd = 0.8,
-      alpha = 0.6, show.legend = FALSE
+      alpha = 0.8,
+      show.legend = FALSE
     )
-    g <- g + geom_line(size = 1.0)
     g <- g + geom_text(
       data = labs, aes_string(
         x = "x", y = "y", label = "label"
@@ -401,15 +405,167 @@ plot_mat_ogive <- function(object,
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 0L),
       sides = "b", position = position, alpha = 0.5, lty = 1,
-      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex")
+      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex", lty = "sex"), show.legend = FALSE
     )
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 1L),
       sides = "t", position = position, alpha = 0.5, lty = 1,
-      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex")
+      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "sex", lty = "sex"), show.legend = FALSE
     )
   }
 
+  g
+}
+
+
+#' @importFrom stats binomial plogis predict
+#' @export
+#' @rdname plot_mat_ogive
+
+plot_mat_annual_ogives <- function(object,
+                                   xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
+                                   title =
+                                     if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
+                                   rug = TRUE, rug_n = 1500, x_max = 1.75,
+                                   prediction_type = c("all", "male", "female", "none"),
+                                   french = FALSE) {
+  if (object$year_re) {
+    b <- glmmTMB::fixef(object$model)[[1L]]
+    ranef <- glmmTMB::ranef(object$model)
+    re <- ranef$cond$year
+  } else {
+    stop("Year is not a random effect in this model; use plot_mat_ogive instead.")
+  }
+
+  nd_re <- object$pred_data
+  nd_fe <- object$pred_data
+  # nd_fe <- filter(nd_re, year == nd_re$year[[1L]]) # fake; all same
+  nd_fe$glmm_re <- NULL # also may not exist if no random effects
+
+  prediction_type <- match.arg(prediction_type)
+  if (prediction_type == "male") {
+    nd_fe <- filter(nd_fe, female == 0L)
+  }
+  if (prediction_type == "female") {
+    nd_fe <- filter(nd_fe, female == 1L)
+  }
+
+  labs_year <- list()
+  for (i in (unique(as.character(nd_re$year)))) {
+    m_perc <- data.frame(
+      p0.5 = logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5)
+    )
+    m_perc$p0.95 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95)
+    m_perc$p0.05 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05)
+
+    f_perc <- data.frame(
+      p0.5 = logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5)
+    )
+    f_perc$p0.95 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95)
+    f_perc$p0.05 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05)
+
+    labs_f <- tibble(
+      p = c("05", "50", "95"),
+      value = c(f_perc$p0.05, f_perc$p0.5, f_perc$p0.95),
+      x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+      y = seq(0.75, 0.6, length.out = 3L),
+      sex = "F",
+      year = i
+    )
+
+    labs_m <- tibble(
+      p = c("05", "50", "95"),
+      value = c(m_perc$p0.05, m_perc$p0.5, m_perc$p0.95),
+      x = 0.75 * max(nd_re$age_or_length), # re-calculated below
+      y = seq(0.4, 0.25, length.out = 3),
+      sex = "M",
+      year = i
+    )
+    labs_year[[i]] <- bind_rows(labs_m, labs_f)
+  }
+  labs <- do.call(rbind, labs_year)
+
+  if (prediction_type == "male") {
+    labs <- filter(labs, sex == "M")
+  }
+  if (prediction_type == "female") {
+    labs <- filter(labs, sex == "F")
+  }
+
+  nd_fe <- mutate(nd_fe, sex = ifelse(female == 1L, "F", "M"))
+  nd_re <- mutate(nd_re, sex = ifelse(female == 1L, "F", "M"))
+  object$data <- mutate(object$data, sex = ifelse(female == 1L, "F", "M"))
+
+  if (object$type[[1]] == "age") {
+    labs <- mutate(labs,
+      label =
+        paste0(
+          sex, " ", p, " = ",
+          sprintf("%.1f", round(value, 1L)), en2fr("y", translate = french)
+        )
+    )
+  } else {
+    labs <- mutate(labs,
+      label =
+        paste0(sex, " ", p, " = ", sprintf("%.1f", round(value, 1L)), "cm")
+    )
+  }
+  max_x <- min(c(max(labs$value) * x_max, max(nd_fe$age_or_length)))
+
+  if (object$type[[1]] == "age") {
+    labs <- mutate(labs, x = max_x * 0.7) # actual x position calculation
+  } else {
+    labs <- mutate(labs, x = max_x * 0.05) # actual x position calculation
+  }
+
+  nd_fe$sex <- factor(nd_fe$sex, levels = c("F", "M"))
+  nd_re$sex <- factor(nd_re$sex, levels = c("F", "M"))
+  labs$sex <- factor(labs$sex, levels = c("F", "M"))
+  labs$sex <- factor(labs$sex, levels = c("F", "M"))
+
+  nd_re$year <- as.factor(nd_re$year)
+
+  g <- ggplot(nd_re, aes_string("age_or_length", "glmm_re2", colour = "year"))
+  g <- g + geom_vline(
+    data = filter(labs, p == "50"),
+    aes_string(xintercept = "value", colour = "year"), lwd = 0.8,
+    alpha = 0.3, show.legend = FALSE
+  )
+  g <- g + geom_line(size = 2, alpha = 0.5)
+  # g <- g + geom_text(
+  #   data = labs, aes_string(
+  #     x = "x", y = "y", label = "label"
+  #   ),
+  #   hjust = 0, show.legend = FALSE, size = 3
+  # )
+  g <- g + facet_wrap(~sex, nrow = 2)
+  g <- g + scale_colour_viridis_d() +
+    labs(colour = "Year") +
+    coord_cartesian(
+      expand = FALSE, ylim = c(-0.005, 1.005),
+      xlim = c(0, max_x)
+    ) + gfplot::theme_pbs()
+
+  if (rug) {
+    if (nrow(object$data) > rug_n) {
+      temp <- object$data[sample(seq_len(nrow(object$data)), rug_n), , drop = FALSE]
+    } else {
+      temp <- object$data
+    }
+    position <- if (object$type == "age") "jitter" else "identity"
+    g <- g + ggplot2::geom_rug(
+      data = filter(temp, mature == 0L),
+      sides = "b", position = position, alpha = 0.5, lty = 1, lwd = 2,
+      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "as.character(year)")
+    )
+    g <- g + ggplot2::geom_rug(
+      data = filter(temp, mature == 1L),
+      sides = "t", position = position, alpha = 0.5, lty = 1, lwd = 2,
+      aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "as.character(year)")
+    )
+  }
+  g <- g + xlab(xlab) + ylab("Probability mature") +
+    ggplot2::ggtitle(title)
   g
 }
 

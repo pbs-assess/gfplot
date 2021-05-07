@@ -126,6 +126,18 @@ d_split_yr <- split_catch_maturity(d_survey_sets, d_survey_samples,
 print(d_split_yr$maturity_plot)
 ```
 
+While the above plot is saved by the splitting function, it can also be rebuilt and modified using the plot functions applied to the saved model object named 'm'.
+
+```{r}
+plot_mat_ogive(d_split_yr$m)
+```
+
+
+For models with year as a random effect, there's a special function for plotting annual ogives in colour.
+```{r}
+plot_mat_annual_ogives(d_split_yr$m)
+```
+
 
 ```{r}
 d_split_sa <- split_catch_maturity(d_survey_sets, d_survey_samples, 
