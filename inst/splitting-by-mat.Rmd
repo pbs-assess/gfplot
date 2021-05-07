@@ -49,8 +49,6 @@ d_survey_sets  <- get_survey_sets("pacific cod")
 d_survey_samples  <- get_survey_samples("pacific cod")
 ```
 
-In addition to the individual `get_*()` functions, there is a function `cache_pbs_data()` that runs all the `get_*()` functions and caches the data in a folder that you specify. I'm going to use this approach here because I'm not currently on the PBS network and it saves running the SQL queries each time the R Markdown document is recompiled.
-
 The helper function `cache_pbs_data()` will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
 
 ```{r}
@@ -67,14 +65,6 @@ d_survey_sets     <- readRDS(file.path(cache, "pbs-survey-sets.rds"))
 d_survey_samples  <- readRDS(file.path(cache, "pbs-survey-samples.rds"))
 ```
 
-Now let's create a folder to hold some PDF versions of our figures:
-
-```{r}
-figs <- file.path("pcod-figs")
-dir.create(figs, showWarnings = FALSE)
-```
-
-
 ```{r}
 d_split <- split_catch_maturity(d_survey_sets, d_survey_samples, 
   survey = c("SYN HS", "SYN QCS"),
@@ -89,7 +79,6 @@ print(d_split$maturity_plot)
 
 
 Underlying biological data and model details are saved in object m
-
 ```{r}
 d_split$m$model
 ```
