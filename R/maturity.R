@@ -172,12 +172,12 @@ fit_mat_ogive <- function(dat,
   }
 
   if (sample_id_re) {
-    nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
+    nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
   } else {
 
   if (year_re) {
     year_f <- as.character(nd$year)
-    nd$glmm_re <- predict(m, newdata = nd, se.fit = FALSE)
+    nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
     # nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
     #   b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
   }
