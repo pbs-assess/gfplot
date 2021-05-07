@@ -138,18 +138,23 @@ For models with year as a random effect, there's a special function for plotting
 plot_mat_annual_ogives(d_split_yr$m)
 ```
 
+```{r}
+plot_mat_annual_ogives(d_split_re$m)
+```
+
 
 ```{r}
 d_split_sa <- split_catch_maturity(d_survey_sets, d_survey_samples, 
   survey = c("SYN HS", "SYN QCS"),
   years = NULL, 
   sample_id_re = TRUE, 
-  # year_re = TRUE,
+  year_re = FALSE,
   p_threshold = 0.5,
   plot = TRUE
 )
 print(d_split_sa$maturity_plot)
 ```
+
 
 The "data" element contains the original d_survey_sets dataframe with the addition of:
 

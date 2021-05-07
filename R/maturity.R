@@ -172,13 +172,13 @@ fit_mat_ogive <- function(dat,
 
   if (sample_id_re) {
     nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
-  } else {
-    if (year_re) {
-      year_f <- as.character(nd$year)
-      nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
-      nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
+  }
+
+  if (year_re) {
+    year_f <- as.character(nd$year)
+    nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
+    nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
         b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
-    }
   }
 
   nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
@@ -357,7 +357,7 @@ plot_mat_ogive <- function(object,
           aes_string("age_or_length", "glmm_re",
             group = "paste(year, sex)",
             colour = "sex", lty = "sex"
-          ), inherit.aes = FALSE, alpha = 0.05,
+          ), inherit.aes = FALSE, alpha = 0.2,
           show.legend = FALSE
         )
       }
@@ -365,8 +365,7 @@ plot_mat_ogive <- function(object,
   }
 
   if (prediction_type != "none") {
-
-    g <- g + geom_line(size = 1.0)
+    g <- g + geom_line(size = 1.0) #lwd = 1, alpha = 0.8
     g <- g + geom_vline(
       data = filter(labs, p == "50"),
       aes_string(xintercept = "value", colour = "sex", lty = "sex"), lwd = 0.8,
@@ -386,6 +385,7 @@ plot_mat_ogive <- function(object,
     breaks = c("F", "M"), drop = FALSE
   ) +
     ggplot2::scale_linetype_discrete(breaks = c("F", "M"), drop = FALSE) +
+    # ggplot2::scale_linetype_manual(values=c("solid", "dotted")) +
     xlab(xlab) + ylab("Probability mature") +
     theme_pbs() +
     coord_cartesian(
@@ -520,9 +520,6 @@ plot_mat_annual_ogives <- function(object,
 
   nd_fe$sex <- factor(nd_fe$sex, levels = c("F", "M"))
   nd_re$sex <- factor(nd_re$sex, levels = c("F", "M"))
-  labs$sex <- factor(labs$sex, levels = c("F", "M"))
-  labs$sex <- factor(labs$sex, levels = c("F", "M"))
-
   nd_re$year <- as.factor(nd_re$year)
 
   g <- ggplot(nd_re, aes_string("age_or_length", "glmm_re2", colour = "year"))
@@ -532,12 +529,6 @@ plot_mat_annual_ogives <- function(object,
     alpha = 0.3, show.legend = FALSE
   )
   g <- g + geom_line(size = 2, alpha = 0.5)
-  # g <- g + geom_text(
-  #   data = labs, aes_string(
-  #     x = "x", y = "y", label = "label"
-  #   ),
-  #   hjust = 0, show.legend = FALSE, size = 3
-  # )
   g <- g + facet_wrap(~sex, nrow = 2)
   g <- g + scale_colour_viridis_d() +
     labs(colour = "Year") +
