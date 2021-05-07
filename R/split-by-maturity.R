@@ -23,11 +23,12 @@
 #' d_survey_samples <- gfdata::get_survey_samples("pacific cod")
 #'
 #' d_by_maturity <- split_catch_maturity(d_survey_sets, d_survey_samples,
-#' survey = c("SYN HS", "SYN QCS"),
-#' years = NULL,
-#' cutoff_quantile = 0.5,
-#' plot = TRUE
-#' )}
+#'   survey = c("SYN HS", "SYN QCS"),
+#'   years = NULL,
+#'   cutoff_quantile = 0.5,
+#'   plot = TRUE
+#' )
+#' }
 split_catch_maturity <- function(survey_sets, fish,
                                  split_dens_type = "density_kgpm2",
                                  survey = c("SYN HS", "SYN QCS"),
@@ -38,7 +39,6 @@ split_catch_maturity <- function(survey_sets, fish,
                                  sample_id_re = TRUE,
                                  year_re = FALSE,
                                  plot = FALSE) {
-
   if (is.null(years)) years <- unique(survey_sets[["year"]])
 
   species <- fish$species_common_name[1]
@@ -70,8 +70,8 @@ split_catch_maturity <- function(survey_sets, fish,
   # does maturity data exist at all for this species?
   maturity_codes <- unique(fish$maturity_code)
 
-  if(length(maturity_codes)<3) {
-    print( )
+  if (length(maturity_codes) < 3) {
+    print()
     return(list(data = survey_sets, maturity = NULL, mass_model = NULL))
   }
 
@@ -95,65 +95,62 @@ split_catch_maturity <- function(survey_sets, fish,
     levels_per_year <- unique(years_w_maturity$maturity_levels)
 
     if (max(levels_per_year) < 3) { # NA plus only one recorded maturity level is max ever recorded
-    warning("Maturity data not recorded, so catch not split.")
-    return(list(data = survey_sets, model = NULL))
-    }
-
-    if (min(levels_per_year) < 3) {  # some years lack maturity data
-
-      if (length(levels_per_year) < 3) {
-
       warning("Maturity data not recorded, so catch not split.")
       return(list(data = survey_sets, model = NULL))
+    }
 
+    if (min(levels_per_year) < 3) { # some years lack maturity data
+
+      if (length(levels_per_year) < 3) {
+        warning("Maturity data not recorded, so catch not split.")
+        return(list(data = survey_sets, model = NULL))
       } else {
+        warning("Some years lack maturity data, but catch still split.")
 
-      warning("Some years lack maturity data, but catch still split.")
-
-      m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
-
-      if(p_threshold == 0.5) {
-      f_fish$threshold <- m$mat_perc$f.p0.5
-      m_fish$threshold <- m$mat_perc$m.p0.5
-      }
-      if(p_threshold == 0.05) {
-        f_fish$threshold <- m$mat_perc$f.p0.05
-        m_fish$threshold <- m$mat_perc$m.p0.05
-      }
-      if(p_threshold == 0.95) {
-        f_fish$threshold <- m$mat_perc$f.p0.95
-        m_fish$threshold <- m$mat_perc$m.p0.95
-      }
-      }
-    } else {
-      if (year_re) {
-      m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re, year_re = TRUE)
-      if(p_threshold == 0.5) {
-      f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.5)
-      m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.5)
-      }
-      if(p_threshold == 0.05) {
-        f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.05)
-        m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.05)
-      }
-      if(p_threshold == 0.95) {
-        f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.95)
-        m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.95)
-      }
-      } else {
-        #browser()
         m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
 
-        # apply global estimates to all catches
-        if(p_threshold == 0.5) {
-        f_fish$threshold <- m$mat_perc$f.p0.5
-        m_fish$threshold <- m$mat_perc$m.p0.5
+        if (p_threshold == 0.5) {
+          f_fish$threshold <- m$mat_perc$f.p0.5
+          m_fish$threshold <- m$mat_perc$m.p0.5
         }
-        if(p_threshold == 0.05) {
+        if (p_threshold == 0.05) {
           f_fish$threshold <- m$mat_perc$f.p0.05
           m_fish$threshold <- m$mat_perc$m.p0.05
         }
-        if(p_threshold == 0.95) {
+        if (p_threshold == 0.95) {
+          f_fish$threshold <- m$mat_perc$f.p0.95
+          m_fish$threshold <- m$mat_perc$m.p0.95
+        }
+      }
+    } else {
+      if (year_re) {
+        m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re, year_re = TRUE)
+        if (p_threshold == 0.5) {
+          f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.5)
+          m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.5)
+        }
+        if (p_threshold == 0.05) {
+          f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.05)
+          m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.05)
+        }
+        if (p_threshold == 0.95) {
+          f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.95)
+          m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.95)
+        }
+      } else {
+        # browser()
+        m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
+
+        # apply global estimates to all catches
+        if (p_threshold == 0.5) {
+          f_fish$threshold <- m$mat_perc$f.p0.5
+          m_fish$threshold <- m$mat_perc$m.p0.5
+        }
+        if (p_threshold == 0.05) {
+          f_fish$threshold <- m$mat_perc$f.p0.05
+          m_fish$threshold <- m$mat_perc$m.p0.05
+        }
+        if (p_threshold == 0.95) {
           f_fish$threshold <- m$mat_perc$f.p0.95
           m_fish$threshold <- m$mat_perc$m.p0.95
         }
@@ -216,30 +213,32 @@ split_catch_maturity <- function(survey_sets, fish,
       ) %>%
       filter(adult == 1) %>%
       rename(mass_ratio_mature = mass_ratio, n_mature = count, n_sampled = n) %>%
-      select(fishing_event_id,
+      select(
+        fishing_event_id,
         est_sample_mass, # needed for perc_sampled data check below
         measured_weight, n_weights, n_mature, n_sampled, # these are optional data checks
-        mass_ratio_mature) %>%
+        mass_ratio_mature
+      ) %>%
       unique()
 
 
     sets_w_ratio <- left_join(survey_sets, set_ratio, by = "fishing_event_id")
 
-# browser()
+    # browser()
     # chose value to use when a sample mass ratio is not available
     if (use_median_ratio) {
       na_value <- median(sets_w_ratio$mass_ratio_mature, na.rm = TRUE)
-      } else {
+    } else {
       na_value <- mean(sets_w_ratio$mass_ratio_mature, na.rm = TRUE)
-      }
+    }
 
     sets_w_ratio$mass_ratio_mature[is.na(sets_w_ratio$mass_ratio_mature)] <- na_value
 
     # add column to check for discrepencies between total catch weight and biological sample weights
     # est_sample_mass is in g while catch_weight is in kg
 
-    sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_weight - sets_w_ratio$est_sample_mass/1000), 2)
-    sets_w_ratio$perc_sampled <- round((sets_w_ratio$est_sample_mass/1000)/sets_w_ratio$catch_weight, 2)*100
+    sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_weight - sets_w_ratio$est_sample_mass / 1000), 2)
+    sets_w_ratio$perc_sampled <- round((sets_w_ratio$est_sample_mass / 1000) / sets_w_ratio$catch_weight, 2) * 100
 
     sets_w_ratio$split_dens_type <- sets_w_ratio[[split_dens_type]]
 
@@ -247,7 +246,7 @@ split_catch_maturity <- function(survey_sets, fish,
       mutate(
         adult_density = split_dens_type * mass_ratio_mature,
         imm_density = split_dens_type * (1 - mass_ratio_mature)
-        )
+      )
 
     data$split_dens_type <- split_dens_type
 
@@ -255,7 +254,7 @@ split_catch_maturity <- function(survey_sets, fish,
       try(
         maturity_plot <- plot_mat_ogive(m) +
           ggplot2::ggtitle(paste("Length at maturity for", species, "surveys", ssid_string, ""))
-        )
+      )
       try(
         mass_plot <- ggplot(fish_maturity, aes(length, new_mass, colour = as.factor(sex))) +
           geom_point(size = 1.5, alpha = 0.35, shape = 1) +
@@ -264,15 +263,14 @@ split_catch_maturity <- function(survey_sets, fish,
           facet_wrap(~year) + gfplot::theme_pbs() +
           xlab("") + ylab("Weight (open circles are estimates)") + labs(colour = "Sex") +
           ggplot2::ggtitle(paste("Length-weight relationship for", species, "surveys", ssid_string, ""))
-        )
+      )
     }
-
   } else {
     return(list(data = survey_sets, model = NULL))
   }
   if (plot) {
-  list(data = data, m = m, maturity_plot = maturity_plot, mass_plot = mass_plot)
+    list(data = data, m = m, maturity_plot = maturity_plot, mass_plot = mass_plot)
   } else {
-  list(data = data, m = m)
+    list(data = data, m = m)
   }
 }
