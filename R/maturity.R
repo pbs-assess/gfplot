@@ -342,22 +342,24 @@ plot_mat_ogive <- function(object,
 
   if ("glmm_re" %in% names(nd_re)) {
     if (object$sample_id_re) {
+      n_re <- length(unique(nd_re$sample_id))/10
       g <- g + geom_line(
         data = nd_re,
         aes_string("age_or_length", "glmm_re",
           group = "paste(sample_id, sex)",
           colour = "sex", lty = "sex"
-        ), inherit.aes = FALSE, alpha = 0.05,
+        ), inherit.aes = FALSE, alpha = 1/n_re,
         show.legend = FALSE
       )
     } else {
       if (object$year_re) {
+        n_re <- length(unique(nd_re$year))
         g <- g + geom_line(
           data = nd_re,
           aes_string("age_or_length", "glmm_re",
             group = "paste(year, sex)",
             colour = "sex", lty = "sex"
-          ), inherit.aes = FALSE, alpha = 0.2,
+          ), inherit.aes = FALSE, alpha = 2/n_re,
           show.legend = FALSE
         )
       }
