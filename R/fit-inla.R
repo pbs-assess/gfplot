@@ -181,10 +181,10 @@ predict_inla <- function(obj, pred_grid, samples = 100L,
   latent_names <- rownames(inla.mcmc[[1]]$latent)
   re_indx <- grep("^i2D", latent_names)
   if (include_depth) {
-    depth_fe_indx1 <- grep("^depth$", latent_names)
-    depth_fe_indx2 <- grep("^depth2$", latent_names)
+    depth_fe_indx1 <- grep("^depth:1", latent_names)
+    depth_fe_indx2 <- grep("^depth2:1$", latent_names)
   }
-  intercept_indx <- grep("^intercept$", latent_names)
+  intercept_indx <- grep("^intercept:1$", latent_names)
 
   # read in locations and knots, form projection matrix
   grid_locs <- pred_grid[, c("X", "Y")]
