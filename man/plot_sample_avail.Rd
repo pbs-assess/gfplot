@@ -10,7 +10,8 @@ plot_sample_avail(
   title = "Biological samples",
   palette = "Greys",
   trans = sqrt,
-  french = FALSE
+  french = FALSE,
+  text_colour = "white"
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ capitalizing the first letter.}
 scale. E.g. \code{sqrt} or \code{log} or \code{I} if you don't want any transformation.}
 
 \item{french}{Logical.}
+
+\item{text_colour}{Colour for the value text labels}
 }
 \description{
 Plot sample availability
