@@ -488,6 +488,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @param cell_size The size of the grid cells for the model predictions.
 #' @param circles Logical for whether to plot the model predictions in circles.
 #'   This analysis report uses this for the IPHC survey.
+#' @param french Logical for French or English.
 #'
 #' @return
 #' A ggplot object.
@@ -546,7 +547,8 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol = FALSE,
                              north_symbol_coord = c(130, 5975),
                              north_symbol_length = 30,
-                             cell_size = 2, circles = FALSE) {
+                             cell_size = 2, circles = FALSE,
+                             french = FALSE) {
   fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(

@@ -33,7 +33,8 @@ plot_survey_sets(
   north_symbol_coord = c(130, 5975),
   north_symbol_length = 30,
   cell_size = 2,
-  circles = FALSE
+  circles = FALSE,
+  french = FALSE
 )
 }
 \arguments{
@@ -113,6 +114,8 @@ coordinates.}
 
 \item{circles}{Logical for whether to plot the model predictions in circles.
 This analysis report uses this for the IPHC survey.}
+
+\item{french}{Logical for French or English.}
 }
 \value{
 A ggplot object.
