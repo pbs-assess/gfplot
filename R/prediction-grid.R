@@ -43,10 +43,13 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
           " `survey_boundary` argument as a data frame with columns `X` and `Y`."
         )
       }
-
-      shape_utm <- ll2utm(gfplot::survey_boundaries[[region]],
-        utm_zone = utm_zone
-      )
+      if(is.null(survey_boundary)){
+        shape_utm <- ll2utm(gfplot::survey_boundaries[[region]],
+                            utm_zone = utm_zone)
+      }else{
+        shape_utm <- ll2utm(survey_boundary[[region]],
+                            utm_zone = utm_zone)
+      }
     }
     if (draw_boundary) {
       sp_poly <- sp::SpatialPolygons(
