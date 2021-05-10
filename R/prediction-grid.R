@@ -34,7 +34,7 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
       )
     } else {
       region <- gsub(
-        "SYN | OUT| N| S| FISS", "", survey) # to match names(gfplot::survey_boundaries)
+        "SYN | OUT| N| S", "", survey) # to match names(gfplot::survey_boundaries)
 
       if (!region %in% names(gfplot::survey_boundaries) && is.null(survey_boundary)) {
         stop(
