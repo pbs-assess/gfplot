@@ -53,3 +53,6 @@
 ^inst/tmb/*.dll
 ^lw_gfplot.cpp$
 ^vb_gfplot.cpp$
+^vb.rds$
+^vb.stan$
+^prediction-grids$

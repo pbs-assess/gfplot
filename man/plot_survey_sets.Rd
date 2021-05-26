@@ -33,7 +33,8 @@ plot_survey_sets(
   north_symbol_coord = c(130, 5975),
   north_symbol_length = 30,
   cell_size = 2,
-  circles = FALSE
+  circles = FALSE,
+  french = FALSE
 )
 }
 \arguments{
@@ -113,6 +114,8 @@ coordinates.}
 
 \item{circles}{Logical for whether to plot the model predictions in circles.
 This analysis report uses this for the IPHC survey.}
+
+\item{french}{Logical}
 }
 \value{
 A ggplot object.
@@ -123,7 +126,7 @@ predictions and/or the raw data. Includes a number of options for customizing
 the map including the ability to rotate the map.
 }
 \examples{
-\donttest{
+\dontrun{
 set.seed(123)
 # pop_surv <- get_survey_sets("pacific ocean perch")
 # or use built-in data:

@@ -77,7 +77,7 @@ Set to \code{NULL} to include all samples.}
 For use with data for a single species.
 }
 \examples{
-\donttest{
+\dontrun{
 # with `rstan::optimizing()` for the mode of the posterior density:
 model_f <- fit_vb(pop_samples, sex = "female")
 model_m <- fit_vb(pop_samples, sex = "male")

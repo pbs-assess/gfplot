@@ -37,7 +37,7 @@
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # with `rstan::optimizing()` for the mode of the posterior density:
 #' model_f <- fit_vb(pop_samples, sex = "female")
 #' model_m <- fit_vb(pop_samples, sex = "male")
@@ -246,7 +246,7 @@ fit_vb <- function(dat,
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' d <- get_survey_samples("pacific ocean perch")
 #' model_f <- fit_length_weight(d, sex = "female")
 #' model_m <- fit_length_weight(d, sex = "male")
@@ -368,7 +368,7 @@ fit_length_weight <- function(dat,
 #' @rdname plot_growth
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # d <- get_survey_samples("pacific ocean perch")
 #' d <- pop_samples
 #' model_f <- fit_length_weight(d, sex = "female")
@@ -496,7 +496,6 @@ plot_growth <- function(object_female, object_male,
   g
 }
 
-#' @inheritParams plot_growth
 #' @param ... Arguments to pass to [plot_growth()].
 #' @export
 #' @rdname plot_growth
@@ -505,8 +504,6 @@ plot_vb <- function(..., type = "vb") {
     ggplot2::ggtitle("Growth")
 }
 
-#' @inheritParams plot_vb
-#' @inheritParams plot_growth
 #' @export
 #' @rdname plot_growth
 plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)",

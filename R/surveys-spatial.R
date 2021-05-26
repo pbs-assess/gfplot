@@ -110,75 +110,9 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
   ini
 }
 
-# @param formula_positive A formula for the positive model component.
-# @param formula_binary A formula for the binary model component.
-# @param n_knots The number of knots in the spatial approximation.
-# @param iter A number of iterations to pass to Stan.
-# @param chains The number of chains to pass to Stan.
-# @param adapt_delta An argument to pass to Stan. Values closer to 1 will result
-#   in smaller jump distances at the expense of speed.
-# @param cores The number of cores to pass to Stan.
-# @param ... Other arguments to pass to Stan.
-#
-# @export
-# @rdname survey-spatial-modelling
-fit_glmmfields <- function(dat,
-                           formula_positive = density ~ depth_scaled + depth_scaled2,
-                           formula_binary = present ~ depth_scaled + depth_scaled2,
-                           n_knots = 20,
-                           iter = 1000,
-                           chains = 4, adapt_delta = 0.98,
-                           cores = parallel::detectCores(), ...) {
-
-  stop("Temporarily disabled until the package is on CRAN.")
-
-  # n_beta <- 2L
-  # message("Fitting positive component model...")
-  # m1 <- glmmfields::glmmfields(formula_positive,
-  #   lon = "X", lat = "Y",
-  #   data = filter(dat, present == 1), iter = iter,
-  #   prior_gp_theta = glmmfields::half_t(7, 0, 10),
-  #   prior_gp_sigma = glmmfields::half_t(7, 0, 10),
-  #   prior_intercept = glmmfields::half_t(7, 0, 10),
-  #   prior_beta = glmmfields::half_t(500, 0, 2),
-  #   prior_sigma = glmmfields::half_t(7, 0, 2),
-  #   nknots = n_knots, cluster = "pam", chains = chains,
-  #   family = glmmfields::lognormal(link = "log"),
-  #   covariance = "squared-exponential",
-  #   init = function() initf(
-  #       init_b0 = 0,
-  #       length(unique(dat$year)), n_knots, n_beta
-  #     ),
-  #   cores = cores,
-  #   control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...
-  # )
-  #
-  # message("Fitting binary component model...")
-  # m2 <- glmmfields::glmmfields(formula_binary,
-  #   lon = "X", lat = "Y",
-  #   data = dat, iter = iter,
-  #   prior_gp_theta = glmmfields::half_t(7, 0, 10),
-  #   prior_gp_sigma = glmmfields::half_t(7, 0, 10),
-  #   prior_intercept = glmmfields::half_t(7, 0, 10),
-  #   prior_beta = glmmfields::half_t(500, 0, 2),
-  #   prior_sigma = glmmfields::half_t(7, 0, 2),
-  #   nknots = n_knots, cluster = "pam", chains = chains,
-  #   family = binomial(link = "logit"), covariance = "squared-exponential",
-  #   init = function() initf(
-  #       init_b0 = 0,
-  #       length(unique(dat$year)), n_knots, n_beta, type = "binomial"
-  #     ),
-  #   cores = cores,
-  #   control = list(adapt_delta = adapt_delta, max_treedepth = 20), ...
-  # )
-  #
-  # list(pos = m1, bin = m2)
-}
-
 #' Spatial modeling of survey data
 #'
-#' Implements geostatistical models of trawl or longline survey data. Uses INLA
-#' or glmmfields (currently disabled) for Bayesian inference.
+#' Implements geostatistical models of trawl or longline survey data.
 #'
 #' @param dat Output from [get_survey_sets()].
 #' @param years The year to include in the model. Should be a single year.
@@ -187,32 +121,13 @@ fit_glmmfields <- function(dat,
 #' @param density_column The name of the column that includes the relative
 #'   biomass density to use. E.g. `"density_kgpm2"` for trawl surveys or
 #'   `"density_ppkm2"` for the long line surveys.
-#' @param chains The number of MCMC chains. Only applies to the glmmfields
-#'   model.
-#' @param iter The number of MCMC chains. Only applies to the glmmfields model.
-#' @param max_knots The maximum number of knots to use in the predictive process
-#'   approximation in the glmmfields model. If this number is larger than the
-#'   number of data points then the number of knots is set to the number of data
-#'   points minus 2. Only applies to the glmmfields model.
-#' @param adapt_delta Value to pass to [rstan::sampling()]. Values closer to 1
-#'   make smaller steps in the Hamiltonian MCMC at the expense of speed. Only
-#'   applies to the glmmfields model.
-#' @param thin Value to pass to [rstan::sampling()] to thin the MCMC samples.
-#'   Only applies to the glmmfields model.
-#' @param mcmc_posterior_samples Number of final MCMC samples to return. Applies
-#'   to both glmmfields and INLA.
 #' @param required_obs_percent A required fraction of positive sets before a
 #'   model is fit.
 #' @param utm_zone The UTM zone to perform the modeling in. Defaults to zone 9.
-#' @param model The backend software to fit the model. Options are `"inla"` or
-#'   `"glmmfields"` (currently disabled until on CRAN). INLA implements in
-#'   approximation of the posterior via the integrated nested Laplace
-#'   approximation, but the results are usually quite good and are likely drive
-#'   considerably faster than glmmfields, especially for larger data sets or for
-#'   many knots.
+#' @param model Depreciated. Always uses sdmTMB.
 #' @param include_depth Logical: should depth be included as a predictor? If
 #'   `FALSE` then the model will only have a spatial random field as the
-#'   predictor. Currently only applies to the INLA model.
+#'   predictor.
 #' @param survey_boundary If not `NULL`, a data frame with the survey boundary
 #'   defined in columns `X` and `Y` in longitude and latitude coordinates. If
 #'   `NULL`, the functions will search for a matching element in the included
@@ -224,20 +139,11 @@ fit_glmmfields <- function(dat,
 #'   size in kilometers. The package includes a survey grid for the HBLL surveys
 #'   in `gfplot::hbll_grid`.
 #' @param tmb_knots The number of knots to pass to [sdmTMB::sdmTMB()].
-#' @param inla_knots_pos The number of knots for the positive component model if
-#'   fit with INLA.
-#' @param inla_knots_bin The number of knots for the binary component model if
-#'   fit with INLA.
-#' @param gamma_scaling A value to multiply the positive densities by internally
-#'   before fitting the Gamma GLMM. The predictions are then divided by this
-#'   value internally to render a prediction on the original scale. The reason
-#'   for this is that values to are too small can create computational problems
-#'   for INLA.
 #' @param cell_width The cell width if a prediction grid is made on the fly.
 #' @param ... Any other arguments to pass on to the modelling function.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' set.seed(123)
 #' # pop_surv <- get_survey_sets("pacific ocean perch")
 #' # or use built-in data:
@@ -252,28 +158,15 @@ fit_glmmfields <- function(dat,
 #' @rdname survey-spatial-modelling
 fit_survey_sets <- function(dat, years, survey = NULL,
                             density_column = "density_kgpm2",
-                            chains = 4,
-                            iter = 1000,
-                            max_knots = 20,
-                            adapt_delta = 0.95,
-                            thin = 1,
-                            mcmc_posterior_samples = 150,
                             required_obs_percent = 0.05,
                             utm_zone = 9,
-                            model = c("inla", "sdmTMB", "glmmfields"),
+                            model = NULL,
                             include_depth = TRUE,
                             survey_boundary = NULL,
                             premade_grid = NULL,
                             tmb_knots = 200,
-                            inla_knots_pos = 75,
-                            inla_knots_bin = 100,
-                            gamma_scaling = 1000,
                             cell_width = 2,
                             ...) {
-
-  model <- match.arg(model)
-  if (model == "glmmfields")
-    stop("glmmfields is temporarily disabled.")
 
   .d_tidy <- tidy_survey_sets(dat, survey = survey,
     years = years, density_column = density_column)
@@ -281,10 +174,6 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   if (nrow(.d_tidy) == 0) {
     stop("No survey data for species-survey-year combination.")
   }
-
-  # assertthat::assert_that(length(unique(.d_tidy$year)) == 1L,
-  #   msg = "fit_survey_sets() only works with a single year of data."
-  # )
 
   if (!survey %in% c("HBLL OUT N", "HBLL OUT S", "HBLL", "HBLL OUT", "IPHC FISS")) {
     if (sum(is.na(.d_tidy$depth)) > 0L) { # any interpolation needed?
@@ -319,115 +208,41 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     ))
   }
 
-  model <- match.arg(model)
-  if (model == "glmmfields") {
-    stop("glmmfields option needs to be checked!")
-    if (!include_depth) {
-      warning("Depth is currently always included with the glmmmfields model.")
-    }
-    if (mcmc_posterior_samples[[1]] > 0.5 * iter[[1]]) {
-      stop(
-        "`mcmc_posterior_samples` must be <= `0.5 * iter`",
-        "(0.5 because of 50% warmup iterations)."
-      )
-    }
-
-    m <- fit_glmmfields(.d_scaled,
-      chains = chains, iter = iter,
-      n_knots = min(sum(.d_tidy$present) - 2, max_knots),
-      adapt_delta = adapt_delta, thin = thin
-    )
-
-    message("Predicting density onto grid...")
-
-    pos <- predict(m$pos,
-      newdata = data.frame(pg),
-      type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
-    )
-    bin <- predict(m$bin,
-      newdata = data.frame(pg),
-      type = "response", return_mcmc = TRUE, iter = mcmc_posterior_samples
-    )
+  message("Predicting density onto grid across all years using sdmTMB...")
+  if (survey %in% c("IPHC FISS")) # fixed station
+    tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
+  .spde <- sdmTMB::make_spde(.d_scaled$X, .d_scaled$Y, n_knots = tmb_knots)
+  if (length(unique(.d_scaled$year)) > 1)
+    formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
+  else
+    formula <- density ~ depth_scaled + depth_scaled2
+  m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
+    spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
+  }, error = function(e) NA)
+  if (is.na(m)) { # Did not converge.
+    warning('The spatial TMB model did not converge.', call. = FALSE)
+    return(list(
+      predictions = pg, data = .d_tidy,
+      models = NA, survey = survey,
+      years = years
+    ))
   }
-  if (model == "inla") {
-    message("Predicting density onto grid...")
-    bin <- fit_inla(.d_scaled,
-      response = "present", family = "binomial",
-      include_depth = include_depth,
-      n_knots = min(c(nrow(.d_scaled) - 1, inla_knots_bin)),
-      ...
-    )
-
-    dpos <- filter(.d_scaled, present == 1)
-    dpos$density <- dpos$density * gamma_scaling # note scaling for computational reasons
-    pos <- fit_inla(dpos,
-      response = "density", family = "gamma",
-      include_depth = include_depth,
-      n_knots = min(c(nrow(dpos) - 1), inla_knots_pos),
-      ...
-    )
-    m <- list()
-    m$bin <- bin
-    m$pos <- pos
-
-    p_bin <- predict_inla(bin, pg,
-      include_depth = include_depth,
-      samples = mcmc_posterior_samples
-    )
-    p_pos <- predict_inla(pos, pg,
-      include_depth = include_depth,
-      samples = mcmc_posterior_samples
-    )
-
-    bin <- stats::plogis(p_bin)
-    pos <- exp(p_pos) / gamma_scaling # note scaling for computational reasons
+  # These are fixed station (IPHC) or they come from grids without years
+  if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
+    pg_one <- pg
+    pg_one$year <- max(.d_scaled$year)
+  } else {
+    pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
+    pg <- pg_one
   }
+  # FIXME: just returning last year for consistency!
+  pred <- predict(m, newdata = pg_one) # returns all years!
+  pred <- pred[pred$year == max(pred$year), ]
+  stopifnot(identical(nrow(pg), nrow(pred)))
+  pg$combined <- exp(pred$est)
+  pg$pos <- NA
+  pg$bin <- NA
 
-  if (model %in% c("glmmfields", "inla")) {
-    com <- bin * pos
-    pg$combined <- apply(com, 1, median)
-    pg$combined0.05 <- apply(com, 1, quantile, probs = 0.05)
-    pg$combined0.95 <- apply(com, 1, quantile, probs = 0.95)
-    pg$bin <- apply(bin, 1, median)
-    pg$bin0.05 <- apply(bin, 1, quantile, probs = 0.05)
-    pg$bin0.95 <- apply(bin, 1, quantile, probs = 0.95)
-    pg$pos <- apply(pos, 1, median)
-  } else { # sdmTMB; tweedie
-    message("Predicting density onto grid across all years using sdmTMB...")
-    if (survey %in% c("IPHC FISS")) # fixed station
-      tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
-    .spde <- sdmTMB::make_spde(.d_scaled$X, .d_scaled$Y, n_knots = tmb_knots)
-    if (length(unique(.d_scaled$year)) > 1)
-      formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
-    else
-      formula <- density ~ depth_scaled + depth_scaled2
-    m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
-      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
-    }, error = function(e) NA)
-    if (is.na(m)) { # Did not converge.
-      warning('The spatial TMB model did not converge.', call. = FALSE)
-      return(list(
-        predictions = pg, data = .d_tidy,
-        models = NA, survey = survey,
-        years = years
-      ))
-    }
-    # These are fixed station (IPHC) or they come from grids without years
-    if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
-      pg_one <- pg
-      pg_one$year <- max(.d_scaled$year)
-    } else {
-      pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
-      pg <- pg_one
-    }
-    # FIXME: just returning last year for consistency!
-    pred <- predict(m, newdata = pg_one) # returns all years!
-    pred <- pred[pred$year == max(pred$year), ]
-    stopifnot(identical(nrow(pg), nrow(pred)))
-    pg$combined <- exp(pred$est)
-    pg$pos <- NA
-    pg$bin <- NA
-  }
   list(
     predictions = pg, data = .d_scaled, models = m, survey = survey,
     years = years
@@ -488,6 +303,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @param cell_size The size of the grid cells for the model predictions.
 #' @param circles Logical for whether to plot the model predictions in circles.
 #'   This analysis report uses this for the IPHC survey.
+#' @param french Logical
 #'
 #' @return
 #' A ggplot object.
@@ -495,7 +311,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @export
 #' @family spatial survey modelling functions
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' set.seed(123)
 #' # pop_surv <- get_survey_sets("pacific ocean perch")
 #' # or use built-in data:
@@ -546,7 +362,8 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol = FALSE,
                              north_symbol_coord = c(130, 5975),
                              north_symbol_length = 30,
-                             cell_size = 2, circles = FALSE) {
+                             cell_size = 2, circles = FALSE,
+                             french = FALSE) {
   fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(
@@ -676,7 +493,8 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     ) +
     guides(shape = FALSE, colour = FALSE) +
     labs(size = pt_label, fill = fill_label) +
-    ylab(en2fr("Northing", translate=french)) + xlab(en2fr("Easting", translate=french))
+    ylab(en2fr("Northing", translate = french)) +
+    xlab(en2fr("Easting", translate = french))
 
   if (!show_legend) {
     g <- g + theme(legend.position = "none")

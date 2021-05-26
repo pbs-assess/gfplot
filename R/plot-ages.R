@@ -3,7 +3,6 @@
 #' Functions for plotting age frequency data.
 #'
 #' @details
-#'
 #' * [tidy_ages_raw()] or [tidy_ages_weighted()] prepare PBS data for `plot_ages()`.
 #'   These work across one or multiple species.
 #' * `plot_ages()` Plots age frequencies for each year for selected surveys for

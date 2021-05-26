@@ -40,7 +40,7 @@ clean_localities <- function(x) {
 #' A (tibble) data frame.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cpue_historical(end_year = 2016) %>%
 #'   tidy_cpue_historical(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 #' }

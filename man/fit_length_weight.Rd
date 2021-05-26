@@ -51,7 +51,7 @@ units.}
 For use with data for a single species.
 }
 \examples{
-\donttest{
+\dontrun{
 d <- get_survey_samples("pacific ocean perch")
 model_f <- fit_length_weight(d, sex = "female")
 model_m <- fit_length_weight(d, sex = "male")

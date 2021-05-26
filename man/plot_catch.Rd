@@ -18,13 +18,13 @@ plot_catch(
 )
 }
 \arguments{
-\item{dat}{Input data frame. For \code{tidy_catch()} should be from
-\code{\link[=get_catch]{get_catch()}}. For \code{plot_catch()} should be from \code{tidy_catch()} or be
-formatted similarly. See details.}
+\item{dat}{Input data frame. For \code{tidy_catch()} should be from \code{\link[=get_catch]{get_catch()}}.
+For \code{plot_catch()} should be from \code{tidy_catch()} or be formatted similarly.
+See details.}
 
-\item{areas}{Fisheries and Oceans major statistical areas (eg.
-3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
-with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B")} or
+\item{areas}{Fisheries and Oceans major statistical areas (eg. 3C, 3D, 5A,
+5B, etc.). See gfplot::pbs_areas for a lookup table with descriptions.
+Enter as a regular expression. For example, \code{c("5A", "5B")} or
 \code{c("5[CDE]+", "5[AB]+")}.}
 
 \item{french}{Logical for French or English.}
@@ -35,9 +35,7 @@ with descriptions. Enter as a regular expression. For example, \code{c("5A", "5B
 
 \item{units}{A named character vector with names referring to text that will
 be pasted into the y-axis label and a value defining the quantity to divide
-the \code{value} column by for that unit label.
-Defaults to \code{c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)} if
-\code{units = NULL}.}
+the \code{value} column by for that unit label. Defaults to \code{c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)} if \code{units = NULL}.}
 
 \item{unreliable}{An optional numeric vector defining years before which the
 data are less reliable. Leave as \code{NA} to omit.}
@@ -50,11 +48,10 @@ Functions for plotting catch data over time as a stacked bar plot.
 }
 \details{
 \itemize{
-\item \code{tidy_catch()} Prepares PBS data for \code{plot_catch()}. This works across one
-or multiple species.
-\item \code{plot_catch()} Plots catch. The input data frame must come from
-\code{tidy_catch()} or have the columns (in any order): \code{year}, \code{gear}, \code{value}
-(containing catches or landings).
+\item \code{tidy_catch()} Prepares PBS data for \code{plot_catch()}. This works
+across one or multiple species. * \code{plot_catch()} Plots catch. The input data
+frame must come from \code{tidy_catch()} or have the columns (in any order):
+\code{year}, \code{gear}, \code{value} (containing catches or landings).
 }
 }
 \examples{

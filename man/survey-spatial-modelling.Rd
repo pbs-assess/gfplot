@@ -9,22 +9,13 @@ fit_survey_sets(
   years,
   survey = NULL,
   density_column = "density_kgpm2",
-  chains = 4,
-  iter = 1000,
-  max_knots = 20,
-  adapt_delta = 0.95,
-  thin = 1,
-  mcmc_posterior_samples = 150,
   required_obs_percent = 0.05,
   utm_zone = 9,
-  model = c("inla", "sdmTMB", "glmmfields"),
+  model = NULL,
   include_depth = TRUE,
   survey_boundary = NULL,
   premade_grid = NULL,
   tmb_knots = 200,
-  inla_knots_pos = 75,
-  inla_knots_bin = 100,
-  gamma_scaling = 1000,
   cell_width = 2,
   ...
 )
@@ -41,41 +32,16 @@ column \code{survey_abbrev} in the data frame returned by \code{\link[=get_surve
 biomass density to use. E.g. \code{"density_kgpm2"} for trawl surveys or
 \code{"density_ppkm2"} for the long line surveys.}
 
-\item{chains}{The number of MCMC chains. Only applies to the glmmfields
-model.}
-
-\item{iter}{The number of MCMC chains. Only applies to the glmmfields model.}
-
-\item{max_knots}{The maximum number of knots to use in the predictive process
-approximation in the glmmfields model. If this number is larger than the
-number of data points then the number of knots is set to the number of data
-points minus 2. Only applies to the glmmfields model.}
-
-\item{adapt_delta}{Value to pass to \code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}}. Values closer to 1
-make smaller steps in the Hamiltonian MCMC at the expense of speed. Only
-applies to the glmmfields model.}
-
-\item{thin}{Value to pass to \code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}} to thin the MCMC samples.
-Only applies to the glmmfields model.}
-
-\item{mcmc_posterior_samples}{Number of final MCMC samples to return. Applies
-to both glmmfields and INLA.}
-
 \item{required_obs_percent}{A required fraction of positive sets before a
 model is fit.}
 
 \item{utm_zone}{The UTM zone to perform the modeling in. Defaults to zone 9.}
 
-\item{model}{The backend software to fit the model. Options are \code{"inla"} or
-\code{"glmmfields"} (currently disabled until on CRAN). INLA implements in
-approximation of the posterior via the integrated nested Laplace
-approximation, but the results are usually quite good and are likely drive
-considerably faster than glmmfields, especially for larger data sets or for
-many knots.}
+\item{model}{Depreciated. Always uses sdmTMB.}
 
 \item{include_depth}{Logical: should depth be included as a predictor? If
 \code{FALSE} then the model will only have a spatial random field as the
-predictor. Currently only applies to the INLA model.}
+predictor.}
 
 \item{survey_boundary}{If not \code{NULL}, a data frame with the survey boundary
 defined in columns \code{X} and \code{Y} in longitude and latitude coordinates. If
@@ -91,28 +57,15 @@ in \code{gfplot::hbll_grid}.}
 
 \item{tmb_knots}{The number of knots to pass to \code{\link[sdmTMB:sdmTMB]{sdmTMB::sdmTMB()}}.}
 
-\item{inla_knots_pos}{The number of knots for the positive component model if
-fit with INLA.}
-
-\item{inla_knots_bin}{The number of knots for the binary component model if
-fit with INLA.}
-
-\item{gamma_scaling}{A value to multiply the positive densities by internally
-before fitting the Gamma GLMM. The predictions are then divided by this
-value internally to render a prediction on the original scale. The reason
-for this is that values to are too small can create computational problems
-for INLA.}
-
 \item{cell_width}{The cell width if a prediction grid is made on the fly.}
 
 \item{...}{Any other arguments to pass on to the modelling function.}
 }
 \description{
-Implements geostatistical models of trawl or longline survey data. Uses INLA
-or glmmfields (currently disabled) for Bayesian inference.
+Implements geostatistical models of trawl or longline survey data.
 }
 \examples{
-\donttest{
+\dontrun{
 set.seed(123)
 # pop_surv <- get_survey_sets("pacific ocean perch")
 # or use built-in data:

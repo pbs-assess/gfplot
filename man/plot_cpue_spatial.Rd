@@ -60,19 +60,21 @@ the coast if it is rotated at all.}
 \item{show_historical}{Should the historical extent of fishing (before
 \code{start_year}) be shown?}
 
-\item{return_data}{Logical for whether to return the data instead of the plot.}
+\item{return_data}{Logical for whether to return the data instead of the
+plot.}
 
 \item{min_cells}{The minimum number of cells needed before the hexagons are
 shown.}
 
 \item{french}{Logical for French or English.}
 
-\item{percent_excluded_xy}{If not \code{NULL}, should be a numeric vector of length 2
-corresponding to the x and y location (as fraction from the bottom left)
-of text describing the percentage of fishing events excluded due to the privacy rule.}
+\item{percent_excluded_xy}{If not \code{NULL}, should be a numeric vector of
+length 2 corresponding to the x and y location (as fraction from the bottom
+left) of text describing the percentage of fishing events excluded due to
+the privacy rule.}
 
-\item{percent_excluded_text}{The text to associate with the annotation showing
-the percentage of fishing events excluded due to the privacy rule.}
+\item{percent_excluded_text}{The text to associate with the annotation
+showing the percentage of fishing events excluded due to the privacy rule.}
 }
 \description{
 Plot a map of commercial CPUE

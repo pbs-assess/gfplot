@@ -65,7 +65,7 @@ locality-specific trips. This function well aggregate fishing events into
 trips in 1991 and after to create a consistent form of data.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cpue_historical(end_year = 2016) \%>\%
   tidy_cpue_historical(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 }

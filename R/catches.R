@@ -2,28 +2,25 @@
 #'
 #' Functions for plotting catch data over time as a stacked bar plot.
 #'
-#' @details
-#' * `tidy_catch()` Prepares PBS data for `plot_catch()`. This works across one
-#' or multiple species.
-#' * `plot_catch()` Plots catch. The input data frame must come from
-#' `tidy_catch()` or have the columns (in any order): `year`, `gear`, `value`
-#' (containing catches or landings).
+#' @details * `tidy_catch()` Prepares PBS data for `plot_catch()`. This works
+#' across one or multiple species. * `plot_catch()` Plots catch. The input data
+#' frame must come from `tidy_catch()` or have the columns (in any order):
+#' `year`, `gear`, `value` (containing catches or landings).
 #'
-#' @param dat Input data frame. For `tidy_catch()` should be from
-#' [get_catch()]. For `plot_catch()` should be from `tidy_catch()` or be
-#' formatted similarly. See details.
-#' @param areas Fisheries and Oceans major statistical areas (eg.
-#'  3C, 3D, 5A, 5B, etc.). See gfplot::pbs_areas for a lookup table
-#'  with descriptions. Enter as a regular expression. For example, `c("5A", "5B")` or
-#'  `c("5[CDE]+", "5[AB]+")`.
+#' @param dat Input data frame. For `tidy_catch()` should be from [get_catch()].
+#'   For `plot_catch()` should be from `tidy_catch()` or be formatted similarly.
+#'   See details.
+#' @param areas Fisheries and Oceans major statistical areas (eg. 3C, 3D, 5A,
+#'   5B, etc.). See gfplot::pbs_areas for a lookup table with descriptions.
+#'   Enter as a regular expression. For example, `c("5A", "5B")` or
+#'   `c("5[CDE]+", "5[AB]+")`.
 #' @param french Logical for French or English.
 #' @param ylab Y axis label.
 #' @param xlim X axis limits in years.
 #' @param units A named character vector with names referring to text that will
 #'   be pasted into the y-axis label and a value defining the quantity to divide
-#'   the `value` column by for that unit label.
-#'   Defaults to `c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)` if
-#'   `units = NULL`.
+#'   the `value` column by for that unit label. Defaults to `c('1000 t' =
+#'   1000000, 't' = 1000, 'kg' = 1)` if `units = NULL`.
 #' @param unreliable An optional numeric vector defining years before which the
 #'   data are less reliable. Leave as `NA` to omit.
 #' @param blank_plot If `TRUE` then a blank plot with appropriate axes will be

@@ -79,7 +79,7 @@ depending on whether the model was fit to female, male, or both sexes
 combined.
 }
 \examples{
-\donttest{
+\dontrun{
 # d <- get_survey_samples("pacific ocean perch")
 d <- pop_samples
 model_f <- fit_length_weight(d, sex = "female")

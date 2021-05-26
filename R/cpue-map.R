@@ -19,15 +19,17 @@
 #' @param fill_lab Label for the color legend.
 #' @param show_historical Should the historical extent of fishing (before
 #'   `start_year`) be shown?
-#' @param return_data Logical for whether to return the data instead of the plot.
+#' @param return_data Logical for whether to return the data instead of the
+#'   plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
 #' @param french Logical for French or English.
-#' @param percent_excluded_xy If not `NULL`, should be a numeric vector of length 2
-#'   corresponding to the x and y location (as fraction from the bottom left)
-#'   of text describing the percentage of fishing events excluded due to the privacy rule.
-#' @param percent_excluded_text The text to associate with the annotation showing
-#'   the percentage of fishing events excluded due to the privacy rule.
+#' @param percent_excluded_xy If not `NULL`, should be a numeric vector of
+#'   length 2 corresponding to the x and y location (as fraction from the bottom
+#'   left) of text describing the percentage of fishing events excluded due to
+#'   the privacy rule.
+#' @param percent_excluded_text The text to associate with the annotation
+#'   showing the percentage of fishing events excluded due to the privacy rule.
 #'
 #' @export
 #' @importFrom utils data
