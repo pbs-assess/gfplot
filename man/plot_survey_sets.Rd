@@ -115,7 +115,7 @@ coordinates.}
 \item{circles}{Logical for whether to plot the model predictions in circles.
 This analysis report uses this for the IPHC survey.}
 
-\item{french}{Logical}
+\item{french}{Logical for French or English.}
 }
 \value{
 A ggplot object.

@@ -1,0 +1,203 @@
+---
+title: "Split catch by maturity"
+author: "Philina English"
+date: "05/05/2021"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache = TRUE,
+  autodep = TRUE,
+  fig.path = "pcod-knitr-figs/",
+  cache.path = "pcod-knitr-cache/"
+)
+```
+
+# Setup
+
+If you don't already have the package installed, then run:
+
+```{r, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("seananderson/gfplot")
+```
+
+First we will load the package along with gfdata, ggplot2, and dplyr since we will use them within our code later.
+
+```{r, cache=FALSE}
+library(gfplot)
+library(gfdata)
+library(ggplot2)
+library(dplyr)
+options(scipen=999)
+```
+
+
+# Get the synoptic survey set and biological sample data 
+
+As an example, we could extract the data with the following gfdata function calls if we were on a DFO laptop, with appropriate database permissions, and on the PBS network:
+
+
+```{r, eval=FALSE}
+d_survey_sets  <- get_survey_sets("pacific cod")
+d_survey_samples  <- get_survey_samples("pacific cod")
+```
+
+The helper function `cache_pbs_data()` will extract all of the data into a series of `.rds` files into whatever folder you specify to the `path` argument. I'll wrap it in a quick check just to make sure we don't download the data twice if we build this document again.
+
+```{r}
+if (!file.exists(file.path("pcod-cache", "pbs-survey-sets.rds"))) { # quick check for speed
+  cache_pbs_data("pacific cod", path = "pcod-cache")
+}
+```
+
+Let's read those data files in to work with here.
+
+```{r}
+cache             <- file.path("pcod-cache")
+d_survey_sets     <- readRDS(file.path(cache, "pbs-survey-sets.rds"))
+d_survey_samples  <- readRDS(file.path(cache, "pbs-survey-samples.rds"))
+```
+
+```{r}
+d_split <- split_catch_maturity(d_survey_sets, d_survey_samples, 
+  survey = c("SYN HS", "SYN QCS"),
+  years = NULL, 
+  sample_id_re = FALSE, 
+  year_re = FALSE,
+  p_threshold = 0.5,
+  plot = TRUE
+)
+print(d_split$maturity_plot)
+```
+
+
+Underlying biological data and model details are saved in object m
+```{r}
+d_split$m$model
+```
+
+Both year and sample id as random effects
+```{r}
+d_split_re <- split_catch_maturity(d_survey_sets, d_survey_samples, 
+  survey = c("SYN HS", "SYN QCS"),
+  years = NULL, 
+  sample_id_re = TRUE, 
+  year_re = TRUE,
+  p_threshold = 0.5,
+  plot = TRUE
+)
+print(d_split_re$maturity_plot)
+```
+
+```{r}
+d_split_re$m$model
+```
+
+
+Just year as a random effect
+```{r}
+d_split_yr <- split_catch_maturity(d_survey_sets, d_survey_samples, 
+  survey = c("SYN HS", "SYN QCS"),
+  years = NULL, 
+  sample_id_re = FALSE, 
+  year_re = TRUE,
+  p_threshold = 0.5,
+  plot = TRUE
+)
+
+print(d_split_yr$maturity_plot)
+```
+
+While the above plot is saved by the splitting function, it can also be rebuilt and modified using the plot functions applied to the saved model object named 'm'.
+
+```{r}
+plot_mat_ogive(d_split_yr$m)
+```
+
+
+For models with year as a random effect, there's a special function for plotting annual ogives in colour.
+```{r}
+plot_mat_annual_ogives(d_split_yr$m)
+```
+
+```{r}
+plot_mat_annual_ogives(d_split_re$m)
+```
+
+
+```{r}
+d_split_sa <- split_catch_maturity(d_survey_sets, d_survey_samples, 
+  survey = c("SYN HS", "SYN QCS"),
+  years = NULL, 
+  sample_id_re = TRUE, 
+  year_re = FALSE,
+  p_threshold = 0.5,
+  plot = TRUE
+)
+print(d_split_sa$maturity_plot)
+```
+
+
+The "data" element contains the original d_survey_sets dataframe with the addition of:
+
+est_sample_mass - estimated total mass of individually sampled fish
+measured_weight - measured total mass of individually sampled fish
+n_weights - count of individually weighed fish
+n_mature - number of mature fish sampled
+n_sampled - total fish individually sampled fish
+
+mass_ratio_mature - ratio of mass that represents mature fish
+
+raw_error - catch minus samples in kg; < 0 should be impossible
+perc_sampled - percent by mass of catch sampled; >1 suggests either fish were smaller than predicted from lengths, or a discrepency in data entry  
+
+split_dens_type - what are the units of the following density columns
+adult_density - estimated biomass density of mature fish
+imm_density - estimated biomass density of immature fish
+
+
+```{r}
+glimpse(d_split$data)
+```
+
+```{r}
+ggplot(data = d_split$data, aes(catch_weight, perc_sampled)) +
+  geom_point(alpha = 0.25) +
+  # ylim(0,10) + xlim(0, 70) +
+  theme_classic()
+```
+
+There are some samples that have higher mass of individual fish samples than the reported total catch
+
+```{r}
+ggplot(data = d_split$data, aes(catch_weight, est_sample_mass/1000, colour = n_sampled-n_weights)) +
+  geom_point(alpha = 0.5) +
+  xlim(0, 100) + ylim(0,100) +
+  theme_classic()
+```
+
+```{r}
+ggplot(data = d_split$data, aes(unsampled_catch)) +
+  geom_histogram(alpha = 0.5) +
+  # xlim(-20, 100) +
+  scale_x_log10() +
+  theme_classic()
+```
+
+```{r}
+ggplot(data = d_split$data, aes(catch_weight, unsampled_catch, colour = n_sampled-n_weights)) +
+  geom_point(alpha = 0.5) +
+  xlim(0, 250) + ylim(-20, 0) +
+  theme_classic()
+```
+
+```{r}
+print(d_split$mass_plot)
+```

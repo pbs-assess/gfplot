@@ -13,7 +13,8 @@ plot_lengths(
   survey_cols = NULL,
   alpha = 0.24,
   bin_size = 2,
-  min_total = 20
+  min_total = 20,
+  show_year = "even"
 )
 }
 \arguments{
@@ -43,6 +44,9 @@ function.}
 
 \item{min_total}{Minimum number of fish for a given survey and year needed
 before a histogram is shown.}
+
+\item{show_year}{Which years to show a label for. Can be one of 'even' or 'odd'. Any
+other value will enable labels for all years.}
 }
 \description{
 Functions for plotting length frequency data.

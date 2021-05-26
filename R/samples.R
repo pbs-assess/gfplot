@@ -82,6 +82,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @param trans A function to transform the counts before applying the color
 #'   scale. E.g. `sqrt` or `log` or `I` if you don't want any transformation.
 #' @param french Logical.
+#' @param text_colour Colour for the value text labels
 #'
 #' @examples
 #' set.seed(1)
@@ -105,7 +106,7 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' @export
 
 plot_sample_avail <- function(dat, year_range = NULL, title = "Biological samples",
-                              palette = "Greys", trans = sqrt, french = FALSE) {
+                              palette = "Greys", trans = sqrt, french = FALSE, text_colour = "white") {
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- firstup(as.character(gsub("_", " ", dat$type)))
@@ -163,7 +164,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
     ) +
     ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
     geom_text(aes_string(x = "year", label = "n_text"),
-      colour = "white",
+      colour = text_colour,
       size = 2.1, alpha = 1
     ) +
     ggplot2::scale_y_discrete(position = "left") +

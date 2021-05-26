@@ -303,7 +303,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @param cell_size The size of the grid cells for the model predictions.
 #' @param circles Logical for whether to plot the model predictions in circles.
 #'   This analysis report uses this for the IPHC survey.
-#' @param french Logical
+#' @param french Logical for French or English.
 #'
 #' @return
 #' A ggplot object.

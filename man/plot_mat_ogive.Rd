@@ -3,18 +3,31 @@
 \name{fit_mat_ogive}
 \alias{fit_mat_ogive}
 \alias{plot_mat_ogive}
+\alias{plot_mat_annual_ogives}
 \title{Fit and plot maturity ogives}
 \usage{
 fit_mat_ogive(
   dat,
   type = c("age", "length"),
   sample_id_re = FALSE,
+  year_re = FALSE,
   months = seq(1, 12),
   ageing_method_codes = NULL,
   usability_codes = c(0, 1, 2, 6)
 )
 
 plot_mat_ogive(
+  object,
+  xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
+  title = if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
+  rug = TRUE,
+  rug_n = 1500,
+  x_max = 1.75,
+  prediction_type = c("all", "male", "female", "none"),
+  french = FALSE
+)
+
+plot_mat_annual_ogives(
   object,
   xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
   title = if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
@@ -32,6 +45,9 @@ plot_mat_ogive(
 
 \item{sample_id_re}{If \code{TRUE} then the model will include random intercepts
 for sample ID.}
+
+\item{year_re}{If \code{TRUE} the model will include random intercepts
+for year.}
 
 \item{months}{A numeric vector indicating which months to include when
 fitting the maturity ogive. Defaults to all months.}
@@ -73,7 +89,6 @@ plot_mat_ogive(m)
 
 m <- fit_mat_ogive(d, type = "length", sample_id_re = FALSE)
 plot_mat_ogive(m)
-
 \dontrun{
 ## with random intercepts for sample ID:
 m <- fit_mat_ogive(d, type = "length", sample_id_re = TRUE)
