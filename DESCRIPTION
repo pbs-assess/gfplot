@@ -39,7 +39,6 @@ Imports:
     glmmTMB,
     grid,
     hexbin,
-    INLA,
     lubridate,
     magrittr,
     methods,
