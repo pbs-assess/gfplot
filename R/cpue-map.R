@@ -1,6 +1,7 @@
-#' Plot a map of commercial CPUE
+#' Plot a map of commercial CPUE or Catch (trawl only)
 #'
-#' @param dat Data from [get_cpue_spatial()] or [get_cpue_spatial_ll()]
+#' @param dat Data from [gfdata::get_cpue_spatial()], [gfdata::get_cpue_spatial_ll()],
+#'   or [gfdata::get_catch_spatial()]
 #' @param start_year Starting year.
 #' @param bin_width Width of hexagons in km.
 #' @param n_minimum_vessels Minimum number of unique vessels before a hexagon is
@@ -30,7 +31,8 @@
 #'   the privacy rule.
 #' @param percent_excluded_text The text to associate with the annotation
 #'   showing the percentage of fishing events excluded due to the privacy rule.
-#'
+#' @param plot_catch If `TRUE` plot catch instead of CPUE. If `FALSE` (default),
+#'   plot CPUE. See `dat` for data information.
 #' @export
 #' @importFrom utils data
 #'
@@ -47,25 +49,30 @@
 
 plot_cpue_spatial <-
   function(dat,
-             start_year = 2013,
-             bin_width = 7,
-             n_minimum_vessels = 3,
-             xlim = c(122, 890),
-             ylim = c(5373, 6027),
-             utm_zone = 9, bath = c(100, 200, 500),
-             fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option = "D"),
-             colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
-             rotation_angle = 0,
-             rotation_center = c(500, 5700),
-             fill_lab = "CPUE (kg/hr)",
-             show_historical = FALSE,
-             return_data = FALSE,
-             min_cells = 1,
-             french = FALSE,
-             percent_excluded_xy = NULL,
-             percent_excluded_text = "Fishing events excluded due to Privacy Act") {
+           start_year = 2013,
+           bin_width = 7,
+           n_minimum_vessels = 3,
+           xlim = c(122, 890),
+           ylim = c(5373, 6027),
+           utm_zone = 9, bath = c(100, 200, 500),
+           fill_scale = ggplot2::scale_fill_viridis_c(trans = "sqrt", option = "D"),
+           colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
+           rotation_angle = 0,
+           rotation_center = c(500, 5700),
+           fill_lab = ifelse(plot_catch, "Catch (t)", "CPUE (kg/hr)"),
+           show_historical = FALSE,
+           return_data = FALSE,
+           min_cells = 1,
+           french = FALSE,
+           percent_excluded_xy = NULL,
+           percent_excluded_text = "Fishing events excluded due to Privacy Act",
+           plot_catch = FALSE) {
 
-    dat <- filter(dat, !is.na(.data$cpue))
+    if(plot_catch){
+      dat <- filter(dat, !is.na(.data$catch))
+    }else{
+      dat <- filter(dat, !is.na(.data$cpue))
+    }
     dat <- filter(dat, !is.na(vessel_registration_number)) # for privacy rule
 
     pre_footprint_dat <- filter(dat, year < start_year)
@@ -96,7 +103,7 @@ plot_cpue_spatial <-
         pre_footprint_dat <- ll2utm(pre_footprint_dat, utm_zone = utm_zone)
 
       privacy_out <- enact_privacy_rule(dat, bin_width = bin_width,
-        n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim)
+        n_minimum_vessels = n_minimum_vessels, xlim = xlim, ylim = ylim, plot_catch)
       gdat <- privacy_out$data
 
       if (show_historical) {
@@ -112,10 +119,10 @@ plot_cpue_spatial <-
         if (nrow(gdat) < min_cells) {
           plot_hexagons <- FALSE
         } else {
-          public_dat <- compute_hexagon_xy(privacy_out$data, bin_width = bin_width)
+          public_dat <- compute_hexagon_xy(privacy_out$data, bin_width = bin_width, plot_catch)
           if (show_historical)
             public_dat_historical <-
-              compute_hexagon_xy(privacy_out_historical$data, bin_width = bin_width)
+              compute_hexagon_xy(privacy_out_historical$data, bin_width = bin_width, plot_catch)
         }
       }
     }
@@ -138,7 +145,7 @@ plot_cpue_spatial <-
       }
       g <- g + geom_polygon(data = public_dat, aes_string(
         x = "X", y = "Y",
-        fill = "cpue", colour = "cpue", group = "hex_id"
+        fill = ifelse(plot_catch, "catch", "cpue"), colour = ifelse(plot_catch, "catch", "cpue"), group = "hex_id"
       ), inherit.aes = FALSE, lwd = 0.2) + fill_scale + colour_scale
 
     }
@@ -177,6 +184,12 @@ plot_cpue_spatial <-
 
     g
   }
+
+#' @export
+#' @rdname plot_cpue_spatial
+plot_catch_spatial <- function(...){
+  plot_cpue_spatial(..., plot_catch = TRUE)
+}
 
 hex_coords <- function(x, y, unitcell_x = 1, unitcell_y = 1) {
   data.frame(
@@ -257,7 +270,7 @@ rotate_df <- function(df, rotation_angle, rotation_center) {
   df
 }
 
-enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
+enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim, plot_catch = FALSE) {
   # count unique vessels per hexagon cell for privacy:
 
   # Fake data to make sure that the hexagons overlap perfectly.
@@ -290,14 +303,18 @@ enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
       fun = function(x) length(unique(x))
     )
 
-  # the actual CPUE hexagon binning:
+  # the actual CPUE or Catch hexagon binning:
+  if(plot_catch){
+    bin_func <- function(x) sum(x / 1000, na.rm = FALSE)
+  }else{
+    bin_func <- function(x) exp(mean(log(x), na.rm = FALSE))
+  }
   g <- ggplot(dat, aes_string("X", "Y")) +
     coord_equal(xlim = xlim, ylim = ylim) +
     stat_summary_hex(
-      aes_string(x = "X", y = "Y", z = "cpue"),
+      aes_string(x = "X", y = "Y", z = ifelse(plot_catch, "catch", "cpue")),
       data = dat, binwidth = bin_width,
-      fun = function(x) exp(mean(log(x), na.rm = FALSE))
-    )
+      fun = bin_func)
 
   # enact the privacy rule:
   gdat <- ggplot2::ggplot_build(g)$data[[1]]
@@ -309,7 +326,7 @@ enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
   # sanity check:
   stopifnot(identical(nrow(gdat), nrow(gdat_count)))
   stopifnot(identical(nrow(gdat), nrow(gdat_fe_id_count)))
-  # Number of hexagon cells for vessel count and CPUE didn't match.
+  # Number of hexagon cells for vessel count and CPUE or Catch didn't match.
   # Stopping because the privacy rule might not remain valid in this case.
 
   gdat <- gdat[gdat_count$value >= n_minimum_vessels, , drop = FALSE]
@@ -322,16 +339,24 @@ enact_privacy_rule <- function(dat, bin_width, n_minimum_vessels, xlim, ylim) {
   list(data = gdat, lost_fe_ids = lost_fe_ids, total_fe_ids = total_fe_ids)
 }
 
-compute_hexagon_xy <- function(gdat, bin_width) {
+compute_hexagon_xy <- function(gdat, bin_width, plot_catch = FALSE) {
   # compute hexagon x-y coordinates for geom_polygon()
   dx <- bin_width/2
   dy <- bin_width/2
-  public_dat <- lapply(seq_len(nrow(gdat)), function(i)
-    data.frame(
-      hex_id = i, cpue = gdat[i, "value"],
-      hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy)
-    )) %>%
-    bind_rows()
+  if(plot_catch){
+    public_dat <- lapply(seq_len(nrow(gdat)), function(i){
+      data.frame(
+        hex_id = i, catch = gdat[i, "value"],
+        hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy))
+    })
+  }else{
+    public_dat <- lapply(seq_len(nrow(gdat)), function(i){
+      data.frame(
+        hex_id = i, cpue = gdat[i, "value"],
+        hex_coords(gdat[i, "x"], gdat[i, "y"], dx, dy))
+    })
+  }
+  public_dat <- public_dat %>% bind_rows()
   public_dat$X <- public_dat$x
   public_dat$Y <- public_dat$y
   public_dat

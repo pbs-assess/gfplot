@@ -2,7 +2,8 @@
 % Please edit documentation in R/cpue-map.R
 \name{plot_cpue_spatial}
 \alias{plot_cpue_spatial}
-\title{Plot a map of commercial CPUE}
+\alias{plot_catch_spatial}
+\title{Plot a map of commercial CPUE or Catch (trawl only)}
 \usage{
 plot_cpue_spatial(
   dat,
@@ -17,17 +18,21 @@ plot_cpue_spatial(
   colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
   rotation_angle = 0,
   rotation_center = c(500, 5700),
-  fill_lab = "CPUE (kg/hr)",
+  fill_lab = ifelse(plot_catch, "Catch (t)", "CPUE (kg/hr)"),
   show_historical = FALSE,
   return_data = FALSE,
   min_cells = 1,
   french = FALSE,
   percent_excluded_xy = NULL,
-  percent_excluded_text = "Fishing events excluded due to Privacy Act"
+  percent_excluded_text = "Fishing events excluded due to Privacy Act",
+  plot_catch = FALSE
 )
+
+plot_catch_spatial(...)
 }
 \arguments{
-\item{dat}{Data from \code{\link[=get_cpue_spatial]{get_cpue_spatial()}} or \code{\link[=get_cpue_spatial_ll]{get_cpue_spatial_ll()}}}
+\item{dat}{Data from \code{\link[gfdata:get_data]{gfdata::get_cpue_spatial()}}, \code{\link[gfdata:get_data]{gfdata::get_cpue_spatial_ll()}},
+or \code{\link[gfdata:get_data]{gfdata::get_catch_spatial()}}}
 
 \item{start_year}{Starting year.}
 
@@ -75,9 +80,12 @@ the privacy rule.}
 
 \item{percent_excluded_text}{The text to associate with the annotation
 showing the percentage of fishing events excluded due to the privacy rule.}
+
+\item{plot_catch}{If \code{TRUE} plot catch instead of CPUE. If \code{FALSE} (default),
+plot CPUE. See \code{dat} for data information.}
 }
 \description{
-Plot a map of commercial CPUE
+Plot a map of commercial CPUE or Catch (trawl only)
 }
 \examples{
 ## fake data demo:
