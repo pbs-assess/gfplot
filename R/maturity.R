@@ -391,7 +391,7 @@ plot_mat_ogive <- function(object,
       expand = FALSE, ylim = c(-0.005, 1.005),
       xlim = c(0, max_x)
     ) +
-    labs(colour = en2fr("Sex", french), lty = en2fr("Sex")) +
+    labs(colour = en2fr("Sex", french), lty = en2fr("Sex", french)) +
     ggplot2::ggtitle(en2fr(title, french))
 
   if (rug) {
