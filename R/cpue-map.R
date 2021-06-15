@@ -174,6 +174,7 @@ plot_cpue_spatial <-
     if (!is.null(percent_excluded_xy) && exists("privacy_out")) {
       excluded_fe <- round(
         privacy_out$lost_fe_ids/privacy_out$total_fe_ids * 100, 0)
+      if (is.na(excluded_fe)) stop("excluded_fe was NA.", call. = FALSE)
       if (excluded_fe == 0) excluded_fe <- "< 0.5%"
       g <- g + ggplot2::annotate("text",
         x = min(xlim) + percent_excluded_xy[1] * diff(range(xlim)),
