@@ -124,7 +124,6 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 #' @param required_obs_percent A required fraction of positive sets before a
 #'   model is fit.
 #' @param utm_zone The UTM zone to perform the modeling in. Defaults to zone 9.
-#' @param model Depreciated. Always uses sdmTMB.
 #' @param include_depth Logical: should depth be included as a predictor? If
 #'   `FALSE` then the model will only have a spatial random field as the
 #'   predictor.
@@ -160,7 +159,6 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             density_column = "density_kgpm2",
                             required_obs_percent = 0.05,
                             utm_zone = 9,
-                            model = NULL,
                             include_depth = TRUE,
                             survey_boundary = NULL,
                             premade_grid = NULL,
@@ -211,7 +209,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   message("Predicting density onto grid across all years using sdmTMB...")
   if (survey %in% c("IPHC FISS")) # fixed station
     tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
-  .spde <- sdmTMB::make_spde(.d_scaled$X, .d_scaled$Y, n_knots = tmb_knots)
+  .spde <- sdmTMB::make_mesh(.d_scaled, xy_cols = c("X", "Y"), n_knots = tmb_knots)
   if (length(unique(.d_scaled$year)) > 1)
     formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
   else

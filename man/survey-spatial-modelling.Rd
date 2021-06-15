@@ -11,7 +11,6 @@ fit_survey_sets(
   density_column = "density_kgpm2",
   required_obs_percent = 0.05,
   utm_zone = 9,
-  model = NULL,
   include_depth = TRUE,
   survey_boundary = NULL,
   premade_grid = NULL,
@@ -36,8 +35,6 @@ biomass density to use. E.g. \code{"density_kgpm2"} for trawl surveys or
 model is fit.}
 
 \item{utm_zone}{The UTM zone to perform the modeling in. Defaults to zone 9.}
-
-\item{model}{Depreciated. Always uses sdmTMB.}
 
 \item{include_depth}{Logical: should depth be included as a predictor? If
 \code{FALSE} then the model will only have a spatial random field as the
