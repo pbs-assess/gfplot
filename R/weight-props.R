@@ -199,7 +199,7 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
     select(year, grouping_code, area_km2) %>%
     unique() %>%
     group_by(year) %>%
-    mutate(total_area_km2 = sum(area_km2))
+    mutate(total_area_km2 = sum(area_km2, na.rm = TRUE))
 
   strat_dens <- select(
     strat_dat, year, fishing_event_id,
