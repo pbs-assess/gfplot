@@ -258,3 +258,49 @@ make_pred_mm <- function(x, years) {
 logit_perc <- function(a, b, perc = 0.5) {
   -(log((1 / perc) - 1) + a) / b
 }
+
+#' Set the year in the data frame to be the fishing year as defined between the month and day given
+#'
+#' @rdname plot_catch
+#' @param month_fishing_starts The month in which the fishing year starts and ends.
+#'  The `year` column of the returned data frame will refer to the fishing year as determined by
+#'  this and the `day_fishing_starts` argument.
+#' @param day_fishing_starts The day of the month in which the fishing year starts and ends.
+#'  See `month_fishing_starts`
+#' @param yr_col Name of the column in `dat` holding the fishing year data
+#' @param date_col Name of the column in `dat` holding the date data
+#' @param ... Absorb unused parameters
+#'
+#' @return The data frame `dat` with modified year data
+#' @export
+#' @examples
+#' \dontrun
+#' d <- gfdata::get_catch("arrowtooth flounder")
+#' d <- set_fishing_year(d, 2, 21) # Feb 21 - Feb 20 is the fishing year
+set_fishing_year <- function(dat,
+                             month_fishing_starts = 1,
+                             day_fishing_starts = 1,
+                             yr_col = "year",
+                             date_col = "best_date",
+                             ...){
+
+  stopifnot(yr_col %in% names(dat))
+  stopifnot(date_col %in% names(dat))
+  stopifnot(month_fishing_starts %in% 1:12)
+  stopifnot(day_fishing_starts %in% 1:31)
+  if(month_fishing_starts == 2 && day_fishing_starts > 28){
+    stop("day_fishing_starts must be 28 or less for February", call. = FALSE)
+  }
+  if(month_fishing_starts %in% c(4, 6, 9, 11) && day_fishing_starts > 30){
+    stop("day_fishing_starts must be 30 or less for April, June, September, or November", call. = FALSE)
+  }
+
+  yr_col_sym <- sym(yr_col)
+  date_col_sym <- sym(date_col)
+
+  dat %>%
+    mutate(day_of_year = yday(!!date_col_sym),
+           cutoff_day = yday(ymd(paste0(!!yr_col_sym, "-", month_fishing_starts, "-", day_fishing_starts))),
+           !!yr_col_sym := ifelse(day_of_year < cutoff_day, year - 1, year)) %>%
+    select(-day_of_year, -cutoff_day)
+}

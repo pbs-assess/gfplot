@@ -39,8 +39,16 @@
 NULL
 
 #' @rdname plot_catch
+#' @param ... Absorbs arguments intended for other functions
+#'
+#' @importFrom lubridate yday ymd
 #' @export
-tidy_catch <- function(dat, areas = NULL) {
+tidy_catch <- function(dat,
+                       areas = NULL,
+                       ...) {
+
+  dat <- set_fishing_year(dat, ...)
+
   if (!is.null(areas)) {
     dat$area <- assign_areas(dat$major_stat_area_name, areas)
     dat <- dat[!is.na(dat$area), , drop = FALSE]
