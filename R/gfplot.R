@@ -7,21 +7,21 @@
 #'
 #' @docType package
 #' @name gfplot
-#' @importFrom dplyr filter mutate summarise select group_by n arrange ungroup
+#' @importFrom dplyr distinct filter mutate summarise select group_by n arrange ungroup
 #' @importFrom dplyr inner_join left_join right_join anti_join full_join
 #' @importFrom dplyr semi_join
 #' @importFrom dplyr bind_rows case_when pull contains tibble rename as_tibble
-#' @importFrom rlang enquo quo_name ":=" "!!" .data
+#' @importFrom rlang enquo quo_name ":=" "!!" .data sym
 #' @importFrom forcats fct_reorder
 #' @importFrom assertthat assert_that are_equal
 #' @importFrom RColorBrewer brewer.pal
-#' @importFrom ggplot2 ggplot aes_string geom_hline geom_vline scale_fill_manual
+#' @importFrom ggplot2 ggplot aes aes_string geom_hline geom_vline scale_fill_manual
 #'   scale_colour_manual scale_x_continuous scale_size_area coord_cartesian
 #'   guides geom_point facet_wrap xlab ylab geom_col ylim xlim geom_rect
 #'   geom_text scale_fill_continuous geom_line labs scale_y_continuous
 #'   guide_legend geom_ribbon element_text scale_shape_manual element_line
 #'   geom_path geom_polygon coord_equal stat_summary_hex facet_grid
-#'   position_identity coord_fixed
+#'   position_identity coord_fixed scale_color_viridis_d scale_colour_viridis_d
 #' @importFrom stats coef model.matrix lm binomial rnorm
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
@@ -51,18 +51,34 @@ if (getRversion() >= "2.15.1") {
     "month", "freq", "trip_id", "sample_id", "survey_id", "value", "prop",
     "annual_prop", "quarter", "sum_freq",
 
+    "add_tally",
+    "adult",
     "area_km2",
     "catch_weight",
+    "count",
+    "cutoff_day",
+    "day_of_year",
     "density_kgpm2",
+    "est_sample_mass",
     "fe_end_date",
     "fishing_event_id",
     "grouping1",
     "grouping_code",
     "landed_kg_quarter",
     "landed_kg_year",
+    "mass_ratio",
+    "mass_ratio_mature",
+    "maturity_mass",
+    "measured_weight",
+    "method",
+    "n_mature",
+    "n_sampled",
+    "n_weights",
+    "new_mass",
     "samp_catch_weight_quarter",
     "samp_trip_catch_weight",
     "sum_weighted_freq1",
+    "threshold",
     "weight",
     "weighted_freq1",
     "weighted_freq1_scaled",

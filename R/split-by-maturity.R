@@ -16,7 +16,7 @@
 #' @param plot Logical for whether to produce plots
 #'    (length-weight and length-at-maturity relationships).
 #' @export
-#'
+#' @importFrom dplyr if_else
 #' @examples
 #' \dontrun{
 #' d_survey_sets <- gfdata::get_survey_sets("pacific cod")
