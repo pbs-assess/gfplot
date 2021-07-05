@@ -21,7 +21,6 @@ run_sql <- function(database, query) {
 
 db_connection <- function(server = "DFBCV9TWVASP001",
                           database = "GFBioSQL") {
-
   pbs_uid <- getOption("pbs.uid")
   pbs_pwd <- getOption("pbs.pwd")
   pbs_ip <- getOption("pbs.ip")
@@ -124,9 +123,16 @@ firstup <- function(x) {
 }
 
 first_cap <- function(s, strict = FALSE) {
-  cap <- function(s) paste(toupper(substring(s, 1, 1)),
-    {s <- substring(s, 2); if(strict) tolower(s) else s},
-    sep = "", collapse = " " )
+  cap <- function(s) {
+    paste(toupper(substring(s, 1, 1)),
+      {
+        s <- substring(s, 2)
+        if (strict) tolower(s) else s
+      },
+      sep = "",
+      collapse = " "
+    )
+  }
   sapply(strsplit(s, split = " "), cap, USE.NAMES = !is.null(names(s)))
 }
 
@@ -205,7 +211,7 @@ factor_bin_clean <- function(x, bins, clean = TRUE) {
 #' x <- c("5D: NORTHERN HECATE STRAIT", "3C: S.W. VANCOUVER ISLAND", "3D: N.W. VANCOUVER ISLAND")
 #' assign_areas(x)
 assign_areas <- function(major_stat_area_description,
-  area_regex = c("3[CD]+", "5[AB]+", "5[CDE]+")) {
+                         area_regex = c("3[CD]+", "5[AB]+", "5[CDE]+")) {
   out <- rep(NA, length(major_stat_area_description))
   for (i in seq_along(area_regex)) {
     out[grepl(area_regex[i], major_stat_area_description)] <-
@@ -259,14 +265,15 @@ logit_perc <- function(a, b, perc = 0.5) {
   -(log((1 / perc) - 1) + a) / b
 }
 
-#' Set the year in the data frame to be the fishing year as defined between the month and day given
+#' Set the year in the data frame to be the fishing year as defined between the
+#' month and day given
 #'
 #' @rdname plot_catch
-#' @param month_fishing_starts The month in which the fishing year starts and ends.
-#'  The `year` column of the returned data frame will refer to the fishing year as determined by
-#'  this and the `day_fishing_starts` argument.
-#' @param day_fishing_starts The day of the month in which the fishing year starts and ends.
-#'  See `month_fishing_starts`
+#' @param month_fishing_starts The month in which the fishing year starts and
+#'   ends. The `year` column of the returned data frame will refer to the
+#'   fishing year as determined by this and the `day_fishing_starts` argument.
+#' @param day_fishing_starts The day of the month in which the fishing year
+#'   starts and ends. See `month_fishing_starts`
 #' @param yr_col Name of the column in `dat` holding the fishing year data
 #' @param date_col Name of the column in `dat` holding the date data
 #' @param ... Absorb unused parameters
@@ -274,24 +281,24 @@ logit_perc <- function(a, b, perc = 0.5) {
 #' @return The data frame `dat` with modified year data
 #' @export
 #' @examples
-#' \dontrun
+#' \dontrun{
 #' d <- gfdata::get_catch("arrowtooth flounder")
 #' d <- set_fishing_year(d, 2, 21) # Feb 21 - Feb 20 is the fishing year
+#' }
 set_fishing_year <- function(dat,
                              month_fishing_starts = 1,
                              day_fishing_starts = 1,
                              yr_col = "year",
                              date_col = "best_date",
-                             ...){
-
+                             ...) {
   stopifnot(yr_col %in% names(dat))
   stopifnot(date_col %in% names(dat))
   stopifnot(month_fishing_starts %in% 1:12)
   stopifnot(day_fishing_starts %in% 1:31)
-  if(month_fishing_starts == 2 && day_fishing_starts > 28){
+  if (month_fishing_starts == 2 && day_fishing_starts > 28) {
     stop("day_fishing_starts must be 28 or less for February", call. = FALSE)
   }
-  if(month_fishing_starts %in% c(4, 6, 9, 11) && day_fishing_starts > 30){
+  if (month_fishing_starts %in% c(4, 6, 9, 11) && day_fishing_starts > 30) {
     stop("day_fishing_starts must be 30 or less for April, June, September, or November", call. = FALSE)
   }
 
@@ -299,8 +306,10 @@ set_fishing_year <- function(dat,
   date_col_sym <- sym(date_col)
 
   dat %>%
-    mutate(day_of_year = yday(!!date_col_sym),
-           cutoff_day = yday(ymd(paste0(!!yr_col_sym, "-", month_fishing_starts, "-", day_fishing_starts))),
-           !!yr_col_sym := ifelse(day_of_year < cutoff_day, year - 1, year)) %>%
+    mutate(
+      day_of_year = yday(!!date_col_sym),
+      cutoff_day = yday(ymd(paste0(!!yr_col_sym, "-", month_fishing_starts, "-", day_fishing_starts))),
+      !!yr_col_sym := ifelse(day_of_year < cutoff_day, year - 1, year)
+    ) %>%
     select(-day_of_year, -cutoff_day)
 }
