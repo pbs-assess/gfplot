@@ -52,7 +52,7 @@ element \code{cell_area} the content a single numeric value describing the grid
 size in kilometers. The package includes a survey grid for the HBLL surveys
 in \code{gfplot::hbll_grid}.}
 
-\item{tmb_knots}{The number of knots to pass to \code{\link[sdmTMB:sdmTMB]{sdmTMB::sdmTMB()}}.}
+\item{tmb_knots}{The number of knots to pass to \code{sdmTMB::sdmTMB()}.}
 
 \item{cell_width}{The cell width if a prediction grid is made on the fly.}
 

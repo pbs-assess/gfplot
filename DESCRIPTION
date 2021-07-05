@@ -52,7 +52,6 @@ Imports:
     tidyr,
     xml2,
     tweedie,
-    sdmTMB (>= 0.0.0.9001),
     ggrepel,
     boot,
     rosettafish
@@ -61,7 +60,8 @@ Suggests:
     rmarkdown,
     testthat,
     rgdal,
-    scales
+    scales,
+    sdmTMB (>= 0.0.0.9001)
 VignetteBuilder: 
     knitr
 Remotes: 

@@ -137,7 +137,7 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 #'   element `cell_area` the content a single numeric value describing the grid
 #'   size in kilometers. The package includes a survey grid for the HBLL surveys
 #'   in `gfplot::hbll_grid`.
-#' @param tmb_knots The number of knots to pass to [sdmTMB::sdmTMB()].
+#' @param tmb_knots The number of knots to pass to `sdmTMB::sdmTMB()`.
 #' @param cell_width The cell width if a prediction grid is made on the fly.
 #' @param ... Any other arguments to pass on to the modelling function.
 #'
@@ -207,44 +207,49 @@ fit_survey_sets <- function(dat, years, survey = NULL,
   }
 
   message("Predicting density onto grid across all years using sdmTMB...")
-  if (survey %in% c("IPHC FISS")) # fixed station
-    tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
-  .spde <- sdmTMB::make_mesh(.d_scaled, xy_cols = c("X", "Y"), n_knots = tmb_knots)
-  if (length(unique(.d_scaled$year)) > 1)
-    formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
-  else
-    formula <- density ~ depth_scaled + depth_scaled2
-  m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
-    spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
-  }, error = function(e) NA)
-  if (is.na(m)) { # Did not converge.
-    warning('The spatial TMB model did not converge.', call. = FALSE)
+
+  if (requireNamespace("sdmTMB", quietly = TRUE)) {
+    if (survey %in% c("IPHC FISS")) # fixed station
+      tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
+    .spde <- sdmTMB::make_mesh(.d_scaled, xy_cols = c("X", "Y"), n_knots = tmb_knots)
+    if (length(unique(.d_scaled$year)) > 1)
+      formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
+    else
+      formula <- density ~ depth_scaled + depth_scaled2
+    m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
+      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
+    }, error = function(e) NA)
+    if (is.na(m)) { # Did not converge.
+      warning('The spatial TMB model did not converge.', call. = FALSE)
+      return(list(
+        predictions = pg, data = .d_tidy,
+        models = NA, survey = survey,
+        years = years
+      ))
+    }
+    # These are fixed station (IPHC) or they come from grids without years
+    if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
+      pg_one <- pg
+      pg_one$year <- max(.d_scaled$year)
+    } else {
+      pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
+      pg <- pg_one
+    }
+    # FIXME: just returning last year for consistency!
+    pred <- predict(m, newdata = pg_one) # returns all years!
+    pred <- pred[pred$year == max(pred$year), ]
+    stopifnot(identical(nrow(pg), nrow(pred)))
+    pg$combined <- exp(pred$est)
+    pg$pos <- NA
+    pg$bin <- NA
+
     return(list(
-      predictions = pg, data = .d_tidy,
-      models = NA, survey = survey,
+      predictions = pg, data = .d_scaled, models = m, survey = survey,
       years = years
     ))
-  }
-  # These are fixed station (IPHC) or they come from grids without years
-  if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
-    pg_one <- pg
-    pg_one$year <- max(.d_scaled$year)
   } else {
-    pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
-    pg <- pg_one
+    stop("sdmTMB not installed.", call. = FALSE)
   }
-  # FIXME: just returning last year for consistency!
-  pred <- predict(m, newdata = pg_one) # returns all years!
-  pred <- pred[pred$year == max(pred$year), ]
-  stopifnot(identical(nrow(pg), nrow(pred)))
-  pg$combined <- exp(pred$est)
-  pg$pos <- NA
-  pg$bin <- NA
-
-  list(
-    predictions = pg, data = .d_scaled, models = m, survey = survey,
-    years = years
-  )
 }
 
 #' Plot the output from a geostatistical model of survey data
