@@ -1,8 +1,3 @@
----
-output:
-  md_document:
-    variant: gfm
----
 
 # gfplot: An R package for data extraction and plotting of British Columbia groundfish data
 
