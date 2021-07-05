@@ -45,6 +45,6 @@ plot_cpue_predictions <- function(dat, model_version = "Combined", scale = FALSE
       x = ""
     ) +
     ylim(0, NA) +
-    guides(colour = FALSE, fill = FALSE)
+    guides(colour = "none", fill = "none")
 }
 

@@ -154,7 +154,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       scale_colour_manual(values = line_col, breaks = c("M", "F")) +
       scale_size_area(max_size = max_size) +
       guides(
-        size = FALSE, colour = guide_legend(override.aes = list(size = 3.5))
+        size = "none", colour = guide_legend(override.aes = list(size = 3.5))
       ) +
       geom_text(
         data = counts, y = age_max + 0.005 * age_range,
@@ -163,13 +163,15 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
         angle = 90
       ) +
       geom_point(aes_string(
-        size = "proportion", group = "sex", fill = "sex",
+        size = "proportion",
+        group = "sex",
+        fill = if (!is.null(survey_cols)) NULL else "sex",
         colour = "sex"
-      ), pch = 21)
+      ), pch = 21, fill = if (!is.null(survey_cols)) "#88888820" else NULL)
   }
 
   if (!is.null(survey_cols)) {
-    g <- g + guides(fill = FALSE, colour = FALSE)
+    g <- g + guides(fill = "none", colour = "none")
   }
 
   g

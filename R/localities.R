@@ -67,7 +67,7 @@ plot_dfo_localities <- function(localities = "all",
     inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70") +
     ggplot2::coord_equal(xlim = utm_range$X, ylim = utm_range$Y) +
     ggplot2::scale_fill_manual(na.value = "white", values = rep("grey60", 1e3)) +
-    theme_pbs() + ggplot2::guides(fill = FALSE, colour = FALSE) +
+    theme_pbs() + ggplot2::guides(fill = "none", colour = "none") +
     ggplot2::labs(y = en2fr("Northing", translate=french), x = en2fr("Easting", translate=french))
 
   if (localities[[1]] != "all") {

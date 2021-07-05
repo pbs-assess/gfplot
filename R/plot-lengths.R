@@ -101,8 +101,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   g <- ggplot(dat, aes_string("length_bin", "proportion")) +
     geom_col(
       width = bin_size,
-      aes_string(colour = "sex", fill = "sex"), size = 0.3,
-      position = position_identity()
+      aes_string(colour = "sex", fill = if (!is.null(survey_cols)) NULL else "sex"), size = 0.3,
+      position = position_identity(), fill = if (!is.null(survey_cols)) "#88888824" else NULL
     ) +
     theme_pbs() +
     scale_fill_manual(values = fill_col, breaks = c("M", "F")) +
@@ -140,7 +140,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
                  labeller = ggplot2::labeller(.rows = is_all), drop = FALSE)
   }
   if (!is.null(survey_cols)) {
-    g <- g + guides(fill = FALSE, colour = FALSE)
+    g <- g + guides(fill = "none", colour = "none")
   }
 
   g

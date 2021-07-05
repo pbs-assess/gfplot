@@ -193,7 +193,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       strip.background = element_blank(),
       strip.text.x = element_blank()
     ) +
-    guides(fill = FALSE, colour = FALSE) +
+    guides(fill = "none", colour = "none") +
     scale_x_continuous(breaks = seq(0, yrs[2], year_increment))
 
   if (scale) {

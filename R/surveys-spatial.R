@@ -187,6 +187,10 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       draw_boundary = TRUE,
       premade_grid = premade_grid
     )$grid
+    if (!is.null(premade_grid)) {
+      pg$X <- premade_grid$grid$X # FIXME: bad hack; went in as lat and long
+      pg$Y <- premade_grid$grid$Y
+    }
   } else {
     .d_interp <- mutate(.d_tidy, akima_depth = .data$depth)
     .d_scaled <- scale_survey_predictors(.d_interp)
@@ -212,12 +216,15 @@ fit_survey_sets <- function(dat, years, survey = NULL,
     if (survey %in% c("IPHC FISS")) # fixed station
       tmb_knots <- nrow(filter(.d_scaled,year==max(year))) - 1
     .spde <- sdmTMB::make_mesh(.d_scaled, xy_cols = c("X", "Y"), n_knots = tmb_knots)
-    if (length(unique(.d_scaled$year)) > 1)
+    if (length(unique(.d_scaled$year)) > 1) {
       formula <- density ~ 0 + as.factor(year) + depth_scaled + depth_scaled2
-    else
+      time <- "year"
+    } else {
       formula <- density ~ depth_scaled + depth_scaled2
+      time <- NULL
+    }
     m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
-      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = "year", ...)
+      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = time, ...)
     }, error = function(e) NA)
     if (is.na(m)) { # Did not converge.
       warning('The spatial TMB model did not converge.', call. = FALSE)
@@ -232,12 +239,13 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       pg_one <- pg
       pg_one$year <- max(.d_scaled$year)
     } else {
-      pg_one <- filter(pg, year == max(.d_scaled$year)) # all the same, pick one
+      if (!"year" %in% names(pg)) pg$year <- 1L
+      pg_one <- filter(pg, year == max(pg$year)) # all the same, pick one
       pg <- pg_one
     }
     # FIXME: just returning last year for consistency!
     pred <- predict(m, newdata = pg_one) # returns all years!
-    pred <- pred[pred$year == max(pred$year), ]
+    pred <- pred[pred$year == max(pred$year), , drop = FALSE]
     stopifnot(identical(nrow(pg), nrow(pred)))
     pg$combined <- exp(pred$est)
     pg$pos <- NA
@@ -494,7 +502,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
       data = coast, aes_string(x = "X", y = "Y", group = "PID"),
       fill = "grey87", col = "grey70", lwd = 0.2
     ) +
-    guides(shape = FALSE, colour = FALSE) +
+    guides(shape = "none", colour = "none") +
     labs(size = pt_label, fill = fill_label) +
     ylab(en2fr("Northing", translate = french)) +
     xlab(en2fr("Easting", translate = french))

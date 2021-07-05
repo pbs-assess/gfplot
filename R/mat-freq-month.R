@@ -179,7 +179,7 @@ plot_maturity_months <- function(dat,
       scale_colour_manual(values = line_col) +
       scale_size_area(max_size = max_size) +
       guides(
-        size = FALSE, colour = guide_legend(override.aes = list(size = 3.5)),
+        size = "none", colour = guide_legend(override.aes = list(size = 3.5)),
         fill = guide_legend(override.aes = list(size = 3.5))
       ) +
       geom_text(

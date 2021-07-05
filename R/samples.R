@@ -162,7 +162,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
       axis.ticks.x = element_blank(),
       axis.ticks.y = element_blank()
     ) +
-    ggplot2::guides(fill = FALSE) + xlab("") + ylab("") +
+    ggplot2::guides(fill = "none") + xlab("") + ylab("") +
     geom_text(aes_string(x = "year", label = "n_text"),
       colour = text_colour,
       size = 2.1, alpha = 1
