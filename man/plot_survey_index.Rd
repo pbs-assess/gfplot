@@ -8,7 +8,7 @@
 tidy_survey_index(
   dat,
   survey = c("SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI", "HBLL OUT N", "HBLL OUT S",
-    "HBLL INS N", "HBLL INS S", "MSA HS", "IPHC FISS"),
+    "HBLL INS N", "HBLL INS S", "OTHER HS MSA", "IPHC FISS"),
   min_years = 3,
   year_range = NULL
 )
