@@ -22,7 +22,7 @@ tidy_survey_index <- function(dat,
                                 "SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI",
                                 "HBLL OUT N",
                                 "HBLL OUT S", "HBLL INS N", "HBLL INS S",
-                                "MSA HS", "IPHC FISS"
+                                "OTHER HS MSA", "IPHC FISS"
                               ),
                               min_years = 3, year_range = NULL) {
   if (is.null(year_range)) {
