@@ -1,8 +1,15 @@
+---
+output:
+  md_document:
+    variant: gfm
+---
+
 # gfplot: An R package for data extraction and plotting of British Columbia groundfish data
 
-[![Travis-CI Build
-Status](https://travis-ci.org/pbs-assess/gfplot.svg?branch=master)](https://travis-ci.org/pbs-assess/gfplot)
-<!-- [![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip) -->
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/pbs-assess/gfplot/workflows/R-CMD-check/badge.svg)](https://github.com/pbs-assess/gfplot/actions)
+<!-- badges: end -->
 
 Facilitates the creation of an annual groundfish data synopsis report
 with [gfsynopsis](https://github.com/pbs-assess/gfsynopsis).
@@ -10,7 +17,7 @@ with [gfsynopsis](https://github.com/pbs-assess/gfsynopsis).
 Note that the documentation is incomplete in some places. Please post in
 the [issue tracker](https://github.com/pbs-assess/gfplot/issues) if you
 have questions or suggestions on how the package or its documentation
-could be improved. We welcome pull requests\!
+could be improved. We welcome pull requests!
 
 In addition to the help available through the R console, a [web version
 of the documentation is
@@ -60,31 +67,25 @@ Generic functions for any similarly formatted data:
 
 ``` r
 sort(fns[grepl("tidy", fns)])
-#>  [1] "tidy_age_precision"    "tidy_ages_raw"        
-#>  [3] "tidy_ages_weighted"    "tidy_catch"           
-#>  [5] "tidy_comps"            "tidy_comps_commercial"
-#>  [7] "tidy_comps_survey"     "tidy_cpue_historical" 
-#>  [9] "tidy_cpue_index"       "tidy_lengths_raw"     
-#> [11] "tidy_lengths_weighted" "tidy_maturity_months" 
-#> [13] "tidy_sample_avail"     "tidy_survey_index"    
-#> [15] "tidy_survey_sets"
+#>  [1] "tidy_age_precision"    "tidy_ages_raw"         "tidy_ages_weighted"   
+#>  [4] "tidy_catch"            "tidy_comps"            "tidy_comps_commercial"
+#>  [7] "tidy_comps_survey"     "tidy_cpue_historical"  "tidy_cpue_index"      
+#> [10] "tidy_lengths_raw"      "tidy_lengths_weighted" "tidy_maturity_months" 
+#> [13] "tidy_sample_avail"     "tidy_survey_index"     "tidy_survey_sets"
 ```
 
 ``` r
 sort(fns[grepl("fit", fns)])
-#> [1] "fit_cpue_index_glmmtmb" "fit_length_weight"     
-#> [3] "fit_mat_ogive"          "fit_survey_sets"       
-#> [5] "fit_vb"
+#> [1] "fit_cpue_index_glmmtmb" "fit_length_weight"      "fit_mat_ogive"         
+#> [4] "fit_survey_sets"        "fit_vb"
 ```
 
 ``` r
 sort(fns[grepl("plot", fns)])
-#>  [1] "plot_age_precision"     "plot_ages"             
-#>  [3] "plot_catch"             "plot_cpue_spatial"     
-#>  [5] "plot_growth"            "plot_length_weight"    
-#>  [7] "plot_lengths"           "plot_mat_ogive"        
-#>  [9] "plot_maturity_months"   "plot_predictor_bubbles"
-#> [11] "plot_qres_histogram"    "plot_qres_qq"          
-#> [13] "plot_sample_avail"      "plot_survey_index"     
-#> [15] "plot_survey_sets"       "plot_vb"
+#>  [1] "plot_age_precision"     "plot_ages"              "plot_catch"            
+#>  [4] "plot_catch_spatial"     "plot_cpue_spatial"      "plot_growth"           
+#>  [7] "plot_length_weight"     "plot_lengths"           "plot_mat_annual_ogives"
+#> [10] "plot_mat_ogive"         "plot_maturity_months"   "plot_predictor_bubbles"
+#> [13] "plot_qres_histogram"    "plot_qres_qq"           "plot_sample_avail"     
+#> [16] "plot_survey_index"      "plot_survey_sets"       "plot_vb"
 ```
