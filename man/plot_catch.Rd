@@ -33,7 +33,7 @@ For \code{plot_catch()} should be from \code{tidy_catch()} or be formatted simil
 See details.}
 
 \item{areas}{Fisheries and Oceans major statistical areas (eg. 3C, 3D, 5A,
-5B, etc.). See gfplot::pbs_areas for a lookup table with descriptions.
+5B, etc.). See \code{gfplot::pbs_areas} for a lookup table with descriptions.
 Enter as a regular expression. For example, \code{c("5A", "5B")} or
 \code{c("5[CDE]+", "5[AB]+")}.}
 
@@ -47,7 +47,8 @@ Enter as a regular expression. For example, \code{c("5A", "5B")} or
 
 \item{units}{A named character vector with names referring to text that will
 be pasted into the y-axis label and a value defining the quantity to divide
-the \code{value} column by for that unit label. Defaults to \code{c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)} if \code{units = NULL}.}
+the \code{value} column by for that unit label. Defaults to
+\code{c('1000 t' = 1000000, 't' = 1000, 'kg' = 1)} if \code{units = NULL}.}
 
 \item{unreliable}{An optional numeric vector defining years before which the
 data are less reliable. Leave as \code{NA} to omit.}
@@ -55,12 +56,12 @@ data are less reliable. Leave as \code{NA} to omit.}
 \item{blank_plot}{If \code{TRUE} then a blank plot with appropriate axes will be
 returned. Used in the synopsis report.}
 
-\item{month_fishing_starts}{The month in which the fishing year starts and ends.
-The \code{year} column of the returned data frame will refer to the fishing year as determined by
-this and the \code{day_fishing_starts} argument.}
+\item{month_fishing_starts}{The month in which the fishing year starts and
+ends. The \code{year} column of the returned data frame will refer to the
+fishing year as determined by this and the \code{day_fishing_starts} argument.}
 
-\item{day_fishing_starts}{The day of the month in which the fishing year starts and ends.
-See \code{month_fishing_starts}}
+\item{day_fishing_starts}{The day of the month in which the fishing year
+starts and ends. See \code{month_fishing_starts}}
 
 \item{yr_col}{Name of the column in \code{dat} holding the fishing year data}
 
@@ -89,7 +90,8 @@ tidy_catch(d, areas = c("5[CDE]+", "5[AB]+", "3[CD]+")) \%>\%
 tidy_catch(d, areas = c("5A", "5B")) \%>\%
   plot_catch()
 }
-\dontrun
+\dontrun{
 d <- gfdata::get_catch("arrowtooth flounder")
 d <- set_fishing_year(d, 2, 21) # Feb 21 - Feb 20 is the fishing year
+}
 }
