@@ -56,3 +56,4 @@
 ^vb.rds$
 ^vb.stan$
 ^prediction-grids$
+^codecov.yml$
