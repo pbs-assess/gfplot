@@ -464,14 +464,6 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     ) +
       fill_scale + colour_scale
   }
-  if (show_model_predictions && circles) {
-    g <- g + ggplot2::geom_point(
-      data = pred_dat, aes_string("X", "Y",
-        fill = fill_column, colour = fill_column, group = "id"
-      ), size = cell_size, pch = 21
-    ) +
-      fill_scale + colour_scale
-  }
   if (show_raw_data) {
     g <- g +
       geom_point(
@@ -528,6 +520,16 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
         ),
         inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
       )})})
+
+  # plot circles on top of land for inlets:
+  if (show_model_predictions && circles) {
+    g <- g + ggplot2::geom_point(
+      data = pred_dat, aes_string("X", "Y",
+        fill = fill_column, colour = fill_column, group = "id"
+      ), size = cell_size, pch = 21
+    ) +
+      fill_scale + colour_scale
+  }
 
   if (north_symbol) {
     g <- g + ggplot2::geom_segment(
