@@ -31,11 +31,12 @@ tidy_comps(
   frequency_type = c("raw", "weighted"),
   dat_survey_sets = NULL,
   dat_catch = NULL,
-  remove_unsexed = TRUE
+  remove_unsexed = TRUE,
+  ...
 )
 }
 \arguments{
-\item{...}{Arguments to pass to \code{tidy_comps()}.}
+\item{...}{Arguments to pass to \code{\link[=set_fishing_year]{set_fishing_year()}}}
 
 \item{dat}{The input samples data frame from \code{\link[=get_commercial_samples]{get_commercial_samples()}} or
 \code{\link[=get_survey_samples]{get_survey_samples()}}.}

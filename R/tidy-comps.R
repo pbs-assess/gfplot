@@ -119,6 +119,7 @@ tidy_lengths_weighted <- function(...) {
 
 #' @export
 #' @rdname tidy_comps
+#' @param ... Arguments to pass to [set_fishing_year()]
 tidy_comps <- function(dat,
                        survey = c(
                          "SYN WCHG", "SYN HS", "SYN QCS", "SYN WCVI", "HBLL OUT N",
@@ -135,7 +136,13 @@ tidy_comps <- function(dat,
                        frequency_type = c("raw", "weighted"),
                        dat_survey_sets = NULL,
                        dat_catch = NULL,
-                       remove_unsexed = TRUE) {
+                       remove_unsexed = TRUE,
+                       ...) {
+
+  if(sample_type == "commercial" && !is.null(dat_catch)){
+    dat_catch <- set_fishing_year(dat_catch, ...)
+  }
+
   age_length <- match.arg(age_length)
   sample_type <- match.arg(sample_type)
   frequency_type <- match.arg(frequency_type)
