@@ -25,6 +25,10 @@ tidy_survey_index <- function(dat,
                                 "OTHER HS MSA", "IPHC FISS"
                               ),
                               min_years = 3, year_range = NULL) {
+
+  if ("MSA HS" %in% unique(dat$survey_abbrev) && "OTHER HS MSA" %in% survey) {
+    survey[survey == "OTHER HS MSA"] <- "MSA HS"
+  }
   if (is.null(year_range)) {
     year_range <- range(dat$year, na.rm = TRUE)
   }
