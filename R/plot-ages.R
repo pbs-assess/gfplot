@@ -96,6 +96,7 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     ))
     fill_col <- rep("#FFFFFF10", length(col))
     line_col <- col
+    names(fill_col) <- names(line_col)
     dat$sex <- paste(dat$sex, dat$survey_abbrev)
   } else {
     fill_col <- paste0(substr(line_col, 1L, 7L), as.character(alpha * 100))
@@ -165,9 +166,9 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
       geom_point(aes_string(
         size = "proportion",
         group = "sex",
-        fill = if (!is.null(survey_cols)) NULL else "sex",
+        fill = "sex",
         colour = "sex"
-      ), pch = 21, fill = if (!is.null(survey_cols)) "#88888820" else NULL)
+      ), pch = 21)
   }
 
   if (!is.null(survey_cols)) {
