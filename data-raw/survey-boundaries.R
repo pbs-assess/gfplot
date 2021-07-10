@@ -69,10 +69,60 @@ shape <- rgdal::readOGR(
   dsn = ".",
   layer = "PHMA_S_GRID", verbose = FALSE)
 plot(shape)
-hbll_grid <- select(shape@data, LONGITUDE, LATITUDE, DEPTH_M) %>%
-  rename(X = LONGITUDE, Y = LATITUDE, depth = DEPTH_M)
+
+## former code that poduced half the grid offset by 1km from the other half
+# hbll_grid <- select(shape@data, LONGITUDE, LATITUDE, DEPTH_M) %>%
+#   rename(X = LONGITUDE, Y = LATITUDE, depth = DEPTH_M)
+
+# new approach to getting lat lon centroids from shape file using sf
+library(sf)
+proj1 =  sp::proj4string(shape)
+hbll_sf <- st_as_sf(shape)
+
+hbll_sf_ll <- st_transform(hbll_sf, crs = 4326)
+hbll_sf_ll$geometry <- st_centroid(hbll_sf_ll$geometry) %>% st_geometry()
+
+# to add sf geometry back onto dataframe
+sfc_as_cols <- function(x, names = c("x","y")) {
+  stopifnot(inherits(x,"sf") #&& inherits(sf::st_geometry(x),"sfc_POINT")
+  )
+  ret <- sf::st_coordinates(x)
+  ret <- tibble::as_tibble(ret)
+  stopifnot(length(names) == ncol(ret))
+  x <- x[ , !names(x) %in% names]
+  ret <- setNames(ret,names)
+  dplyr::bind_cols(x,ret)
+}
+
+hbll_grid <- sfc_as_cols(hbll_sf_ll, c("x", "y"))
+st_geometry(hbll_grid) <- NULL
+
+
+hbll_grid <- dplyr::select(hbll_grid, x, y,
+  # BLOCK_DESI, # will need to add if including utms
+  # LONGITUDE, LATITUDE, # will need if you want to do back to old grid or compare between
+  DEPTH_M) %>%
+  rename(
+    #X = LONGITUDE, Y = LATITUDE, # original values from data associated with shape file
+    X = x, Y = y, # lat/lon centroids of grid cells in shape file
+    depth = DEPTH_M
+  )
+
+
+# ## if you want add lower case x, y wit utms to grid?
+# hbll_sf_utm <- st_transform(hbll_sf, crs = 3156)
+# hbll_sf_utm$geometry <- st_centroid(hbll_sf_utm$geometry) %>% st_geometry()
+# hbll_s_grid_utm <- sfc_as_cols(hbll_sf_utm, c("x", "y"))
+# st_geometry(hbll_s_grid_utm) <- NULL
+#
+# hbll_grid_utm <- dplyr::select(hbll_s_grid_utm, BLOCK_DESI, x, y, DEPTH_M) %>%
+#   rename(depth = DEPTH_M)
+#
+# hbll_grid <- left_join(hbll_grid, hbll_grid_utm)
+
 hbll_grid <- mutate(hbll_grid, depth = -depth) %>%
   filter(depth > 0)
+
 setwd("../../../")
 hbll_s_grid <- list(grid = hbll_grid, cell_area = 2.0)
 usethis::use_data(hbll_s_grid, internal = FALSE, overwrite = TRUE)
@@ -131,7 +181,7 @@ setwd("../../../")
 
 # dogfish ----------------------------
 
-setwd("inst/extdata/dogfish")
+setwd("/inst/extdata/dogfish")
 
 library(sf)
 library(ggplot2)
