@@ -26,7 +26,6 @@
 \alias{get_sensor_data_fe_trawl}
 \alias{get_sensor_data_ll_td}
 \alias{get_management}
-\alias{get_sara_dat}
 \alias{cache_pbs_data}
 \title{Get PBS data}
 \usage{
@@ -113,8 +112,6 @@ get_management(
   area = NULL,
   start_year = NULL
 )
-
-get_sara_dat()
 
 cache_pbs_data(
   species,

@@ -953,26 +953,6 @@ get_management <- function(species = NULL, species_group = NULL, fishery = NULL,
   .d %>% arrange(dplyr::desc(action_start_date))
 }
 
-#' @export
-#' @rdname get_data
-get_sara_dat <- function() {
-  .h <- xml2::read_html(
-    "http://www.registrelep-sararegistry.gc.ca/sar/index/default_e.cfm"
-  )
-  .d <- .h %>%
-    rvest::html_nodes("table") %>%
-    .[[1]] %>%
-    rvest::html_table() %>%
-    .[-(1:2), ] %>%
-    dplyr::as_tibble() %>%
-    filter(.data$Taxon %in% "Fishes") %>%
-    filter(!grepl("Salmon", .data$`Common name *`))
-  names(.d) <- tolower(names(.d))
-  names(.d) <- gsub(" ", "_", names(.d))
-  names(.d) <- gsub("_\\*", "", names(.d))
-  as_tibble(.d)
-}
-
 #' @param file_name Optional filename(s) for the cached file. Defaults to the
 #'   same as the `species` argument.
 #' @param path The folder where the cached data will be saved.
