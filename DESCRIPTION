@@ -54,7 +54,8 @@ Imports:
     tweedie,
     ggrepel,
     boot,
-    rosettafish
+    rosettafish,
+    numform
 Suggests:
     knitr,
     rmarkdown,

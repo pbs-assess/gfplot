@@ -110,7 +110,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
   dat$n_plot <- trans(dat$n)
   dat$n_text <- round_nice(dat$n)
   dat$type <- firstup(as.character(gsub("_", " ", dat$type)))
-  dat <- dat %>% mutate(type = gsub("Ageing structure", "Age structures", type))
+  dat <- dat %>% mutate(type = gsub("Ageing structure", "Structures", type))
   dat$type <- paste("#", dat$type, sep = " ")
 
   year_min <- min(dat$year, na.rm = TRUE)
@@ -136,7 +136,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
         "# Weight",
         "# Maturity",
         "# Age",
-        "# Age structures"
+        "# Structures"
       ))))
 
   if (french){
@@ -144,7 +144,7 @@ plot_sample_avail <- function(dat, year_range = NULL, title = "Biological sample
     levels(dat$type)[levels(dat$type)=="# Weight"] <- paste("#", en2fr("Weight"))
     levels(dat$type)[levels(dat$type)=="# Maturity"] <- paste("#", en2fr("Maturity"))
     levels(dat$type)[levels(dat$type)=="# Age"] <- paste("#", en2fr("Age"))
-    levels(dat$type)[levels(dat$type)=="# Age structures"] <- paste("#", en2fr("Age structures"))
+    levels(dat$type)[levels(dat$type)=="# Structures"] <- paste("#", "Structure")
   }
 
   ggplot(dat, aes_string("year", "type")) +

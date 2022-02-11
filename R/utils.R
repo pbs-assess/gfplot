@@ -148,9 +148,14 @@ round_any <- function(x, accuracy) {
   round(x / accuracy) * accuracy
 }
 
-round_nice <- function(x) {
+round_nice <- function(x, thousands_k = TRUE) {
   out <- round_any(x, 100)
   out[out == 0] <- x[out == 0]
+  if (thousands_k) {
+    out <- as.numeric(out)
+    out <- ifelse(out >= 1000, numform::f_thous(out, relative = 1L), out)
+    # out <- gsub("\\.0K", "K", out)
+  }
   out[x == 0] <- ""
   out
 }
