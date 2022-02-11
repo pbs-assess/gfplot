@@ -153,7 +153,7 @@ round_nice <- function(x, thousands_k = TRUE) {
   out[out == 0] <- x[out == 0]
   if (thousands_k) {
     out <- as.numeric(out)
-    out <- ifelse(out >= 1000, numform::f_thous(out, relative = 1L), out)
+    out <- ifelse(out >= 1000, numform::f_thous(out, relative = 0L), out)
     # out <- gsub("\\.0K", "K", out)
   }
   out[x == 0] <- ""

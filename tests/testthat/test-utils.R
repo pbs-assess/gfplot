@@ -69,7 +69,7 @@ test_that("round_nice() works", {
   expect_equal(round_nice(1001, thousands_k = FALSE), "1000")
   expect_equal(round_nice(1502, thousands_k = FALSE), "1500")
   expect_equal(round_nice(1001, thousands_k = TRUE), "1K")
-  expect_equal(round_nice(1502, thousands_k = TRUE), "1.5K")
+  expect_equal(round_nice(1502, thousands_k = TRUE), "2K")
 })
 
 test_that("read_sql works", {
