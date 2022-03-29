@@ -73,7 +73,7 @@ Set to \code{NULL} to include all samples.}
 \item{frequency_type}{Should the frequencies or proportions be based on raw
 value or with weighted samples?}
 
-\item{dat_survey_sets}{A data frame from \code{\link[=get_survey_sets]{get_survey_sets()}}. Needed for
+\item{dat_survey_sets}{A data frame from \link{get_survey_sets(..., join_sample_ids = TRUE)}. Needed for
 weighted samples if \code{sample_type = "survey"}.}
 
 \item{dat_catch}{A data frame from \code{\link[=get_catch]{get_catch()}}. Needed for weighted samples

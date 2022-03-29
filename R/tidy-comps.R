@@ -29,7 +29,7 @@
 #' @param sample_type Are the samples from a commercial or survey source?
 #' @param frequency_type Should the frequencies or proportions be based on raw
 #'   value or with weighted samples?
-#' @param dat_survey_sets A data frame from [get_survey_sets()]. Needed for
+#' @param dat_survey_sets A data frame from [get_survey_sets(..., join_sample_ids = TRUE)]. Needed for
 #'   weighted samples if `sample_type = "survey"`.
 #' @param dat_catch A data frame from [get_catch()]. Needed for weighted samples
 #'   if `sample_type = "commercial"`.
