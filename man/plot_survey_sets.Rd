@@ -128,7 +128,7 @@ the map including the ability to rotate the map.
 \examples{
 \dontrun{
 set.seed(123)
-# pop_surv <- get_survey_sets("pacific ocean perch")
+# pop_surv <- gfdata::get_survey_sets("pacific ocean perch")
 # or use built-in data:
 fit <- fit_survey_sets(pop_surv,
   years = 2015,

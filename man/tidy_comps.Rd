@@ -38,8 +38,8 @@ tidy_comps(
 \arguments{
 \item{...}{Arguments to pass to \code{\link[=set_fishing_year]{set_fishing_year()}}}
 
-\item{dat}{The input samples data frame from \code{\link[=get_commercial_samples]{get_commercial_samples()}} or
-\code{\link[=get_survey_samples]{get_survey_samples()}}.}
+\item{dat}{The input samples data frame from \code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}} or
+\code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}.}
 
 \item{survey}{A character vector of survey names to use. These should match
 the survey abbreviations in GFBio. All of the survey listed here will be
@@ -58,7 +58,7 @@ area descriptions. The pattern \code{"*"} will return all areas. For example,
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Default to \code{NULL}, which brings in all valid ageing codes.
-See \code{\link[=get_age_methods]{get_age_methods()}}.}
+See \code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
 
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
@@ -73,10 +73,10 @@ Set to \code{NULL} to include all samples.}
 \item{frequency_type}{Should the frequencies or proportions be based on raw
 value or with weighted samples?}
 
-\item{dat_survey_sets}{A data frame from \link{get_survey_sets(..., join_sample_ids = TRUE)}. Needed for
+\item{dat_survey_sets}{A data frame from \code{gfdata::get_survey_sets(..., join_sample_ids = TRUE)}. Needed for
 weighted samples if \code{sample_type = "survey"}.}
 
-\item{dat_catch}{A data frame from \code{\link[=get_catch]{get_catch()}}. Needed for weighted samples
+\item{dat_catch}{A data frame from \code{\link[gfdata:get_data]{gfdata::get_catch()}}. Needed for weighted samples
 if \code{sample_type = "commercial"}.}
 
 \item{remove_unsexed}{Logical}
@@ -102,13 +102,13 @@ bin. E.g. \code{13} with \code{bin_size = 2} would represent a bin from \code{12
 
 # # extract data with get_*() functions:
 # # main age/length data:
-# rs_comm_samples <- get_commercial_samples("redstripe rockfish",
+# rs_comm_samples <- gfdata::get_commercial_samples("redstripe rockfish",
 #   discard_keepers = TRUE)
-# rs_survey_samples <- get_survey_samples("redstripe rockfish")
+# rs_survey_samples <- gfdata::get_survey_samples("redstripe rockfish")
 #
 # # for weighting:
-# rs_catch <- get_catch("redstripe rockfish")
-# rs_survey_sets <- get_survey_sets("redstripe rockfish")
+# rs_catch <- gfdata::get_catch("redstripe rockfish")
+# rs_survey_sets <- gfdata::get_survey_sets("redstripe rockfish")
 
 # calculate raw age frequencies for survey data:
 tidy_ages_raw(rs_survey_samples,

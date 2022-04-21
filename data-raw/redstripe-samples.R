@@ -18,12 +18,12 @@ rs_catch <- dplyr::filter(rs_catch, species_common_name == spp)
 library(dplyr)
 
 # # main age/length data:
-# rs_comm_samples <- get_comm_samples("redstripe rockfish", discard_keepers = TRUE)
-# rs_survey_samples <- get_survey_samples("redstripe rockfish")
+# rs_comm_samples <- gfdata::get_comm_samples("redstripe rockfish", discard_keepers = TRUE)
+# rs_survey_samples <- gfdata::get_survey_samples("redstripe rockfish")
 #
 # # for weighting:
-# rs_catch <- get_catch("redstripe rockfish")
-# rs_survey_sets <- get_survey_sets("redstripe rockfish")
+# rs_catch <- gfdata::get_catch("redstripe rockfish")
+# rs_survey_sets <- gfdata::get_survey_sets("redstripe rockfish")
 
 rs_comm_samples <- filter(rs_comm_samples, year > 2008, year < 2015)
 rs_comm_samples$species_scientific_name <- NULL

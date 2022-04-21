@@ -7,7 +7,7 @@
 #' frame must come from `tidy_catch()` or have the columns (in any order):
 #' `year`, `gear`, `value` (containing catches or landings).
 #'
-#' @param dat Input data frame. For `tidy_catch()` should be from [get_catch()].
+#' @param dat Input data frame. For `tidy_catch()` should be from [gfdata::get_catch()].
 #'   For `plot_catch()` should be from `tidy_catch()` or be formatted similarly.
 #'   See details.
 #' @param areas Fisheries and Oceans major statistical areas (eg. 3C, 3D, 5A,
@@ -28,7 +28,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_catch("lingcod")
+#' d <- gfdata::get_catch("lingcod")
 #' tidy_catch(d, areas = c("5[CDE]+", "5[AB]+", "3[CD]+")) %>%
 #'   plot_catch()
 #'

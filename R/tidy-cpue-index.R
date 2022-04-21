@@ -3,7 +3,7 @@
 #' This function determines the qualifying "fleet" for CPUE analyses. It is
 #' meant to be used with modern data available at the fishing event level.
 #'
-#' @param dat An input data frame from [get_cpue_index()].
+#' @param dat An input data frame from [gfdata::get_cpue_index()].
 #' @param species_common The species common name.
 #' @param year_range The range of years to include.
 #' @param alt_year_start_date Alternative year starting date specified as a
@@ -40,7 +40,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_cpue_index(gear = "bottom trawl")
+#' d <- gfdata::get_cpue_index(gear = "bottom trawl")
 #' walleye <- tidy_cpue_index(d, "walleye pollock",
 #'   area_grep_pattern = "5[CDE]+"
 #' )

@@ -1,21 +1,21 @@
 #' Tidy PBS samples data for [plot_sample_avail()]
 #'
-#' @param dat Input data frame from [get_survey_samples()].
+#' @param dat Input data frame from [gfdata::get_survey_samples()].
 #' @param year_range Either `NULL`, in which case all years are returned,
 #'   or a numeric vector of length two giving the lower and upper years to
 #'   include.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
-#'   See [get_age_methods()].
+#'   See [gfdata::get_age_methods()].
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_survey_samples("lingcod")
+#' d <- gfdata::get_survey_samples("lingcod")
 #' tidy_sample_avail(d)
 #'
-#' d <- get_commercial_samples("lingcod")
+#' d <- gfdata::get_commercial_samples("lingcod")
 #' tidy_sample_avail(d)
 #' }
 
@@ -93,12 +93,12 @@ tidy_sample_avail <- function(dat, year_range = NULL,
 #' plot_sample_avail(d)
 #'
 #' \dontrun{
-#' d <- get_survey_samples("lingcod")
+#' d <- gfdata::get_survey_samples("lingcod")
 #' d <- tidy_sample_avail(d, year_range = c(1996, 2016))
 #' plot_sample_avail(d, year_range = c(1996, 2016),
 #'   title = "Survey samples")
 #'
-#' d <- get_commercial_samples("lingcod")
+#' d <- gfdata::get_commercial_samples("lingcod")
 #' d <- tidy_sample_avail(d, year_range = c(1996, 2016))
 #' plot_sample_avail(d, year_range = c(1996, 2016),
 #'   title = "Commercial samples")

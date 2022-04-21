@@ -25,8 +25,8 @@ fit_vb(
 )
 }
 \arguments{
-\item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
-\code{\link[=get_commercial_samples]{get_commercial_samples()}}.}
+\item{dat}{Input data frame. Should be from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or
+\code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 
@@ -60,7 +60,7 @@ lengths. Can be useful for outliers. Defaults to including all data.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
-\code{\link[=get_age_methods]{get_age_methods()}}.}
+\code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
 
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.

@@ -11,7 +11,7 @@ A data frame
 pop_samples
 }
 \description{
-Originally retrieved with \code{get_survey_samples("pacific ocean perch")}. Has
+Originally retrieved with \code{gfdata::get_survey_samples("pacific ocean perch")}. Has
 been filtered in various ways to condense the data set for use in examples
 throughout the package.
 }

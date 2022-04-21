@@ -2,8 +2,8 @@
 #'
 #' For use with data for a single species.
 #'
-#' @param dat Input data frame. Should be from [get_survey_samples()] or
-#'   [get_commercial_samples()].
+#' @param dat Input data frame. Should be from [gfdata::get_survey_samples()] or
+#'   [gfdata::get_commercial_samples()].
 #' @param sex Either "male" or "female".
 #' @param method `"mpd"` for the mode of the posterior distribution (with
 #'   [rstan::optimizing()]) or `"mcmc"` for full MCMC sampling with Stan (with
@@ -25,7 +25,7 @@
 #' @param uniform_priors Logical. If true then uniform priors will be used.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes. See
-#'   [get_age_methods()].
+#'   [gfdata::get_age_methods()].
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
@@ -222,8 +222,8 @@ fit_vb <- function(dat,
 #'
 #' For use with data for a single species.
 #'
-#' @param dat Input data frame. Should be from [get_survey_samples()] or
-#'   [get_commercial_samples()].
+#' @param dat Input data frame. Should be from [gfdata::get_survey_samples()] or
+#'   [gfdata::get_commercial_samples()].
 #' @param sex Either "male" or "female".
 #' @param downsample If not `Inf` this represents a number of fish specimens to
 #'   sample prior to model fitting. Can be useful for large data sets that you
@@ -247,7 +247,7 @@ fit_vb <- function(dat,
 #' @export
 #' @examples
 #' \dontrun{
-#' d <- get_survey_samples("pacific ocean perch")
+#' d <- gfdata::get_survey_samples("pacific ocean perch")
 #' model_f <- fit_length_weight(d, sex = "female")
 #' model_m <- fit_length_weight(d, sex = "male")
 #' plot_length_weight(object_female = model_f, object_male = model_m)
@@ -369,7 +369,7 @@ fit_length_weight <- function(dat,
 #'
 #' @examples
 #' \dontrun{
-#' # d <- get_survey_samples("pacific ocean perch")
+#' # d <- gfdata::get_survey_samples("pacific ocean perch")
 #' d <- pop_samples
 #' model_f <- fit_length_weight(d, sex = "female")
 #' model_m <- fit_length_weight(d, sex = "male")

@@ -18,7 +18,7 @@ tidy_cpue_historical(
 )
 }
 \arguments{
-\item{dat}{Data from \code{\link[=get_cpue_historical]{get_cpue_historical()}}.}
+\item{dat}{Data from \code{\link[gfdata:get_data]{gfdata::get_cpue_historical()}}.}
 
 \item{species_common}{A species common name in lowercase.}
 
@@ -66,7 +66,7 @@ trips in 1991 and after to create a consistent form of data.
 }
 \examples{
 \dontrun{
-get_cpue_historical(end_year = 2016) \%>\%
+gfdata::get_cpue_historical(end_year = 2016) \%>\%
   tidy_cpue_historical(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 }
 }

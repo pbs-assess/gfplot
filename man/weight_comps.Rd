@@ -13,17 +13,17 @@ tidy_comps_survey(specimen_dat, survey_tows, value, bin_size = NULL)
 weight_comps(dat)
 }
 \arguments{
-\item{specimen_dat}{Specimen data. E.g. from \code{\link[=get_commercial_samples]{get_commercial_samples()}} for
-commercial data or \code{\link[=get_survey_samples]{get_survey_samples()}} for survey data.}
+\item{specimen_dat}{Specimen data. E.g. from \code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}} for
+commercial data or \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} for survey data.}
 
-\item{catch_dat}{Catch data. E.g. from \code{\link[=get_catch]{get_catch()}}.}
+\item{catch_dat}{Catch data. E.g. from \code{\link[gfdata:get_data]{gfdata::get_catch()}}.}
 
 \item{value}{The \strong{unquoted} column name with the values to re-weight
 (e.g. \code{age} or \code{length}).}
 
 \item{bin_size}{The binning size (likely only used for lengths).}
 
-\item{survey_tows}{Survey tow data. E.g. from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
+\item{survey_tows}{Survey tow data. E.g. from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}.}
 
 \item{dat}{A properly formatted data frame such the output from
 \code{tidy_comps_survey()} or \code{tidy_comps_commercial()}. See details.}
@@ -66,8 +66,8 @@ species <- "redstripe rockfish"
 
 ## Surveys:
 ## ssid = 1 is Queen Charlotte Sound Synoptic Survey:
-# rs_survey_samples <- get_survey_samples(species, ssid = 1)
-# rs_survey_sets <- get_survey_sets(species, ssid = 1)
+# rs_survey_samples <- gfdata::get_survey_samples(species, ssid = 1)
+# rs_survey_sets <- gfdata::get_survey_sets(species, ssid = 1)
 
 surv_lengths <- tidy_comps_survey(rs_survey_samples, rs_survey_sets,
   value = length, bin_size = 2)
@@ -79,8 +79,8 @@ surv_ages
 weight_comps(surv_ages)
 
 ## Commercial:
-# rs_comm_samples <- get_commercial_samples(species)
-# rs_catch <- get_catch(species)
+# rs_comm_samples <- gfdata::get_commercial_samples(species)
+# rs_catch <- gfdata::get_catch(species)
 
 com_lengths <- tidy_comps_commercial(rs_comm_samples, rs_catch,
   value = length, bin_size = 2)

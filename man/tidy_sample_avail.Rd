@@ -7,7 +7,7 @@
 tidy_sample_avail(dat, year_range = NULL, ageing_method_codes = NULL)
 }
 \arguments{
-\item{dat}{Input data frame from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
+\item{dat}{Input data frame from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}.}
 
 \item{year_range}{Either \code{NULL}, in which case all years are returned,
 or a numeric vector of length two giving the lower and upper years to
@@ -15,17 +15,17 @@ include.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Default to \code{NULL}, which brings in all valid ageing codes.
-See \code{\link[=get_age_methods]{get_age_methods()}}.}
+See \code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
 }
 \description{
 Tidy PBS samples data for \code{\link[=plot_sample_avail]{plot_sample_avail()}}
 }
 \examples{
 \dontrun{
-d <- get_survey_samples("lingcod")
+d <- gfdata::get_survey_samples("lingcod")
 tidy_sample_avail(d)
 
-d <- get_commercial_samples("lingcod")
+d <- gfdata::get_commercial_samples("lingcod")
 tidy_sample_avail(d)
 }
 }

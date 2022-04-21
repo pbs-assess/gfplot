@@ -75,12 +75,12 @@ pop_samples \%>\%
   plot_ages()
 
 # main age/length data:
-rs_comm_samples <- get_commercial_samples("redstripe rockfish")
-rs_survey_samples <- get_survey_samples("redstripe rockfish")
+rs_comm_samples <- gfdata::get_commercial_samples("redstripe rockfish")
+rs_survey_samples <- gfdata::get_survey_samples("redstripe rockfish")
 #
 # for weighting:
-rs_catch <- get_catch("redstripe rockfish")
-rs_survey_sets <- get_survey_sets("redstripe rockfish")
+rs_catch <- gfdata::get_catch("redstripe rockfish")
+rs_survey_sets <- gfdata::get_survey_sets("redstripe rockfish")
 
 # survey raw age frequencies:
 tidy_ages_raw(rs_survey_samples,

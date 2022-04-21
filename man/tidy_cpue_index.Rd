@@ -25,7 +25,7 @@ tidy_cpue_index(
 )
 }
 \arguments{
-\item{dat}{An input data frame from \code{\link[=get_cpue_index]{get_cpue_index()}}.}
+\item{dat}{An input data frame from \code{\link[gfdata:get_data]{gfdata::get_cpue_index()}}.}
 
 \item{species_common}{The species common name.}
 
@@ -80,7 +80,7 @@ meant to be used with modern data available at the fishing event level.
 }
 \examples{
 \dontrun{
-d <- get_cpue_index(gear = "bottom trawl")
+d <- gfdata::get_cpue_index(gear = "bottom trawl")
 walleye <- tidy_cpue_index(d, "walleye pollock",
   area_grep_pattern = "5[CDE]+"
 )

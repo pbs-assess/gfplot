@@ -8,7 +8,7 @@ clean_localities <- function(x) {
 #' or an "arithmetic" CPUE where the catch and effort are summed each year and
 #' divided.
 #'
-#' @param dat Data from [get_cpue_historical()].
+#' @param dat Data from [gfdata::get_cpue_historical()].
 #' @param species_common A species common name in lowercase.
 #' @param year_range A range of years to include. Can go up to current year but
 #'   note the management changes, particularly in 1996.
@@ -41,7 +41,7 @@ clean_localities <- function(x) {
 #'
 #' @examples
 #' \dontrun{
-#' get_cpue_historical(end_year = 2016) %>%
+#' gfdata::get_cpue_historical(end_year = 2016) %>%
 #'   tidy_cpue_historical(species_common = "pacific cod", area_grep_pattern = "5[CD]+")
 #' }
 #' @export

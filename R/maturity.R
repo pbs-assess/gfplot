@@ -1,6 +1,6 @@
 #' Fit and plot maturity ogives
 #'
-#' @param dat Data from [get_survey_samples()].
+#' @param dat Data from [gfdata::get_survey_samples()].
 #' @param type Should this be an age or length fit?
 #' @param sample_id_re If `TRUE` then the model will include random intercepts
 #'   for sample ID.
@@ -10,14 +10,14 @@
 #'   fitting the maturity ogive. Defaults to all months.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes.
-#'   See [get_age_methods()].
+#'   See [gfdata::get_age_methods()].
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples
-#' # d <- get_survey_samples("pacific ocean perch", ssid = 1)
+#' # d <- gfdata::get_survey_samples("pacific ocean perch", ssid = 1)
 #' d <- pop_samples
 #'
 #' m <- fit_mat_ogive(d, type = "age", sample_id_re = FALSE)

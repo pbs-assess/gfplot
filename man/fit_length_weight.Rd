@@ -17,8 +17,8 @@ fit_length_weight(
 )
 }
 \arguments{
-\item{dat}{Input data frame. Should be from \code{\link[=get_survey_samples]{get_survey_samples()}} or
-\code{\link[=get_commercial_samples]{get_commercial_samples()}}.}
+\item{dat}{Input data frame. Should be from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or
+\code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 
@@ -52,7 +52,7 @@ For use with data for a single species.
 }
 \examples{
 \dontrun{
-d <- get_survey_samples("pacific ocean perch")
+d <- gfdata::get_survey_samples("pacific ocean perch")
 model_f <- fit_length_weight(d, sex = "female")
 model_m <- fit_length_weight(d, sex = "male")
 plot_length_weight(object_female = model_f, object_male = model_m)

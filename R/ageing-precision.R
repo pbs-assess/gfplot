@@ -1,16 +1,16 @@
 #' Tidy PBS ageing precision data
 #'
-#' @param dat A data frame from [get_age_precision()]
+#' @param dat A data frame from [gfdata::get_age_precision()]
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
-#'   See [get_age_methods()].
+#'   See [gfdata::get_age_methods()].
 #'
 #' @export
 #'
 #' @template ageing-precision-examples
 #' @examples
 #' \dontrun{
-#' get_age_precision("yelloweye rockfish") %>%
+#' gfdata::get_age_precision("yelloweye rockfish") %>%
 #'  tidy_age_precision() %>%
 #'  plot_age_precision()
 #' }

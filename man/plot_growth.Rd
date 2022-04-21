@@ -80,7 +80,7 @@ combined.
 }
 \examples{
 \dontrun{
-# d <- get_survey_samples("pacific ocean perch")
+# d <- gfdata::get_survey_samples("pacific ocean perch")
 d <- pop_samples
 model_f <- fit_length_weight(d, sex = "female")
 model_m <- fit_length_weight(d, sex = "male")

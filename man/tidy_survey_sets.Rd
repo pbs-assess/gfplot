@@ -13,9 +13,9 @@ tidy_survey_sets(
 )
 }
 \arguments{
-\item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}
+\item{dat}{Output from \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
 
-\item{survey}{The name of a survey (see get_ssids()).}
+\item{survey}{The name of a survey (see \code{\link[gfdata:lookup]{gfdata::get_ssids()}}).}
 
 \item{years}{The years.}
 

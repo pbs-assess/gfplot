@@ -3,8 +3,8 @@
 #' @name plot_maturity_months
 NULL
 
-#' @param dat For [tidy_maturity_months()], data from [get_survey_samples()]
-#'   or [get_commercial_samples()] or [bind_samples()]. For [plot_maturity_months()],
+#' @param dat For [tidy_maturity_months()], data from [gfdata::get_survey_samples()]
+#'   or [gfdata::get_commercial_samples()] or [bind_samples()]. For [plot_maturity_months()],
 #'   data from [tidy_maturity_months()].
 #' @param months A vector of months to include. Defaults to all.
 #' @param usability_codes An optional vector of usability codes.
@@ -119,12 +119,12 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 #' @rdname plot_maturity_months
 #' @examples
 #' \dontrun{
-#' # pop_samples <- get_survey_samples("pacific ocean perch")
+#' # pop_samples <- gfdata::get_survey_samples("pacific ocean perch")
 #' tidy_maturity_months(pop_samples) %>%
 #'   plot_maturity_months()
 #' }
 #' \dontrun{
-#' d <- get_survey_samples("lingcod")
+#' d <- gfdata::get_survey_samples("lingcod")
 #' tidy_maturity_months(d) %>%
 #'   plot_maturity_months()
 #' }

@@ -39,7 +39,7 @@ plot_mat_annual_ogives(
 )
 }
 \arguments{
-\item{dat}{Data from \code{\link[=get_survey_samples]{get_survey_samples()}}.}
+\item{dat}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}.}
 
 \item{type}{Should this be an age or length fit?}
 
@@ -54,7 +54,7 @@ fitting the maturity ogive. Defaults to all months.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to \code{NULL}, which brings in all valid ageing codes.
-See \code{\link[=get_age_methods]{get_age_methods()}}.}
+See \code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
 
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
@@ -81,7 +81,7 @@ to show model fits when you have sufficient data.}
 Fit and plot maturity ogives
 }
 \examples{
-# d <- get_survey_samples("pacific ocean perch", ssid = 1)
+# d <- gfdata::get_survey_samples("pacific ocean perch", ssid = 1)
 d <- pop_samples
 
 m <- fit_mat_ogive(d, type = "age", sample_id_re = FALSE)

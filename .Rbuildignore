@@ -57,3 +57,4 @@
 ^vb.stan$
 ^prediction-grids$
 ^codecov.yml$
+.github

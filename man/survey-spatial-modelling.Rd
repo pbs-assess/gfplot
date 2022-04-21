@@ -20,12 +20,12 @@ fit_survey_sets(
 )
 }
 \arguments{
-\item{dat}{Output from \code{\link[=get_survey_sets]{get_survey_sets()}}.}
+\item{dat}{Output from \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
 
 \item{years}{The year to include in the model. Should be a single year.}
 
 \item{survey}{The survey abbreviation. Should match the contents of the
-column \code{survey_abbrev} in the data frame returned by \code{\link[=get_survey_sets]{get_survey_sets()}}.}
+column \code{survey_abbrev} in the data frame returned by \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
 
 \item{density_column}{The name of the column that includes the relative
 biomass density to use. E.g. \code{"density_kgpm2"} for trawl surveys or
@@ -64,7 +64,7 @@ Implements geostatistical models of trawl or longline survey data.
 \examples{
 \dontrun{
 set.seed(123)
-# pop_surv <- get_survey_sets("pacific ocean perch")
+# pop_surv <- gfdata::get_survey_sets("pacific ocean perch")
 # or use built-in data:
 fit <- fit_survey_sets(pop_surv,
   years = 2015,

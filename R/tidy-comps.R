@@ -5,8 +5,8 @@
 #' or frequencies in which the samples are weighted. See [weight_comps()] for
 #' details on the weighting procedure.
 #'
-#' @param dat The input samples data frame from [get_commercial_samples()] or
-#'   [get_survey_samples()].
+#' @param dat The input samples data frame from [gfdata::get_commercial_samples()] or
+#'   [gfdata::get_survey_samples()].
 #' @param survey A character vector of survey names to use. These should match
 #'   the survey abbreviations in GFBio. All of the survey listed here will be
 #'   rendered in the final plot in the order that they are specified to this
@@ -20,7 +20,7 @@
 #'   `"5[CDE]+"` would return areas 5C, 5D, and 5E. See [base::regex()].
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Default to `NULL`, which brings in all valid ageing codes.
-#'   See [get_age_methods()].
+#'   See [gfdata::get_age_methods()].
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
@@ -29,9 +29,9 @@
 #' @param sample_type Are the samples from a commercial or survey source?
 #' @param frequency_type Should the frequencies or proportions be based on raw
 #'   value or with weighted samples?
-#' @param dat_survey_sets A data frame from [get_survey_sets(..., join_sample_ids = TRUE)]. Needed for
+#' @param dat_survey_sets A data frame from `gfdata::get_survey_sets(..., join_sample_ids = TRUE)`. Needed for
 #'   weighted samples if `sample_type = "survey"`.
-#' @param dat_catch A data frame from [get_catch()]. Needed for weighted samples
+#' @param dat_catch A data frame from [gfdata::get_catch()]. Needed for weighted samples
 #'   if `sample_type = "commercial"`.
 #' @param remove_unsexed Logical
 #'
@@ -52,13 +52,13 @@
 #'
 #' # # extract data with get_*() functions:
 #' # # main age/length data:
-#' # rs_comm_samples <- get_commercial_samples("redstripe rockfish",
+#' # rs_comm_samples <- gfdata::get_commercial_samples("redstripe rockfish",
 #' #   discard_keepers = TRUE)
-#' # rs_survey_samples <- get_survey_samples("redstripe rockfish")
+#' # rs_survey_samples <- gfdata::get_survey_samples("redstripe rockfish")
 #' #
 #' # # for weighting:
-#' # rs_catch <- get_catch("redstripe rockfish")
-#' # rs_survey_sets <- get_survey_sets("redstripe rockfish")
+#' # rs_catch <- gfdata::get_catch("redstripe rockfish")
+#' # rs_survey_sets <- gfdata::get_survey_sets("redstripe rockfish")
 #'
 #' # calculate raw age frequencies for survey data:
 #' tidy_ages_raw(rs_survey_samples,
@@ -151,7 +151,7 @@ tidy_comps <- function(dat,
     is.null(dat_survey_sets)) {
     stop("A data frame must be supplied for `dat_survey_sets` ",
       "if `frequency_type = 'weighted'`. ",
-      "Extract it with `get_survey_sets('your species')`.",
+      "Extract it with `gfdata::get_survey_sets('your species')`.",
       call. = FALSE
     )
   }
@@ -159,7 +159,7 @@ tidy_comps <- function(dat,
     is.null(dat_catch)) {
     stop("A data frame must be supplied for `dat_catch` ",
       "if `frequency_type = 'weighted'`. ",
-      "Extract it with `get_catch('your species')`.",
+      "Extract it with `gfdata::get_catch('your species')`.",
       call. = FALSE
     )
   }

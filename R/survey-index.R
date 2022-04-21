@@ -2,13 +2,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_survey_index("lingcod") %>%
+#' gfdata::get_survey_index("lingcod") %>%
 #'   tidy_survey_index() %>%
 #'   plot_survey_index()
 #' }
 #' @name plot_survey_index
 
-#' @param dat For [tidy_survey_index()], data from [get_survey_index()]. For
+#' @param dat For [tidy_survey_index()], data from [gfdata::get_survey_index()]. For
 #'   [plot_survey_index()], data from [tidy_survey_index()].
 #' @param survey A character vector of survey abbreviations to include.
 #' @param min_years The minimum number of years for a survey before it is

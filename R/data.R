@@ -23,7 +23,7 @@
 
 #' Example Pacific Ocean Perch biological samples from QCS.
 #'
-#' Originally retrieved with `get_survey_samples("pacific ocean perch")`. Has
+#' Originally retrieved with `gfdata::get_survey_samples("pacific ocean perch")`. Has
 #' been filtered in various ways to condense the data set for use in examples
 #' throughout the package.
 #'
@@ -32,7 +32,7 @@
 
 #' Example Pacific Ocean Perch survey data from QCS in 2015
 #'
-#' Originally retrieved with `get_survey_sets("pacific ocean perch")`.
+#' Originally retrieved with `gfdata::get_survey_sets("pacific ocean perch")`.
 #'
 #' @format A data frame
 "pop_surv"

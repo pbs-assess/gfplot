@@ -26,8 +26,8 @@ plot_maturity_months(
 )
 }
 \arguments{
-\item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[=get_survey_samples]{get_survey_samples()}}
-or \code{\link[=get_commercial_samples]{get_commercial_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
+\item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}
+or \code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
 data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 
 \item{months}{A vector of months to include. Defaults to all.}
@@ -62,12 +62,12 @@ Plot maturity frequency by month
 }
 \examples{
 \dontrun{
-# pop_samples <- get_survey_samples("pacific ocean perch")
+# pop_samples <- gfdata::get_survey_samples("pacific ocean perch")
 tidy_maturity_months(pop_samples) \%>\%
   plot_maturity_months()
 }
 \dontrun{
-d <- get_survey_samples("lingcod")
+d <- gfdata::get_survey_samples("lingcod")
 tidy_maturity_months(d) \%>\%
   plot_maturity_months()
 }

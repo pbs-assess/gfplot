@@ -50,12 +50,12 @@ d$n[10] <- 0 # example zero
 plot_sample_avail(d)
 
 \dontrun{
-d <- get_survey_samples("lingcod")
+d <- gfdata::get_survey_samples("lingcod")
 d <- tidy_sample_avail(d, year_range = c(1996, 2016))
 plot_sample_avail(d, year_range = c(1996, 2016),
   title = "Survey samples")
 
-d <- get_commercial_samples("lingcod")
+d <- gfdata::get_commercial_samples("lingcod")
 d <- tidy_sample_avail(d, year_range = c(1996, 2016))
 plot_sample_avail(d, year_range = c(1996, 2016),
   title = "Commercial samples")

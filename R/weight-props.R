@@ -8,10 +8,10 @@
 #' samples, respectively, and format it for weighting. `weight_comps()` does the
 #' actual weighting based on the output from the `tidy_*` functions.
 #'
-#' @param specimen_dat Specimen data. E.g. from [get_commercial_samples()] for
-#' commercial data or [get_survey_samples()] for survey data.
-#' @param catch_dat Catch data. E.g. from [get_catch()].
-#' @param survey_tows Survey tow data. E.g. from [get_survey_samples()].
+#' @param specimen_dat Specimen data. E.g. from [gfdata::get_commercial_samples()] for
+#' commercial data or [gfdata::get_survey_samples()] for survey data.
+#' @param catch_dat Catch data. E.g. from [gfdata::get_catch()].
+#' @param survey_tows Survey tow data. E.g. from [gfdata::get_survey_samples()].
 #' @param value The **unquoted** column name with the values to re-weight
 #' (e.g. `age` or `length`).
 #' @param bin_size The binning size (likely only used for lengths).
@@ -51,8 +51,8 @@
 #'
 #' ## Surveys:
 #' ## ssid = 1 is Queen Charlotte Sound Synoptic Survey:
-#' # rs_survey_samples <- get_survey_samples(species, ssid = 1)
-#' # rs_survey_sets <- get_survey_sets(species, ssid = 1)
+#' # rs_survey_samples <- gfdata::get_survey_samples(species, ssid = 1)
+#' # rs_survey_sets <- gfdata::get_survey_sets(species, ssid = 1)
 #'
 #' surv_lengths <- tidy_comps_survey(rs_survey_samples, rs_survey_sets,
 #'   value = length, bin_size = 2)
@@ -64,8 +64,8 @@
 #' weight_comps(surv_ages)
 #'
 #' ## Commercial:
-#' # rs_comm_samples <- get_commercial_samples(species)
-#' # rs_catch <- get_catch(species)
+#' # rs_comm_samples <- gfdata::get_commercial_samples(species)
+#' # rs_catch <- gfdata::get_catch(species)
 #'
 #' com_lengths <- tidy_comps_commercial(rs_comm_samples, rs_catch,
 #'   value = length, bin_size = 2)

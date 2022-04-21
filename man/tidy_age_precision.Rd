@@ -7,27 +7,27 @@
 tidy_age_precision(dat, ageing_method_codes = NULL)
 }
 \arguments{
-\item{dat}{A data frame from \code{\link[=get_age_precision]{get_age_precision()}}}
+\item{dat}{A data frame from \code{\link[gfdata:get_data]{gfdata::get_age_precision()}}}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Default to \code{NULL}, which brings in all valid ageing codes.
-See \code{\link[=get_age_methods]{get_age_methods()}}.}
+See \code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
 }
 \description{
 Tidy PBS ageing precision data
 }
 \examples{
 \dontrun{
-get_ageing_precision("shortraker rockfish") \%>\%
+gfdata::get_ageing_precision("shortraker rockfish") \%>\%
   tidy_ageing_precision() \%>\%
   plot_ageing_precision()
 
-get_ageing_precision("pacific ocean perch") \%>\%
+gfdata::get_ageing_precision("pacific ocean perch") \%>\%
   tidy_ageing_precision() \%>\%
   plot_ageing_precision(n = 200)
 }
 \dontrun{
-get_age_precision("yelloweye rockfish") \%>\%
+gfdata::get_age_precision("yelloweye rockfish") \%>\%
  tidy_age_precision() \%>\%
  plot_age_precision()
 }

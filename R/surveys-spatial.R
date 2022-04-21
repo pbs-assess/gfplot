@@ -1,7 +1,7 @@
 #' Tidy the survey set data for use in modeling
 #'
-#' @param dat Output from [get_survey_sets()].
-#' @param survey The name of a survey (see get_ssids()).
+#' @param dat Output from [gfdata::get_survey_sets()].
+#' @param survey The name of a survey (see [gfdata::get_ssids()]).
 #' @param years The years.
 #' @param utm_zone UTM zone.
 #' @param density_column Name of the density column.
@@ -114,10 +114,10 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 #'
 #' Implements geostatistical models of trawl or longline survey data.
 #'
-#' @param dat Output from [get_survey_sets()].
+#' @param dat Output from [gfdata::get_survey_sets()].
 #' @param years The year to include in the model. Should be a single year.
 #' @param survey The survey abbreviation. Should match the contents of the
-#'   column `survey_abbrev` in the data frame returned by [get_survey_sets()].
+#'   column `survey_abbrev` in the data frame returned by [gfdata::get_survey_sets()].
 #' @param density_column The name of the column that includes the relative
 #'   biomass density to use. E.g. `"density_kgpm2"` for trawl surveys or
 #'   `"density_ppkm2"` for the long line surveys.
@@ -144,7 +144,7 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 #' @examples
 #' \dontrun{
 #' set.seed(123)
-#' # pop_surv <- get_survey_sets("pacific ocean perch")
+#' # pop_surv <- gfdata::get_survey_sets("pacific ocean perch")
 #' # or use built-in data:
 #' fit <- fit_survey_sets(pop_surv,
 #'   years = 2015,
@@ -324,7 +324,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' @examples
 #' \dontrun{
 #' set.seed(123)
-#' # pop_surv <- get_survey_sets("pacific ocean perch")
+#' # pop_surv <- gfdata::get_survey_sets("pacific ocean perch")
 #' # or use built-in data:
 #' fit <- fit_survey_sets(pop_surv,
 #'   years = 2015,

@@ -188,6 +188,7 @@ plot_cpue_spatial <-
 
 #' @export
 #' @rdname plot_cpue_spatial
+#' @param ... Arguments for [plot_cpue_spatial()].
 plot_catch_spatial <- function(...){
   plot_cpue_spatial(..., plot_catch = TRUE)
 }

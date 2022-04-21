@@ -83,6 +83,8 @@ showing the percentage of fishing events excluded due to the privacy rule.}
 
 \item{plot_catch}{If \code{TRUE} plot catch instead of CPUE. If \code{FALSE} (default),
 plot CPUE. See \code{dat} for data information.}
+
+\item{...}{Arguments for \code{\link[=plot_cpue_spatial]{plot_cpue_spatial()}}.}
 }
 \description{
 Plot a map of commercial CPUE or Catch (trawl only)

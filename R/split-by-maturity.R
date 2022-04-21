@@ -1,7 +1,7 @@
 #' Split catch densities by mass ratio of maturity classes
 #'
-#' @param survey_sets Data from [get_survey_sets()].
-#' @param fish Data from [get_survey_samples()].
+#' @param survey_sets Data from [gfdata::get_survey_sets()].
+#' @param fish Data from [gfdata::get_survey_samples()].
 #' @param split_dens_type Which density type will be split and saved as a column providing units for
 #'     adult_density and imm_density columns.
 #' @param survey List of survey abbreviations.
