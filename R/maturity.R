@@ -337,6 +337,7 @@ plot_mat_ogive <- function(object,
   nd_re$sex <- factor(nd_re$sex, levels = c("F", "M"))
   labs$sex <- factor(labs$sex, levels = c("F", "M"))
   labs$sex <- factor(labs$sex, levels = c("F", "M"))
+  if (isTRUE(french)) labs$label <- gsub("\\.", ",", labs$label)
 
   g <- ggplot(nd_fe, aes_string("age_or_length", "glmm_fe", colour = "sex", lty = "sex"))
 
