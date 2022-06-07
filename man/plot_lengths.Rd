@@ -14,7 +14,8 @@ plot_lengths(
   alpha = 0.24,
   bin_size = 2,
   min_total = 20,
-  show_year = "even"
+  show_year = "even",
+  french = FALSE
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ before a histogram is shown.}
 
 \item{show_year}{Which years to show a label for. Can be one of 'even' or 'odd'. Any
 other value will enable labels for all years.}
+
+\item{french}{French}
 }
 \description{
 Functions for plotting length frequency data.

@@ -143,6 +143,12 @@ plot_maturity_months <- function(dat,
     max(as.numeric(dat$maturity) + n_label_pos[[1]])
   ))
 
+  # not enough space!!
+  # format_french_1000s <- function(x) {
+  #   format(as.numeric(x), big.mark = " ", scientific = FALSE, trim = TRUE)
+  # }
+  # if (french) counts$total_month <- format_french_1000s(counts$total_month)
+
   g <- ggplot(dat, aes_string("month_jitter", "maturity")) +
     ylab("") + xlab("") +
     scale_x_continuous(breaks = seq(1, 12),

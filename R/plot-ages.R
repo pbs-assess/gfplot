@@ -84,6 +84,10 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     ungroup()
 
   counts <- select(dat, total, year, survey_abbrev) %>% unique()
+  format_french_1000s <- function(x) {
+    format(as.numeric(x), big.mark = " ", scientific = FALSE, trim = TRUE)
+  }
+  if (french) counts$total <- format_french_1000s(counts$total)
 
   age_range <- diff(range(dat$age, na.rm = TRUE))
 

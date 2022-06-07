@@ -28,6 +28,7 @@
 #'   before a histogram is shown.
 #' @param show_year Which years to show a label for. Can be one of 'even' or 'odd'. Any
 #'   other value will enable labels for all years.
+#' @param french French
 #'
 #' @export
 #'
@@ -67,7 +68,8 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
                          line_col = c("M" = "grey40", "F" = "red"),
                          survey_cols = NULL, alpha = 0.24,
                          bin_size = 2, min_total = 20,
-                         show_year = "even") {
+                         show_year = "even",
+                         french = FALSE) {
 
   if (!is.null(survey_cols)) {
     survey_col_names <- names(survey_cols)
@@ -88,6 +90,11 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   x_breaks <- x_breaks[seq(1, N - 1)]
   range_lengths <- diff(range(dat$length_bin, na.rm = TRUE))
   counts <- select(dat, survey_abbrev, year, total) %>% unique()
+
+  format_french_1000s <- function(x) {
+    format(as.numeric(x), big.mark = " ", scientific = FALSE, trim = TRUE)
+  }
+  if (french) counts$total <- format_french_1000s(counts$total)
 
   # make max value 1.0 each year-survey combo for plotting:
   dat <- group_by(dat, year, survey_abbrev) %>%
@@ -110,21 +117,21 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
     scale_colour_manual(values = line_col, breaks = c("M", "F")) +
     coord_cartesian(expand = FALSE) +
     scale_x_continuous(breaks = x_breaks) +
-    xlab(xlab) + ylab(ylab) +
+    xlab(en2fr(xlab, french)) + ylab(en2fr(ylab, french)) +
     ylim(-0.04, 1.07) +
     theme(
       axis.text.y = ggplot2::element_blank(),
       axis.ticks.y = ggplot2::element_blank()
     ) +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    labs(colour = "Sex", fill = "Sex") +
+    labs(colour = en2fr("Sex", french), fill = en2fr("Sex", french)) +
     geom_text(
       data = counts,
       x = min(dat$length_bin, na.rm = TRUE) + 0.02 * range_lengths,
       y = 0.85, aes_string(label = "total"),
       inherit.aes = FALSE, colour = "grey50", size = 2.25, hjust = 0
     ) +
-    labs(title = "Length frequencies") +
+    labs(title = en2fr("Length frequencies", french)) +
     theme(panel.grid.major.x = ggplot2::element_line(colour = "grey93"))
 
   if(show_year == "even"){
