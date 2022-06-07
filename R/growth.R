@@ -474,7 +474,8 @@ plot_growth <- function(object_female, object_male,
       g <- ann_func(g, object_female$pars, en2fr("Females", french), col[["Female"]],
         x = lab_x * max(xlim),
         y = lab_y * max(ylim),
-        gap = lab_y_gap * max(ylim)
+        gap = lab_y_gap * max(ylim),
+        french = french
       )
     }
 
@@ -482,14 +483,16 @@ plot_growth <- function(object_female, object_male,
       g <- ann_func(g, object_male$pars, en2fr("Males", french), col[["Male"]],
         x = (lab_x + lab_x_gap) * max(xlim),
         y = lab_y * max(ylim),
-        gap = lab_y_gap * max(ylim)
+        gap = lab_y_gap * max(ylim),
+        french = french
       )
     }
   } else {
     g <- ann_func(g, object_all$pars, en2fr("Both sexes", french), col[[1]],
       x = lab_x * max(xlim),
       y = lab_y * max(ylim),
-      gap = lab_y_gap * max(ylim)
+      gap = lab_y_gap * max(ylim),
+      french = french
     )
   }
 
@@ -519,34 +522,36 @@ plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)"
 }
 
 # annotation helpers:
-ann_vb <- function(gg, pars, title, col, x, y, gap) {
+ann_vb <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
   gg + ggplot2::annotate("text",
     label = title,
     x = x, y = y, hjust = 0, col = col, size = 3
   ) +
-    ann("k", pars[["k"]], dec = 2, x, y - gap) +
-    ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2) +
-    ann("t0", pars[["t0"]], dec = 2, x, y - gap * 3)
+    ann("k", pars[["k"]], dec = 2, x, y - gap, french = french) +
+    ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2, french = french) +
+    ann("t0", pars[["t0"]], dec = 2, x, y - gap * 3, french = french)
 }
 
-ann_lw <- function(gg, pars, title, col, x, y, gap) {
+ann_lw <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
   gg + ggplot2::annotate("text",
     label = title,
     x = x, y = y, hjust = 0, col = col, size = 3
   ) +
-    ann("ln(a)", pars[["log_a"]], dec = 2, x, y - gap) +
-    ann("b", pars[["b"]], dec = 2, x, y - gap * 2)
+    ann("ln(a)", pars[["log_a"]], dec = 2, x, y - gap, french = french) +
+    ann("b", pars[["b"]], dec = 2, x, y - gap * 2, french = french)
 }
 
-ann <- function(par_name, par_val, dec, x, y, col = "grey40") {
+ann <- function(par_name, par_val, dec, x, y, col = "grey40", french = FALSE) {
+  .text <- paste0(
+    par_name, " = ",
+    sprintf(
+      paste0("%.", dec, "f"),
+      round(par_val, dec)
+    )
+  )
+  if (french) .text <- gsub("\\.", ",", .text)
   ggplot2::annotate("text",
-    label = paste0(
-      par_name, " = ",
-      sprintf(
-        paste0("%.", dec, "f"),
-        round(par_val, dec)
-      )
-    ),
+    label = .text,
     x = x,
     y = y,
     hjust = 0,
