@@ -74,18 +74,7 @@ fit_mat_ogive <- function(dat,
       specimen_id, sample_id, trip_start_date
     )
 
-  file <- system.file("extdata", "maturity_assignment.csv",
-    package = "gfplot"
-  )
-
-  mat_df <- readr::read_csv(file,
-    col_types = readr::cols(
-      maturity_convention_code = readr::col_integer(),
-      maturity_convention_desc = readr::col_character(),
-      sex = readr::col_integer(),
-      mature_at = readr::col_integer()
-    )
-  )
+  mat_df <- maturity_assignment
 
   dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_code"))
   dat <- mutate(dat, mature = maturity_code >= mature_at)

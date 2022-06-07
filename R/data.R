@@ -84,3 +84,13 @@
 #'
 #' @format Data
 "dogfish_grid"
+
+#' A data frame with maturity categories and names.
+#'
+#' @format A data frame
+"maturity_short_names"
+
+#' A data frame with maturity categories and assignments.
+#'
+#' @format A data frame
+"maturity_assignment"

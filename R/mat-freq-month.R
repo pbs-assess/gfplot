@@ -37,24 +37,7 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 
   dat <- filter(dat, !is.na(sex))
 
-  file <- system.file("extdata", "maturity_short_names.csv",
-    package = "gfplot"
-  )
-
-  mat_df <- readr::read_csv(file,
-    col_types = readr::cols(
-      maturity_convention_code = readr::col_integer(),
-      maturity_convention_desc = readr::col_character(),
-      `Maturity Convention Max Value` = readr::col_integer(),
-      maturity_code = readr::col_integer(),
-      sex = readr::col_integer(),
-      maturity_name = readr::col_character(),
-      maturity_desc = readr::col_character(),
-      mature_at = readr::col_integer(),
-      maturity_name_short_old = readr::col_character(),
-      maturity_name_short = readr::col_character()
-    )
-  )
+  mat_df <- maturity_short_names # built-in package data
 
   dat <- left_join(dat,
     select(mat_df, sex, maturity_convention_code, maturity_code, maturity_name_short),
