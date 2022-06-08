@@ -228,7 +228,7 @@ plot_catch <- function(dat,
       legend.text =
         ggplot2::element_text(size = ggplot2::rel(0.6), colour = "grey20")
     ) +
-      scale_y_continuous(labels = function(x) format(x, big.mark = ".", scientific = FALSE)) # e.g. 1 000
+      scale_y_continuous(labels = function(x) format(x, big.mark = " ", scientific = FALSE)) # e.g. 1 000
   }
 
   if (!all(dat$area == "Coastwide") && !all(dat$area == rosettafish::en2fr("Coastwide"))) {
