@@ -12,7 +12,7 @@ with [gfsynopsis](https://github.com/pbs-assess/gfsynopsis).
 Note that the documentation is incomplete in some places. Please post in
 the [issue tracker](https://github.com/pbs-assess/gfplot/issues) if you
 have questions or suggestions on how the package or its documentation
-could be improved. We welcome pull requests!
+could be improved.
 
 In addition to the help available through the R console, a [web version
 of the documentation is
@@ -20,47 +20,53 @@ available](https://pbs-assess.github.io/gfplot/index.html).
 
 # Installation
 
-First, install INLA:
-
-``` r
-install.packages("INLA", repos = c(getOption("repos"), 
-  INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
-```
-
 The gfplot package can then be installed and loaded with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("pbs-assess/gfplot")
+# install.packages("remotes")
+remotes::install_github("pbs-assess/gfplot")
 ```
 
 ``` r
 library(gfplot)
 ```
 
-Functions specific to PBS:
+Functions specific to PBS (now in gfdata):
 
 ``` r
-fns <- ls("package:gfplot")
+library(gfdata)
+fns <- ls("package:gfdata")
 sort(fns[grepl("get", fns)])
-#>  [1] "get_age_methods"          "get_age_precision"       
-#>  [3] "get_catch"                "get_commercial_samples"  
-#>  [5] "get_cpue_historical"      "get_cpue_index"          
-#>  [7] "get_cpue_spatial"         "get_cpue_spatial_ll"     
-#>  [9] "get_fishery_ids"          "get_gear_types"          
-#> [11] "get_hake_catch"           "get_major_areas"         
-#> [13] "get_management"           "get_management_areas"    
-#> [15] "get_other_surveys"        "get_sara_dat"            
-#> [17] "get_sensor_attributes"    "get_sensor_data_fe_trawl"
-#> [19] "get_sensor_data_ll_td"    "get_sensor_data_trawl"   
-#> [21] "get_species"              "get_species_groups"      
-#> [23] "get_ssids"                "get_survey_index"        
-#> [25] "get_survey_samples"       "get_survey_sets"
+#>  [1] "get_active_survey_blocks"  "get_age_methods"          
+#>  [3] "get_age_precision"         "get_all_stomachs"         
+#>  [5] "get_catch"                 "get_catch_spatial"        
+#>  [7] "get_comm_gear_types"       "get_commercial_samples"   
+#>  [9] "get_cpue_historical"       "get_cpue_historical_hake" 
+#> [11] "get_cpue_historical_hl"    "get_cpue_index"           
+#> [13] "get_cpue_index_hl"         "get_cpue_spatial"         
+#> [15] "get_cpue_spatial_ll"       "get_eulachon_specimens"   
+#> [17] "get_fishery_ids"           "get_fishery_sectors"      
+#> [19] "get_gear_types"            "get_hake_catch"           
+#> [21] "get_hake_survey_samples"   "get_ll_hook_data"         
+#> [23] "get_major_areas"           "get_management"           
+#> [25] "get_management_areas"      "get_other_surveys"        
+#> [27] "get_sable_landings"        "get_sablefish_surveys"    
+#> [29] "get_sensor_attributes"     "get_sensor_data_ll_ctd"   
+#> [31] "get_sensor_data_ll_ctd_fe" "get_sensor_data_ll_td"    
+#> [33] "get_sensor_data_ll_td_fe"  "get_sensor_data_trawl"    
+#> [35] "get_sensor_data_trawl_fe"  "get_species"              
+#> [37] "get_species_groups"        "get_ssids"                
+#> [39] "get_strata_areas"          "get_survey_blocks"        
+#> [41] "get_survey_gear_types"     "get_survey_ids"           
+#> [43] "get_survey_index"          "get_survey_samples"       
+#> [45] "get_survey_sets"           "get_survey_stomachs"      
+#> [47] "get_table"
 ```
 
 Generic functions for any similarly formatted data:
 
 ``` r
+fns <- ls("package:gfplot")
 sort(fns[grepl("tidy", fns)])
 #>  [1] "tidy_age_precision"    "tidy_ages_raw"         "tidy_ages_weighted"   
 #>  [4] "tidy_catch"            "tidy_comps"            "tidy_comps_commercial"
