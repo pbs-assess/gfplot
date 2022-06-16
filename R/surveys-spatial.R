@@ -60,6 +60,10 @@ interp_survey_bathymetry <- function(dat, utm_zone = 9) {
   xo <- sort(unique(.dat$X))
   yo <- sort(unique(.dat$Y))
 
+  if (!requireNamespace("akima", quietly = TRUE)) {
+    stop("akima must be installed to use this functionality.", call. = FALSE)
+  }
+
   ii <- suppressWarnings(akima::interp(
     x = bath$X,
     y = bath$Y,

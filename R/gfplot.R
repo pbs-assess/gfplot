@@ -26,11 +26,9 @@
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
 #' @importFrom grDevices chull
-#' @importFrom boot boot.ci boot
 #' @importFrom stats t.test
 #' @importFrom utils read.csv
 #' @importFrom rosettafish en2fr
-#' @import Rcpp
 # avoid R CMD check warning; import something:
 #' @importFrom PBSdata .PBSdataEnv
 NULL
@@ -182,13 +180,13 @@ if (getRversion() >= "2.15.1") {
 
     # historical CPUE tidy
     "best_depth_m", "locality", "locality_description", "mean_depth",
-
     "species_ageing_group",
 
     "avg_value", "min_value", "max_value", "parameter", "type",
     "each_specimen_collected",
-    "temp"
-
+    "temp",
+    "maturity_assignment",
+    "maturity_short_names"
   ))
 }
 

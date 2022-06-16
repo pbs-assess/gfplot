@@ -94,6 +94,11 @@ fit_vb <- function(dat,
   }
 
   method <- match.arg(method)
+  if (method %in% c("mcmc", "mpd")) {
+    if (!requireNamespace("rstan", quietly = TRUE)) {
+      stop("rstan must be installed to use this function with 'mpd' or 'mcmc' methods.", call. = FALSE)
+    }
+  }
 
   if (!is.null(usability_codes)) {
     dat <- filter(dat, .data$usability_code %in% usability_codes)

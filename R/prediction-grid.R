@@ -13,6 +13,11 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
   draw_boundary = TRUE,
   premade_grid = NULL) {
 
+  if (is.null(survey)) {
+    if (!requireNamespace("sp", quietly = TRUE)) {
+      stop("The package sp must be installed to use this function with `survey = NULL`.", call. = FALSE)
+    }
+  }
   if (is.null(premade_grid)) {
     if (is.null(survey)) {
       region <- "no-region"
@@ -103,6 +108,9 @@ make_prediction_grid <- function(dat, cell_width = 2, survey = NULL,
           Y > min(dat$Y - 20),
           depth > 0
         )
+      if (!requireNamespace("akima", quietly = TRUE)) {
+        stop("akima must be installed to use this functionality.", call. = FALSE)
+      }
       ii <- akima::interp(
         x = bath$X,
         y = bath$Y,
