@@ -24,7 +24,6 @@ BugReports: https://github.com/pbs-assess/gfplot/issues
 Depends: 
     R (>= 3.4.0)
 Imports:
-    DBI,
     MASS,
     PBSdata,
     PBSmapping,
@@ -39,7 +38,6 @@ Imports:
     lubridate,
     magrittr,
     methods,
-    odbc,
     reshape2,
     rlang,
     tidyr,
