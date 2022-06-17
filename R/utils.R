@@ -198,3 +198,8 @@ set_fishing_year <- function(dat,
     ) %>%
     select(-day_of_year, -cutoff_day)
 }
+
+firstup <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}

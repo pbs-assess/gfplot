@@ -72,11 +72,11 @@ test_that("round_nice() works", {
   expect_equal(round_nice(1502, thousands_k = TRUE), "2K")
 })
 
-test_that("read_sql works", {
-  x <- read_sql("get-catch.sql")
-  expect_gte(length(x), 1)
-  expect_identical(class(x), "character")
-})
+# test_that("read_sql works", {
+#   x <- read_sql("get-catch.sql")
+#   expect_gte(length(x), 1)
+#   expect_identical(class(x), "character")
+# })
 
 test_that("factor_bin_clean works", {
   expect_equal(factor_bin_clean(c(1, 2, 3, 4), c(0, 2, 4)), factor(c(0, 2, 2, 2)))
