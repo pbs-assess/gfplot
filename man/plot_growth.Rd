@@ -3,6 +3,7 @@
 \name{plot_growth}
 \alias{plot_growth}
 \alias{plot_vb}
+\alias{plot_schnute}
 \alias{plot_length_weight}
 \title{Plot von Bertalanffy or length-weight fits}
 \usage{
@@ -10,7 +11,7 @@ plot_growth(
   object_female,
   object_male,
   object_all,
-  type = c("vb", "length-weight"),
+  type = c("schnute", "length-weight"),
   downsample = 2000L,
   pt_alpha = 0.2,
   xlab = "Age (years)",
@@ -21,10 +22,13 @@ plot_growth(
   lab_x_gap = 0.3,
   lab_y_gap = 0.06,
   col = c(Female = "black", Male = "grey40"),
-  french = FALSE
+  french = FALSE,
+  jitter = FALSE
 )
 
 plot_vb(..., type = "vb")
+
+plot_schnute(..., type = "schnute")
 
 plot_length_weight(
   ...,
@@ -67,6 +71,8 @@ plot_length_weight(
 \item{col}{A named character vector declaring the colors for female and male}
 
 \item{french}{Logical.}
+
+\item{jitter}{Logical, whether to jitter data points.}
 
 \item{...}{Arguments to pass to \code{\link[=plot_growth]{plot_growth()}}.}
 }

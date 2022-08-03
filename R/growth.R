@@ -1,6 +1,9 @@
-#' Fit a von Bertalanffy growth model
+#' Fit a growth model for length-at-age
 #'
-#' For use with data for a single species.
+#' For use with data for a single species, fit either a Schnute growth curve or
+#' a von Bertalanffy growth curve. `fit_vb(method = "tmb")` will use `fit_schnute()`
+#' with `p = 1`. Otherwise, separate Stan files are used. The Richards function
+#' is also nested in the Schnute function with `0 < p < 1`.
 #'
 #' @param dat Input data frame. Should be from [gfdata::get_survey_samples()] or
 #'   [gfdata::get_commercial_samples()].
@@ -8,6 +11,14 @@
 #' @param method `"mpd"` for the mode of the posterior distribution (with
 #'   [rstan::optimizing()]) or `"mcmc"` for full MCMC sampling with Stan (with
 #'   [rstan::sampling()]). `"tmb"` for a TMB model.
+#' @param growth Whether to estimate the inflection parameter p (`"schnute"`) or
+#'   fix the parameter p = 1 (`"vb"`) to reduce to the von Bertalanffy equation.
+#' @param a1 The first age parameter in the Schnute function, the corresponding
+#'   length `"L1"` will be estimated. You may want to specify the smallest age
+#'   class in the data.
+#' @param a2 The second age parameter in the Schnute function, the corresponding
+#'   length `"L2"` will be estimated. You may want to specify the largest age
+#'   class in the data. Set `"a2" = 999` to effectively estimate `linf`.
 #' @param downsample If not `Inf` this represents a number of fish specimens to
 #'   sample prior to model fitting. Can be useful for large data sets that you
 #'   want to fit with MCMC for testing purposes.
@@ -34,8 +45,25 @@
 #' @param ... Any other arguments to pass on to [rstan::sampling()] or
 #'   [rstan::optimizing()].
 #' @importFrom stats median quantile rlnorm runif median
+#' @references
+#' Schnute, J. 1981. A Versatile Growth Model with Statistically Stable Parameters.
+#' Canadian Journal of Fisheries and Aquatic Sciences, 38(9), 1128–1140.
+#' <https://doi.org/10.1139/f81-153>
 #'
 #' @export
+#' @details
+#' Linf and t0 are derived from the Schnute equations as:
+#'
+#' \deqn{
+#' linf = \left(\dfrac{\exp(ka_2) L_2^p - \exp(ka_1)L_1^p}{\exp(ka_2) - \exp(ka_1)}\right)^{1/p}
+#' }
+#'
+#' \deqn{
+#' t_0 = a_1 + a_2 - \dfrac{1}{k}\log\left(\dfrac{\exp(ka_2) L_2^p - \exp(ka_1)L_1^p}{L_2^p - L_1^p}\right)
+#' }
+#'
+#' `t_0` is undefined when `p < 0`.
+#'
 #' @examples
 #' \dontrun{
 #' # with `rstan::optimizing()` for the mode of the posterior density:
@@ -44,6 +72,11 @@
 #' plot_vb(model_f, model_m)
 #' model_f$model
 #' model_f$predictions
+#'
+#' # Schnute functions
+#' model_fs <- fit_schnute(pop_samples, sex = "female")
+#' model_ms <- fit_schnute(pop_samples, sex = "male")
+#' plot_schnute(model_fs, model_ms)
 #'
 #' # You can also fit both sexes combined if you want.
 #' # Just note that you need to specify the colours explicitly in the plot.
@@ -65,7 +98,196 @@
 #' obj <- fit_vb(pop_samples[1:2,])
 #' plot_vb(obj, obj)
 #' }
+fit_schnute <- function(dat,
+                        sex = c("female", "male", "all"),
+                        method = c("tmb", "mpd", "mcmc"),
+                        growth = c("schnute", "vb"),
+                        a1 = 0,
+                        a2 = 999,
+                        downsample = Inf,
+                        chains = 4L,
+                        iter = 1000L,
+                        cores = parallel::detectCores(),
+                        allow_slow_mcmc = FALSE,
+                        est_method = median,
+                        min_samples = 50L,
+                        too_high_quantile = 1.0,
+                        uniform_priors = FALSE,
+                        ageing_method_codes = NULL,
+                        usability_codes = c(0, 1, 2, 6),
+                        check_convergence_tmb = TRUE,
+                        tmb_inits = list(k = 0.5, L1 = 10, L2 = 40, log_sigma = log(0.1), p = 1),
+                        ...) {
 
+  method <- match.arg(method)
+  growth <- match.arg(growth)
+
+  if (growth == "vb" && method != "tmb") {
+    stop("Use fit_vb(method = \"", method, "\")")
+  }
+
+  if ("species_common_name" %in% names(dat)) {
+    if (length(unique(dat$species_common_name)) > 1L) {
+      stop("Multiple species detected via the `species_common_name` column. ",
+           "fit_schnute() is for use with a single species. Filter the data yourself ",
+           "first.",
+           call. = FALSE
+      )
+    }
+  }
+
+  if (!is.null(usability_codes)) {
+    dat <- filter(dat, .data$usability_code %in% usability_codes)
+  }
+
+  if (!is.null(ageing_method_codes)) {
+    dat <- filter(dat, .data$ageing_method %in% ageing_method_codes)
+  }
+  dat <- dat[!duplicated(dat$specimen_id), , drop = FALSE]
+  dat <- filter(dat, !is.na(.data$sex), !is.na(.data$length), !is.na(.data$age))
+  ql <- quantile(dat$length, probs = too_high_quantile)
+  dat <- filter(dat, length <= ql)
+
+  sex <- match.arg(sex)
+  dat <- switch(sex,
+                "female" = filter(dat, sex == 2L),
+                "male" = filter(dat, sex == 1L),
+                "all" = dat
+  )
+
+  if (nrow(dat) < min_samples) {
+    return(list(
+      predictions = tibble(
+        ages = NA, length = NA
+      ),
+      pars = list(k = NA, L1 = NA, L2 = NA, log_sigma = NA, p = NA, linf = NA, t0 = NA),
+      data = dat,
+      model = NA
+    ))
+  }
+
+  if (nrow(dat) > downsample) {
+    dat <- dat[sample(seq_len(nrow(dat)), downsample), , drop = FALSE]
+  }
+
+  if (method %in% c('mpd', 'mcmc')) {
+    rstan::rstan_options(auto_write = TRUE)
+    if (uniform_priors) {
+      model_file <- system.file("stan", "schnute-nopriors.stan", package = "gfplot")
+      .f <- "schnute-nopriors.stan"
+    } else {
+      model_file <- system.file("stan", "schnute.stan", package = "gfplot")
+      .f <- "schnute.stan"
+    }
+
+    if (!file.exists(.f)) {
+      file.copy(model_file, to = .f)
+    }
+
+    schnute_mod_gfplot <- rstan::stan_model(.f)
+    assign("schnute_mod_gfplot", schnute_mod_gfplot, envir = globalenv())
+  }
+
+  if (method == "mpd") {
+    mpd_init <- list()
+    mpd_init$k <- 0.2 # wild guess
+    mpd_init$L1 <- 10 # wild guess
+    mpd_init$L2 <- 40 # wild guess
+    mpd_init$sigma <- 0.1
+    mpd_init$p <- 1
+
+    m <- suppressMessages(rstan::optimizing(schnute_mod_gfplot,
+                                            data = list(
+                                              N = nrow(dat), age = dat$age, length = dat$length,
+                                              len_upper_sd = quantile(dat$length, 0.99)[[1]] * 2,
+                                              a1 = a1,
+                                              a2 = a2
+                                            ),
+                                            init = mpd_init, hessian = TRUE, ...
+    ))
+
+    if (m$return_code != 0L && check_convergence_tmb) {
+      stop("Schnute growth model did not converge!")
+    }
+
+    pars <- as.list(m$par)
+  }
+  if (method == "mcmc") {
+    if (nrow(dat) > 50000 && !allow_slow_mcmc) {
+      stop("There are > 50,000 aged fish. ",
+           "MCMC sampling may take a long time. Set `allow_slow_mcmc = TRUE` ",
+           "if you still want to sample from the posterior.",
+           call. = FALSE
+      )
+    }
+    m <- rstan::sampling(schnute_mod_gfplot,
+                         data = list(
+                           N = nrow(dat), age = dat$age, length = dat$length,
+                           len_upper_sd = quantile(dat$length, 0.99)[[1]] * 2,
+                           a1 = a1,
+                           a2 = a2
+                         ),
+                         chains = chains, iter = iter, cores = cores, ...
+    )
+
+    pars <- lapply(rstan::extract(m), est_method)
+  }
+
+  if (method == "tmb") {
+    dlls <- getLoadedDLLs()
+    if (!any(vapply(dlls, function(x) x[["name"]] == "schnute", FUN.VALUE = TRUE))) {
+      lib.f <- system.file("tmb", "schnute.cpp", package = "gfplot")
+      .f <- "schnute_gfplot.cpp"
+      if (!file.exists(.f)) {
+        file.copy(lib.f, to = .f)
+      }
+      TMB::compile(.f)
+      dyn.load(TMB::dynlib("schnute_gfplot"))
+    }
+    data <- list(len = dat$length, age = dat$age, a1 = a1, a2 = a2)
+    map <- list()
+    if (growth == "vb") map$p <- factor(NA)
+
+    obj <- TMB::MakeADFun(data, tmb_inits, DLL = "schnute_gfplot", map = map, silent = TRUE)
+    opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
+    if (opt$convergence != 0L && check_convergence_tmb)
+      stop("Schnute growth model did not converge!")
+    pars <- as.list(opt$par)
+    pars$linf <- obj$report(obj$env$last.par.best)$linf
+    pars$t0 <- obj$report(obj$env$last.par.best)$t0
+    if (growth == "vb") pars$p <- tmb_inits$p
+    m <- obj
+  }
+
+  if (is.na(pars[["t0"]])) warning("Derived t0 is NA.")
+
+  ages <- seq(min(dat$age), max(dat$age), length.out = 200L)
+  pred <- schnute(ages, par = pars, a1 = a1, a2 = a2)
+
+  list(
+    predictions = tibble(age = ages, length = pred),
+    pars = pars, data = as_tibble(dat), model = m
+  )
+}
+
+schnute <- function(ages, par, a1, a2) {
+  L1 <- par[["L1"]]
+  L2 <- par[["L2"]]
+  k <- par[["k"]]
+  p <- par[["p"]]
+  if(is.null(p)) p <- 1
+
+  tmp1 <- L1^p
+  tmp2 <- (L2^p - tmp1)/(1 - exp(-k * (a2 - a1)))
+
+  tmp <- tmp1 + tmp2 * (1 - exp(-k * (ages - a1)))
+  invp <- 1/p
+
+  tmp^invp
+}
+
+#' @rdname fit_schnute
+#' @export
 fit_vb <- function(dat,
                    sex = c("female", "male", "all"),
                    method = c("tmb", "mpd", "mcmc"),
@@ -83,6 +305,41 @@ fit_vb <- function(dat,
                    check_convergence_tmb = TRUE,
                    tmb_inits = list(k = 0.5, linf = 40, log_sigma = log(0.1), t0 = -1),
                    ...) {
+
+  method <- match.arg(method)
+
+  if (method == "tmb") {
+
+    m <- fit_schnute(
+      dat = dat,
+      sex = sex,
+      method = method,
+      growth = "vb",
+      a1 = 0,
+      a2 = 999,
+      downsample = downsample,
+      chains = chains,
+      iter = iter,
+      cores = cores,
+      allow_slow_mcmc = allow_slow_mcmc,
+      est_method = est_method,
+      min_samples = min_samples,
+      too_high_quantile = too_high_quantile,
+      uniform_priors = uniform_priors,
+      ageing_method_codes = ageing_method_codes,
+      usability_codes = usability_codes,
+      check_convergence_tmb = check_convergence_tmb,
+      tmb_inits = list(
+        k = tmb_inits$k, L1 = 0.1 * tmb_inits$linf,
+        L2 = tmb_inits$linf, log_sigma = tmb_inits$log_sigma,
+        p = 1
+      ),
+      ...
+    )
+
+    return(m)
+  }
+
   if ("species_common_name" %in% names(dat)) {
     if (length(unique(dat$species_common_name)) > 1L) {
       stop("Multiple species detected via the `species_common_name` column. ",
@@ -192,28 +449,6 @@ fit_vb <- function(dat,
     pars <- lapply(rstan::extract(m), est_method)
   }
 
-  if (method == "tmb") {
-    dlls <- getLoadedDLLs()
-    if (!any(vapply(dlls, function(x) x[["name"]] == "vb", FUN.VALUE = TRUE))) {
-      lib.f <- system.file("tmb", "vb.cpp", package = "gfplot")
-      .f <- "vb_gfplot.cpp"
-      if (!file.exists(.f)) {
-        file.copy(lib.f, to = .f)
-      }
-      TMB::compile(.f)
-      dyn.load(TMB::dynlib("vb_gfplot"))
-    }
-    data <- list(len = dat$length, age = dat$age)
-
-    obj <- TMB::MakeADFun(data, tmb_inits, DLL = "vb_gfplot", silent = TRUE)
-    opt <- stats::nlminb(obj$par, obj$fn, obj$gr)
-    if (opt$convergence != 0L && check_convergence_tmb)
-      stop("VB growth model did not converge!")
-    pars <- as.list(opt$par)
-    m <- obj
-  }
-
-  vb <- function(ages, linf, k, t0) linf * (1 - exp(-k * (ages - t0)))
   ages <- seq(min(dat$age), max(dat$age), length.out = 200L)
   pred <- vb(ages, linf = pars$linf, k = pars$k, t0 = pars$t0)
 
@@ -222,6 +457,10 @@ fit_vb <- function(dat,
     pars = pars, data = as_tibble(dat), model = m
   )
 }
+
+vb <- function(ages, linf, k, t0) linf * (1 - exp(-k * (ages - t0)))
+
+
 
 #' Fit a length-weight model
 #'
@@ -386,9 +625,10 @@ fit_length_weight <- function(dat,
 #' plot_vb(object_female = model_f, object_male = model_m)
 #' }
 
+
 plot_growth <- function(object_female, object_male,
                         object_all,
-                        type = c("vb", "length-weight"),
+                        type = c("schnute", "length-weight"),
                         downsample = 2000L,
                         pt_alpha = 0.2,
                         xlab = "Age (years)",
@@ -401,8 +641,11 @@ plot_growth <- function(object_female, object_male,
                         col = c("Female" = "black", "Male" = "grey40"),
                         french = FALSE,
                         jitter = FALSE) {
-  xvar <- if (type[[1]] == "vb") "age" else "length"
-  yvar <- if (type[[1]] == "vb") "length" else "weight"
+
+  if (type[1] == "vb") type <- "schnute"
+  type <- match.arg(type)
+  xvar <- if (type == "schnute") "age" else "length"
+  yvar <- if (type == "schnute") "length" else "weight"
 
   if (missing(object_all)) {
     line_dat <- bind_rows(
@@ -437,8 +680,8 @@ plot_growth <- function(object_female, object_male,
   }
   no_pts <- if (nrow(pt_dat) == 0L) TRUE else FALSE
 
-  xdat <- if (type[[1]] == "vb") pt_dat$age else pt_dat$length
-  ydat <- if (type[[1]] == "vb") pt_dat$length else pt_dat$weight
+  xdat <- if (type == "schnute") pt_dat$age else pt_dat$length
+  ydat <- if (type == "schnute") pt_dat$length else pt_dat$weight
 
   if (nrow(pt_dat) > downsample) {
     if (!is.null(seed)) set.seed(seed)
@@ -482,7 +725,7 @@ plot_growth <- function(object_female, object_male,
     ), size = 1.0)
   }
 
-  ann_func <- if (type[[1]] == "vb") ann_vb else ann_lw
+  ann_func <- if (type == "schnute") ann_schnute else ann_lw
 
   if (missing(object_all)) {
     if (!is.na(object_female$pars[[1]])) {
@@ -524,6 +767,13 @@ plot_vb <- function(..., type = "vb") {
 
 #' @export
 #' @rdname plot_growth
+plot_schnute <- function(..., type = "schnute") {
+  plot_growth(..., type = type) +
+    ggplot2::ggtitle("Growth")
+}
+
+#' @export
+#' @rdname plot_growth
 plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)",
                                ylab = "Weight (kg)",
                                lab_x = 0.1, lab_y = 0.9,
@@ -537,15 +787,30 @@ plot_length_weight <- function(..., type = "length-weight", xlab = "Length (cm)"
 }
 
 # annotation helpers:
-ann_vb <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
-  gg + ggplot2::annotate("text",
+ann_schnute <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
+  gout <- gg + ggplot2::annotate("text",
     label = title,
     x = x, y = y, hjust = 0, col = col, size = 3
   ) +
     ann("k", pars[["k"]], dec = 2, x, y - gap, french = french) +
-    ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2, french = french) +
-    ann("t0", pars[["t0"]], dec = 2, x, y - gap * 3, french = french)
+    ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2, french = french)
+
+  gap_counter <- 3
+  if (!is.null(pars[["t0"]]) && !is.na(pars[["t0"]])) {
+    gout <- gout +
+      ann("t0", pars[["t0"]], dec = 2, x, y - gap * gap_counter, french = french)
+    gap_counter <- gap_counter + 1
+  }
+
+  if (!is.null(pars[["p"]]) && !is.na(pars[["p"]]) && pars[["p"]] != 1) {
+    gout <- gout +
+      ann("p", pars[["p"]], dec = 2, x, y - gap * gap_counter, french = french)
+  }
+
+  gout
 }
+
+ann_vb <- ann_schnute
 
 ann_lw <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
   gg + ggplot2::annotate("text",
