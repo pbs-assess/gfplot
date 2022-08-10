@@ -93,15 +93,22 @@ tidy_catch <- function(dat,
   discards$gear <- "Discarded"
 
   all_catch <- bind_rows(landings, discards)
+  # Make a vector of new levels based on what is actually in the data
+  # Without this, pre-filtered catch data may cause an error if some
+  # of the gear types are missing in the table.
+  # The levels will follow the order of `all_gear_ordered` for present
+  # gear types, missing ones are not included in the levels
+  gears_present <- unique(all_catch$gear)
+  all_gear_ordered <- c("Bottom trawl",
+                        "Midwater trawl",
+                        "Hook and line",
+                        "Trap",
+                        "Unknown/trawl",
+                        "Discarded")
+  relevel_gears <- gears_present[order(match(gears_present, all_gear_ordered))]
   all_catch <- mutate(all_catch,
     gear = forcats::fct_relevel(
-      gear,
-      "Bottom trawl",
-      "Midwater trawl",
-      "Hook and line",
-      "Trap",
-      "Unknown/trawl",
-      "Discarded"
+      gear, relevel_gears
     )
   )
 
