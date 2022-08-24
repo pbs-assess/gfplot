@@ -171,7 +171,6 @@ plot_cpue_spatial <-
 
     if (show_majorbound) {
       # add major management region boundaries
-      library(PBSmapping) # needs this for some reason
       majorbound <- load_boundaries(9)
       majorbounds <- fortify(majorbound)
       g <- g + geom_path(
@@ -278,7 +277,9 @@ load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
 }
 
 load_boundaries <- function(utm_zone = 9) {
+  # library(PBSmapping)
   data("major", package = "PBSdata", envir = environment())
+  class(major) <- "data.frame" # this seems to prevent needing to library(PBSmapping)
   gfplot:::ll2utm(major, utm_zone = utm_zone)
 }
 
