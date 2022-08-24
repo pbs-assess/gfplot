@@ -25,6 +25,8 @@ plot_cpue_spatial(
   french = FALSE,
   percent_excluded_xy = NULL,
   percent_excluded_text = "Fishing events excluded due to Privacy Act",
+  show_majorbound = FALSE,
+  major_labels = gfplot:::boundary_labels(utm_zone, xmin = xlim[1]),
   plot_catch = FALSE
 )
 
@@ -80,6 +82,14 @@ the privacy rule.}
 
 \item{percent_excluded_text}{The text to associate with the annotation
 showing the percentage of fishing events excluded due to the privacy rule.}
+
+\item{show_majorbound}{If \code{TRUE}, adds management boundaries.}
+
+\item{major_labels}{Default uses internal function boundary_labels() to
+retrieve a label dataframe. Function can be called and the output modified
+outside this function in order to customize label placement
+(e.g., \code{labels <- gfplot:::boundary_labels(utm_zone = 9)}
+\code{labels[!(labels$label \%in\% c("4B", "5C", "5D")),]$X <- 200}).}
 
 \item{plot_catch}{If \code{TRUE} plot catch instead of CPUE. If \code{FALSE} (default),
 plot CPUE. See \code{dat} for data information.}

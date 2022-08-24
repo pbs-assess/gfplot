@@ -31,6 +31,12 @@
 #'   the privacy rule.
 #' @param percent_excluded_text The text to associate with the annotation
 #'   showing the percentage of fishing events excluded due to the privacy rule.
+#' @param show_majorbound If `TRUE`, adds management boundaries.
+#' @param major_labels Default uses internal function boundary_labels() to
+#'   retrieve a label dataframe. Function can be called and the output modified
+#'   outside this function in order to customize label placement
+#'   (e.g., `labels <- gfplot:::boundary_labels(utm_zone = 9)`
+#'   `labels[!(labels$label %in% c("4B", "5C", "5D")),]$X <- 200`).
 #' @param plot_catch If `TRUE` plot catch instead of CPUE. If `FALSE` (default),
 #'   plot CPUE. See `dat` for data information.
 #' @export
@@ -66,6 +72,8 @@ plot_cpue_spatial <-
            french = FALSE,
            percent_excluded_xy = NULL,
            percent_excluded_text = "Fishing events excluded due to Privacy Act",
+           show_majorbound = FALSE,
+           major_labels = gfplot:::boundary_labels(utm_zone, xmin = xlim[1]),
            plot_catch = FALSE) {
 
     if(plot_catch){
@@ -161,6 +169,21 @@ plot_cpue_spatial <-
         )
       })})
 
+    if (show_majorbound) {
+      # add major management region boundaries
+      library(PBSmapping) # needs this for some reason
+      majorbound <- load_boundaries(9)
+      majorbounds <- fortify(majorbound)
+      g <- g + geom_path(
+        data = majorbounds,
+        aes(X , Y , group = PID), colour = "grey50",
+        lty = 1,
+        inherit.aes = F
+      ) + geom_text(data = major_labels,
+        aes(X , Y, label = label), colour = "grey50"
+      )
+    }
+
     g <- g + geom_polygon(
       data = coastline_utm,
       aes_string(x = "X", y = "Y", group = "PID"),
@@ -252,6 +275,24 @@ load_isobath <- function(xlim_ll, ylim_ll, bath, utm_zone) {
     ylim = ylim_ll + c(-3, 3)
   )
   ll2utm(isobath, utm_zone = utm_zone)
+}
+
+load_boundaries <- function(utm_zone = 9) {
+  data("major", package = "PBSdata", envir = environment())
+  gfplot:::ll2utm(major, utm_zone = utm_zone)
+}
+
+boundary_labels <- function(utm_zone = 9, xmin = NULL){
+  # library(PBSmapping)
+  data("major", package = "PBSdata", envir = environment())
+
+  labels <- attributes(major)$PolyData
+  class(labels) <- "data.frame" # this seems to prevent needing to library(PBSmapping)
+  labels <-  gfplot:::ll2utm(labels, utm_zone = utm_zone)
+  labels[labels$label %in% c("4B", "5C", "5D"),]$X <- c(885, 445, 340)
+  labels[labels$label %in% c("4B", "5C", "5D"),]$Y <- c(5475, 5840, 5970)
+  if(!is.null(xmin)){labels[!(labels$label %in% c("4B", "5C", "5D")),]$X <- xmin + 50}
+  labels
 }
 
 # Rotate coords
