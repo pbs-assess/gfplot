@@ -32,7 +32,7 @@ plot_predictor_bubbles <- function(dat, variable,
     mutate(n_tot = sum(n)) %>%
     ungroup()
 
-  temp_pos %>%
+  p <- temp_pos %>%
     ggplot(aes_string("as.factor(year)", y = variable)) +
     geom_point(aes_string(size = "n", fill = "n"), alpha = 0.4, pch = 21) +
     geom_point(data = temp_all, aes_string(size = "n"), alpha = 0.4, pch = 21) +
@@ -41,7 +41,18 @@ plot_predictor_bubbles <- function(dat, variable,
     xlab("") + ylab(firstup(gsub("_", " ", variable))) +
     labs(size = paste0("Number of\n", group_id)) +
     labs(fill = paste0("Number of\n", group_id)) +
-    ggplot2::scale_size_continuous(range = c(0, 7)) +
-    ggplot2::scale_fill_viridis_c(trans = "log", breaks = c(1, 10, 100, 500)) +
+    ggplot2::scale_size_continuous(range = c(0, 7), breaks = c(1, 10, 100, 500, 1000)) +
+    ggplot2::scale_fill_viridis_c(trans = "log", breaks = c(1, 10, 100, 500, 1000)) +
+    guides(fill = guide_legend(reverse=T), size = guide_legend(reverse=T)) +
     theme_pbs()
+
+  if(length(levels(temp_all[[variable]]))> 13 & length(levels(temp_all[[variable]])) < 40){
+    p <- p + ggplot2::scale_y_discrete(breaks = levels(temp_all[[variable]])[c(T, rep(F, 1))])
+  }
+
+  if(length(levels(temp_all[[variable]]))> 41){
+    p <- p + ggplot2::scale_y_discrete(breaks = levels(temp_all[[variable]])[c(T, rep(F, 4))])
+  }
+
+  p
 }
