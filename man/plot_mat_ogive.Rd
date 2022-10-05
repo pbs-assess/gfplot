@@ -25,6 +25,7 @@ plot_mat_ogive(
   x_max = 1.75,
   prediction_type = c("all", "male", "female", "none"),
   text_label_size = 3,
+  show_quant_text = TRUE,
   french = FALSE
 )
 
@@ -78,6 +79,9 @@ to show model fits when you have sufficient data.}
 
 \item{text_label_size}{Font size for the labels showing the age-at- values
 for either age or length on the plot panel}
+
+\item{show_quant_text}{Logical. If \code{TRUE}, show the quantile values for each
+sex on the panel}
 
 \item{french}{Translate to French?}
 }
