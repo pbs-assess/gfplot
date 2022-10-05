@@ -24,6 +24,7 @@ plot_mat_ogive(
   rug_n = 1500,
   x_max = 1.75,
   prediction_type = c("all", "male", "female", "none"),
+  text_label_size = 3,
   french = FALSE
 )
 
@@ -74,6 +75,9 @@ Set to \code{NULL} to include all samples.}
 
 \item{prediction_type}{The prediction lines to show. Useful if you only want
 to show model fits when you have sufficient data.}
+
+\item{text_label_size}{Font size for the labels showing the age-at- values
+for either age or length on the plot panel}
 
 \item{french}{Translate to French?}
 }

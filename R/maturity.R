@@ -220,6 +220,8 @@ sd2cv <- function(.sd) {
 #' @param x_max Used in determining the right axis limit.
 #' @param prediction_type The prediction lines to show. Useful if you only want
 #'   to show model fits when you have sufficient data.
+#' @param text_label_size Font size for the labels showing the age-at- values
+#'   for either age or length on the plot panel
 #' @param french Translate to French?
 #'
 #' @importFrom stats binomial plogis predict
@@ -232,6 +234,7 @@ plot_mat_ogive <- function(object,
                              if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
                            rug = TRUE, rug_n = 1500, x_max = 1.75,
                            prediction_type = c("all", "male", "female", "none"),
+                           text_label_size = 3,
                            french = FALSE) {
   if (object$sample_id_re) {
     b <- glmmTMB::fixef(object$model)[[1L]]
@@ -370,7 +373,7 @@ plot_mat_ogive <- function(object,
       data = labs, aes_string(
         x = "x", y = "y", label = "label"
       ),
-      hjust = 0, show.legend = FALSE, size = 3
+      hjust = 0, show.legend = FALSE, size = text_label_size
     )
   }
 
