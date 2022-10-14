@@ -363,6 +363,7 @@ fit_length_weight <- function(dat,
 #' @param lab_x_gap Horizontal gap between text labels.
 #' @param lab_y_gap The vertical gap between text labels.
 #' @param col A named character vector declaring the colors for female and male
+#' @param pts_col Logical for whether data points should be coloured to match lines.
 #' @param french Logical.
 #'
 #' @details You can include `object_female` and/or `object_male` or `object_all`
@@ -397,7 +398,8 @@ plot_growth <- function(object_female, object_male,
                         lab_y = 0.3,
                         lab_x_gap = 0.3,
                         lab_y_gap = 0.06,
-                        col = c("Female" = "black", "Male" = "grey40"),
+                        col = c("Female" = "#000000", "Male" = "#666666"),
+                        pts_col = FALSE,
                         french = FALSE) {
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
@@ -459,11 +461,22 @@ plot_growth <- function(object_female, object_male,
       ylim <- c(0, max(pt_dat[, yvar], na.rm = TRUE) * 1.03)
     }
 
-    g <- g + geom_point(
-      data = pt_dat, aes_string(xvar, yvar),
-      alpha = pt_alpha, colour = "grey70", pch = 21
-    ) +
-      coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
+    if (pts_col) {
+      g <- g + geom_point(
+        data = pt_dat,
+        aes_string(xvar, yvar, colour = "sex"),
+        alpha = pt_alpha,
+        pch = 21
+      ) +
+        coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
+    } else {
+      g <- g + geom_point(
+        data = pt_dat, aes_string(xvar, yvar),
+          alpha = pt_alpha, colour = "grey70",
+          pch = 21
+      ) +
+        coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
+    }
   }
 
   if (!no_lines) {
@@ -532,9 +545,9 @@ ann_vb <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
     label = title,
     x = x, y = y, hjust = 0, col = col, size = 3
   ) +
-    ann("k", pars[["k"]], dec = 2, x, y - gap, french = french) +
-    ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2, french = french) +
-    ann("t0", pars[["t0"]], dec = 2, x, y - gap * 3, french = french)
+    ann("k", pars[["k"]], dec = 2, x, y - gap, col = col, french = french) +
+    ann("linf", pars[["linf"]], dec = 1, x, y - gap * 2, col = col, french = french) +
+    ann("t0", pars[["t0"]], dec = 2, x, y - gap * 3, col = col, french = french)
 }
 
 ann_lw <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
@@ -542,11 +555,11 @@ ann_lw <- function(gg, pars, title, col, x, y, gap, french = FALSE) {
     label = title,
     x = x, y = y, hjust = 0, col = col, size = 3
   ) +
-    ann("ln(a)", pars[["log_a"]], dec = 2, x, y - gap, french = french) +
-    ann("b", pars[["b"]], dec = 2, x, y - gap * 2, french = french)
+    ann("ln(a)", pars[["log_a"]], dec = 2, x, y - gap, col = col, french = french) +
+    ann("b", pars[["b"]], dec = 2, x, y - gap * 2, col = col, french = french)
 }
 
-ann <- function(par_name, par_val, dec, x, y, col = "grey40", french = FALSE) {
+ann <- function(par_name, par_val, dec, x, y, col = col, french = FALSE) {
   .text <- paste0(
     par_name, " = ",
     sprintf(
@@ -555,11 +568,14 @@ ann <- function(par_name, par_val, dec, x, y, col = "grey40", french = FALSE) {
     )
   )
   if (french) .text <- gsub("\\.", ",", .text)
+
+  softer_col <- paste0(substr(col, 1L, 7L), as.character(0.9 * 100))
+
   ggplot2::annotate("text",
     label = .text,
     x = x,
     y = y,
     hjust = 0,
-    col = col, size = 3
+    col = softer_col, size = 3
   )
 }
