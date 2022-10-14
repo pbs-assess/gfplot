@@ -214,6 +214,7 @@ sd2cv <- function(.sd) {
 
 #' @param object Output from [fit_mat_ogive()].
 #' @param xlab X axis label.
+#' @param col A named character vector declaring the colors for F and M.
 #' @param title Title for the plot.
 #' @param rug Logical indicating whether rug lines should be added.
 #' @param rug_n The number of rug lines to sample from the total number of fish.
@@ -231,6 +232,7 @@ sd2cv <- function(.sd) {
 #' @rdname plot_mat_ogive
 
 plot_mat_ogive <- function(object,
+                           col = c("M" = "grey50", "F" = "black"),
                            xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
                            title =
                              if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
@@ -382,7 +384,7 @@ plot_mat_ogive <- function(object,
     }
   }
 
-  g <- g + scale_colour_manual(values = c("M" = "grey50", "F" = "black"),
+  g <- g + scale_colour_manual(values = col,
     breaks = c("F", "M"), drop = FALSE) +
     ggplot2::scale_linetype_discrete(breaks = c('F', 'M'), drop = FALSE) +
     xlab(en2fr(xlab, french)) + ylab(en2fr("Probability mature", french)) +

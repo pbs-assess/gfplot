@@ -18,6 +18,7 @@ fit_mat_ogive(
 
 plot_mat_ogive(
   object,
+  col = c(M = "grey50", F = "black"),
   xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
   title = if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
   rug = TRUE,
@@ -63,6 +64,8 @@ All usability codes not in this vector will be omitted.
 Set to \code{NULL} to include all samples.}
 
 \item{object}{Output from \code{\link[=fit_mat_ogive]{fit_mat_ogive()}}.}
+
+\item{col}{A named character vector declaring the colors for F and M.}
 
 \item{xlab}{X axis label.}
 
