@@ -120,8 +120,11 @@ tidy_cpue_index <- function(dat, species_common,
 
   # catch for target spp:
   catch <- group_by(
-    catch, fishing_event_id, best_date, month, locality_code,
-    vessel_registration_number, year, trip_id, hours_fished
+    catch, fishing_event_id, best_date, month,
+    locality_code,
+    vessel_registration_number, year, trip_id, hours_fished,
+    major_stat_area_code,
+    major_stat_area_description
   ) %>%
     mutate(
       spp_in_fe = toupper(species_common) %in% species_common_name,
