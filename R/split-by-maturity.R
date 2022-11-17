@@ -198,13 +198,13 @@ split_catch_maturity <- function(survey_sets, fish,
     set_maturity <- fish_maturity %>%
       group_by(fishing_event_id, adult) %>%
       mutate(maturity_mass = sum(new_mass)) %>%
-      add_tally() %>%
+      dplyr::add_tally() %>%
       rename(count = n) %>%
       ungroup()
 
     set_ratio <- set_maturity %>%
       group_by(fishing_event_id) %>%
-      add_tally() %>%
+      dplyr::add_tally() %>%
       mutate(
         est_sample_mass = sum(new_mass, na.rm = TRUE),
         mass_ratio = maturity_mass / est_sample_mass,

@@ -49,7 +49,6 @@ if (getRversion() >= "2.15.1") {
     "month", "freq", "trip_id", "sample_id", "survey_id", "value", "prop",
     "annual_prop", "quarter", "sum_freq",
 
-    "add_tally",
     "adult",
     "area_km2",
     "catch_weight",
