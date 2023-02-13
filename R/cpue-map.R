@@ -73,7 +73,7 @@ plot_cpue_spatial <-
            percent_excluded_xy = NULL,
            percent_excluded_text = "Fishing events excluded due to Privacy Act",
            show_majorbound = FALSE,
-           major_labels = gfplot:::boundary_labels(utm_zone, xmin = xlim[1]),
+           major_labels = boundary_labels(utm_zone, xmin = xlim[1]),
            plot_catch = FALSE) {
 
     if(plot_catch){
@@ -172,7 +172,7 @@ plot_cpue_spatial <-
     if (show_majorbound) {
       # add major management region boundaries
       majorbound <- load_boundaries(9)
-      majorbounds <- fortify(majorbound)
+      majorbounds <- ggplot2::fortify(majorbound)
       g <- g + geom_path(
         data = majorbounds,
         aes(X , Y , group = PID), colour = "grey50",
@@ -280,7 +280,7 @@ load_boundaries <- function(utm_zone = 9) {
   # library(PBSmapping)
   data("major", package = "PBSdata", envir = environment())
   class(major) <- "data.frame" # this seems to prevent needing to library(PBSmapping)
-  gfplot:::ll2utm(major, utm_zone = utm_zone)
+  ll2utm(major, utm_zone = utm_zone)
 }
 
 boundary_labels <- function(utm_zone = 9, xmin = NULL){
@@ -289,7 +289,7 @@ boundary_labels <- function(utm_zone = 9, xmin = NULL){
 
   labels <- attributes(major)$PolyData
   class(labels) <- "data.frame" # this seems to prevent needing to library(PBSmapping)
-  labels <-  gfplot:::ll2utm(labels, utm_zone = utm_zone)
+  labels <-  ll2utm(labels, utm_zone = utm_zone)
   labels[labels$label %in% c("4B", "5C", "5D"),]$X <- c(885, 445, 340)
   labels[labels$label %in% c("4B", "5C", "5D"),]$Y <- c(5475, 5840, 5970)
   if(!is.null(xmin)){labels[!(labels$label %in% c("4B", "5C", "5D")),]$X <- xmin + 50}

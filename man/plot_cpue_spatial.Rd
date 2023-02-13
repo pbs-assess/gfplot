@@ -26,7 +26,7 @@ plot_cpue_spatial(
   percent_excluded_xy = NULL,
   percent_excluded_text = "Fishing events excluded due to Privacy Act",
   show_majorbound = FALSE,
-  major_labels = gfplot:::boundary_labels(utm_zone, xmin = xlim[1]),
+  major_labels = boundary_labels(utm_zone, xmin = xlim[1]),
   plot_catch = FALSE
 )
 

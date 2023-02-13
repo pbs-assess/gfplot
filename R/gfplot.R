@@ -185,7 +185,10 @@ if (getRversion() >= "2.15.1") {
     "each_specimen_collected",
     "temp",
     "maturity_assignment",
-    "maturity_short_names"
+    "maturity_short_names",
+
+    # cpue map stuff
+    "label", "major"
   ))
 }
 
