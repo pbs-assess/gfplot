@@ -139,13 +139,13 @@ tidy_comps <- function(dat,
                        remove_unsexed = TRUE,
                        ...) {
 
-  if(sample_type == "commercial" && !is.null(dat_catch)){
-    dat_catch <- set_fishing_year(dat_catch, ...)
-  }
-
   age_length <- match.arg(age_length)
   sample_type <- match.arg(sample_type)
   frequency_type <- match.arg(frequency_type)
+
+  if(sample_type == "commercial" && !is.null(dat_catch)){
+    dat_catch <- set_fishing_year(dat_catch, ...)
+  }
 
   if (frequency_type == "weighted" && sample_type == "survey" &&
     is.null(dat_survey_sets)) {
