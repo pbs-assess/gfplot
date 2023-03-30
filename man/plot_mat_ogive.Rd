@@ -12,6 +12,7 @@ fit_mat_ogive(
   sample_id_re = FALSE,
   year_re = FALSE,
   months = seq(1, 12),
+  custom_maturity_at = NULL,
   ageing_method_codes = NULL,
   usability_codes = c(0, 1, 2, 6)
 )
@@ -54,6 +55,12 @@ for year.}
 
 \item{months}{A numeric vector indicating which months to include when
 fitting the maturity ogive. Defaults to all months.}
+
+\item{custom_maturity_at}{A numeric vector of two threshold codes to define
+maturity at with the first being for males and the second for females.
+Defaults to \code{NULL}, which brings in default values from maturity assignment
+dataframe included with this package.
+\code{NA} in either position will also retain the default.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to \code{NULL}, which brings in all valid ageing codes.

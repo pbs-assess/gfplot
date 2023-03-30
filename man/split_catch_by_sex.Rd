@@ -2,7 +2,7 @@
 % Please edit documentation in R/split-by-sex-maturity.R
 \name{split_catch_by_sex}
 \alias{split_catch_by_sex}
-\title{Split catch weights by relative mass sex and maturity classes}
+\title{Split catch weights by relative weight or counts sampled for sex and/or maturity}
 \usage{
 split_catch_by_sex(
   survey_sets,
@@ -18,6 +18,7 @@ split_catch_by_sex(
   use_median_ratio = FALSE,
   sample_id_re = TRUE,
   year_re = FALSE,
+  custom_maturity_at = NULL,
   plot = FALSE
 )
 }
@@ -39,7 +40,7 @@ Variable by this name will be saved indicating which was used.}
 
 \item{years}{List of years. Default 'NULL' includes all years.}
 
-\item{cutoff_quantile}{Set max cutoff quantile for mass modeled from lengths.}
+\item{cutoff_quantile}{Set max cutoff quantile for weight modelled from lengths.}
 
 \item{p_threshold}{Probability of maturity to split at. Default = 0.5. Alternatives are 0.05 or 0.95.}
 
@@ -51,18 +52,24 @@ for sample ID.}
 
 \item{year_re}{Option to have lengths at maturity vary by year, but this requires the gfvelocities package.}
 
+\item{custom_maturity_at}{A numeric vector of two threshold codes to define
+maturity at with the first being for males and the second for females.
+Defaults to \code{NULL}, which brings in default values from maturity assignment
+dataframe included with this package.
+\code{NA} in either position will also retain the default.}
+
 \item{plot}{Logical for whether to produce plots
 (length-weight and length-at-maturity relationships).}
 }
 \description{
-Split catch weights by relative mass sex and maturity classes
+Split catch weights by relative weight or counts sampled for sex and/or maturity
 }
 \examples{
 \dontrun{
 d_survey_sets <- gfdata::get_survey_sets("pacific cod")
 d_survey_samples <- gfdata::get_survey_samples("pacific cod")
 
-d_by_maturity <- split_catch_maturity(
+d_by_maturity <- split_catch_by_sex(
   d_survey_sets, d_survey_samples,
   survey = c("SYN HS", "SYN QCS"),
   years = NULL,

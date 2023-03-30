@@ -16,6 +16,11 @@
 #' @param sample_id_re If `TRUE` then the model will include random intercepts
 #'    for sample ID.
 #' @param year_re Option to have lengths at maturity vary by year, but this requires the gfvelocities package.
+#' @param custom_maturity_at A numeric vector of two threshold codes to define
+#'   maturity at with the first being for males and the second for females.
+#'   Defaults to `NULL`, which brings in default values from maturity assignment
+#'   dataframe included with this package.
+#'   `NA` in either position will also retain the default.
 #' @param plot Logical for whether to produce plots
 #'    (length-weight and length-at-maturity relationships).
 #' @export
@@ -44,6 +49,7 @@ split_catch_by_sex <- function(survey_sets, fish,
                                use_median_ratio = FALSE,
                                sample_id_re = TRUE,
                                year_re = FALSE,
+                               custom_maturity_at = NULL,
                                plot = FALSE) {
   if (catch_variable == "catch_weight" | catch_variable == "density_kgpm2") split_by_weight <- TRUE
 
@@ -143,7 +149,10 @@ split_catch_by_sex <- function(survey_sets, fish,
         } else {
           warning("Some years lack maturity data, but catch still split.", call. = FALSE)
 
-          m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
+          m <- fit_mat_ogive(fish,
+                             type = "length",
+                             sample_id_re = sample_id_re,
+                             custom_maturity_at = custom_maturity_at)
 
           if (p_threshold == 0.5) {
             f_fish$threshold <- m$mat_perc$f.p0.5
@@ -160,7 +169,11 @@ split_catch_by_sex <- function(survey_sets, fish,
         }
       } else {
         if (year_re) {
-          m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re, year_re = TRUE)
+          m <- fit_mat_ogive(fish,
+                             type = "length",
+                             sample_id_re = sample_id_re,
+                             year_re = TRUE,
+                             custom_maturity_at = custom_maturity_at)
           if (p_threshold == 0.5) {
             f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.5)
             m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.5)
@@ -174,7 +187,10 @@ split_catch_by_sex <- function(survey_sets, fish,
             m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.95)
           }
         } else {
-          m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
+          m <- fit_mat_ogive(fish,
+                             type = "length",
+                             sample_id_re = sample_id_re,
+                             custom_maturity_at = custom_maturity_at)
 
           # apply global estimates to all catches
           if (p_threshold == 0.5) {
@@ -214,14 +230,17 @@ split_catch_by_sex <- function(survey_sets, fish,
         filter(!(sex %in% c(1, 2)) & length < min(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
         mutate(
           mature = 0,
-          year_f = as.character(year)
-        )
+          year_f = as.character(year),
+          model_weight = NA,
+          new_weight = weight
+      )
+
       # browser()
       # create groups
       if (split_by_sex) {
         if (immatures_pooled) {
           # since not spliting by sex for immatures, the unsexed imm can be added on
-          fish_groups <- rbind(f_fish, m_fish, imm_fish) %>%
+          fish_groups <- bind_rows(f_fish, m_fish, imm_fish) %>%
             mutate(group_name = ifelse(mature == 1,
               paste("Mature", ifelse(sex == 1, "males", "females")),
               "Immature"
@@ -305,10 +324,17 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
-        group_by(group_name) %>%
+        group_by(group_name, survey_abbrev, year) %>%
         mutate(
           median_prop = median(proportion, na.rm = TRUE),
           mean_prop = mean(proportion, na.rm = TRUE)
+        ) %>%
+        ungroup() %>%
+        # some surveys are missing data for some years
+        group_by(group_name, survey_abbrev) %>%
+        mutate(
+          median_prop = ifelse(is.na(median_prop), round(median(proportion, na.rm = TRUE), 3), median_prop),
+          mean_prop = ifelse(is.na(mean_prop), round(mean(proportion, na.rm = TRUE), 3), mean_prop)
         ) %>%
         ungroup() %>%
         mutate(
@@ -412,10 +438,17 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
-        group_by(group_name) %>%
+        group_by(group_name, survey_abbrev, year) %>%
         mutate(
           median_prop = median(proportion, na.rm = TRUE),
           mean_prop = mean(proportion, na.rm = TRUE)
+        ) %>%
+        ungroup() %>%
+        # some surveys are missing data for some years
+        group_by(group_name, survey_abbrev) %>%
+        mutate(
+          median_prop = ifelse(is.na(median_prop), round(median(proportion, na.rm = TRUE), 3), median_prop),
+          mean_prop = ifelse(is.na(mean_prop), round(mean(proportion, na.rm = TRUE), 3), mean_prop)
         ) %>%
         ungroup() %>%
         mutate(

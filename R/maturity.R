@@ -8,6 +8,11 @@
 #'   for year.
 #' @param months A numeric vector indicating which months to include when
 #'   fitting the maturity ogive. Defaults to all months.
+#' @param custom_maturity_at A numeric vector of two threshold codes to define
+#'   maturity at with the first being for males and the second for females.
+#'   Defaults to `NULL`, which brings in default values from maturity assignment
+#'   dataframe included with this package.
+#'   `NA` in either position will also retain the default.
 #' @param ageing_method_codes A numeric vector of ageing method codes to filter
 #'   on. Defaults to `NULL`, which brings in all valid ageing codes.
 #'   See [gfdata::get_age_methods()].
@@ -35,6 +40,7 @@ fit_mat_ogive <- function(dat,
                           sample_id_re = FALSE,
                           year_re = FALSE,
                           months = seq(1, 12),
+                          custom_maturity_at = NULL,
                           ageing_method_codes = NULL,
                           usability_codes = c(0, 1, 2, 6)) {
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
@@ -77,6 +83,12 @@ fit_mat_ogive <- function(dat,
   mat_df <- maturity_assignment
 
   dat <- left_join(dat, mat_df, by = c("sex", "maturity_convention_code"))
+
+  if(!is.null(custom_maturity_at)){
+    if(!is.na(custom_maturity_at[1])) dat[dat$sex == 1,]$mature_at <- custom_maturity_at[1]
+    if(!is.na(custom_maturity_at[2])) dat[dat$sex == 2,]$mature_at <- custom_maturity_at[2]
+  }
+
   dat <- mutate(dat, mature = maturity_code >= mature_at)
 
   type <- match.arg(type)
