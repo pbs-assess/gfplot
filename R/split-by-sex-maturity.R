@@ -58,6 +58,7 @@ split_catch_by_sex <- function(survey_sets, fish,
   species <- fish$species_common_name[1]
 
   fish <- fish %>%
+    filter(!is.na(length)) %>%
     filter(survey_abbrev %in% survey) %>%
     filter(year %in% years)
 
@@ -80,9 +81,6 @@ split_catch_by_sex <- function(survey_sets, fish,
     stop("There are duplicted fishing_event_ids in the survey_sets dataframe.
          Remove these before running this function.")
   }
-
-  model_ssid <- unique(survey_sets$survey_series_id)
-  ssid_string <- paste(model_ssid, collapse = " ")
 
   if (nrow(fish) > 0) {
     f_fish <- fish %>%
@@ -221,13 +219,15 @@ split_catch_by_sex <- function(survey_sets, fish,
         }
       }
 
+      # browser()
       # classify each fish as immature or mature based on above thresholds
       f_fish <- mutate(f_fish, mature = if_else(length >= threshold, 1, 0, missing = NULL))
       m_fish <- mutate(m_fish, mature = if_else(length >= threshold, 1, 0, missing = NULL))
 
       # get unsexed immature fish
       imm_fish <- fish %>%
-        filter(!(sex %in% c(1, 2)) & length < min(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+        filter(!(sex %in% c(1, 2)) & length < min(c(f_fish$threshold, m_fish$threshold),
+                                                  na.rm = TRUE)) %>%
         mutate(
           mature = 0,
           year_f = as.character(year),
@@ -235,7 +235,6 @@ split_catch_by_sex <- function(survey_sets, fish,
           new_weight = weight
       )
 
-      # browser()
       # create groups
       if (split_by_sex) {
         if (immatures_pooled) {
@@ -321,20 +320,20 @@ split_catch_by_sex <- function(survey_sets, fish,
         fishing_event_id = unique(survey_sets$fishing_event_id),
         group_name = unique(set_values$group_name)
       )
-
+# browser()
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
         group_by(group_name, survey_abbrev, year) %>%
         mutate(
-          median_prop = median(proportion, na.rm = TRUE),
-          mean_prop = mean(proportion, na.rm = TRUE)
+          median_prop_ann = median(proportion, na.rm = TRUE),
+          mean_prop_ann = mean(proportion, na.rm = TRUE)
         ) %>%
         ungroup() %>%
         # some surveys are missing data for some years
         group_by(group_name, survey_abbrev) %>%
         mutate(
-          median_prop = ifelse(is.na(median_prop), round(median(proportion, na.rm = TRUE), 3), median_prop),
-          mean_prop = ifelse(is.na(mean_prop), round(mean(proportion, na.rm = TRUE), 3), mean_prop)
+          median_prop = ifelse(is.na(median_prop_ann), round(median(proportion, na.rm = TRUE), 3), median_prop_ann),
+          mean_prop = ifelse(is.na(mean_prop_ann), round(mean(proportion, na.rm = TRUE), 3), mean_prop_ann)
         ) %>%
         ungroup() %>%
         mutate(
@@ -368,41 +367,37 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       # sets_w_ratio$perc_sampled[Inf] <- NA
 
-      # correct any false 0s
+      # correct any false 0s and resulting NAs in set weight variables
+      global_mean_weight <- mean(fish$weight, na.rm = TRUE)
+
       if (("catch_weight" %in% colnames(.d)) & ("catch_count" %in% colnames(.d))) {
         # browser()
         .d <- sets_w_ratio
         .d$catch_count <- ifelse(.d$catch_weight > 0 & .d$catch_count == 0, NA, .d$catch_count)
         .d$catch_weight <- ifelse(.d$catch_count > 0 & .d$catch_weight == 0, NA, .d$catch_weight)
+        .d <- .d %>% mutate(catch_weight = case_when(
+            is.na(catch_weight) & catch_count == n_sampled ~ est_sample_weight / 1000,
+            is.na(catch_weight) & catch_count > n_sampled & n_sampled > 0 ~ (est_sample_weight / 1000 / n_sampled) * catch_count,
+            # is.na(catch_weight) & n_sampled == 0 ~ global_mean_weight*catch_count,
+            is.na(catch_weight) & n_sampled == 0 ~ NA,
+            !is.na(catch_weight) ~ catch_weight))
+
 
         if (("density_pcpm2" %in% colnames(.d))) {
           .d$density_pcpm2 <- ifelse(.d$catch_count > 0 & .d$density_pcpm2 == 0, NA, .d$density_pcpm2)
         }
         if (("density_kgpm2" %in% colnames(.d))) {
           .d$density_kgpm2 <- ifelse(.d$catch_weight > 0 & .d$density_kgpm2 == 0, NA, .d$density_kgpm2)
+          .d <- .d %>% mutate(
+            density_kgpm2 = case_when(
+              is.na(density_kgpm2) ~ catch_weight / area_swept,
+              !is.na(density_kgpm2) ~ density_kgpm2
+            )
+          )
         }
         sets_w_ratio <- .d
       }
 
-
-      # browser()
-
-      # correct NAs in set weight variables
-      global_mean_weight <- mean(fish$weight, na.rm = TRUE)
-
-      sets_w_ratio <- sets_w_ratio %>% mutate(
-        catch_weight = case_when(
-          is.na(catch_weight) & catch_count == n_sampled ~ est_sample_weight / 1000,
-          is.na(catch_weight) & catch_count > n_sampled & n_sampled > 0 ~ (est_sample_weight / 1000 / n_sampled) * catch_count,
-          # is.na(catch_weight) & n_sampled == 0 ~ global_mean_weight*catch_count,
-          is.na(catch_weight) & n_sampled == 0 ~ NA,
-          !is.na(catch_weight) ~ catch_weight
-        ),
-        density_kgpm2 = case_when(
-          is.na(density_kgpm2) ~ catch_weight / area_swept,
-          !is.na(density_kgpm2) ~ density_kgpm2
-        )
-      )
     } else {
       # if splitting proportion of a count
       group_values <- fish_groups %>%
@@ -440,15 +435,16 @@ split_catch_by_sex <- function(survey_sets, fish,
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
         group_by(group_name, survey_abbrev, year) %>%
         mutate(
-          median_prop = median(proportion, na.rm = TRUE),
-          mean_prop = mean(proportion, na.rm = TRUE)
+          median_prop_ann = median(proportion, na.rm = TRUE),
+          mean_prop_ann = mean(proportion, na.rm = TRUE)
         ) %>%
         ungroup() %>%
-        # some surveys are missing data for some years
+        # some surveys are missing data for some years so we use survey level means in these years
+        # TODO: might be better to use nearest years, but for now if this appear misleading filter !is.na(median_prop_ann)
         group_by(group_name, survey_abbrev) %>%
         mutate(
-          median_prop = ifelse(is.na(median_prop), round(median(proportion, na.rm = TRUE), 3), median_prop),
-          mean_prop = ifelse(is.na(mean_prop), round(mean(proportion, na.rm = TRUE), 3), mean_prop)
+          median_prop = ifelse(is.na(median_prop_ann), round(median(proportion, na.rm = TRUE), 3), median_prop_ann),
+          mean_prop = ifelse(is.na(mean_prop_ann), round(mean(proportion, na.rm = TRUE), 3), mean_prop_ann)
         ) %>%
         ungroup() %>%
         mutate(
@@ -488,6 +484,10 @@ split_catch_by_sex <- function(survey_sets, fish,
     data$split_catch_type <- catch_variable
 
     if (plot) {
+
+      fish_w_maturity <- filter(fish, !is.na(length) & maturity_code > 0)
+      survey_names <- unique(fish_w_maturity$survey_abbrev)
+      ssid_string <- paste(survey_names, collapse = " ")
 
       try(
         (maturity_plot <- plot_mat_ogive(m) +
