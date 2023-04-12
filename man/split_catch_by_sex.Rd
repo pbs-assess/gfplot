@@ -8,16 +8,17 @@ split_catch_by_sex(
   survey_sets,
   fish,
   catch_variable = "catch_weight",
-  survey = c("SYN HS", "SYN QCS", "SYN WCVI", "SYN WCHG"),
   split_by_sex = TRUE,
   split_by_maturity = TRUE,
   immatures_pooled = FALSE,
+  survey = NULL,
   years = NULL,
   cutoff_quantile = 0.9995,
   p_threshold = 0.5,
   use_median_ratio = FALSE,
   sample_id_re = TRUE,
   year_re = FALSE,
+  split_by_weight = FALSE,
   custom_maturity_at = NULL,
   plot = FALSE
 )
@@ -30,13 +31,13 @@ split_catch_by_sex(
 \item{catch_variable}{Which biomass variable will be split. Can be total weight or densities.
 Variable by this name will be saved indicating which was used.}
 
-\item{survey}{List of survey abbreviations.}
-
 \item{split_by_sex}{Should catch be split by sex?}
 
 \item{split_by_maturity}{Should catch be split by maturity?}
 
 \item{immatures_pooled}{If split by maturity, \code{TRUE} when immatures not to be split by sex.}
+
+\item{survey}{List of survey abbreviations. Default 'NULL' includes all surveys in survey_sets.}
 
 \item{years}{List of years. Default 'NULL' includes all years.}
 
@@ -52,14 +53,16 @@ for sample ID.}
 
 \item{year_re}{Option to have lengths at maturity vary by year, but this requires the gfvelocities package.}
 
+\item{split_by_weight}{Default is \code{FALSE}, but will automatically be switched to \code{TRUE} for the standard biomass variable names (\code{catch_weight}, \code{density_kgpm2}, \code{density_kgkm2}).
+(length-weight and length-at-maturity relationships).}
+
 \item{custom_maturity_at}{A numeric vector of two threshold codes to define
 maturity at with the first being for males and the second for females.
 Defaults to \code{NULL}, which brings in default values from maturity assignment
 dataframe included with this package.
 \code{NA} in either position will also retain the default.}
 
-\item{plot}{Logical for whether to produce plots
-(length-weight and length-at-maturity relationships).}
+\item{plot}{Logical for whether to produce plots.}
 }
 \description{
 Split catch weights by relative weight or counts sampled for sex and/or maturity

@@ -4,10 +4,10 @@
 #' @param fish Data from [gfdata::get_survey_samples()] or matching formate where female are coded as `sex = 2`.
 #' @param catch_variable Which biomass variable will be split. Can be total weight or densities.
 #'   Variable by this name will be saved indicating which was used.
-#' @param survey List of survey abbreviations.
 #' @param split_by_sex Should catch be split by sex?
 #' @param split_by_maturity Should catch be split by maturity?
 #' @param immatures_pooled If split by maturity, `TRUE` when immatures not to be split by sex.
+#' @param survey List of survey abbreviations. Default 'NULL' includes all surveys in survey_sets.
 #' @param years List of years. Default 'NULL' includes all years.
 #' @param cutoff_quantile Set max cutoff quantile for weight modelled from lengths.
 #' @param p_threshold Probability of maturity to split at. Default = 0.5. Alternatives are 0.05 or 0.95.
@@ -21,7 +21,8 @@
 #'   Defaults to `NULL`, which brings in default values from maturity assignment
 #'   dataframe included with this package.
 #'   `NA` in either position will also retain the default.
-#' @param plot Logical for whether to produce plots
+#' @param plot Logical for whether to produce plots.
+#' @param split_by_weight Default is `FALSE`, but will automatically be switched to `TRUE` for the standard biomass variable names (`catch_weight`, `density_kgpm2`, `density_kgkm2`).
 #'    (length-weight and length-at-maturity relationships).
 #' @export
 #' @importFrom dplyr if_else
@@ -39,20 +40,24 @@
 #' }
 split_catch_by_sex <- function(survey_sets, fish,
                                catch_variable = "catch_weight",
-                               survey = c("SYN HS", "SYN QCS", "SYN WCVI", "SYN WCHG"),
                                split_by_sex = TRUE,
                                split_by_maturity = TRUE,
                                immatures_pooled = FALSE,
+                               survey = NULL,
                                years = NULL,
                                cutoff_quantile = 0.9995,
                                p_threshold = 0.5,
                                use_median_ratio = FALSE,
                                sample_id_re = TRUE,
                                year_re = FALSE,
+                               split_by_weight = FALSE,
                                custom_maturity_at = NULL,
                                plot = FALSE) {
-  if (catch_variable == "catch_weight" | catch_variable == "density_kgpm2") split_by_weight <- TRUE
+  if (catch_variable == "catch_weight" | catch_variable == "density_kgpm2" | catch_variable == "density_kgkm2") {
+    split_by_weight <- TRUE
+    }
 
+  if (is.null(survey)) survey <- unique(survey_sets[["survey_abbrev"]])
   if (is.null(years)) years <- unique(survey_sets[["year"]])
 
   species <- fish$species_common_name[1]
@@ -73,7 +78,7 @@ split_catch_by_sex <- function(survey_sets, fish,
   }
 
   survey_sets <- .d
-
+# browser()
   # check for duplicated fishing_event_ids
   check_for_duplicates <- survey_sets[duplicated(survey_sets$fishing_event_id), ]
 
@@ -141,7 +146,7 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       if (min(levels_per_year) < 3) { # some years lack maturity data
 
-        if (length(levels_per_year) < 3) { # TODO: check if this threshold should actually be 2
+        if (length(levels_per_year) < 1) { # TODO: check if this threshold should actually be 2
           warning("Maturity data not recorded, so catch not split.", call. = FALSE)
           return(list(data = survey_sets, model = NULL))
         } else {
@@ -400,6 +405,7 @@ split_catch_by_sex <- function(survey_sets, fish,
 
     } else {
       # if splitting proportion of a count
+      # this hasn't yet been tested
       group_values <- fish_groups %>%
         group_by(fishing_event_id, group_name) %>%
         dplyr::add_tally() %>%
@@ -430,6 +436,14 @@ split_catch_by_sex <- function(survey_sets, fish,
         mutate(n_sampled = mean(n_sampled, na.rm = TRUE)) %>%
         ungroup() %>%
         replace(is.na(.), 0)
+
+      # add NA when a particular group was not found
+      # should give df with nrows in survey_sets * number of unique group_names
+      all_groups_for_all_events2 <- expand.grid(
+        fishing_event_id = unique(survey_sets$fishing_event_id),
+        group_name = unique(set_values$group_name)
+      )
+      # browser()
 
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
@@ -466,8 +480,12 @@ split_catch_by_sex <- function(survey_sets, fish,
           )
       }
 
-      # add column to check for discrepencies between total catch weight and biological sample weights
-      # est_sample_weight is in g while catch_weight is in kg
+
+      # add column to check for discrepancies between total catch count and biological sample count
+      # fist were there any catches with weights and samples but no counts?
+      # if so, we will have to assume everything was sampled
+      # this could be checked by summing weights of samples and comparing that to total catch weight
+      sets_w_ratio$catch_count <- ifelse(sets_w_ratio$catch_weight > 0 & sets_w_ratio$n_sampled > 0, sets_w_ratio$n_sampled, sets_w_ratio$catch_count)
       sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_count - (sets_w_ratio$n_sampled)), 2)
       sets_w_ratio$perc_sampled <- round((sets_w_ratio$n_sampled) / sets_w_ratio$catch_count, 2) * 100
 
@@ -489,10 +507,15 @@ split_catch_by_sex <- function(survey_sets, fish,
       survey_names <- unique(fish_w_maturity$survey_abbrev)
       ssid_string <- paste(survey_names, collapse = " ")
 
+      maturity_plot <- NA
+
       try(
         (maturity_plot <- plot_mat_ogive(m) +
           ggplot2::ggtitle(paste("Length at maturity for", species, "surveys", ssid_string, "")))
       )
+
+      weight_plot <- NA
+      if (split_by_weight){
       try(
         (weight_plot <- ggplot(fish_groups, aes(length, new_weight, colour = as.factor(sex))) +
           geom_point(size = 1.5, alpha = 0.35, shape = 1) +
@@ -506,6 +529,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           ggplot2::ggtitle(paste("Length-weight relationship for", species, "surveys", ssid_string, ""))
         )
       )
+      }
     }
   } else {
     return(list(data = survey_sets, model = NULL))
