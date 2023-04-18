@@ -228,15 +228,17 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       time <- NULL
     }
     m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
-      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = time, ...)
+      mesh = .spde, family = sdmTMB::tweedie(link = "log"), time = time, ...)
     }, error = function(e) NA)
-    if (is.na(m)) { # Did not converge.
-      warning('The spatial TMB model did not converge.', call. = FALSE)
-      return(list(
-        predictions = pg, data = .d_tidy,
-        models = NA, survey = survey,
-        years = years
-      ))
+    if (length(m) == 1L) {
+      if (is.na(m)) { # Did not converge.
+        warning('The spatial TMB model did not converge.', call. = FALSE)
+        return(list(
+          predictions = pg, data = .d_tidy,
+          models = NA, survey = survey,
+          years = years
+        ))
+      }
     }
     # These are fixed station (IPHC) or they come from grids without years
     if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
@@ -244,7 +246,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       pg_one$year <- max(.d_scaled$year)
     } else {
       if (!"year" %in% names(pg)) pg$year <- 1L
-      pg_one <- filter(pg, year == max(pg$year)) # all the same, pick one
+      pg_one <- dplyr::filter(pg, year == max(pg$year)) # all the same, pick one
       pg <- pg_one
     }
     # FIXME: just returning last year for consistency!
