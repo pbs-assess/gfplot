@@ -19,6 +19,7 @@
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
+#' @param link The link function for the binomial GLM (by default, \code{"logit"}).
 #' @rdname plot_mat_ogive
 #' @export
 #' @examples
@@ -42,7 +43,10 @@ fit_mat_ogive <- function(dat,
                           months = seq(1, 12),
                           custom_maturity_at = NULL,
                           ageing_method_codes = NULL,
-                          usability_codes = c(0, 1, 2, 6)) {
+                          usability_codes = c(0, 1, 2, 6),
+                          link = c("logit", "probit", "cloglog", "cauchit", "log")) {
+  link <- match.arg(link)
+
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
 
   dat <- dat %>% filter(maturity_convention_code != 9)
@@ -110,14 +114,14 @@ fit_mat_ogive <- function(dat,
         (1 | sample_id) +
         # (1 | survey_series_id) +
         (1 | year),
-      data = .d, family = binomial
+      data = .d, family = binomial(link)
       )
       b <- glmmTMB::fixef(m)[[1L]]
       ranef <- glmmTMB::ranef(m)
       re <- ranef$cond$year
     } else {
       m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
-        data = .d, family = binomial
+        data = .d, family = binomial(link)
       )
 
       b <- glmmTMB::fixef(m)[[1L]]
@@ -125,14 +129,14 @@ fit_mat_ogive <- function(dat,
   } else {
     if (year_re) {
       m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | year),
-        data = .d, family = binomial
+        data = .d, family = binomial(link)
       )
       b <- glmmTMB::fixef(m)[[1L]]
       ranef <- glmmTMB::ranef(m)
       re <- ranef$cond$year
     } else {
       m <- stats::glm(mature ~ age_or_length * female,
-        data = .d, family = binomial
+        data = .d, family = binomial(link)
       )
       b <- stats::coef(m)
     }
@@ -178,25 +182,27 @@ fit_mat_ogive <- function(dat,
   if (year_re) {
     year_f <- as.character(nd$year)
     nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
-    nd$glmm_re2 <- plogis(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
+    nd$glmm_re2 <- m$family$linkinv(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
         b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
   }
 
-  nd$glmm_fe <- plogis(b[[1L]] + b[[3L]] * nd$female +
+  nd$glmm_fe <- m$family$linkinv(b[[1L]] + b[[3L]] * nd$female +
     b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
 
   if (year_re) {
-    mat_perc <- extract_maturity_perc_re(b, re)
+    mat_perc <- extract_maturity_perc_re(b, re, m)
   } else {
-    mat_perc <- extract_maturity_perc(b)
+    mat_perc <- extract_maturity_perc(b, m)
   }
 
-
-  se_l50 <- tryCatch({
-    delta_method(~ -(log((1 / 0.5) - 1) + x1 + x3) / (x2 + x4),
-      mean = stats::coef(m), cov = stats::vcov(m)
-    )
-  }, error = function(e) NA)
+  if (link == "logit") {
+    se_l50 <- tryCatch({delta_method(~ -(log((1/0.5) - 1) + x1 + x3) / (x2 + x4),
+                                     mean = stats::coef(m), cov = stats::vcov(m))}, error = function(e) NA)
+  } else if(requireNamespace("numDeriv", quietly = TRUE)) {
+    se_l50 <- mat_par_delta_method(model = m, perc = 0.5) %>% as.numeric() %>% sqrt()
+  } else {
+    se_l50 <- paste("Download the numDeriv package to get the SE of the", type, "of 50% maturity.")
+  }
 
   list(
     data = .d, pred_data = nd, model = m, sample_id_re = sample_id_re,
@@ -281,16 +287,16 @@ plot_mat_ogive <- function(object,
   # }
 
   m_perc <- data.frame(
-    p0.5 = logit_perc(a = b[[1]], b = b[[2]], perc = 0.5)
+    p0.5 = binomial_perc(a = b[[1]], b = b[[2]], perc = 0.5, linkinv = object$model$family$linkinv)
   )
-  m_perc$p0.95 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.95)
-  m_perc$p0.05 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.05)
+  m_perc$p0.95 <- binomial_perc(a = b[[1]], b = b[[2]], perc = 0.95, linkinv = object$model$family$linkinv)
+  m_perc$p0.05 <- binomial_perc(a = b[[1]], b = b[[2]], perc = 0.05, linkinv = object$model$family$linkinv)
 
   f_perc <- data.frame(
-    p0.5 = logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.5)
+    p0.5 = binomial_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.5, linkinv = object$model$family$linkinv)
   )
-  f_perc$p0.95 <- logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.95)
-  f_perc$p0.05 <- logit_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.05)
+  f_perc$p0.95 <- binomial_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.95, linkinv = object$model$family$linkinv)
+  f_perc$p0.05 <- binomial_perc(a = b[[1]] + b[[3]], b = b[[2]] + b[[4]], perc = 0.05, linkinv = object$model$family$linkinv)
 
   labs_f <- tibble(
     p = c("05", "50", "95"),
@@ -466,16 +472,16 @@ plot_mat_annual_ogives <- function(object,
   labs_year <- list()
   for (i in (unique(as.character(nd_re$year)))) {
     m_perc <- data.frame(
-      p0.5 = logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5)
+      p0.5 = binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5, linkinv = object$model$family$linkinv)
     )
-    m_perc$p0.95 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95)
-    m_perc$p0.05 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05)
+    m_perc$p0.95 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95, linkinv = object$model$family$linkinv)
+    m_perc$p0.05 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05, linkinv = object$model$family$linkinv)
 
     f_perc <- data.frame(
-      p0.5 = logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5)
+      p0.5 = binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5, linkinv = object$model$family$linkinv)
     )
-    f_perc$p0.95 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95)
-    f_perc$p0.05 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05)
+    f_perc$p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95, linkinv = object$model$family$linkinv)
+    f_perc$p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05, linkinv = object$model$family$linkinv)
 
     labs_f <- tibble(
       p = c("05", "50", "95"),
@@ -573,22 +579,25 @@ plot_mat_annual_ogives <- function(object,
   g
 }
 
-extract_maturity_perc <- function(object) {
-  m.p0.5 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.5)
-  m.p0.95 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.95)
-  m.p0.05 <- logit_perc(a = object[[1]], b = object[[2]], perc = 0.05)
+extract_maturity_perc <- function(object, model) {
+  m.p0.5 <- binomial_perc(a = object[[1]], b = object[[2]], perc = 0.5, linkinv = model$family$linkinv)
+  m.p0.95 <- binomial_perc(a = object[[1]], b = object[[2]], perc = 0.95, linkinv = model$family$linkinv)
+  m.p0.05 <- binomial_perc(a = object[[1]], b = object[[2]], perc = 0.05, linkinv = model$family$linkinv)
 
-  f.p0.5 <- logit_perc(
+  f.p0.5 <- binomial_perc(
     a = object[[1]] + object[[3]],
-    b = object[[2]] + object[[4]], perc = 0.5
+    b = object[[2]] + object[[4]], perc = 0.5,
+    linkinv = model$family$linkinv
   )
-  f.p0.95 <- logit_perc(
+  f.p0.95 <- binomial_perc(
     a = object[[1]] + object[[3]],
-    b = object[[2]] + object[[4]], perc = 0.95
+    b = object[[2]] + object[[4]], perc = 0.95,
+    linkinv = model$family$linkinv
   )
-  f.p0.05 <- logit_perc(
+  f.p0.05 <- binomial_perc(
     a = object[[1]] + object[[3]],
-    b = object[[2]] + object[[4]], perc = 0.05
+    b = object[[2]] + object[[4]], perc = 0.05,
+    linkinv = model$family$linkinv
   )
   list(
     m.p0.5 = m.p0.5, m.p0.95 = m.p0.95, m.p0.05 = m.p0.05, f.p0.5 = f.p0.5,
@@ -596,29 +605,42 @@ extract_maturity_perc <- function(object) {
   )
 }
 
-extract_maturity_perc_re <- function(betas, random_intercepts) {
+extract_maturity_perc_re <- function(betas, random_intercepts, model) {
   b <- betas
   re <- random_intercepts
   out <- list()
   for (i in rownames(re)) {
-    m.p0.5 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5)
-    m.p0.95 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95)
-    m.p0.05 <- logit_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05)
+    m.p0.5 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5, linkinv = model$family$linkinv)
+    m.p0.95 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95, linkinv = model$family$linkinv)
+    m.p0.05 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05, linkinv = model$family$linkinv)
 
-    f.p0.5 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5)
-    f.p0.95 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95)
-    f.p0.05 <- logit_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05)
+    f.p0.5 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5, linkinv = model$family$linkinv)
+    f.p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95, linkinv = model$family$linkinv)
+    f.p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05, linkinv = model$family$linkinv)
     out[[i]] <- list(
       m.p0.5 = m.p0.5, m.p0.95 = m.p0.95, m.p0.05 = m.p0.05,
       f.p0.5 = f.p0.5, f.p0.95 = f.p0.95, f.p0.05 = f.p0.05
     )
   }
-  m.mean.p0.5 <- logit_perc(a = b[[1]], b = b[[2]], perc = 0.5)
-  f.mean.p0.5 <- logit_perc(
+  m.mean.p0.5 <- binomial_perc(a = b[[1]], b = b[[2]], perc = 0.5, linkinv = model$family$linkinv)
+  f.mean.p0.5 <- binomial_perc(
     a = b[[1]] + b[[3]],
-    b = b[[2]] + b[[4]], perc = 0.5
+    b = b[[2]] + b[[4]], perc = 0.5,
+    linkinv = model$family$linkinv
   )
   # nrow(re) + 1
   out[["mean"]] <- list(m.mean.p0.5 = m.mean.p0.5, f.mean.p0.5 = f.mean.p0.5)
   out
+}
+
+binomial_perc <- function(x, a, b, perc = 0.5, linkinv, ...) {
+  f <- function(x) linkinv(a + b * x) - perc
+  uniroot(f, interval = c(-100, 100))$root
+}
+
+mat_par_delta_method <- function(model, perc = 0.5) {
+  stopifnot(requireNamespace("numDeriv", quietly = FALSE))
+  f <- function(x) binomial_perc(a = x[1] + x[3], b = x[2] + x[4], perc = perc, linkinv = model$family$linkinv)
+  gradient <- numDeriv::grad(f, x = stats::coef(model))
+  gradient %*% stats::vcov(model) %*% gradient
 }
