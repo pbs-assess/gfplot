@@ -156,7 +156,7 @@ plot_maturity_months <- function(dat,
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    labs(title = title, colour = "Sex", fill = "Sex")
+    labs(title = title, colour = en2fr("Sex"), fill = en2fr("Sex"))
 
   if (nrow(dat) >= 10) {
     g <- g +
