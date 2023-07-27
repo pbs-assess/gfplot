@@ -580,8 +580,11 @@ plot_mat_annual_ogives <- function(object,
 }
 
 extract_maturity_perc <- function(object, model) {
+
   m.p0.5 <- binomial_perc(a = object[[1]], b = object[[2]], perc = 0.5, linkinv = model$modelInfo$family$linkinv)
+
   m.p0.95 <- binomial_perc(a = object[[1]], b = object[[2]], perc = 0.95, linkinv = model$modelInfo$family$linkinv)
+
   m.p0.05 <- binomial_perc(a = object[[1]], b = object[[2]], perc = 0.05, linkinv = model$modelInfo$family$linkinv)
 
   f.p0.5 <- binomial_perc(
@@ -589,11 +592,13 @@ extract_maturity_perc <- function(object, model) {
     b = object[[2]] + object[[4]], perc = 0.5,
     linkinv = model$modelInfo$family$linkinv
   )
+
   f.p0.95 <- binomial_perc(
     a = object[[1]] + object[[3]],
     b = object[[2]] + object[[4]], perc = 0.95,
     linkinv = model$modelInfo$family$linkinv
   )
+
   f.p0.05 <- binomial_perc(
     a = object[[1]] + object[[3]],
     b = object[[2]] + object[[4]], perc = 0.05,
@@ -635,7 +640,7 @@ extract_maturity_perc_re <- function(betas, random_intercepts, model) {
 
 binomial_perc <- function(x, a, b, perc = 0.5, linkinv, ...) {
   f <- function(x) linkinv(a + b * x) - perc
-  uniroot(f, interval = c(-100, 100))$root
+  uniroot(f, interval = c(0, 200))$root
 }
 
 mat_par_delta_method <- function(model, perc = 0.5) {
