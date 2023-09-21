@@ -472,16 +472,16 @@ plot_mat_annual_ogives <- function(object,
   labs_year <- list()
   for (i in (unique(as.character(nd_re$year)))) {
     m_perc <- data.frame(
-      p0.5 = binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5, linkinv = object$model$modelInfo$family$linkinv)
+      p0.5 = binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5, linkinv = family(object$model)$linkinv)
     )
-    m_perc$p0.95 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95, linkinv = object$model$modelInfo$family$linkinv)
-    m_perc$p0.05 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05, linkinv = object$model$modelInfo$family$linkinv)
+    m_perc$p0.95 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95, linkinv = family(object$model)$linkinv)
+    m_perc$p0.05 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05, linkinv = family(object$model)$linkinv)
 
     f_perc <- data.frame(
-      p0.5 = binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5, linkinv = object$model$modelInfo$family$linkinv)
+      p0.5 = binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5, linkinv = family(object$model)$linkinv)
     )
-    f_perc$p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95, linkinv = object$model$modelInfo$family$linkinv)
-    f_perc$p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05, linkinv = object$model$modelInfo$family$linkinv)
+    f_perc$p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95, linkinv = family(object$model)$linkinv)
+    f_perc$p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05, linkinv = family(object$model)$linkinv)
 
     labs_f <- tibble(
       p = c("05", "50", "95"),
