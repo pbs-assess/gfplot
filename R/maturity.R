@@ -635,7 +635,7 @@ extract_maturity_perc_re <- function(betas, random_intercepts, model) {
 
 binomial_perc <- function(x, a, b, perc = 0.5, linkinv, ...) {
   f <- function(x) linkinv(a + b * x) - perc
-  uniroot(f, interval = c(-100, 100))$root
+  uniroot(f, interval = c(-100, 200))$root
 }
 
 mat_par_delta_method <- function(model, perc = 0.5) {
