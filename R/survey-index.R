@@ -90,8 +90,11 @@ tidy_survey_index <- function(dat,
 #'   various surveys.
 #' @param scale Logical: scale the biomass by the maximum?
 #' @param scale_type Scaling type. Scale by max CI or geometric mean?
-#' @param upper_limit_multiplier If geometric mean scaling, max upper CI this
-#'   `upper_limit_multiplier` times the largest scaled geometric mean value.
+#' @param geo_upper_limit_mult If geometric mean scaling, max upper CI this
+#'   `geo_upper_limit_mult` times the largest scaled geometric mean value
+#'   (unless larger than `geo_upper_limit_max`).
+#' @param geo_upper_limit_max If geometric mean scaling, max ylim.
+#' @param geo_scale_years Years for geometric mean scaling.
 #' @param year_increment Increment for the year x axis.
 #' @param french Logical for French or English.
 #' @param pjs_mode PJS mode = dots and line segments.
@@ -108,7 +111,9 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               survey_cols = NULL,
                               scale = TRUE,
                               scale_type = c("max-CI", "geometric-mean"),
-                              upper_limit_multiplier = 1.1,
+                              geo_upper_limit_mult = 1.1,
+                              geo_upper_limit_max = 4,
+                              geo_scale_years = seq(2000, as.integer(format(Sys.Date(), "%Y"))),
                               year_increment = 5,
                               french = FALSE,
                               pjs_mode = FALSE,
@@ -207,10 +212,11 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
       #   ymin = "lowerci_scaled", ymax = "upperci_scaled",
       #   colour = "survey_abbrev"
       # ), col = "#00000060", size = 0.75)
+    suppressMessages({
     suppressWarnings(
       g <- g +
         geom_line(col = "#00000050", size = 0.75)
-    )
+    )})
   } else {
     g <- g +
       geom_ribbon(aes_string(
@@ -243,10 +249,12 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     guides(fill = "none", colour = "none") +
     scale_x_continuous(breaks = seq(0, yrs[2], year_increment))
 
-  # if (!is.null(upper_limit_multiplier)) {
   if (scale_type == "geometric-mean") {
+    geo_years_df <- dplyr::filter(d, year %in% geo_scale_years, !is.na(biomass_scaled))
+    ylim_max <- geo_upper_limit_mult * max(geo_years_df$biomass_scaled)
+    ylim_max <- min(ylim_max, geo_upper_limit_max)
     g <- g + coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5),
-      ylim = c(0, upper_limit_multiplier * max(d$biomass_scaled, na.rm = TRUE)))
+      ylim = c(0, ylim_max))
   }
 
   if (scale) {

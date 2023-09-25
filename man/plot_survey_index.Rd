@@ -22,7 +22,9 @@ plot_survey_index(
   survey_cols = NULL,
   scale = TRUE,
   scale_type = c("max-CI", "geometric-mean"),
-  upper_limit_multiplier = 1.1,
+  geo_upper_limit_mult = 1.1,
+  geo_upper_limit_max = 4,
+  geo_scale_years = seq(2000, as.integer(format(Sys.Date(), "\%Y"))),
   year_increment = 5,
   french = FALSE,
   pjs_mode = FALSE,
@@ -58,8 +60,13 @@ various surveys.}
 
 \item{scale_type}{Scaling type. Scale by max CI or geometric mean?}
 
-\item{upper_limit_multiplier}{If geometric mean scaling, max upper CI this
-\code{upper_limit_multiplier} times the largest scaled geometric mean value.}
+\item{geo_upper_limit_mult}{If geometric mean scaling, max upper CI this
+\code{geo_upper_limit_mult} times the largest scaled geometric mean value
+(unless larger than \code{geo_upper_limit_max}).}
+
+\item{geo_upper_limit_max}{If geometric mean scaling, max ylim.}
+
+\item{geo_scale_years}{Years for geometric mean scaling.}
 
 \item{year_increment}{Increment for the year x axis.}
 
