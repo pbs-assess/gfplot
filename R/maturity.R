@@ -192,7 +192,8 @@ fit_mat_ogive <- function(dat,
   if (year_re) {
     mat_perc <- extract_maturity_perc_re(b, re, m)
   } else {
-    mat_perc <- extract_maturity_perc(b, m)
+    mat_perc <- tryCatch(extract_maturity_perc(b, m),
+      error = function(e) {message("error: ", e); return(NA)})
   }
 
   if (link == "logit") {
