@@ -89,8 +89,12 @@ tidy_survey_index <- function(dat,
 #' @param survey_cols If not `NULL`, a named character vector of colors for the
 #'   various surveys.
 #' @param scale Logical: scale the biomass by the maximum?
+#' @param scale_type Scaling type. Scale by max CI or geometric mean?
+#' @param upper_limit_multiplier If geometric mean scaling, max upper CI this
+#'   `upper_limit_multiplier` times the largest scaled geometric mean value.
 #' @param year_increment Increment for the year x axis.
 #' @param french Logical for French or English.
+#' @param pjs_mode PJS mode = dots and line segments.
 #' @param hide_y_axis Logical: hide the y axis ticks and labels?
 #'
 #' @export
@@ -103,11 +107,16 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
                               xlim = NULL,
                               survey_cols = NULL,
                               scale = TRUE,
+                              scale_type = c("max-CI", "geometric-mean"),
+                              upper_limit_multiplier = 1.1,
                               year_increment = 5,
                               french = FALSE,
+                              pjs_mode = FALSE,
                               hide_y_axis = FALSE) {
 
+  scale_type <- match.arg(scale_type)
   if (scale) {
+    if (scale_type == "max-CI") {
     d <- dat %>%
       group_by(survey_abbrev) %>%
       mutate(
@@ -116,6 +125,17 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
         upperci_scaled = upperci / max(upperci)
       ) %>%
       ungroup()
+    } else {
+      d <- dat %>%
+        group_by(survey_abbrev) %>%
+        mutate(geomean = exp(mean(log(biomass)))) %>%
+        mutate(
+          biomass_scaled = biomass / geomean,
+          lowerci_scaled = lowerci / geomean,
+          upperci_scaled = upperci / geomean
+        ) %>%
+        ungroup()
+    }
   } else {
     d <- dat %>%
       mutate(
@@ -175,14 +195,37 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
 
   g <- g +
     geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", lwd = 0.3) +
-    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93") +
-    geom_ribbon(aes_string(
-      ymin = "lowerci_scaled", ymax = "upperci_scaled",
-      fill = "survey_abbrev"
-    ), colour = NA, alpha = 0.5) +
-    geom_line(col = "#00000050", size = 1) +
+    geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93")
+
+  if (!pjs_mode) {
+    g <- g +
+      geom_ribbon(aes_string(
+        ymin = "lowerci_scaled", ymax = "upperci_scaled",
+        fill = "survey_abbrev"
+      ), colour = NA, alpha = 0.5)
+      # ggplot2::geom_linerange(aes_string(
+      #   ymin = "lowerci_scaled", ymax = "upperci_scaled",
+      #   colour = "survey_abbrev"
+      # ), col = "#00000060", size = 0.75)
+    suppressWarnings(
+      g <- g +
+        geom_line(col = "#00000050", size = 0.75)
+    )
+  } else {
+    g <- g +
+      geom_ribbon(aes_string(
+        ymin = "lowerci_scaled", ymax = "upperci_scaled",
+        fill = "survey_abbrev"
+      ), colour = NA, alpha = 0.5) +
+      ggplot2::geom_linerange(aes_string(
+        ymin = "lowerci_scaled", ymax = "upperci_scaled",
+        colour = "survey_abbrev"
+      ))
+  }
+
+  g <- g +
     geom_point(aes_string(colour = "survey_abbrev"),
-      pch = 21, fill = "grey95", size = 1.4, stroke = 1
+      pch = 21, fill = "grey95", size = 1.3, stroke = 0.8
     ) +
     facet_wrap(~survey_abbrev, ncol = 2, scales = "fixed") +
     theme_pbs() +
@@ -199,6 +242,12 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     ) +
     guides(fill = "none", colour = "none") +
     scale_x_continuous(breaks = seq(0, yrs[2], year_increment))
+
+  # if (!is.null(upper_limit_multiplier)) {
+  if (scale_type == "geometric-mean") {
+    g <- g + coord_cartesian(expand = FALSE, xlim = yrs + c(-0.5, 0.5),
+      ylim = c(0, upper_limit_multiplier * max(d$biomass_scaled, na.rm = TRUE)))
+  }
 
   if (scale) {
   g <- g + geom_text(
