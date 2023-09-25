@@ -21,7 +21,8 @@ plot_growth(
   lab_x_gap = 0.3,
   lab_y_gap = 0.06,
   col = c(Female = "black", Male = "grey40"),
-  french = FALSE
+  french = FALSE,
+  jitter = FALSE
 )
 
 plot_vb(..., type = "vb")
@@ -67,6 +68,8 @@ plot_length_weight(
 \item{col}{A named character vector declaring the colors for female and male}
 
 \item{french}{Logical.}
+
+\item{jitter}{Logical, whether to jitter data points.}
 
 \item{...}{Arguments to pass to \code{\link[=plot_growth]{plot_growth()}}.}
 }
