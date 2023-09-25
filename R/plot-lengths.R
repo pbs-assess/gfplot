@@ -67,6 +67,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
                          fill_col = c("M" = "grey80", "F" = "#FF000010"),
                          line_col = c("M" = "grey40", "F" = "red"),
                          survey_cols = NULL, alpha = 0.24,
+                         survey_facets = NULL,
                          bin_size = 2, min_total = 20,
                          show_year = "even",
                          french = FALSE) {
@@ -90,6 +91,13 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   x_breaks <- x_breaks[seq(1, N - 1)]
   range_lengths <- diff(range(dat$length_bin, na.rm = TRUE))
   counts <- select(dat, survey_abbrev, year, total) %>% unique()
+
+  if (is.null(survey_facets)) {
+    facet_formula <- as.formula(paste("forcats::fct_rev(as.factor(year)) ~ survey_abbrev"))
+  } else {
+    counts <- select(dat, survey_abbrev2, year, total) %>% unique()
+    facet_formula <- as.formula(paste("forcats::fct_rev(as.factor(year)) ~ ", survey_facets))
+  }
 
   format_french_1000s <- function(x) {
     format(as.numeric(x), big.mark = " ", scientific = FALSE, trim = TRUE)
@@ -136,16 +144,19 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
 
   if(show_year == "even"){
     g <- g +
-      facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
-                 labeller = ggplot2::labeller(.rows = is_even), drop = FALSE)
+      facet_grid(facet_formula,
+                 labeller = ggplot2::labeller(.rows = is_even), drop = FALSE,
+                 switch = "y")
   }else if(show_year == "odd"){
     g <- g +
-      facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
-                 labeller = ggplot2::labeller(.rows = is_odd), drop = FALSE)
+      facet_grid(facet_formula,
+                 labeller = ggplot2::labeller(.rows = is_odd), drop = FALSE,
+                 switch = "y")
   }else{
     g <- g +
-      facet_grid(forcats::fct_rev(as.factor(year)) ~ survey_abbrev,
-                 labeller = ggplot2::labeller(.rows = is_all), drop = FALSE)
+      facet_grid(facet_formula,
+                 labeller = ggplot2::labeller(.rows = is_all), drop = FALSE,
+                 switch = "y")
   }
   if (!is.null(survey_cols)) {
     g <- g + guides(fill = "none", colour = "none")
