@@ -90,7 +90,7 @@ tidy_survey_index <- function(dat,
 #'   various surveys.
 #' @param scale Logical: scale the biomass by the maximum?
 #' @param scale_type Scaling type. Scale by max CI or geometric mean?
-#' @param geo_upper_limit_mult If geometric mean scaling, max upper CI this
+#' @param geo_upper_limit_mult If geometric mean scaling, upper y-lim is
 #'   `geo_upper_limit_mult` times the largest scaled geometric mean value
 #'   (unless larger than `geo_upper_limit_max`).
 #' @param geo_upper_limit_max If geometric mean scaling, max ylim.

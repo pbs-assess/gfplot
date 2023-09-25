@@ -60,7 +60,7 @@ various surveys.}
 
 \item{scale_type}{Scaling type. Scale by max CI or geometric mean?}
 
-\item{geo_upper_limit_mult}{If geometric mean scaling, max upper CI this
+\item{geo_upper_limit_mult}{If geometric mean scaling, upper y-lim is
 \code{geo_upper_limit_mult} times the largest scaled geometric mean value
 (unless larger than \code{geo_upper_limit_max}).}
 
