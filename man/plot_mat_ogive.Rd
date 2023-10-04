@@ -14,7 +14,8 @@ fit_mat_ogive(
   months = seq(1, 12),
   custom_maturity_at = NULL,
   ageing_method_codes = NULL,
-  usability_codes = c(0, 1, 2, 6)
+  usability_codes = c(0, 1, 2, 6),
+  link = c("logit", "probit", "cloglog", "cauchit", "log")
 )
 
 plot_mat_ogive(
@@ -69,6 +70,8 @@ See \code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
 Set to \code{NULL} to include all samples.}
+
+\item{link}{The link function for the binomial GLM (by default, \code{"logit"}).}
 
 \item{object}{Output from \code{\link[=fit_mat_ogive]{fit_mat_ogive()}}.}
 
