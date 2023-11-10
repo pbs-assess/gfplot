@@ -361,13 +361,14 @@ plot_mat_ogive <- function(object,
 
   if ("glmm_re" %in% names(nd_re)) {
     if (object$sample_id_re) {
-      n_re <- length(unique(nd_re$sample_id))/10
+      n_re <- length(unique(nd_re$sample_id))/5
+      n_re2 <- ifelse(n_re < 15, 15, n_re)
       g <- g + geom_line(
         data = nd_re,
         aes_string("age_or_length", "glmm_re",
           group = "paste(sample_id, sex)",
           colour = "sex", lty = "sex"
-        ), inherit.aes = FALSE, alpha = 1/n_re,
+        ), inherit.aes = FALSE, alpha = 1/n_re2,
         show.legend = FALSE
       )
     } else {
