@@ -13,17 +13,20 @@
 #' @param p_threshold Probability of maturity to split at. Default = 0.5. Alternatives are 0.05 or 0.95.
 #' @param use_median_ratio If TRUE, uses median proportion mature when catch too small to have biological samples collected.
 #'    Default is FALSE, which uses mean proportion mature.
-#' @param sample_id_re If `TRUE` then the model will include random intercepts
+#' @param sample_id_re If `TRUE` then the ogive model will include random intercepts
 #'    for sample ID.
-#' @param year_re Option to have lengths at maturity vary by year, but this requires the gfvelocities package.
+#' @param year_re Option to have lengths at maturity vary by year.
+#' @param split_by_weight Default is `FALSE`, but will automatically be switched to `TRUE` for the
+#'    standard biomass variable names (`catch_weight`, `density_kgpm2`, `density_kgkm2`).
 #' @param custom_maturity_at A numeric vector of two threshold codes to define
-#'   maturity at with the first being for males and the second for females.
-#'   Defaults to `NULL`, which brings in default values from maturity assignment
-#'   dataframe included with this package.
-#'   `NA` in either position will also retain the default.
+#'    maturity at with the first being for males and the second for females.
+#'    Defaults to `NULL`, which brings in default values from maturity assignment
+#'    dataframe included with this package.
+#'    `NA` in either position will also retain the default.
+#' @param custom_length_threshold A numeric vector of two threshold codes to define
+#'    maturity at with the first being for males and the second for females.
+#'    Defaults to `NULL`, which calculates the maturity ogive.
 #' @param plot Logical for whether to produce plots.
-#' @param split_by_weight Default is `FALSE`, but will automatically be switched to `TRUE` for the standard biomass variable names (`catch_weight`, `density_kgpm2`, `density_kgkm2`).
-#'    (length-weight and length-at-maturity relationships).
 #' @export
 #' @importFrom dplyr if_else
 #' @examples
@@ -50,8 +53,9 @@ split_catch_by_sex <- function(survey_sets, fish,
                                use_median_ratio = FALSE,
                                sample_id_re = TRUE,
                                year_re = FALSE,
-                               split_by_weight = FALSE,
+                               split_by_weight = FALSE, # changes internally for some weight-based catch variables
                                custom_maturity_at = NULL,
+                               custom_length_thresholds = NULL,
                                plot = FALSE) {
   if (catch_variable == "catch_weight" | catch_variable == "density_kgpm2" | catch_variable == "density_kgkm2") {
     split_by_weight <- TRUE
@@ -62,10 +66,7 @@ split_catch_by_sex <- function(survey_sets, fish,
 
   species <- fish$species_common_name[1]
 
-  fish <- fish %>%
-    filter(!is.na(length)) %>%
-    filter(survey_abbrev %in% survey) %>%
-    filter(year %in% years)
+  fish <- fish %>% filter(!is.na(length))
 
   .d <- survey_sets %>%
     filter(survey_abbrev %in% survey) %>%
@@ -89,18 +90,27 @@ split_catch_by_sex <- function(survey_sets, fish,
 
   if (nrow(fish) > 0) {
     f_fish <- fish %>%
+      filter(!is.na(length)) %>%
       filter(sex == 2) %>%
       mutate(year_f = as.character(year))
 
     m_fish <- fish %>%
+      filter(!is.na(length)) %>%
       filter(sex == 1) %>%
       mutate(year_f = as.character(year))
 
-    if (split_by_weight) {
+    fish_lengths <- fish %>%
+      ## when some surveys or sets of years lack maturity data, can we still get something from other surveys?
+      filter(survey_abbrev %in% survey) %>%
+      filter(year %in% years) %>%
+      filter(!is.na(length))
+
+    # if (split_by_weight) {
+
       # model weight of fish with only length data
       # TMB model to estimate weight of length only fish
-      f_weight <- fit_length_weight(fish, sex = "female", method == "tmb")
-      m_weight <- fit_length_weight(fish, sex = "male", method == "tmb")
+      f_weight <- fit_length_weight(fish_lengths, sex = "female", method == "tmb")
+      m_weight <- fit_length_weight(fish_lengths, sex = "male", method == "tmb")
 
       f_fish <- mutate(f_fish,
         model_weight = exp(f_weight$pars$log_a + f_weight$pars$b * (log(length))) * 1000,
@@ -120,17 +130,34 @@ split_catch_by_sex <- function(survey_sets, fish,
       max_model_m <- quantile(m_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
       m_fish$model_weight[m_fish$model_weight > max_model_m] <- max_model_m
       m_fish$new_weight[is.na(m_fish$weight)] <- m_fish$model_weight[is.na(m_fish$weight)]
-    }
+    # }
 
     if (split_by_maturity) {
+      if(is.null(custom_length_thresholds)) {
 
-      # does maturity data exist at all for this species?
-      maturity_codes <- unique(fish$maturity_code)
+      # does maturity data exist within focal surveys for this species?
+      maturity_codes <- unique(fish_lengths$maturity_code)
 
       if (length(maturity_codes) < 3) {
-        warning("Fewer than 3 maturity codes; returning NULL data.", call. = FALSE)
-        return(list(data = survey_sets, maturity = NULL, weight_model = NULL))
+        # if maturity data lacking within focal surveys for this species,
+        # does it exists elsewhere in sample data provided?
+        maturity_codes <- unique(fish$maturity_code)
+
+        if (length(maturity_codes) < 3) {
+          # no
+          warning("Fewer than 3 maturity codes; returning NULL data.", call. = FALSE)
+          return(list(data = survey_sets, maturity = NULL, weight_model = NULL))
+        } else {
+          # yes
+          warning("Fewer than 3 maturity codes available from target surveys,",
+                  "so all survey data provided were used to define the split.", call. = FALSE)
+        }
+      } else {
+        # there is enough maturity data in the surveys and years of interest to just use those
+        fish <- fish_lengths
       }
+
+      fish <- filter(fish, !is.na(maturity_code))
 
       # Check if only some years without maturity data, and set year_re = FALSE in that case
       years_w_maturity <- fish %>%
@@ -151,10 +178,11 @@ split_catch_by_sex <- function(survey_sets, fish,
           return(list(data = survey_sets, model = NULL))
         } else {
           warning("Some years lack maturity data, but catch still split.", call. = FALSE)
-
+# browser()
           m <- fit_mat_ogive(fish,
                              type = "length",
                              sample_id_re = sample_id_re,
+                             usability_codes = NULL,
                              custom_maturity_at = custom_maturity_at)
 
           if (p_threshold == 0.5) {
@@ -176,6 +204,7 @@ split_catch_by_sex <- function(survey_sets, fish,
                              type = "length",
                              sample_id_re = sample_id_re,
                              year_re = TRUE,
+                             usability_codes = NULL,
                              custom_maturity_at = custom_maturity_at)
           if (p_threshold == 0.5) {
             f_fish$threshold <- lapply(f_fish$year_f, function(x) m$mat_perc[[x]]$f.p0.5)
@@ -192,6 +221,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         } else {
           m <- fit_mat_ogive(fish,
                              type = "length",
+                             usability_codes = NULL,
                              sample_id_re = sample_id_re,
                              custom_maturity_at = custom_maturity_at)
 
@@ -222,6 +252,11 @@ split_catch_by_sex <- function(survey_sets, fish,
           #   m_fish$threshold <- lapply(m_fish$sample_id, function(x) m$mat_perc[[x]]$m.p0.95)
           # }
         }
+      }
+      } else {
+        m <- NA
+        f_fish$threshold <- custom_length_thresholds[2]
+        m_fish$threshold <- custom_length_thresholds[1]
       }
 
       # browser()
@@ -272,6 +307,7 @@ split_catch_by_sex <- function(survey_sets, fish,
       group_name = unique(fish_groups$group_name)
     )
 
+    # split by weight ----
     if (split_by_weight) {
       group_values <- fish_groups %>%
         group_by(fishing_event_id, group_name) %>%
@@ -328,17 +364,23 @@ split_catch_by_sex <- function(survey_sets, fish,
 # browser()
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
+        group_by(fishing_event_id) %>%
+        mutate(
+      mean_weight_kg = max(est_sample_weight, na.rm = TRUE)/max(n_sampled, na.rm = TRUE)/1000
+        ) %>%
         group_by(group_name, survey_abbrev, year) %>%
         mutate(
           median_prop_ann = median(proportion, na.rm = TRUE),
-          mean_prop_ann = mean(proportion, na.rm = TRUE)
+          mean_prop_ann = mean(proportion, na.rm = TRUE),
+          mean_ann_weight_kg = mean(mean_weight_kg, na.rm = TRUE)
         ) %>%
         ungroup() %>%
-        # some surveys are missing data for some years
+        # some surveys are missing data for some years so we use survey level means in these years
         group_by(group_name, survey_abbrev) %>%
         mutate(
           median_prop = ifelse(is.na(median_prop_ann), round(median(proportion, na.rm = TRUE), 3), median_prop_ann),
-          mean_prop = ifelse(is.na(mean_prop_ann), round(mean(proportion, na.rm = TRUE), 3), mean_prop_ann)
+          mean_prop = ifelse(is.na(mean_prop_ann), round(mean(proportion, na.rm = TRUE), 3), mean_prop_ann),
+          mean_weight_kg = ifelse(is.na(mean_ann_weight_kg), round(mean(mean_weight_kg, na.rm = TRUE), 3), mean_weight_kg)
         ) %>%
         ungroup() %>%
         mutate(
@@ -365,10 +407,13 @@ split_catch_by_sex <- function(survey_sets, fish,
           )
       }
 
-      # add column to check for discrepencies between total catch weight and biological sample weights
+      # add column to check for discrepancies between total catch weight and biological sample weights
       # est_sample_weight is in g while catch_weight is in kg
       sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_weight - (sets_w_ratio$est_sample_weight / 1000)), 2)
       sets_w_ratio$perc_sampled <- round((sets_w_ratio$est_sample_weight / 1000) / sets_w_ratio$catch_weight, 2) * 100
+
+      # estimate a catch count using mean weight of individuals sampled or survey-level means when no samples
+      sets_w_ratio$est_catch_count <- sets_w_ratio$catch_weight / sets_w_ratio$mean_weight_kg
 
       # sets_w_ratio$perc_sampled[Inf] <- NA
 
@@ -404,7 +449,7 @@ split_catch_by_sex <- function(survey_sets, fish,
       }
 
     } else {
-      # if splitting proportion of a count
+      # if splitting proportion of a count ----
       # this hasn't yet been tested
       group_values <- fish_groups %>%
         group_by(fishing_event_id, group_name) %>%
@@ -417,6 +462,8 @@ split_catch_by_sex <- function(survey_sets, fish,
         dplyr::add_tally() %>%
         rename(n_sampled = n) %>%
         mutate(
+          est_sample_weight = sum(new_weight),
+          mean_weight_kg = (est_sample_weight / n_sampled)/ 1000,
           proportion = group_n / n_sampled
         ) %>%
         ungroup() %>%
@@ -425,6 +472,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           n_sampled,
           group_name,
           group_n,
+          mean_weight_kg,
           proportion
         ) %>%
         unique()
@@ -457,8 +505,16 @@ split_catch_by_sex <- function(survey_sets, fish,
         # TODO: might be better to use nearest years, but for now if this appear misleading filter !is.na(median_prop_ann)
         group_by(group_name, survey_abbrev) %>%
         mutate(
-          median_prop = ifelse(is.na(median_prop_ann), round(median(proportion, na.rm = TRUE), 3), median_prop_ann),
-          mean_prop = ifelse(is.na(mean_prop_ann), round(mean(proportion, na.rm = TRUE), 3), mean_prop_ann)
+          median_prop = ifelse(
+            is.na(median_prop_ann),
+            round(median(proportion, na.rm = TRUE), 3),
+            median_prop_ann
+            ),
+          mean_prop = ifelse(
+            is.na(mean_prop_ann),
+            round(mean(proportion, na.rm = TRUE), 3),
+            mean_prop_ann
+            )
         ) %>%
         ungroup() %>%
         mutate(
@@ -480,12 +536,25 @@ split_catch_by_sex <- function(survey_sets, fish,
           )
       }
 
+      if ("catch_weight" %in% colnames(.d)){
+        sets_w_ratio$est_catch_count <- sets_w_ratio$catch_weight / sets_w_ratio$mean_weight_kg
+      }
 
       # add column to check for discrepancies between total catch count and biological sample count
       # fist were there any catches with weights and samples but no counts?
-      # if so, we will have to assume everything was sampled
-      # this could be checked by summing weights of samples and comparing that to total catch weight
-      sets_w_ratio$catch_count <- ifelse(sets_w_ratio$catch_weight > 0 & sets_w_ratio$n_sampled > 0, sets_w_ratio$n_sampled, sets_w_ratio$catch_count)
+      sets_w_ratio$catch_count <- ifelse(
+        !(sets_w_ratio$catch_count > 0) & sets_w_ratio$catch_weight > 0 & sets_w_ratio$n_sampled > 0,
+
+        ## we could assume everything was sampled
+        ## this could be checked by summing weights of samples and comparing that to total catch weight
+        # sets_w_ratio$n_sampled,
+
+        ## or we can use the estimated count based on the mean weights measured
+        sets_w_ratio$est_catch_count,
+
+        sets_w_ratio$catch_count
+        )
+
       sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_count - (sets_w_ratio$n_sampled)), 2)
       sets_w_ratio$perc_sampled <- round((sets_w_ratio$n_sampled) / sets_w_ratio$catch_count, 2) * 100
 
@@ -534,12 +603,21 @@ split_catch_by_sex <- function(survey_sets, fish,
   } else {
     return(list(data = survey_sets, model = NULL))
   }
+
   if (split_by_maturity) {
-    if (plot) {
-      list(data = data, m = m, maturity_plot = maturity_plot, weight_plot = weight_plot)
-    } else {
-      list(data = data, m = m)
-    }
+    # if(is.null(custom_length_thresholds)) {
+      if (plot) {
+        list(data = data, m = m, maturity_plot = maturity_plot, weight_plot = weight_plot)
+      } else {
+        list(data = data, m = m)
+      }
+   # } else {
+   #   if (plot) {
+   #   list(data = data, model = NULL, maturity_plot = maturity_plot, weight_plot = weight_plot)
+   #   } else {
+   #     list(data = data, model = NULL)
+   #   }
+   # }
   } else {
     list(data = data, model = NULL)
   }

@@ -20,6 +20,7 @@ split_catch_by_sex(
   year_re = FALSE,
   split_by_weight = FALSE,
   custom_maturity_at = NULL,
+  custom_length_thresholds = NULL,
   plot = FALSE
 )
 }
@@ -48,13 +49,13 @@ Variable by this name will be saved indicating which was used.}
 \item{use_median_ratio}{If TRUE, uses median proportion mature when catch too small to have biological samples collected.
 Default is FALSE, which uses mean proportion mature.}
 
-\item{sample_id_re}{If \code{TRUE} then the model will include random intercepts
+\item{sample_id_re}{If \code{TRUE} then the ogive model will include random intercepts
 for sample ID.}
 
-\item{year_re}{Option to have lengths at maturity vary by year, but this requires the gfvelocities package.}
+\item{year_re}{Option to have lengths at maturity vary by year.}
 
-\item{split_by_weight}{Default is \code{FALSE}, but will automatically be switched to \code{TRUE} for the standard biomass variable names (\code{catch_weight}, \code{density_kgpm2}, \code{density_kgkm2}).
-(length-weight and length-at-maturity relationships).}
+\item{split_by_weight}{Default is \code{FALSE}, but will automatically be switched to \code{TRUE} for the
+standard biomass variable names (\code{catch_weight}, \code{density_kgpm2}, \code{density_kgkm2}).}
 
 \item{custom_maturity_at}{A numeric vector of two threshold codes to define
 maturity at with the first being for males and the second for females.
@@ -63,6 +64,10 @@ dataframe included with this package.
 \code{NA} in either position will also retain the default.}
 
 \item{plot}{Logical for whether to produce plots.}
+
+\item{custom_length_threshold}{A numeric vector of two threshold codes to define
+maturity at with the first being for males and the second for females.
+Defaults to \code{NULL}, which calculates the maturity ogive.}
 }
 \description{
 Split catch weights by relative weight or counts sampled for sex and/or maturity
