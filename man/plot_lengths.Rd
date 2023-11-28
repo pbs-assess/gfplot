@@ -12,6 +12,7 @@ plot_lengths(
   line_col = c(M = "grey40", F = "red"),
   survey_cols = NULL,
   alpha = 0.24,
+  survey_facets = NULL,
   bin_size = 2,
   min_total = 20,
   show_year = "even",

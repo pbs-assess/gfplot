@@ -219,10 +219,10 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     )})
   } else {
     g <- g +
-      geom_ribbon(aes_string(
-        ymin = "lowerci_scaled", ymax = "upperci_scaled",
-        fill = "survey_abbrev"
-      ), colour = NA, alpha = 0.5) +
+      # geom_ribbon(aes_string(
+      #   ymin = "lowerci_scaled", ymax = "upperci_scaled",
+      #   fill = "survey_abbrev"
+      # ), colour = NA, alpha = 0.5) +
       ggplot2::geom_linerange(aes_string(
         ymin = "lowerci_scaled", ymax = "upperci_scaled",
         colour = "survey_abbrev"

@@ -143,6 +143,7 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 #'   in `gfplot::hbll_grid`.
 #' @param tmb_knots The number of knots to pass to `sdmTMB::sdmTMB()`.
 #' @param cell_width The cell width if a prediction grid is made on the fly.
+#' @param family Family
 #' @param ... Any other arguments to pass on to the modelling function.
 #'
 #' @examples
@@ -168,6 +169,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             premade_grid = NULL,
                             tmb_knots = 200,
                             cell_width = 2,
+                            family = sdmTMB::tweedie(),
                             ...) {
 
   .d_tidy <- tidy_survey_sets(dat, survey = survey,
@@ -228,7 +230,7 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       time <- NULL
     }
     m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
-      mesh = .spde, family = sdmTMB::tweedie(link = "log"), time = time, ...)
+      mesh = .spde, family = family, time = time, ...)
     }, error = function(e) NA)
     if (length(m) == 1L) {
       if (is.na(m)) { # Did not converge.
@@ -250,10 +252,10 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       pg <- pg_one
     }
     # FIXME: just returning last year for consistency!
-    pred <- predict(m, newdata = pg_one) # returns all years!
+    pred <- predict(m, newdata = pg_one, type = "response") # returns all years!
     pred <- pred[pred$year == max(pred$year), , drop = FALSE]
     stopifnot(identical(nrow(pg), nrow(pred)))
-    pg$combined <- exp(pred$est)
+    pg$combined <- pred$est
     pg$pos <- NA
     pg$bin <- NA
 
