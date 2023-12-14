@@ -570,6 +570,8 @@ split_catch_by_sex <- function(survey_sets, fish,
 
     data$split_catch_type <- catch_variable
 
+    data <- data[,which(unlist(lapply(data, function(x)!all(is.na(x))))), with=FALSE]
+
     if (plot) {
 
       fish_w_maturity <- filter(fish, !is.na(length) & maturity_code > 0)
