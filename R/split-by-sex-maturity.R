@@ -393,7 +393,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           mean_weight_kg = ifelse(n_fish_sampled==0, NA_real_, mean_weight_kg),
           proportion = ifelse(n_fish_sampled==0, NA_real_, proportion)
           ) %>%
-        group_by(group_name, survey_abbrev, year) %>%
+        group_by(group_name, survey_series_id, year) %>%
         mutate(
           n_events_sampled = sum(!is.na(proportion)),
           # median_prop_ann = ifelse(all(is.na(proportion)), NA_real_, spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE)),
@@ -422,7 +422,7 @@ split_catch_by_sex <- function(survey_sets, fish,
                   )
 
       btw_yr <- sets_w_ratio %>% filter(!is.na(proportion)) %>%
-        group_by(group_name, survey_abbrev) %>%
+        group_by(group_name, survey_series_id) %>%
         dplyr::add_tally() %>% filter(n >= min_sample_number) %>%
         summarise(sd = sd(proportion, na.rm = TRUE),
                   se = sd(proportion, na.rm = TRUE)/sqrt(length(proportion))
@@ -470,7 +470,7 @@ split_catch_by_sex <- function(survey_sets, fish,
                                   round(mean(mean_weight_kg,na.rm = TRUE), 3), mean_weight_kg)
         ) %>% ungroup() %>%
         # some surveys are missing data for some years so we use survey level means in these years
-        group_by(group_name, survey_abbrev) %>%
+        group_by(group_name, survey_series_id) %>%
         mutate(
           total_survey_samples = sum(!is.na(proportion)),
           # median_prop = ifelse(all(is.na(proportion)), NA_real_,
@@ -532,7 +532,7 @@ split_catch_by_sex <- function(survey_sets, fish,
             use_within_yr_prop = FALSE,
             total_ann_samples = sum(!is.na(proportion))
           ) %>% ungroup() %>%
-          group_by(group_name, survey_abbrev) %>%
+          group_by(group_name, survey_series_id) %>%
           mutate(
             total_survey_samples = sum(!is.na(proportion)),
             # median_prop = ifelse(all(is.na(proportion)), NA_real_,
@@ -709,7 +709,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           # removes false 0s introduced a few lines above
           proportion = ifelse(n_fish_sampled==0, NA_real_, proportion)
         ) %>%
-        group_by(group_name, survey_abbrev, year) %>%
+        group_by(group_name, survey_series_id, year) %>%
         mutate(
           n_events_sampled = sum(!is.na(proportion)),
           median_prop_ann = median(proportion, na.rm = TRUE),
@@ -730,7 +730,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           )
 
         btw_yr <- sets_w_ratio %>% filter(!is.na(proportion)) %>%
-          group_by(group_name, survey_abbrev) %>%
+          group_by(group_name, survey_series_id) %>%
           dplyr::add_tally() %>% filter(n >= min_sample_number) %>%
           summarise(sd = sd(proportion, na.rm = TRUE),
                     se = sd(proportion, na.rm = TRUE)/sqrt(length(proportion))
@@ -773,7 +773,7 @@ split_catch_by_sex <- function(survey_sets, fish,
             )
           ) %>% ungroup() %>%
           # some surveys are missing data for some years so we use survey level means in these years
-          group_by(group_name, survey_abbrev) %>%
+          group_by(group_name, survey_series_id) %>%
           mutate(
             total_survey_samples = sum(!is.na(proportion)),
             # median_prop = ifelse(all(is.na(proportion)), NA_real_,
@@ -825,7 +825,7 @@ split_catch_by_sex <- function(survey_sets, fish,
             use_within_yr_prop = FALSE,
             total_ann_samples = sum(!is.na(proportion))
           ) %>% ungroup() %>%
-          group_by(group_name, survey_abbrev) %>%
+          group_by(group_name, survey_series_id) %>%
           mutate(
             total_survey_samples = sum(!is.na(proportion)),
             median_prop = ifelse(all(is.na(proportion)), NA_real_,
