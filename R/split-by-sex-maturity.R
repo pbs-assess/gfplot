@@ -115,6 +115,12 @@ split_catch_by_sex <- function(survey_sets, fish,
       filter(sex == 1) %>%
       mutate(year_f = as.character(year))
 
+    # we want to include fish that were not able to be sexed when not fully splitting by sex
+    try(u_fish <- fish %>%
+      filter(!is.na(length)) %>%
+      filter(!(sex %in% c(1, 2))) %>%
+      mutate(year_f = as.character(year)))
+
     fish_lengths <- fish %>%
       ## when some surveys or sets of years lack maturity data, can we still get something from other surveys?
       filter(survey_abbrev %in% survey) %>%
@@ -138,6 +144,12 @@ split_catch_by_sex <- function(survey_sets, fish,
         new_weight = weight
       )
 
+      # for unknown sex fish, use average of male and female coefs
+      u_fish <- mutate(u_fish,
+                       model_weight = exp(((m_weight$pars$log_a + f_weight$pars$log_a) / 2) + (m_weight$pars$b + f_weight$pars$b) / 2 * (log(length))) * 1000,
+                       new_weight = weight
+      )
+
       # only apply simulated weight when below chosen cutoff_quantile
       max_model <- quantile(f_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
       f_fish$model_weight[f_fish$model_weight > max_model] <- max_model
@@ -146,6 +158,9 @@ split_catch_by_sex <- function(survey_sets, fish,
       max_model_m <- quantile(m_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
       m_fish$model_weight[m_fish$model_weight > max_model_m] <- max_model_m
       m_fish$new_weight[is.na(m_fish$weight)] <- m_fish$model_weight[is.na(m_fish$weight)]
+
+      u_fish$model_weight[u_fish$model_weight > max(max_model, max_model_m)] <- max(max_model, max_model_m)
+      u_fish$new_weight[is.na(u_fish$weight)] <- u_fish$model_weight[is.na(u_fish$weight)]
     # }
 
     if (split_by_maturity) {
@@ -280,22 +295,20 @@ split_catch_by_sex <- function(survey_sets, fish,
       f_fish <- mutate(f_fish, mature = if_else(length >= threshold, 1, 0, missing = NULL))
       m_fish <- mutate(m_fish, mature = if_else(length >= threshold, 1, 0, missing = NULL))
 
-      # get unsexed immature fish
-      imm_fish <- fish %>%
-        filter(!(sex %in% c(1, 2)) & length < min(c(f_fish$threshold, m_fish$threshold),
-                                                  na.rm = TRUE)) %>%
-        mutate(
-          mature = 0,
-          year_f = as.character(year),
-          model_weight = NA,
-          new_weight = weight
-      )
+      imm_fish <- NULL
+      mat_fish <- NULL
 
       # create groups
       if (split_by_sex) {
         if (immatures_pooled) {
-          # since not spliting by sex for immatures, the unsexed imm can be added on
+          try(imm_fish <- u_fish %>%
+            filter(length < min(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+            mutate(mature = 0))
+
+          # since not spliting by sex for immatures, we want to include immatures that were not able to be sexed
           fish_groups <- bind_rows(f_fish, m_fish, imm_fish) %>%
+            # but only when sexes where collected for mature specimens
+            filter(fishing_event_id %in% unique(f_fish$fishing_event_id, m_fish$fishing_event_id)) %>%
             mutate(group_name = ifelse(mature == 1,
               paste("Mature", ifelse(sex == 1, "males", "females")),
               "Immature"
@@ -308,7 +321,16 @@ split_catch_by_sex <- function(survey_sets, fish,
             ))
         }
       } else {
-        fish_groups <- rbind(f_fish, m_fish, imm_fish) %>%
+
+        try(mat_fish <- u_fish %>%
+          filter(length >= mean(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+          mutate(mature = 1))
+
+        try(imm_fish <- u_fish %>%
+          filter(length < mean(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+          mutate(mature = 0))
+
+        fish_groups <- rbind(f_fish, m_fish, imm_fish, mat_fish) %>%
           mutate(group_name = ifelse(mature == 1, "Mature", "Immature"))
       }
     } else {
@@ -326,6 +348,7 @@ split_catch_by_sex <- function(survey_sets, fish,
     # split by weight ----
     if (split_by_weight) {
       group_values <- fish_groups %>%
+        filter(!is.na(new_weight)) %>%
         group_by(fishing_event_id, group_name) %>%
         mutate(group_weight = sum(new_weight)) %>%
         dplyr::add_tally() %>%
@@ -334,6 +357,7 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       set_values <- group_values %>%
         group_by(fishing_event_id) %>%
+        filter(!is.na(new_weight)) %>%
         dplyr::add_tally() %>%
         rename(n_fish_sampled = n) %>%
         mutate(
