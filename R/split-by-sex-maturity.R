@@ -29,8 +29,9 @@
 #'    Defaults to `NULL`, which brings in default values from maturity assignment
 #'    dataframe included with this package.
 #'    `NA` in either position will also retain the default.
-#' @param min_sample_number If fewer samples than this threshold, than generate proportion for
-#'    unsampled sets from multiple surveys, or failing that, years.
+#' @param min_sample_number If fewer sets sampled than this threshold, or fewer fish sampled than 3x this value,
+#'    the proportion for unsampled sets will be based on either all other years of the survey,
+#'    or other surveys in the same year, depending on `prioritize_time` option choice.
 #' @param prioritize_time Default `NULL` chooses to apply the annual mean (or median if `use_median_ratio = TRUE`)
 #'    when annual sample number for a survey are fewer than `min_sample_number` and the SD of observed proportions across all years within a
 #'    survey is larger than across all samples within a year. `TRUE` forces this behaviour without comparing SDs.
@@ -420,6 +421,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         group_by(group_name, survey_series_id, year) %>%
         mutate(
           n_events_sampled = sum(!is.na(proportion)),
+          n_fish_by_surv_yr = sum(n_fish_sampled, na.rm = TRUE),
           # median_prop_ann = ifelse(all(is.na(proportion)), NA_real_, spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE)),
           # mean_prop_ann = weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE),
           median_prop_ann = ifelse(all(is.na(proportion)), NA_real_, median(proportion, w = n_fish_sampled, na.rm = TRUE)),
@@ -470,6 +472,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         mutate(
           use_within_yr_prop = TRUE,
           total_ann_samples = sum(!is.na(proportion)),
+          total_ann_fish = sum(n_fish_sampled, na.rm = TRUE),
           # median_prop = ifelse(all(is.na(proportion)), NA_real_,
           #                      ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
           #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
@@ -480,11 +483,15 @@ split_catch_by_sex <- function(survey_sets, fish,
           #                    mean_prop_ann
           #                    ),
           median_prop = ifelse(all(is.na(proportion)), NA_real_,
-                               ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+                               ifelse(is.na(median_prop_ann)|
+                                        n_events_sampled < min_sample_number|
+                                          n_fish_by_surv_yr < min_sample_number*3,
                                       round(median(proportion, na.rm = TRUE), 3),
                                       median_prop_ann
                                )),
-          mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+          mean_prop = ifelse(is.na(mean_prop_ann)|
+                               n_events_sampled < min_sample_number|
+                                  n_fish_by_surv_yr < min_sample_number*3,
                              round(mean(proportion, na.rm = TRUE), 3),
                              mean_prop_ann
           ),
@@ -497,6 +504,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         group_by(group_name, survey_series_id) %>%
         mutate(
           total_survey_samples = sum(!is.na(proportion)),
+          total_survey_fish = sum(n_fish_sampled, na.rm = TRUE),
           # median_prop = ifelse(all(is.na(proportion)), NA_real_,
           #                      ifelse(is.na(median_prop)|total_ann_samples < min_sample_number,
           #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
@@ -507,11 +515,15 @@ split_catch_by_sex <- function(survey_sets, fish,
           #                    mean_prop
           #                    ),
           median_prop = ifelse(all(is.na(proportion)), NA_real_,
-                               ifelse(is.na(median_prop)|total_ann_samples < min_sample_number,
+                               ifelse(is.na(median_prop)|
+                                        total_ann_samples < min_sample_number|
+                                          total_ann_fish < min_sample_number*3,
                                       round(median(proportion, na.rm = TRUE), 3),
                                       median_prop
                                )),
-          mean_prop = ifelse(is.na(mean_prop)|total_ann_samples < min_sample_number,
+          mean_prop = ifelse(is.na(mean_prop)|
+                               total_ann_samples < min_sample_number|
+                                 total_ann_fish < min_sample_number*3,
                              round(mean(proportion, na.rm = TRUE), 3),
                              mean_prop
           ),
@@ -535,11 +547,15 @@ split_catch_by_sex <- function(survey_sets, fish,
           #                    mean_prop
           #                    ),
           median_prop = ifelse(all(is.na(proportion)), NA_real_,
-                               ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+                               ifelse(is.na(median_prop)|
+                                        total_survey_samples < min_sample_number|
+                                          total_survey_fish < min_sample_number*3,
                                       round(median(proportion, na.rm = TRUE), 3),
                                       median_prop
                                )),
-          mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+          mean_prop = ifelse(is.na(mean_prop)|
+                               total_survey_samples < min_sample_number|
+                                  total_survey_fish < min_sample_number*3,
                              round(mean(proportion, na.rm = TRUE), 3),
                              mean_prop
           ),
@@ -559,6 +575,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           group_by(group_name, survey_series_id) %>%
           mutate(
             total_survey_samples = sum(!is.na(proportion)),
+            total_survey_fish = sum(n_fish_sampled, na.rm = TRUE),
             # median_prop = ifelse(all(is.na(proportion)), NA_real_,
             #                      ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
             #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
@@ -569,11 +586,15 @@ split_catch_by_sex <- function(survey_sets, fish,
             #                    mean_prop_ann
             # )
             median_prop = ifelse(all(is.na(proportion)), NA_real_,
-                                 ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+                                 ifelse(is.na(median_prop_ann)|
+                                          n_events_sampled < min_sample_number|
+                                            n_fish_by_surv_yr < min_sample_number*3,
                                         round(median(proportion, na.rm = TRUE), 3),
                                         median_prop_ann
                                  )),
-            mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+            mean_prop = ifelse(is.na(mean_prop_ann)|
+                                 n_events_sampled < min_sample_number|
+                                    n_fish_by_surv_yr < min_sample_number*3,
                                round(mean(proportion, na.rm = TRUE), 3),
                                mean_prop_ann
             ),
@@ -587,6 +608,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           group_by(group_name) %>%
           mutate(
             total_samples = sum(!is.na(proportion)),
+            total_fish = sum(n_fish_sampled, na.rm = TRUE),
             # median_prop = ifelse(all(is.na(proportion)), NA_real_,
             #                      ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
             #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
@@ -597,11 +619,15 @@ split_catch_by_sex <- function(survey_sets, fish,
             #                    mean_prop
             # ),
             median_prop = ifelse(all(is.na(proportion)), NA_real_,
-                                 ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+                                 ifelse(is.na(median_prop)|
+                                          total_survey_samples < min_sample_number|
+                                            total_survey_fish < min_sample_number*3,
                                         round(median(proportion, na.rm = TRUE), 3),
                                         median_prop
                                  )),
-            mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+            mean_prop = ifelse(is.na(mean_prop)|
+                                 total_survey_samples < min_sample_number|
+                                   total_survey_fish < min_sample_number*3,
                                round(mean(proportion, na.rm = TRUE), 3),
                                mean_prop
             ),

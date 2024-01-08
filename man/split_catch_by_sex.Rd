@@ -50,8 +50,9 @@ All available samples will still be used to determine thresholds.}
 
 \item{years}{List of years. Default \code{NULL} includes all years.}
 
-\item{min_sample_number}{If fewer samples than this threshold, than generate proportion for
-unsampled sets from multiple surveys, or failing that, years.}
+\item{min_sample_number}{If fewer sets sampled than this threshold, or fewer fish sampled than 3x this value,
+the proportion for unsampled sets will be based on either all other years of the survey,
+or other surveys in the same year, depending on \code{prioritize_time} option choice.}
 
 \item{prioritize_time}{Default \code{NULL} chooses to apply the annual mean (or median if \code{use_median_ratio = TRUE})
 when annual sample number for a survey are fewer than \code{min_sample_number} and the SD of observed proportions across all years within a
