@@ -13,6 +13,8 @@ split_catch_by_sex(
   immatures_pooled = FALSE,
   survey = NULL,
   years = NULL,
+  min_sample_number = 10,
+  prioritize_time = NULL,
   cutoff_quantile = 0.9995,
   p_threshold = 0.5,
   use_median_ratio = FALSE,
@@ -27,7 +29,7 @@ split_catch_by_sex(
 \arguments{
 \item{survey_sets}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
 
-\item{fish}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or matching formate where female are coded as \code{sex = 2}.}
+\item{fish}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or matching format where female are coded as \code{sex = 2}.}
 
 \item{catch_variable}{Which biomass variable will be split. Can be total weight or densities.
 Variable by this name will be saved indicating which was used.}
@@ -38,15 +40,30 @@ Variable by this name will be saved indicating which was used.}
 
 \item{immatures_pooled}{If split by maturity, \code{TRUE} when immatures not to be split by sex.}
 
-\item{survey}{List of survey abbreviations. Default 'NULL' includes all surveys in survey_sets.}
+\item{survey}{List of survey abbreviations. Default \code{NULL} includes all surveys in \code{survey_sets}.
+Sets without samples will use annual survey mean/median proportions. If no samples were collected,
+other surveys in that year may be used (see \code{prioritize_time} option) or the global proportion.
+Because of this, one should only run this function on data of one population and gear type at a
+time such that morphological relationships and selectivity are relatively consistent. If you want
+only survey and year combinations with sample data, filter for \code{!is.na(median_prop_ann)}.
+All available samples will still be used to determine thresholds.}
 
-\item{years}{List of years. Default 'NULL' includes all years.}
+\item{years}{List of years. Default \code{NULL} includes all years.}
+
+\item{min_sample_number}{If fewer sets sampled than this threshold, or fewer fish sampled than 3x this value,
+the proportion for unsampled sets will be based on either all other years of the survey,
+or other surveys in the same year, depending on \code{prioritize_time} option choice.}
+
+\item{prioritize_time}{Default \code{NULL} chooses to apply the annual mean (or median if \code{use_median_ratio = TRUE})
+when annual sample number for a survey are fewer than \code{min_sample_number} and the SD of observed proportions across all years within a
+survey is larger than across all samples within a year. \code{TRUE} forces this behaviour without comparing SDs.
+\code{FALSE} uses survey level mean/median whenever the annual sample number for that survey is less than the \code{min_sample_number}.}
 
 \item{cutoff_quantile}{Set max cutoff quantile for weight modelled from lengths.}
 
-\item{p_threshold}{Probability of maturity to split at. Default = 0.5. Alternatives are 0.05 or 0.95.}
+\item{p_threshold}{Probability of maturity to split at. Default = \code{0.5}. Alternatives are \code{0.05} or \code{0.95}.}
 
-\item{use_median_ratio}{If TRUE, uses median proportion mature when catch too small to have biological samples collected.
+\item{use_median_ratio}{If \code{TRUE}, uses median proportion mature when catch too small to have biological samples collected.
 Default is FALSE, which uses mean proportion mature.}
 
 \item{sample_id_re}{If \code{TRUE} then the ogive model will include random intercepts
@@ -63,11 +80,11 @@ Defaults to \code{NULL}, which brings in default values from maturity assignment
 dataframe included with this package.
 \code{NA} in either position will also retain the default.}
 
-\item{plot}{Logical for whether to produce plots.}
+\item{custom_length_thresholds}{Instead of estimating length at maturity, they can be provided as a vector
+of length 2, first being for males and the second for females. Defaults to \code{NULL}
+to estimate these lengths from maturity ogives.}
 
-\item{custom_length_threshold}{A numeric vector of two threshold codes to define
-maturity at with the first being for males and the second for females.
-Defaults to \code{NULL}, which calculates the maturity ogive.}
+\item{plot}{Logical for whether to produce plots.}
 }
 \description{
 Split catch weights by relative weight or counts sampled for sex and/or maturity

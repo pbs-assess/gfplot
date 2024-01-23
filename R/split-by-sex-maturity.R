@@ -1,17 +1,23 @@
 #' Split catch weights by relative weight or counts sampled for sex and/or maturity
 #'
 #' @param survey_sets Data from [gfdata::get_survey_sets()].
-#' @param fish Data from [gfdata::get_survey_samples()] or matching formate where female are coded as `sex = 2`.
+#' @param fish Data from [gfdata::get_survey_samples()] or matching format where female are coded as `sex = 2`.
 #' @param catch_variable Which biomass variable will be split. Can be total weight or densities.
 #'   Variable by this name will be saved indicating which was used.
 #' @param split_by_sex Should catch be split by sex?
 #' @param split_by_maturity Should catch be split by maturity?
 #' @param immatures_pooled If split by maturity, `TRUE` when immatures not to be split by sex.
-#' @param survey List of survey abbreviations. Default 'NULL' includes all surveys in survey_sets.
-#' @param years List of years. Default 'NULL' includes all years.
+#' @param survey List of survey abbreviations. Default `NULL` includes all surveys in `survey_sets`.
+#'    Sets without samples will use annual survey mean/median proportions. If no samples were collected,
+#'    other surveys in that year may be used (see `prioritize_time` option) or the global proportion.
+#'    Because of this, one should only run this function on data of one population and gear type at a
+#'    time such that morphological relationships and selectivity are relatively consistent. If you want
+#'    only survey and year combinations with sample data, filter for `!is.na(median_prop_ann)`.
+#'    All available samples will still be used to determine thresholds.
+#' @param years List of years. Default `NULL` includes all years.
 #' @param cutoff_quantile Set max cutoff quantile for weight modelled from lengths.
-#' @param p_threshold Probability of maturity to split at. Default = 0.5. Alternatives are 0.05 or 0.95.
-#' @param use_median_ratio If TRUE, uses median proportion mature when catch too small to have biological samples collected.
+#' @param p_threshold Probability of maturity to split at. Default = `0.5`. Alternatives are `0.05` or `0.95`.
+#' @param use_median_ratio If `TRUE`, uses median proportion mature when catch too small to have biological samples collected.
 #'    Default is FALSE, which uses mean proportion mature.
 #' @param sample_id_re If `TRUE` then the ogive model will include random intercepts
 #'    for sample ID.
@@ -23,10 +29,19 @@
 #'    Defaults to `NULL`, which brings in default values from maturity assignment
 #'    dataframe included with this package.
 #'    `NA` in either position will also retain the default.
-#' @param custom_length_threshold A numeric vector of two threshold codes to define
-#'    maturity at with the first being for males and the second for females.
-#'    Defaults to `NULL`, which calculates the maturity ogive.
+#' @param min_sample_number If fewer sets sampled than this threshold, or fewer fish sampled than 3x this value,
+#'    the proportion for unsampled sets will be based on either all other years of the survey,
+#'    or other surveys in the same year, depending on `prioritize_time` option choice.
+#' @param prioritize_time Default `NULL` chooses to apply the annual mean (or median if `use_median_ratio = TRUE`)
+#'    when annual sample number for a survey are fewer than `min_sample_number` and the SD of observed proportions across all years within a
+#'    survey is larger than across all samples within a year. `TRUE` forces this behaviour without comparing SDs.
+#'    `FALSE` uses survey level mean/median whenever the annual sample number for that survey is less than the `min_sample_number`.
+#' @param custom_length_thresholds Instead of estimating length at maturity, they can be provided as a vector
+#'    of length 2, first being for males and the second for females. Defaults to `NULL`
+#'    to estimate these lengths from maturity ogives.
 #' @param plot Logical for whether to produce plots.
+
+#'
 #' @export
 #' @importFrom dplyr if_else
 #' @examples
@@ -48,6 +63,8 @@ split_catch_by_sex <- function(survey_sets, fish,
                                immatures_pooled = FALSE,
                                survey = NULL,
                                years = NULL,
+                               min_sample_number = 10,
+                               prioritize_time = NULL,
                                cutoff_quantile = 0.9995,
                                p_threshold = 0.5,
                                use_median_ratio = FALSE,
@@ -99,6 +116,12 @@ split_catch_by_sex <- function(survey_sets, fish,
       filter(sex == 1) %>%
       mutate(year_f = as.character(year))
 
+    # we want to include fish that were not able to be sexed when not fully splitting by sex
+    try(u_fish <- fish %>%
+      filter(!is.na(length)) %>%
+      filter(!(sex %in% c(1, 2))) %>%
+      mutate(year_f = as.character(year)))
+
     fish_lengths <- fish %>%
       ## when some surveys or sets of years lack maturity data, can we still get something from other surveys?
       filter(survey_abbrev %in% survey) %>%
@@ -122,6 +145,12 @@ split_catch_by_sex <- function(survey_sets, fish,
         new_weight = weight
       )
 
+      # for unknown sex fish, use average of male and female coefs
+      u_fish <- mutate(u_fish,
+                       model_weight = exp(((m_weight$pars$log_a + f_weight$pars$log_a) / 2) + (m_weight$pars$b + f_weight$pars$b) / 2 * (log(length))) * 1000,
+                       new_weight = weight
+      )
+
       # only apply simulated weight when below chosen cutoff_quantile
       max_model <- quantile(f_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
       f_fish$model_weight[f_fish$model_weight > max_model] <- max_model
@@ -130,6 +159,9 @@ split_catch_by_sex <- function(survey_sets, fish,
       max_model_m <- quantile(m_fish$weight, probs = c(cutoff_quantile), na.rm = TRUE)
       m_fish$model_weight[m_fish$model_weight > max_model_m] <- max_model_m
       m_fish$new_weight[is.na(m_fish$weight)] <- m_fish$model_weight[is.na(m_fish$weight)]
+
+      u_fish$model_weight[u_fish$model_weight > max(max_model, max_model_m)] <- max(max_model, max_model_m)
+      u_fish$new_weight[is.na(u_fish$weight)] <- u_fish$model_weight[is.na(u_fish$weight)]
     # }
 
     if (split_by_maturity) {
@@ -264,22 +296,20 @@ split_catch_by_sex <- function(survey_sets, fish,
       f_fish <- mutate(f_fish, mature = if_else(length >= threshold, 1, 0, missing = NULL))
       m_fish <- mutate(m_fish, mature = if_else(length >= threshold, 1, 0, missing = NULL))
 
-      # get unsexed immature fish
-      imm_fish <- fish %>%
-        filter(!(sex %in% c(1, 2)) & length < min(c(f_fish$threshold, m_fish$threshold),
-                                                  na.rm = TRUE)) %>%
-        mutate(
-          mature = 0,
-          year_f = as.character(year),
-          model_weight = NA,
-          new_weight = weight
-      )
+      imm_fish <- NULL
+      mat_fish <- NULL
 
       # create groups
       if (split_by_sex) {
         if (immatures_pooled) {
-          # since not spliting by sex for immatures, the unsexed imm can be added on
+          try(imm_fish <- u_fish %>%
+            filter(length < min(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+            mutate(mature = 0))
+
+          # since not spliting by sex for immatures, we want to include immatures that were not able to be sexed
           fish_groups <- bind_rows(f_fish, m_fish, imm_fish) %>%
+            # but only when sexes where collected for mature specimens
+            filter(fishing_event_id %in% unique(f_fish$fishing_event_id, m_fish$fishing_event_id)) %>%
             mutate(group_name = ifelse(mature == 1,
               paste("Mature", ifelse(sex == 1, "males", "females")),
               "Immature"
@@ -292,7 +322,16 @@ split_catch_by_sex <- function(survey_sets, fish,
             ))
         }
       } else {
-        fish_groups <- rbind(f_fish, m_fish, imm_fish) %>%
+
+        try(mat_fish <- u_fish %>%
+          filter(length >= mean(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+          mutate(mature = 1))
+
+        try(imm_fish <- u_fish %>%
+          filter(length < mean(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
+          mutate(mature = 0))
+
+        fish_groups <- rbind(f_fish, m_fish, imm_fish, mat_fish) %>%
           mutate(group_name = ifelse(mature == 1, "Mature", "Immature"))
       }
     } else {
@@ -310,6 +349,7 @@ split_catch_by_sex <- function(survey_sets, fish,
     # split by weight ----
     if (split_by_weight) {
       group_values <- fish_groups %>%
+        filter(!is.na(new_weight)) %>%
         group_by(fishing_event_id, group_name) %>%
         mutate(group_weight = sum(new_weight)) %>%
         dplyr::add_tally() %>%
@@ -318,8 +358,9 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       set_values <- group_values %>%
         group_by(fishing_event_id) %>%
+        filter(!is.na(new_weight)) %>%
         dplyr::add_tally() %>%
-        rename(n_sampled = n) %>%
+        rename(n_fish_sampled = n) %>%
         mutate(
           est_sample_weight = sum(new_weight, na.rm = TRUE),
           proportion = group_weight / est_sample_weight,
@@ -329,7 +370,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         ungroup() %>%
         select(
           fishing_event_id,
-          n_sampled, # these are optional data checks
+          n_fish_sampled, # these are optional data checks
           est_sample_weight, # needed for perc_sampled data check below
           measured_weight,
           n_weights,
@@ -348,12 +389,12 @@ split_catch_by_sex <- function(survey_sets, fish,
         # duplicate event level values for all groups including those not represented in the sample
         mutate(
           est_sample_weight = mean(est_sample_weight, na.rm = TRUE),
-          n_sampled = mean(n_sampled, na.rm = TRUE),
+          n_fish_sampled = mean(n_fish_sampled, na.rm = TRUE),
           measured_weight = mean(measured_weight, na.rm = TRUE),
           n_weights = mean(n_weights, na.rm = TRUE)
         ) %>%
         ungroup() %>%
-        replace(is.na(.), 0)
+        replace(is.na(.), 0) # seems to be needed
 
       # add NA when a particular group was not found
       # should give df with nrows in survey_sets * number of unique group_names
@@ -361,34 +402,250 @@ split_catch_by_sex <- function(survey_sets, fish,
         fishing_event_id = unique(survey_sets$fishing_event_id),
         group_name = unique(set_values$group_name)
       )
+
 # browser()
+
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
         group_by(fishing_event_id) %>%
         mutate(
-      mean_weight_kg = max(est_sample_weight, na.rm = TRUE)/max(n_sampled, na.rm = TRUE)/1000
+          mean_weight_kg = max(est_sample_weight, na.rm = TRUE)/max(n_fish_sampled, na.rm = TRUE)/1000
         ) %>%
-        group_by(group_name, survey_abbrev, year) %>%
+        ungroup() %>%
         mutate(
-          median_prop_ann = median(proportion, na.rm = TRUE),
+          # removes false 0s if they were introduced a few lines above
+          # I'm not sure if this actually happens
+          mean_weight_kg = ifelse(n_fish_sampled==0, NA_real_, mean_weight_kg),
+          proportion = ifelse(n_fish_sampled==0, NA_real_, proportion)
+          ) %>%
+        group_by(group_name, survey_series_id, year) %>%
+        mutate(
+          n_events_sampled = sum(!is.na(proportion)),
+          n_fish_by_surv_yr = sum(n_fish_sampled, na.rm = TRUE),
+          # median_prop_ann = ifelse(all(is.na(proportion)), NA_real_, spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE)),
+          # mean_prop_ann = weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE),
+          median_prop_ann = ifelse(all(is.na(proportion)), NA_real_, median(proportion, w = n_fish_sampled, na.rm = TRUE)),
           mean_prop_ann = mean(proportion, na.rm = TRUE),
-          mean_ann_weight_kg = mean(mean_weight_kg, na.rm = TRUE)
+          mean_ann_weight_kg = weighted.mean(mean_weight_kg, w = n_fish_sampled, na.rm = TRUE)
+          # mean_ann_weight_kg = mean(mean_weight_kg, na.rm = TRUE)
         ) %>%
-        ungroup() %>%
-        # some surveys are missing data for some years so we use survey level means in these years
-        group_by(group_name, survey_abbrev) %>%
+        ungroup()
+
+      # currently using unweighted because we are extrapolating to unsampled locations, so location should be unit of measurement
+      # if weighted turns out to be better, turn this warning on and document change, possibly even rename function?
+      # warning("This function uses means or medians weighted by the number
+      #         of fish sampled for aggregating ratios at all scales.")
+
+      # generated proportions for use on unsampled sets ----
+
+      if(is.null(prioritize_time)){
+
+      within_yr <- sets_w_ratio %>% filter(!is.na(proportion)) %>%
+        group_by(group_name, year) %>%
+        dplyr::add_tally() %>% filter(n >= min_sample_number) %>%
+        summarise(sd = sd(proportion, na.rm = TRUE),
+                  se = sd(proportion, na.rm = TRUE)/sqrt(length(proportion))
+                  )
+
+      btw_yr <- sets_w_ratio %>% filter(!is.na(proportion)) %>%
+        group_by(group_name, survey_series_id) %>%
+        dplyr::add_tally() %>% filter(n >= min_sample_number) %>%
+        summarise(sd = sd(proportion, na.rm = TRUE),
+                  se = sd(proportion, na.rm = TRUE)/sqrt(length(proportion))
+                  )
+
+      # mean(within_yr$sd, na.rm = TRUE)
+      # mean(btw_yr$sd, na.rm = TRUE)
+      # browser()
+
+      # calculated SE too, in case SD was too sensitive but SD seems to be working
+        if(mean(btw_yr$sd, na.rm = TRUE) > mean(within_yr$sd, na.rm = TRUE)){
+          prioritize_time = TRUE
+        } else {
+          prioritize_time = FALSE
+        }
+      }
+
+      if(prioritize_time){
+      # some survey years are missing sample data, so try annual means for these surveys, which tend to not catch anyway
+      sets_w_ratio <- sets_w_ratio %>% group_by(group_name, year) %>%
         mutate(
-          median_prop = ifelse(is.na(median_prop_ann), round(median(proportion, na.rm = TRUE), 3), median_prop_ann),
-          mean_prop = ifelse(is.na(mean_prop_ann), round(mean(proportion, na.rm = TRUE), 3), mean_prop_ann),
-          mean_weight_kg = ifelse(is.na(mean_ann_weight_kg), round(mean(mean_weight_kg, na.rm = TRUE), 3), mean_weight_kg)
+          use_within_yr_prop = TRUE,
+          total_ann_samples = sum(!is.na(proportion)),
+          total_ann_fish = sum(n_fish_sampled, na.rm = TRUE),
+          # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+          #                      ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+          #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+          #                      median_prop_ann
+          #                      )),
+          # mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+          #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+          #                    mean_prop_ann
+          #                    ),
+          median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                               ifelse(is.na(median_prop_ann)|
+                                        n_events_sampled < min_sample_number|
+                                          n_fish_by_surv_yr < min_sample_number*3,
+                                      round(median(proportion, na.rm = TRUE), 3),
+                                      median_prop_ann
+                               )),
+          mean_prop = ifelse(is.na(mean_prop_ann)|
+                               n_events_sampled < min_sample_number|
+                                  n_fish_by_surv_yr < min_sample_number*3,
+                             round(mean(proportion, na.rm = TRUE), 3),
+                             mean_prop_ann
+          ),
+          # mean_weight_kg = ifelse(is.na(mean_ann_weight_kg),
+          #                         round(weighted.mean(mean_weight_kg, w = n_fish_sampled, na.rm = TRUE), 3), mean_weight_kg)
+          mean_weight_kg = ifelse(is.na(mean_ann_weight_kg),
+                                  round(mean(mean_weight_kg,na.rm = TRUE), 3), mean_weight_kg)
+        ) %>% ungroup() %>%
+        # some surveys are missing data for some years so we use survey level means in these years
+        group_by(group_name, survey_series_id) %>%
+        mutate(
+          total_survey_samples = sum(!is.na(proportion)),
+          total_survey_fish = sum(n_fish_sampled, na.rm = TRUE),
+          # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+          #                      ifelse(is.na(median_prop)|total_ann_samples < min_sample_number,
+          #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+          #                      median_prop
+          #                      )),
+          # mean_prop = ifelse(is.na(mean_prop)|total_ann_samples < min_sample_number,
+          #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+          #                    mean_prop
+          #                    ),
+          median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                               ifelse(is.na(median_prop)|
+                                        total_ann_samples < min_sample_number|
+                                          total_ann_fish < min_sample_number*3,
+                                      round(median(proportion, na.rm = TRUE), 3),
+                                      median_prop
+                               )),
+          mean_prop = ifelse(is.na(mean_prop)|
+                               total_ann_samples < min_sample_number|
+                                 total_ann_fish < min_sample_number*3,
+                             round(mean(proportion, na.rm = TRUE), 3),
+                             mean_prop
+          ),
+          # mean_weight_kg = ifelse(is.na(mean_weight_kg),
+          #                         round(weighted.mean(mean_weight_kg, w = n_fish_sampled, na.rm = TRUE), 3), mean_weight_kg)
+          mean_weight_kg = ifelse(is.na(mean_weight_kg),
+                                  round(mean(mean_weight_kg, na.rm = TRUE), 3), mean_weight_kg)
         ) %>%
         ungroup() %>%
+        # if that fails use global means
+        group_by(group_name) %>%
+        mutate(
+          total_samples = sum(!is.na(proportion)),
+          # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+          #                      ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+          #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+          #                      median_prop
+          #                      )),
+          # mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+          #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+          #                    mean_prop
+          #                    ),
+          median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                               ifelse(is.na(median_prop)|
+                                        total_survey_samples < min_sample_number|
+                                          total_survey_fish < min_sample_number*3,
+                                      round(median(proportion, na.rm = TRUE), 3),
+                                      median_prop
+                               )),
+          mean_prop = ifelse(is.na(mean_prop)|
+                               total_survey_samples < min_sample_number|
+                                  total_survey_fish < min_sample_number*3,
+                             round(mean(proportion, na.rm = TRUE), 3),
+                             mean_prop
+          ),
+          # mean_weight_kg = ifelse(is.na(mean_weight_kg),
+          #                         round(weighted.mean(mean_weight_kg, w = n_fish_sampled, na.rm = TRUE), 3), mean_weight_kg)
+          mean_weight_kg = ifelse(is.na(mean_weight_kg),
+                                  round(mean(mean_weight_kg, na.rm = TRUE), 3), mean_weight_kg)
+        ) %>%
+        ungroup()
+      } else {
+          # skip straight to survey level means when missing or insufficient data for some years
+        sets_w_ratio <- sets_w_ratio %>% group_by(group_name, year) %>%
+          mutate(
+            use_within_yr_prop = FALSE,
+            total_ann_samples = sum(!is.na(proportion))
+          ) %>% ungroup() %>%
+          group_by(group_name, survey_series_id) %>%
+          mutate(
+            total_survey_samples = sum(!is.na(proportion)),
+            total_survey_fish = sum(n_fish_sampled, na.rm = TRUE),
+            # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+            #                      ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+            #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                      median_prop_ann
+            # )),
+            # mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+            #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                    mean_prop_ann
+            # )
+            median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                                 ifelse(is.na(median_prop_ann)|
+                                          n_events_sampled < min_sample_number|
+                                            n_fish_by_surv_yr < min_sample_number*3,
+                                        round(median(proportion, na.rm = TRUE), 3),
+                                        median_prop_ann
+                                 )),
+            mean_prop = ifelse(is.na(mean_prop_ann)|
+                                 n_events_sampled < min_sample_number|
+                                    n_fish_by_surv_yr < min_sample_number*3,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop_ann
+            ),
+            # mean_weight_kg = ifelse(is.na(mean_ann_weight_kg),
+            #                         round(weighted.mean(mean_weight_kg, w = n_fish_sampled, na.rm = TRUE), 3), mean_weight_kg)
+            mean_weight_kg = ifelse(is.na(mean_ann_weight_kg),
+                                    round(mean(mean_weight_kg, na.rm = TRUE), 3), mean_weight_kg)
+          ) %>%
+          ungroup() %>%
+          # if that fails use global means
+          group_by(group_name) %>%
+          mutate(
+            total_samples = sum(!is.na(proportion)),
+            total_fish = sum(n_fish_sampled, na.rm = TRUE),
+            # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+            #                      ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+            #                      round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                      median_prop
+            # )),
+            # mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+            #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                    mean_prop
+            # ),
+            median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                                 ifelse(is.na(median_prop)|
+                                          total_survey_samples < min_sample_number|
+                                            total_survey_fish < min_sample_number*3,
+                                        round(median(proportion, na.rm = TRUE), 3),
+                                        median_prop
+                                 )),
+            mean_prop = ifelse(is.na(mean_prop)|
+                                 total_survey_samples < min_sample_number|
+                                   total_survey_fish < min_sample_number*3,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop
+            ),
+            # mean_weight_kg = ifelse(is.na(mean_weight_kg),
+            #                         round(weighted.mean(mean_weight_kg, w = n_fish_sampled, na.rm = TRUE), 3), mean_weight_kg)
+            mean_weight_kg = ifelse(is.na(mean_weight_kg),
+                                    round(mean(mean_weight_kg, na.rm = TRUE), 3), mean_weight_kg)
+          ) %>%
+          ungroup()
+      }
+
+      sets_w_ratio <- sets_w_ratio %>%
         mutate(
           # replace NAs with 0 for all event group combinations not represented in the samples
           group_n = ifelse(is.na(group_n), 0, group_n),
           group_weight = ifelse(is.na(group_weight), 0, group_weight),
           est_sample_weight = ifelse(is.na(est_sample_weight), 0, est_sample_weight),
-          n_sampled = ifelse(is.na(n_sampled), 0, n_sampled),
+          n_fish_sampled = ifelse(is.na(n_fish_sampled), 0, n_fish_sampled),
           measured_weight = ifelse(is.na(measured_weight), 0, measured_weight),
           n_weights = ifelse(is.na(n_weights), 0, n_weights)
         )
@@ -426,10 +683,10 @@ split_catch_by_sex <- function(survey_sets, fish,
         .d$catch_count <- ifelse(.d$catch_weight > 0 & .d$catch_count == 0, NA, .d$catch_count)
         .d$catch_weight <- ifelse(.d$catch_count > 0 & .d$catch_weight == 0, NA, .d$catch_weight)
         .d <- .d %>% mutate(catch_weight = case_when(
-            is.na(catch_weight) & catch_count == n_sampled ~ est_sample_weight / 1000,
-            is.na(catch_weight) & catch_count > n_sampled & n_sampled > 0 ~ (est_sample_weight / 1000 / n_sampled) * catch_count,
-            # is.na(catch_weight) & n_sampled == 0 ~ global_mean_weight*catch_count,
-            is.na(catch_weight) & n_sampled == 0 ~ NA,
+            is.na(catch_weight) & catch_count == n_fish_sampled ~ est_sample_weight / 1000,
+            is.na(catch_weight) & catch_count > n_fish_sampled & n_fish_sampled > 0 ~ (est_sample_weight / 1000 / n_fish_sampled) * catch_count,
+            # is.na(catch_weight) & n_fish_sampled == 0 ~ global_mean_weight*catch_count,
+            is.na(catch_weight) & n_fish_sampled == 0 ~ NA,
             !is.na(catch_weight) ~ catch_weight))
 
 
@@ -451,6 +708,9 @@ split_catch_by_sex <- function(survey_sets, fish,
     } else {
       # if splitting proportion of a count ----
       # this hasn't yet been tested
+      warning("Splitting count data hasn't been tested for this function yet.
+              Recommend stepping through this part of the function the first time you use it.")
+      # browser()
       group_values <- fish_groups %>%
         group_by(fishing_event_id, group_name) %>%
         dplyr::add_tally() %>%
@@ -460,16 +720,16 @@ split_catch_by_sex <- function(survey_sets, fish,
       set_values <- group_values %>%
         group_by(fishing_event_id) %>%
         dplyr::add_tally() %>%
-        rename(n_sampled = n) %>%
+        rename(n_fish_sampled = n) %>%
         mutate(
           est_sample_weight = sum(new_weight),
-          mean_weight_kg = (est_sample_weight / n_sampled)/ 1000,
-          proportion = group_n / n_sampled
+          mean_weight_kg = (est_sample_weight / n_fish_sampled)/ 1000,
+          proportion = group_n / n_fish_sampled
         ) %>%
         ungroup() %>%
         select(
           fishing_event_id,
-          n_sampled,
+          n_fish_sampled,
           group_name,
           group_n,
           mean_weight_kg,
@@ -481,7 +741,7 @@ split_catch_by_sex <- function(survey_sets, fish,
       set_values_filled <- left_join(all_groups_for_all_events, set_values) %>%
         group_by(fishing_event_id) %>%
         # duplicate event level values for all groups including those not represented in the sample
-        mutate(n_sampled = mean(n_sampled, na.rm = TRUE)) %>%
+        mutate(n_fish_sampled = mean(n_fish_sampled, na.rm = TRUE)) %>%
         ungroup() %>%
         replace(is.na(.), 0)
 
@@ -491,36 +751,175 @@ split_catch_by_sex <- function(survey_sets, fish,
         fishing_event_id = unique(survey_sets$fishing_event_id),
         group_name = unique(set_values$group_name)
       )
-      # browser()
 
+      # generated proportions for use on unsampled sets ----
       survey_sets2 <- left_join(all_groups_for_all_events2, survey_sets)
       sets_w_ratio <- left_join(survey_sets2, set_values_filled) %>%
-        group_by(group_name, survey_abbrev, year) %>%
         mutate(
+          # removes false 0s introduced a few lines above
+          proportion = ifelse(n_fish_sampled==0, NA_real_, proportion)
+        ) %>%
+        group_by(group_name, survey_series_id, year) %>%
+        mutate(
+          n_events_sampled = sum(!is.na(proportion)),
           median_prop_ann = median(proportion, na.rm = TRUE),
-          mean_prop_ann = mean(proportion, na.rm = TRUE)
+          mean_prop_ann = mean(proportion, na.rm = TRUE),
+          # median_prop_ann = ifelse(all(is.na(proportion)), NA_real_, spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE)),
+          # mean_prop_ann = weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE)
         ) %>%
-        ungroup() %>%
-        # some surveys are missing data for some years so we use survey level means in these years
-        # TODO: might be better to use nearest years, but for now if this appear misleading filter !is.na(median_prop_ann)
-        group_by(group_name, survey_abbrev) %>%
-        mutate(
-          median_prop = ifelse(
-            is.na(median_prop_ann),
-            round(median(proportion, na.rm = TRUE), 3),
-            median_prop_ann
+        ungroup()
+
+      # generated proportions for use on unsampled sets ----
+      if(is.null(prioritize_time)){
+
+        within_yr <- sets_w_ratio %>% filter(!is.na(proportion)) %>%
+          group_by(group_name, year) %>%
+          dplyr::add_tally() %>% filter(n >= min_sample_number) %>%
+          summarise(sd = sd(proportion, na.rm = TRUE),
+                    se = sd(proportion, na.rm = TRUE)/sqrt(length(proportion))
+          )
+
+        btw_yr <- sets_w_ratio %>% filter(!is.na(proportion)) %>%
+          group_by(group_name, survey_series_id) %>%
+          dplyr::add_tally() %>% filter(n >= min_sample_number) %>%
+          summarise(sd = sd(proportion, na.rm = TRUE),
+                    se = sd(proportion, na.rm = TRUE)/sqrt(length(proportion))
+          )
+
+        # mean(within_yr$sd, na.rm = TRUE)
+        # mean(btw_yr$sd, na.rm = TRUE)
+        # browser()
+
+        # calculated SE too, in case SD was too sensitive but SD seems to be working
+        if(mean(btw_yr$sd, na.rm = TRUE) > mean(within_yr$sd, na.rm = TRUE)){
+          prioritize_time = TRUE
+        } else {
+          prioritize_time = FALSE
+        }
+      }
+
+      if(prioritize_time){
+        # some survey years are missing sample data, so try annual means for these surveys, which tend to not catch anyway
+        sets_w_ratio <- sets_w_ratio %>% group_by(group_name, year) %>%
+          mutate(
+            use_within_yr_prop = TRUE,
+            total_ann_samples = sum(!is.na(proportion)),
+            # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+            #                      ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+            #                             round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                             median_prop_ann
+            #                      )),
+            # mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+            #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                    mean_prop_ann
+            # )
+            median_prop = ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+                                 round(median(proportion, na.rm = TRUE), 3),
+                                 median_prop_ann
             ),
-          mean_prop = ifelse(
-            is.na(mean_prop_ann),
-            round(mean(proportion, na.rm = TRUE), 3),
-            mean_prop_ann
+            mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop_ann
             )
-        ) %>%
-        ungroup() %>%
+          ) %>% ungroup() %>%
+          # some surveys are missing data for some years so we use survey level means in these years
+          group_by(group_name, survey_series_id) %>%
+          mutate(
+            total_survey_samples = sum(!is.na(proportion)),
+            # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+            #                      ifelse(is.na(median_prop)|total_ann_samples < min_sample_number,
+            #                             round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                             median_prop
+            #                      )),
+            # mean_prop = ifelse(is.na(mean_prop)|total_ann_samples < min_sample_number,
+            #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                    mean_prop
+            # )
+            median_prop = ifelse(is.na(median_prop)|total_ann_samples < min_sample_number,
+                                 round(median(proportion, na.rm = TRUE), 3),
+                                 median_prop
+            ),
+            mean_prop = ifelse(is.na(mean_prop)|total_ann_samples < min_sample_number,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop
+            )
+          ) %>%
+          ungroup() %>%
+          # if that fails use global means
+          group_by(group_name) %>%
+          mutate(
+            total_samples = sum(!is.na(proportion)),
+            # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+            #                      ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+            #                             round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                             median_prop
+            #                      )),
+            # mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+            #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                    mean_prop
+            # )
+            median_prop = ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+                                 round(median(proportion, na.rm = TRUE), 3),
+                                 median_prop
+            ),
+            mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop
+            )
+          ) %>%
+          ungroup()
+      } else {
+        # skip straight to survey level means when missing or insufficient data for some years
+        sets_w_ratio <- sets_w_ratio %>% group_by(group_name, year) %>%
+          mutate(
+            use_within_yr_prop = FALSE,
+            total_ann_samples = sum(!is.na(proportion))
+          ) %>% ungroup() %>%
+          group_by(group_name, survey_series_id) %>%
+          mutate(
+            total_survey_samples = sum(!is.na(proportion)),
+            median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                                 ifelse(is.na(median_prop_ann)| n_events_sampled < min_sample_number,
+                                        round(median(proportion, na.rm = TRUE), 3),
+                                        median_prop_ann
+                                 )),
+            mean_prop = ifelse(is.na(mean_prop_ann)| n_events_sampled < min_sample_number,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop_ann
+            )
+          ) %>%
+          ungroup() %>%
+          # if that fails use global means
+          group_by(group_name) %>%
+          mutate(
+            total_samples = sum(!is.na(proportion)),
+            # median_prop = ifelse(all(is.na(proportion)), NA_real_,
+            #                      ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+            #                             round(spatstat.geom::weighted.median(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                             median_prop
+            #                      )),
+            # mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+            #                    round(weighted.mean(proportion, w = n_fish_sampled, na.rm = TRUE), 3),
+            #                    mean_prop
+            # )
+            median_prop = ifelse(all(is.na(proportion)), NA_real_,
+                                 ifelse(is.na(median_prop)|total_survey_samples < min_sample_number,
+                                        round(median(proportion, na.rm = TRUE), 3),
+                                        median_prop
+                                 )),
+            mean_prop = ifelse(is.na(mean_prop)|total_survey_samples < min_sample_number,
+                               round(mean(proportion, na.rm = TRUE), 3),
+                               mean_prop
+            )
+          ) %>%
+          ungroup()
+      }
+
+      sets_w_ratio <- sets_w_ratio %>%
         mutate(
           # replace NAs with 0 for all event group combinations not represented in the samples
           group_n = ifelse(is.na(group_n), 0, group_n),
-          n_sampled = ifelse(is.na(n_sampled), 0, n_sampled)
+          n_fish_sampled = ifelse(is.na(n_fish_sampled), 0, n_fish_sampled)
         )
 
       # chose value to use when a sample weight ratio is not available
@@ -543,11 +942,11 @@ split_catch_by_sex <- function(survey_sets, fish,
       # add column to check for discrepancies between total catch count and biological sample count
       # fist were there any catches with weights and samples but no counts?
       sets_w_ratio$catch_count <- ifelse(
-        !(sets_w_ratio$catch_count > 0) & sets_w_ratio$catch_weight > 0 & sets_w_ratio$n_sampled > 0,
+        !(sets_w_ratio$catch_count > 0) & sets_w_ratio$catch_weight > 0 & sets_w_ratio$n_fish_sampled > 0,
 
         ## we could assume everything was sampled
         ## this could be checked by summing weights of samples and comparing that to total catch weight
-        # sets_w_ratio$n_sampled,
+        # sets_w_ratio$n_fish_sampled,
 
         ## or we can use the estimated count based on the mean weights measured
         sets_w_ratio$est_catch_count,
@@ -555,8 +954,8 @@ split_catch_by_sex <- function(survey_sets, fish,
         sets_w_ratio$catch_count
         )
 
-      sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_count - (sets_w_ratio$n_sampled)), 2)
-      sets_w_ratio$perc_sampled <- round((sets_w_ratio$n_sampled) / sets_w_ratio$catch_count, 2) * 100
+      sets_w_ratio$unsampled_catch <- round((sets_w_ratio$catch_count - (sets_w_ratio$n_fish_sampled)), 2)
+      sets_w_ratio$perc_sampled <- round((sets_w_ratio$n_fish_sampled) / sets_w_ratio$catch_count, 2) * 100
 
       # sets_w_ratio$perc_sampled[Inf] <- NA
     }
