@@ -271,7 +271,8 @@ plot_mat_ogive <- function(object,
   }
 
   nd_re <- object$pred_data
-  nd_fe <- object$pred_data
+  nd_fe <- object$pred_data |>
+    dplyr::distinct(age_or_length, female, .keep_all = TRUE) # Remove duplicate predictions (predictions were done for each sample_id)
   # nd_fe <- filter(nd_re, year == nd_re$year[[1L]]) # fake; all same
   nd_fe$glmm_re <- NULL # also may not exist if no random effects
 
