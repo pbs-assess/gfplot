@@ -21,6 +21,7 @@ Type objective_function<Type>::operator() ()
   int n = len.size();
   vector<Type> eta(n);
   Type nll = 0.0;
+  REPORT(eta);
 
   for(int i = 0; i < n; i++){
     eta(i) = linf * (1 - exp(-k * (age(i) - t0)));
