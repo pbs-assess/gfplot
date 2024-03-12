@@ -34,8 +34,7 @@ plot_survey_sets(
   north_symbol_length = 30,
   cell_size = 2,
   circles = FALSE,
-  french = FALSE,
-  family = sdmTMB::delta_lognormal()
+  french = FALSE
 )
 }
 \arguments{
@@ -117,8 +116,6 @@ coordinates.}
 This analysis report uses this for the IPHC survey.}
 
 \item{french}{Logical for French or English.}
-
-\item{family}{Family}
 }
 \value{
 A ggplot object.

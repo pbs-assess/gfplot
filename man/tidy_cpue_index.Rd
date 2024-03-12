@@ -21,7 +21,8 @@ tidy_cpue_index(
   depth_bin_quantiles = c(0.001, 0.999),
   min_bin_prop = 0.001,
   lat_bin_quantiles = c(0, 1),
-  gear = "bottom trawl"
+  gear = "bottom trawl",
+  return_raw_data = FALSE
 )
 }
 \arguments{
