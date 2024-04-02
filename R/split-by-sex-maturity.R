@@ -4,8 +4,8 @@
 #' @param fish Data from [gfdata::get_survey_samples()] or matching format where female are coded as `sex = 2`.
 #' @param catch_variable Which biomass variable will be split. Can be total weight or densities.
 #'   Variable by this name will be saved indicating which was used.
-#' @param split_by_sex Should catch be split by sex?
-#' @param split_by_maturity Should catch be split by maturity?
+#' @param split_by_sex Logical for should catch be split by sex?
+#' @param split_by_maturity Logical for should catch be split by a maturity at length threshold?
 #' @param immatures_pooled If split by maturity, `TRUE` when immatures not to be split by sex.
 #' @param survey List of survey abbreviations. Default `NULL` includes all surveys in `survey_sets`.
 #'    Sets without samples will use annual survey mean/median proportions. If no samples were collected,
@@ -83,7 +83,9 @@ split_catch_by_sex <- function(survey_sets, fish,
 
   species <- fish$species_common_name[1]
 
+  if(split_by_maturity){
   fish <- fish %>% filter(!is.na(length))
+  }
 
   .d <- survey_sets %>%
     filter(survey_abbrev %in% survey) %>%
@@ -107,18 +109,18 @@ split_catch_by_sex <- function(survey_sets, fish,
 
   if (nrow(fish) > 0) {
     f_fish <- fish %>%
-      filter(!is.na(length)) %>%
+      # filter(!is.na(length)) %>%
       filter(sex == 2) %>%
       mutate(year_f = as.character(year))
 
     m_fish <- fish %>%
-      filter(!is.na(length)) %>%
+      # filter(!is.na(length)) %>%
       filter(sex == 1) %>%
       mutate(year_f = as.character(year))
 
     # we want to include fish that were not able to be sexed when not fully splitting by sex
     try(u_fish <- fish %>%
-      filter(!is.na(length)) %>%
+      # filter(!is.na(length)) %>%
       filter(!(sex %in% c(1, 2))) %>%
       mutate(year_f = as.character(year)))
 
@@ -182,14 +184,18 @@ split_catch_by_sex <- function(survey_sets, fish,
         } else {
           # yes
           warning("Fewer than 3 maturity codes available from target surveys,",
-                  "so all survey data provided were used to define the split.", call. = FALSE)
+                  "but all survey data provided were used to define the split.", call. = FALSE)
         }
       } else {
         # there is enough maturity data in the surveys and years of interest to just use those
-        fish <- fish_lengths
+        warning("There is enough maturity data in the surveys and years of interest to just use those,",
+                "but all survey data provided were used to define the split. If you don't want this,",
+                "filter the fish samples to include only surveys and/or years of interest.",
+                call. = FALSE)
+        # fish <- fish_lengths
       }
 
-      fish <- filter(fish, !is.na(maturity_code))
+      fish <- filter(fish, !is.na(maturity_code), !is.na(length))
 
       # Check if only some years without maturity data, and set year_re = FALSE in that case
       years_w_maturity <- fish %>%
