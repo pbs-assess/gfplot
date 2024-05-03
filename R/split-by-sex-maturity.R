@@ -292,7 +292,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         }
       }
       } else {
-        m <- NA
+        m <- NULL
         f_fish$threshold <- custom_length_thresholds[2]
         m_fish$threshold <- custom_length_thresholds[1]
       }
