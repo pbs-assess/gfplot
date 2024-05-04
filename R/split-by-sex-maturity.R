@@ -317,7 +317,7 @@ split_catch_by_sex <- function(survey_sets, fish,
           # since not splitting by sex for immatures, we want to include immatures that were not able to be sexed
           fish_groups <- bind_rows(f_fish, m_fish, imm_fish) %>%
             # but only when sexes where collected for other specimens
-            filter(fishing_event_id %in% unique(f_fish$fishing_event_id, m_fish$fishing_event_id)) %>%
+            filter(fishing_event_id %in% c(f_fish$fishing_event_id, m_fish$fishing_event_id)) %>%
             mutate(group_name = ifelse(mature == 1,
               paste("Mature", ifelse(sex == 1, "males", "females")),
               "Immature"
