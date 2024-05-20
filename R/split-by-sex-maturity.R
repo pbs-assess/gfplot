@@ -108,6 +108,7 @@ split_catch_by_sex <- function(survey_sets, fish,
   }
 
   if (nrow(fish) > 0) {
+
     f_fish <- fish %>%
       # filter(!is.na(length)) %>%
       filter(sex == 2) %>%
@@ -171,11 +172,12 @@ split_catch_by_sex <- function(survey_sets, fish,
 
       # does maturity data exist within focal surveys for this species?
       maturity_codes <- unique(fish_lengths$maturity_code)
+      fish_w_mat <- filter(fish, !is.na(maturity_code), !is.na(length))
 
       if (length(maturity_codes) < 3) {
         # if maturity data lacking within focal surveys for this species,
         # does it exists elsewhere in sample data provided?
-        maturity_codes <- unique(fish$maturity_code)
+        maturity_codes <- unique(fish_w_mat$maturity_code)
 
         if (length(maturity_codes) < 3) {
           # no
@@ -195,10 +197,10 @@ split_catch_by_sex <- function(survey_sets, fish,
         # fish <- fish_lengths
       }
 
-      fish <- filter(fish, !is.na(maturity_code), !is.na(length))
+      # fish <- filter(fish, !is.na(maturity_code), !is.na(length))
 
       # Check if only some years without maturity data, and set year_re = FALSE in that case
-      years_w_maturity <- fish %>%
+      years_w_maturity <- fish_w_mat %>%
         group_by(year) %>%
         mutate(maturity_levels = length(unique(maturity_code)))
 
@@ -217,7 +219,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         } else {
           warning("Some years lack maturity data, but catch still split.", call. = FALSE)
 # browser()
-          m <- fit_mat_ogive(fish,
+          m <- fit_mat_ogive(fish_w_mat,
                              type = "length",
                              sample_id_re = sample_id_re,
                              usability_codes = NULL,
@@ -238,7 +240,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         }
       } else {
         if (year_re) {
-          m <- fit_mat_ogive(fish,
+          m <- fit_mat_ogive(fish_w_mat,
                              type = "length",
                              sample_id_re = sample_id_re,
                              year_re = TRUE,
@@ -257,7 +259,7 @@ split_catch_by_sex <- function(survey_sets, fish,
             m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.95)
           }
         } else {
-          m <- fit_mat_ogive(fish,
+          m <- fit_mat_ogive(fish_w_mat,
                              type = "length",
                              usability_codes = NULL,
                              sample_id_re = sample_id_re,
@@ -292,7 +294,7 @@ split_catch_by_sex <- function(survey_sets, fish,
         }
       }
       } else {
-        m <- NA
+        m <- NULL
         f_fish$threshold <- custom_length_thresholds[2]
         m_fish$threshold <- custom_length_thresholds[1]
       }
@@ -312,10 +314,10 @@ split_catch_by_sex <- function(survey_sets, fish,
             filter(length < min(c(f_fish$threshold, m_fish$threshold), na.rm = TRUE)) %>%
             mutate(mature = 0))
 
-          # since not spliting by sex for immatures, we want to include immatures that were not able to be sexed
+          # since not splitting by sex for immatures, we want to include immatures that were not able to be sexed
           fish_groups <- bind_rows(f_fish, m_fish, imm_fish) %>%
-            # but only when sexes where collected for mature specimens
-            filter(fishing_event_id %in% unique(f_fish$fishing_event_id, m_fish$fishing_event_id)) %>%
+            # but only when sexes where collected for other specimens
+            filter(fishing_event_id %in% c(f_fish$fishing_event_id, m_fish$fishing_event_id)) %>%
             mutate(group_name = ifelse(mature == 1,
               paste("Mature", ifelse(sex == 1, "males", "females")),
               "Immature"
@@ -354,6 +356,7 @@ split_catch_by_sex <- function(survey_sets, fish,
 
     # split by weight ----
     if (split_by_weight) {
+
       group_values <- fish_groups %>%
         filter(!is.na(new_weight)) %>%
         group_by(fishing_event_id, group_name) %>%
