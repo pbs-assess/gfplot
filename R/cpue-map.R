@@ -24,7 +24,7 @@
 #'   plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
-#' @param french Logical for French or English.
+#' @param french Logical. If `TRUE`, create the plot in French
 #' @param percent_excluded_xy If not `NULL`, should be a numeric vector of
 #'   length 2 corresponding to the x and y location (as fraction from the bottom
 #'   left) of text describing the percentage of fishing events excluded due to
@@ -65,7 +65,9 @@ plot_cpue_spatial <-
            colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
            rotation_angle = 0,
            rotation_center = c(500, 5700),
-           fill_lab = ifelse(plot_catch, "Catch (t)", "CPUE (kg/hr)"),
+           fill_lab = ifelse(plot_catch,
+                             en2fr("Catch (t)", translate = french),
+                             en2fr("CPUE (kg/hr)", translate = french)),
            show_historical = FALSE,
            return_data = FALSE,
            min_cells = 1,
@@ -189,7 +191,10 @@ plot_cpue_spatial <-
       inherit.aes = FALSE, lwd = 0.2, fill = "grey90", col = "grey70"
     ) +
       coord_equal(xlim = xlim, ylim = ylim) +
-      theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
+      theme_pbs() + labs(fill = fill_lab,
+                         colour = fill_lab,
+                         y = en2fr("Northing", translate = french),
+                         x = en2fr("Easting", translate = french))
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 

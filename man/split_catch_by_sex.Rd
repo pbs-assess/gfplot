@@ -34,9 +34,9 @@ split_catch_by_sex(
 \item{catch_variable}{Which biomass variable will be split. Can be total weight or densities.
 Variable by this name will be saved indicating which was used.}
 
-\item{split_by_sex}{Should catch be split by sex?}
+\item{split_by_sex}{Logical for should catch be split by sex?}
 
-\item{split_by_maturity}{Should catch be split by maturity?}
+\item{split_by_maturity}{Logical for should catch be split by a maturity at length threshold?}
 
 \item{immatures_pooled}{If split by maturity, \code{TRUE} when immatures not to be split by sex.}
 

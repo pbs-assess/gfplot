@@ -18,7 +18,8 @@ plot_cpue_spatial(
   colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
   rotation_angle = 0,
   rotation_center = c(500, 5700),
-  fill_lab = ifelse(plot_catch, "Catch (t)", "CPUE (kg/hr)"),
+  fill_lab = ifelse(plot_catch, en2fr("Catch (t)", translate = french),
+    en2fr("CPUE (kg/hr)", translate = french)),
   show_historical = FALSE,
   return_data = FALSE,
   min_cells = 1,
@@ -73,7 +74,7 @@ plot.}
 \item{min_cells}{The minimum number of cells needed before the hexagons are
 shown.}
 
-\item{french}{Logical for French or English.}
+\item{french}{Logical. If \code{TRUE}, create the plot in French}
 
 \item{percent_excluded_xy}{If not \code{NULL}, should be a numeric vector of
 length 2 corresponding to the x and y location (as fraction from the bottom

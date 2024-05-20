@@ -211,7 +211,6 @@ plot_catch <- function(dat,
   if (blank_plot) {
     g <- g + ylim(0, 1)
   }
-
   g <- g +
     theme_pbs() +
     scale_fill_manual(
