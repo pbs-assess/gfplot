@@ -47,7 +47,9 @@ fit_mat_ogive <- function(dat,
                           link = c("logit", "probit", "cloglog", "cauchit", "log")) {
   link <- match.arg(link)
 
+  if(!("month" %in% names(dat))){
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
+  }
 
   dat <- dat %>% filter(maturity_convention_code != 9)
 
