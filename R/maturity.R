@@ -7,7 +7,8 @@
 #' @param year_re If `TRUE` the model will include random intercepts
 #'   for year.
 #' @param months A numeric vector indicating which months to include when
-#'   fitting the maturity ogive. Defaults to all months.
+#'   fitting the maturity ogive. Defaults to including all months, but not NAs.
+#'   Changing to NULL will include all data including NAs.
 #' @param custom_maturity_at A numeric vector of two threshold codes to define
 #'   maturity at with the first being for males and the second for females.
 #'   Defaults to `NULL`, which brings in default values from maturity assignment
@@ -63,7 +64,10 @@ fit_mat_ogive <- function(dat,
 
   type <- match.arg(type)
   dat <- dat[dat$sex %in% c(1, 2), , drop = FALSE]
+
+  if(!is.null(months)){
   dat <- dat[dat$month %in% months, , drop = FALSE]
+  }
 
   if (type == "age" && !is.null(ageing_method_codes)) {
     dat <- filter(dat, ageing_method %in% ageing_method_codes)
@@ -83,7 +87,7 @@ fit_mat_ogive <- function(dat,
       maturity_code, sex,
       maturity_convention_code,
       # survey_series_id,
-      specimen_id, sample_id, trip_start_date
+      specimen_id, sample_id, month
     )
 
   mat_df <- maturity_assignment
