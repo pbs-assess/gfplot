@@ -127,9 +127,12 @@ split_catch_by_sex <- function(survey_sets, fish,
 
     fish_lengths <- fish %>%
       ## when some surveys or sets of years lack maturity data, can we still get something from other surveys?
-      filter(survey_abbrev %in% survey) %>%
-      filter(year %in% years) %>%
-      filter(!is.na(length))
+      filter(survey_abbrev %in% survey) |>
+      filter(year %in% years) |>
+      # filter(!is.na(length)) |>
+      # zero lengths and weights shouldn't be possible! but rex sole from mssm has some
+      filter(length > 0) |>
+      filter(weight > 0| is.na(weight))
 
     # if (split_by_weight) {
 
