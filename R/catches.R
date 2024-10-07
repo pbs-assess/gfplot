@@ -123,16 +123,18 @@ tidy_catch <- function(dat,
 #' @export
 plot_catch <- function(dat,
                        french = FALSE,
-                       ylab = en2fr("Catch", french), xlim = c(1954, 2017),
-                       units = NULL,
+                       ylab = en2fr("Catch", french),
+                       xlim = c(1954, 2017),
+                       units = c("1000 t", "kt", "t", "kg"),
                        unreliable = c(1996, 2006),
                        blank_plot = FALSE) {
-  if (is.null(units)) {
-    units <- c(
-      `1000 t` = 1000000,
-      `t` = 1000, `kg` = 1
-    )
-  }
+
+  units <- match.arg(units)
+  scale_val <- switch(units,
+                      `1000 t` = 1e6,
+                      `kt` = 1e6,
+                      `t` = 1e3,
+                      `kg` = 1)
 
   gears <- c(
     "Bottom trawl",
@@ -156,15 +158,15 @@ plot_catch <- function(dat,
   names(pal) <- gears
   dat$gear <- factor(dat$gear, levels = gears)
 
-  scale_val <- units[[1]]
-  ylab_gg <- paste0(ylab, " (", names(units)[1], ")")
+  ylab_gg <- paste0(ylab, " (", units, ")")
 
-  for (i in seq_along(units)) {
-    if (max(dat$value) < (1000 * units[[i]])) {
-      scale_val <- units[[i]]
-      ylab_gg <- paste0(ylab, " (", names(units)[i], ")")
-    }
-  }
+  # Does not seem necessary
+  # for (i in seq_along(units)) {
+  #   if (max(dat$value) < (1000 * units[[i]])) {
+  #     scale_val <- units[[i]]
+  #     ylab_gg <- paste0(ylab, " (", names(units)[i], ")")
+  #   }
+  # }
 
   if (!blank_plot) {
     dat <- left_join(
