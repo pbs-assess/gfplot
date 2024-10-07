@@ -223,6 +223,7 @@ plot_catch <- function(dat,
       values = pal, drop = FALSE, breaks = gears,
       labels = gears
     ) +
+    scale_y_continuous(labels = scales::comma) +
     coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
     ggplot2::theme(legend.position = "bottom") +

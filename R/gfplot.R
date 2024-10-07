@@ -26,6 +26,7 @@
 #'   update.formula formula as.formula density sd
 #' @importFrom methods as
 #' @importFrom grDevices chull
+#' @importFrom scales comma
 #' @importFrom stats t.test
 #' @importFrom utils read.csv
 #' @importFrom rosettafish en2fr
