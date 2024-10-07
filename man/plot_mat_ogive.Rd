@@ -55,7 +55,8 @@ for sample ID.}
 for year.}
 
 \item{months}{A numeric vector indicating which months to include when
-fitting the maturity ogive. Defaults to all months.}
+fitting the maturity ogive. Defaults to including all months, but not NAs.
+Changing to NULL will include all data including NAs.}
 
 \item{custom_maturity_at}{A numeric vector of two threshold codes to define
 maturity at with the first being for males and the second for females.
