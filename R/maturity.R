@@ -49,7 +49,12 @@ fit_mat_ogive <- function(dat,
   link <- match.arg(link)
 
   if(!("month" %in% names(dat))){
-  dat <- mutate(dat, month = lubridate::month(trip_start_date))
+      if(("sample_date" %in% names(dat))){
+        dat <- mutate(dat, month = lubridate::month(sample_date))
+      } else {
+        dat <- mutate(dat, month = lubridate::month(trip_start_date))
+        print("Assigned a month using trip start dates rather than sample dates.")
+      }
   }
 
   dat <- dat %>% filter(maturity_convention_code != 9)
