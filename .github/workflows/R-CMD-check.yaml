@@ -69,7 +69,8 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("textshaping")
-          remotes::install_cran("rgdal")
+          remotes::install_cran("akima")
+          install.packages("rgdal", repos="http://R-Forge.R-project.org")
         shell: Rscript {0}
 
       - name: Check
