@@ -74,6 +74,9 @@ level is less than this value then that factor level will be dropped.}
 below these quantiles will be discarded.}
 
 \item{gear}{One or more gear types as a character vector.}
+
+\item{return_raw_data}{If \code{TRUE}, return a data.frame containing the raw
+data}
 }
 \description{
 This function determines the qualifying "fleet" for CPUE analyses. It is

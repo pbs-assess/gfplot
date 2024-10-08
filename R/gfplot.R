@@ -46,6 +46,36 @@ if (getRversion() >= "2.15.1") {
     "landed_pcs", "species_common_name", "species_desc", "species_science_name",
     "trip_start_date", "year",
 
+    # binomial_perc:
+    "uniroot",
+
+    # extract_maturity_perc, extract_maturity_perc_re, fit_mat_ogive,
+    # mat_par_delta_method, plot_mat_annual_ogives
+    "family",
+
+    # plot_growth:
+    "geom_jitter",
+
+    # plot_lengths:
+    "survey_abbrev2",
+
+    # plot_mat_ogive:
+    "age_or_length",
+
+    # plot_survey_index:
+    "geomean",
+
+    # plot_survey_index:
+    "biomass_scaled",
+
+    # split_catch_by_sex:
+    "new_weight", "group_name", "group_weight", "est_sample_weight",
+    "n_fish_sampled", "mean_weight_kg", "group_n", "weighted.mean",
+    "median_prop_ann", "n_events_sampled", "n_fish_by_surv_yr",
+    "mean_prop_ann", "mean_ann_weight_kg", "median_prop", "total_ann_samples",
+    "total_ann_fish", "mean_prop", "total_survey_samples",
+    "total_survey_fish", "split_catch_type",
+
     # weighting:
     "month", "freq", "trip_id", "sample_id", "survey_id", "value", "prop",
     "annual_prop", "quarter", "sum_freq",

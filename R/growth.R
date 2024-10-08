@@ -149,6 +149,8 @@ fit_vb <- function(dat,
     }
 
     vb_mod_gfplot <- rstan::stan_model(.f)
+
+    # Following causes a NOTE in check()
     assign("vb_mod_gfplot", vb_mod_gfplot, envir = globalenv())
   }
 

@@ -41,6 +41,9 @@ various surveys.}
 
 \item{alpha}{Transparency for the fill color in the histograms.}
 
+\item{survey_facets}{A vector of names to use in the survey formula labels
+used in the facets. If \code{NULL}, the survey abbreviations will be used.}
+
 \item{bin_size}{Bin size. Should match the bin size used with the \verb{tidy_*()}
 function.}
 

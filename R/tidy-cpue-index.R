@@ -35,6 +35,8 @@
 #' @param lat_bin_quantiles Quantiles for the latitude bands. Values above and
 #'   below these quantiles will be discarded.
 #' @param gear One or more gear types as a character vector.
+#' @param return_raw_data If `TRUE`, return a data.frame containing the raw
+#' data
 #'
 #' @export
 #'
@@ -61,7 +63,8 @@ tidy_cpue_index <- function(dat, species_common,
                             depth_bin_quantiles = c(0.001, 0.999),
                             min_bin_prop = 0.001,
                             lat_bin_quantiles = c(0, 1),
-                            gear = "bottom trawl", return_raw_data = FALSE) {
+                            gear = "bottom trawl",
+                            return_raw_data = FALSE) {
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
     gfplot::pbs_areas$major_stat_area_description

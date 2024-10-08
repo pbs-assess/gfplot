@@ -21,6 +21,8 @@
 #' `"F"` and `"M"` for female and male.
 #' @param survey_cols An optional named character vector of colors for the
 #'   various surveys.
+#' @param survey_facets A vector of names to use in the survey formula labels
+#' used in the facets. If `NULL`, the survey abbreviations will be used.
 #' @param alpha Transparency for the fill color in the histograms.
 #' @param bin_size Bin size. Should match the bin size used with the `tidy_*()`
 #'   function.
