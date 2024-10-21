@@ -77,6 +77,7 @@ factor_bin_clean <- function(x, bins, clean = TRUE) {
   out <- bins[findInterval(x, bins, rightmost.closed = TRUE)]
   max_char <- max(nchar(out))
   ndec <- ndecimals(out)
+
   if (clean & ndec == 0) {
     out <- sprintf(paste0("%0", max_char, "d"), out)
   } # pad with zeros
@@ -118,7 +119,10 @@ factor_clean <- function(x) {
 }
 
 ndecimals <- function(x) {
-  ndec <- nchar(lapply(strsplit(as.character(x), "\\."), function(x) x[2]))
+  ndec <- nchar(lapply(strsplit(as.character(x),
+                                options("OutDec")),
+                       \(x) x[2]))
+
   if (!all(is.na(ndec))) {
     ndec <- max(ndec, na.rm = TRUE)
   } else {
