@@ -16,8 +16,9 @@ NULL
 tidy_maturity_months <- function(dat, months = seq(1, 12),
   usability_codes = c(0, 1, 2, 6), french = FALSE) {
 
-  if (!is.null(usability_codes))
+  if (!is.null(usability_codes)){
     dat <- filter(dat, .data$usability_code %in% usability_codes)
+  }
 
   dat <- mutate(dat, month = lubridate::month(trip_start_date))
   dat <- filter(dat, month %in% months)
