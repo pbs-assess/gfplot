@@ -10,11 +10,17 @@ NULL
 #' @param usability_codes An optional vector of usability codes.
 #'   All usability codes not in this vector will be omitted.
 #'   Set to `NULL` to include all samples.
+#' @param name_convention Name convention defaults to "corrected"
+#'   will return the same names as "original", but with some corrections
+#'   in how they are applied to fish with maturity_code == 3. Use "original"
+#'   for the 2019-2023 version. Use "updated" for a new naming scheme that
+#'   uses "developing" and "developed" in place of "mature" and "ripe", but
+#'   note that rosettafish and other code may need to be updated to use these.
 #' @param french Logical for French or English.
 #' @export
 #' @rdname plot_maturity_months
 tidy_maturity_months <- function(dat, months = seq(1, 12),
-  usability_codes = c(0, 1, 2, 6), french = FALSE) {
+  usability_codes = c(0, 1, 2, 6), name_convention = "corrected", french = FALSE) {
 
   if (!is.null(usability_codes)){
     dat <- filter(dat, .data$usability_code %in% usability_codes)
@@ -40,13 +46,8 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
 
   mat_df <- maturity_short_names # built-in package data
 
-  dat <- left_join(dat,
-    select(mat_df, sex, maturity_convention_code, maturity_code, maturity_name_short),
-    by = c("sex", "maturity_convention_code", "maturity_code")
-  )
-
-  dat <- filter(dat, sex %in% c(1L, 2L))
-  dat <- dat %>% mutate(sex = ifelse(sex == 2L, "F", "M"))
+  if(name_convention == "original") {mat_df <- mat_df |> mutate(maturity_name_short = maturity_name_2019)}
+  if(name_convention == "corrected") {mat_df <- mat_df |> mutate(maturity_name_short = maturity_name_short)}
 
   mat_levels <- rev(c(
     "Immature",
@@ -62,6 +63,38 @@ tidy_maturity_months <- function(dat, months = seq(1, 12),
     "Spent",
     "Resting"
   ))
+
+  if(name_convention == "updated") {
+    mat_df <- mat_df |> mutate(maturity_name_short = maturity_name_updated)
+
+  mat_levels <- rev(c(
+    "Immature",
+    "Maturing",
+    "Mature",
+    "Developing",
+    "Developed",
+    "Gravid",
+    "Embryos",
+    "Ripe",
+    "Running Ripe",
+    "Uterine Eggs",
+    "Yolk Sac Pups",
+    "Term Pups",
+    "Spent",
+    "Resorbing",
+    "Resting"
+  ))
+
+  }
+
+  dat <- left_join(dat,
+    select(mat_df, sex, maturity_convention_code, maturity_code, maturity_name_short),
+    by = c("sex", "maturity_convention_code", "maturity_code")
+  )
+
+  dat <- filter(dat, sex %in% c(1L, 2L))
+  dat <- dat %>% mutate(sex = ifelse(sex == 2L, "F", "M"))
+
 
   mat_levels <- mat_levels[mat_levels %in% unique(dat$maturity_name_short)]
   dat <- dat[!is.na(dat$maturity_name_short), , drop = FALSE]
