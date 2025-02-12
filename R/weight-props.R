@@ -184,14 +184,14 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
 
   strat_dat <- survey_tows %>%
     select(
-      year, survey_id, fishing_event_id, sample_id, grouping_code,
+      year, survey_id, fishing_event_id, grouping_code,
       density_kgpm2, area_km2
     )
 
   raw_comp <- specimen_dat %>%
     filter(!is.na(grouping_code)) %>%
-    select(year, sample_id, !!value, sex, grouping_code) %>%
-    group_by(year, sex, sample_id, grouping_code, !!value) %>%
+    select(year, fishing_event_id, !!value, sex, grouping_code) %>%
+    group_by(year, sex, fishing_event_id, grouping_code, !!value) %>%
     summarise(freq = n())
 
   strat_areas <- strat_dat %>%
@@ -211,20 +211,20 @@ tidy_comps_survey <- function(specimen_dat, survey_tows, value,
 
   sample_dens <- specimen_dat %>%
     inner_join(strat_dat,
-      by = c("year", "survey_id", "sample_id", "grouping_code")
+      by = c("year", "survey_id", "fishing_event_id", "grouping_code")
     ) %>%
-    group_by(year, grouping_code, sample_id) %>%
+    group_by(year, grouping_code, fishing_event_id) %>%
     summarise(density = mean(density_kgpm2 * 1e6)) # should be one unique value
 
-  assertthat::assert_that(all(!duplicated(sample_dens$sample_id)))
+  assertthat::assert_that(all(!duplicated(sample_dens$fishing_event_id)))
 
   inner_join(raw_comp, sample_dens,
-    by = c("year", "sample_id", "grouping_code")
+    by = c("year", "fishing_event_id", "grouping_code")
   ) %>%
     inner_join(strat_dens, by = c("year", "grouping_code")) %>%
     inner_join(strat_areas, by = c("year", "grouping_code")) %>%
     ungroup() %>%
-    arrange(year, sex, sample_id, !!value)
+    arrange(year, sex, fishing_event_id, !!value)
 }
 
 weight_comps_base <- function(dat) {
@@ -296,7 +296,7 @@ weight_comps <- function(dat) {
     names(dat)[seq_len(2)],
     c("year", "sex")
   ))
-  assertthat::assert_that(names(dat)[[3]] %in% c("sample_id", "trip_id"))
+  assertthat::assert_that(names(dat)[[3]] %in% c("fishing_event_id", "trip_id"))
 
   names(dat) <- c(
     "year", "sex", "id", "grouping1", "value", "freq",

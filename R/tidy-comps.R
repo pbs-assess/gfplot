@@ -250,13 +250,13 @@ tidy_comps <- function(dat,
       dat <- dat %>%
         select(
           species_common_name, survey_abbrev, year, sex, age,
-          .data$length, sample_id, grouping_code, survey_id
+          .data$length, fishing_event_id, grouping_code, survey_id
         )
     } else {
       dat <- dat %>%
         select(
           species_common_name, survey_abbrev, year, sex, age,
-          .data$length, sample_id, trip_start_date, trip_id, catch_weight
+          .data$length, fishing_event_id, trip_start_date, trip_id, catch_weight
         )
     }
   }
