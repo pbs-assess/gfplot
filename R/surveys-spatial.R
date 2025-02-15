@@ -275,11 +275,12 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' the map including the ability to rotate the map.
 #'
 #' @param pred_dat The `predictions` element of the output from
-#'   [fit_survey_sets()].
+#'   [fit_survey_sets()]. Must contain a year column.
 #' @param raw_dat The `data` element of the output from [fit_survey_sets()].
-#' @param fill_column The name of the column to plot. Options are `"combined"`
+#' @param fill_column The name of the column to plot. Default ptions are `"combined"`
 #'   for the combined model, `"bin"` for the binary component model, or `"pos"`
-#'   for the positive component model.
+#'   for the positive component model, but works for other variables (though some
+#'   may require changes to fill and colour scales.
 #' @param fill_scale A ggplot `scale_fill_*` object.
 #' @param colour_scale A ggplot `scale_colour_*` object. You likely want this to
 #'   match `fill_scale` unless you want the map to look strange.
@@ -383,7 +384,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol_length = 30,
                              cell_size = 2, circles = FALSE,
                              french = FALSE) {
-  fill_column <- match.arg(fill_column)
+  # fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,
@@ -409,10 +410,11 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
           Y - cell_size / 2, Y - cell_size / 2,
           Y + cell_size / 2, Y + cell_size / 2
         ),
-        combined = row_dat$combined,
-        bin = row_dat$bin,
-        pos = row_dat$pos,
-        # year = row_dat$year,
+        fill_column = row_dat[fill_column],
+        # combined = row_dat$combined,
+        # bin = row_dat$bin,
+        # pos = row_dat$pos,
+        year = row_dat$year,
         id = i
       )
     }) %>% bind_rows()
