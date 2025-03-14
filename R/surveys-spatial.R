@@ -384,7 +384,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol_length = 30,
                              cell_size = 2, circles = FALSE,
                              french = FALSE) {
-  # fill_column <- match.arg(fill_column)
+  fill_column <- match.arg(fill_column)
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,
