@@ -39,6 +39,7 @@
 #'   `labels[!(labels$label %in% c("4B", "5C", "5D")),]$X <- 200`).
 #' @param plot_catch If `TRUE` plot catch instead of CPUE. If `FALSE` (default),
 #'   plot CPUE. See `dat` for data information.
+#' @param shapefile Optional shapefile to add polygon. \pkg{sf} class.
 #' @export
 #' @importFrom utils data
 #'
@@ -76,6 +77,7 @@ plot_cpue_spatial <-
            percent_excluded_text = "Fishing events excluded due to Privacy Act",
            show_majorbound = FALSE,
            major_labels = boundary_labels(utm_zone, xmin = xlim[1]),
+           shapefile = NULL,
            plot_catch = FALSE) {
 
     if(plot_catch){
@@ -141,6 +143,20 @@ plot_cpue_spatial <-
     isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
     coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
 
+    if (!is.null(shapefile)) {
+      # optional shape file to highlight:
+      coords <- sf::st_coordinates(shapefile) |>
+        as.data.frame() |>
+        dplyr::mutate(X = X / 1000, Y = Y / 1000)
+      polyset <- data.frame(
+        PID = 1,              # Polygon ID
+        POS = seq_len(nrow(coords)), # Point sequence
+        X = coords[, 1],      # X-coordinates (longitude)
+        Y = coords[, 2]       # Y-coordinates (latitude)
+      )
+      shape_rotated <- rotate_df(polyset, rotation_angle, rotation_center)
+    }
+
     g <- ggplot()
 
     if (plot_hexagons) {
@@ -197,6 +213,12 @@ plot_cpue_spatial <-
                          x = en2fr("Easting", translate = french))
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
+
+
+    if (!is.null(shapefile)) {
+      g <- g + geom_polygon(mapping = aes_string(x = "X", y = "Y", group = "PID"),
+        fill = NA, colour = "black", data = shape_rotated, lwd = 0.8)
+    }
 
     if (!is.null(percent_excluded_xy) && exists("privacy_out")) {
       excluded_fe <- round(
