@@ -172,8 +172,11 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             family = sdmTMB::tweedie(),
                             ...) {
 
-  .d_tidy <- tidy_survey_sets(dat, survey = survey,
-    years = years, density_column = density_column)
+  .d_tidy <- tidy_survey_sets(
+    dat, 
+    survey = if (survey == "SYN QCS-HS") c("SYN QCS", "SYN HS") else survey,
+    years = years, density_column = density_column
+  )
 
   if (nrow(.d_tidy) == 0) {
     stop("No survey data for species-survey-year combination.")
