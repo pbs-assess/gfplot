@@ -129,12 +129,26 @@ plot_catch <- function(dat,
                        unreliable = c(1996, 2006),
                        blank_plot = FALSE) {
 
-  units <- match.arg(units)
-  scale_val <- switch(units,
-                      `1000 t` = 1e6,
-                      `kt` = 1e6,
-                      `t` = 1e3,
-                      `kg` = 1)
+  # Choose best unit (or user specified)
+  unit_label <- c("1000 t" = 1e6, "kt" = 1e6, "t" = 1e3, "kg" = 1)
+
+  if (is.null(units)) {
+    max_val <- max(dat$value, na.rm = TRUE)
+    matches <- which((max_val / unit_label) >= 1)
+
+    if (length(matches) > 0) {
+      idx <- matches[which.max(unit_label[matches])] # largest matching unit
+    } else {
+      idx <- which.min(unit_label) # smallest unit if no matches
+    }
+
+    units <- names(unit_label)[[idx]]
+    scale_val <- unit_label[[idx]]
+
+  } else {
+    units <- match.arg(units)
+    scale_val <- unit_label[[units]]
+  }
 
   gears <- c(
     "Bottom trawl",
