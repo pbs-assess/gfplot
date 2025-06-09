@@ -46,7 +46,7 @@ plot_cpue_predictions <- function(dat,
                       "CPUE (kg/hour)")
   }else{
     y_label <- ifelse(french,
-                      "CPUE (kg/h) moyenne géométrique divisée",
+                      "CPUE (kg/h) divisé par la\nmoyenne géométrique",
                       "CPUE (kg/hour) divided\nby geometric mean")
   }
 
