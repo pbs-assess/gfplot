@@ -48,6 +48,7 @@ Imports:
     tweedie
 Suggests:
     akima,
+    covr,
     hexbin,
     knitr,
     rmarkdown,
