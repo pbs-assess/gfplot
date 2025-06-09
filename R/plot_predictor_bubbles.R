@@ -15,43 +15,64 @@
 #'   my_predictor = sample(gl(20, 20), size = 400),
 #'   area = rep("a", 400))
 #' plot_predictor_bubbles(d, "my_predictor")
-plot_predictor_bubbles <- function(dat, variable,
-  group_id = "fishing_event_id", ncol = 2) {
-  temp_pos <- dat %>%
-    filter(spp_catch > 0) %>%
-    group_by(area, year, !!rlang::sym(variable)) %>%
-    summarise(n = length(unique(!!rlang::sym(group_id)))) %>%
-    group_by(area, !!rlang::sym(variable)) %>%
-    mutate(n_tot = sum(n)) %>%
+plot_predictor_bubbles <- function(dat,
+                                   variable,
+                                   group_id = "fishing_event_id",
+                                   ncol = 2) {
+
+  temp_pos <- dat >|
+    filter(spp_catch > 0) >|
+    group_by(area, year, !!rlang::sym(variable)) >|
+    summarise(n = length(unique(!!rlang::sym(group_id)))) >|
+    group_by(area, !!rlang::sym(variable)) >|
+    mutate(n_tot = sum(n)) >|
     ungroup()
 
-  temp_all <- dat %>%
-    group_by(area, year, !!rlang::sym(variable)) %>%
-    summarise(n = length(unique(!!rlang::sym(group_id)))) %>%
-    group_by(area, !!rlang::sym(variable)) %>%
-    mutate(n_tot = sum(n)) %>%
+  temp_all <- dat >|
+    group_by(area, year, !!rlang::sym(variable)) >|
+    summarise(n = length(unique(!!rlang::sym(group_id)))) >|
+    group_by(area, !!rlang::sym(variable)) >|
+    mutate(n_tot = sum(n)) >|
     ungroup()
 
-  p <- temp_pos %>%
-    ggplot(aes_string("as.factor(year)", y = variable)) +
-    geom_point(aes_string(size = "n", fill = "n"), alpha = 0.4, pch = 21) +
-    geom_point(data = temp_all, aes_string(size = "n"), alpha = 0.4, pch = 21) +
-    facet_wrap(~area, scales = "free", ncol = ncol) +
+  p <- temp_pos >|
+    ggplot(aes_string("as.factor(year)",
+                      y = variable)) +
+    geom_point(aes_string(size = "n",
+                          fill = "n"),
+               alpha = 0.4,
+               pch = 21) +
+    geom_point(data = temp_all,
+               aes_string(size = "n"),
+               alpha = 0.4,
+               pch = 21) +
+    facet_wrap(~area,
+               scales = "free",
+               ncol = ncol) +
     ggplot2::scale_x_discrete(breaks = seq(1950, 2020, 5)) +
-    xlab("") + ylab(firstup(gsub("_", " ", variable))) +
+    xlab("") +
+    ylab(firstup(gsub("_", " ", variable))) +
     labs(size = paste0("Number of\n", group_id)) +
     labs(fill = paste0("Number of\n", group_id)) +
-    ggplot2::scale_size_continuous(range = c(0, 7), breaks = c(1, 10, 100, 500, 1000)) +
-    ggplot2::scale_fill_viridis_c(trans = "log", breaks = c(1, 10, 100, 500, 1000)) +
-    guides(fill = guide_legend(reverse=T), size = guide_legend(reverse=T)) +
+    ggplot2::scale_size_continuous(range = c(0, 7),
+                                   breaks = c(1, 10, 100, 500, 1000)) +
+    ggplot2::scale_fill_viridis_c(trans = "log",
+                                  breaks = c(1, 10, 100, 500, 1000)) +
+    guides(fill = guide_legend(reverse = TRUE),
+           size = guide_legend(reverse=T)) +
     theme_pbs()
 
-  if(length(levels(temp_all[[variable]]))> 13 & length(levels(temp_all[[variable]])) < 40){
-    p <- p + ggplot2::scale_y_discrete(breaks = levels(temp_all[[variable]])[c(T, rep(F, 1))])
+  if(length(levels(temp_all[[variable]])) > 13 &
+     length(levels(temp_all[[variable]])) < 40){
+    p <- p +
+      ggplot2::scale_y_discrete(
+        breaks = levels(temp_all[[variable]])[c(TRUE, rep(FALSE, 1))])
   }
 
-  if(length(levels(temp_all[[variable]]))> 41){
-    p <- p + ggplot2::scale_y_discrete(breaks = levels(temp_all[[variable]])[c(T, rep(F, 4))])
+  if(length(levels(temp_all[[variable]])) > 41){
+    p <- p +
+      ggplot2::scale_y_discrete(
+        breaks = levels(temp_all[[variable]])[c(TRUE, rep(FALSE, 4))])
   }
 
   p
