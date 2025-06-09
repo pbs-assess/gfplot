@@ -5,7 +5,6 @@
 #' See the README on
 #' \href{https://github.com/seananderson/gfplot#readme}{GitHub}
 #'
-#' @docType package
 #' @name gfplot
 #' @importFrom dplyr distinct filter mutate summarise select group_by n arrange ungroup
 #' @importFrom dplyr inner_join left_join right_join anti_join full_join
@@ -32,6 +31,7 @@
 #' @importFrom rosettafish en2fr
 # avoid R CMD check warning; import something:
 #' @importFrom PBSdata .PBSdataEnv
+"_PACKAGE"
 NULL
 
 # from: https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
