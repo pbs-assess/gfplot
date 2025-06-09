@@ -149,6 +149,8 @@ fit_vb <- function(dat,
     }
 
     vb_mod_gfplot <- rstan::stan_model(.f)
+
+    # Following causes a NOTE in check()
     assign("vb_mod_gfplot", vb_mod_gfplot, envir = globalenv())
   }
 
@@ -365,6 +367,7 @@ fit_length_weight <- function(dat,
 #' @param col A named character vector declaring the colors for female and male
 #' @param pts_col Logical for whether data points should be coloured to match lines.
 #' @param french Logical.
+#' @param jitter Logical, whether to jitter data points.
 #'
 #' @details You can include `object_female` and/or `object_male` or `object_all`
 #' depending on whether the model was fit to female, male, or both sexes
@@ -398,9 +401,10 @@ plot_growth <- function(object_female, object_male,
                         lab_y = 0.3,
                         lab_x_gap = 0.3,
                         lab_y_gap = 0.06,
-                        col = c("Female" = "#000000", "Male" = "#666666"),
-                        pts_col = FALSE,
-                        french = FALSE) {
+                        col = c("Female" = "black", "Male" = "grey40"),
+                        french = FALSE,
+                        jitter = FALSE) {
+
   xvar <- if (type[[1]] == "vb") "age" else "length"
   yvar <- if (type[[1]] == "vb") "length" else "weight"
 
@@ -461,19 +465,16 @@ plot_growth <- function(object_female, object_male,
       ylim <- c(0, max(pt_dat[, yvar], na.rm = TRUE) * 1.03)
     }
 
-    if (pts_col) {
-      g <- g + geom_point(
-        data = pt_dat,
-        aes_string(xvar, yvar, colour = "sex"),
-        alpha = pt_alpha,
-        pch = 21
+    if (jitter) {
+      g <- g + geom_jitter(
+        data = pt_dat, aes_string(xvar, yvar),
+        alpha = pt_alpha, colour = "grey70", pch = 21
       ) +
         coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
     } else {
       g <- g + geom_point(
         data = pt_dat, aes_string(xvar, yvar),
-          alpha = pt_alpha, colour = "grey70",
-          pch = 21
+        alpha = pt_alpha, colour = "grey70", pch = 21
       ) +
         coord_cartesian(xlim = xlim, ylim = ylim, expand = FALSE)
     }

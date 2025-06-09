@@ -74,6 +74,7 @@ is_dfo <- function() {
 # }
 
 factor_bin_clean <- function(x, bins, clean = TRUE) {
+
   out <- bins[findInterval(x, bins, rightmost.closed = TRUE)]
   max_char <- max(nchar(out))
   ndec <- ndecimals(out)
@@ -127,6 +128,7 @@ ndecimals <- function(x) {
                                        "\\,",
                                        "\\.")),
                        function(x) x[2]))
+
   if (!all(is.na(ndec))) {
     ndec <- max(ndec, na.rm = TRUE)
   } else {

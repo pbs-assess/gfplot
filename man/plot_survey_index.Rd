@@ -21,8 +21,13 @@ plot_survey_index(
   xlim = NULL,
   survey_cols = NULL,
   scale = TRUE,
+  scale_type = c("max-CI", "geometric-mean"),
+  geo_upper_limit_mult = 1.1,
+  geo_upper_limit_max = 4,
+  geo_scale_years = seq(2000, as.integer(format(Sys.Date(), "\%Y"))),
   year_increment = 5,
   french = FALSE,
+  pjs_mode = FALSE,
   hide_y_axis = FALSE
 )
 }
@@ -53,9 +58,21 @@ various surveys.}
 
 \item{scale}{Logical: scale the biomass by the maximum?}
 
+\item{scale_type}{Scaling type. Scale by max CI or geometric mean?}
+
+\item{geo_upper_limit_mult}{If geometric mean scaling, upper y-lim is
+\code{geo_upper_limit_mult} times the largest scaled geometric mean value
+(unless larger than \code{geo_upper_limit_max}).}
+
+\item{geo_upper_limit_max}{If geometric mean scaling, max ylim.}
+
+\item{geo_scale_years}{Years for geometric mean scaling.}
+
 \item{year_increment}{Increment for the year x axis.}
 
 \item{french}{Logical for French or English.}
+
+\item{pjs_mode}{PJS mode = dots and line segments.}
 
 \item{hide_y_axis}{Logical: hide the y axis ticks and labels?}
 }

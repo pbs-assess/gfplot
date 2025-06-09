@@ -39,13 +39,14 @@ plot_survey_sets(
 }
 \arguments{
 \item{pred_dat}{The \code{predictions} element of the output from
-\code{\link[=fit_survey_sets]{fit_survey_sets()}}.}
+\code{\link[=fit_survey_sets]{fit_survey_sets()}}. Must contain a year column.}
 
 \item{raw_dat}{The \code{data} element of the output from \code{\link[=fit_survey_sets]{fit_survey_sets()}}.}
 
-\item{fill_column}{The name of the column to plot. Options are \code{"combined"}
+\item{fill_column}{The name of the column to plot. Default ptions are \code{"combined"}
 for the combined model, \code{"bin"} for the binary component model, or \code{"pos"}
-for the positive component model.}
+for the positive component model, but works for other variables (though some
+may require changes to fill and colour scales.}
 
 \item{fill_scale}{A ggplot \verb{scale_fill_*} object.}
 

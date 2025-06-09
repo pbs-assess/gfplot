@@ -8,7 +8,7 @@ split_catch_maturity(
   survey_sets,
   fish,
   split_dens_type = "density_kgpm2",
-  survey = c("SYN HS", "SYN QCS"),
+  survey = c("SYN HS", "SYN QCS", "SYN WCVI", "SYN WCHG"),
   years = NULL,
   cutoff_quantile = 0.9995,
   p_threshold = 0.5,
@@ -53,10 +53,10 @@ Split catch densities by mass ratio of maturity classes
 d_survey_sets <- gfdata::get_survey_sets("pacific cod")
 d_survey_samples <- gfdata::get_survey_samples("pacific cod")
 
-d_by_maturity <- split_catch_maturity(d_survey_sets, d_survey_samples,
+d_by_maturity <- split_catch_maturity(
+  d_survey_sets, d_survey_samples,
   survey = c("SYN HS", "SYN QCS"),
   years = NULL,
-  cutoff_quantile = 0.5,
   plot = TRUE
 )
 }

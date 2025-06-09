@@ -13,7 +13,7 @@ plot_catch(
   french = FALSE,
   ylab = en2fr("Catch", french),
   xlim = c(1954, 2017),
-  units = NULL,
+  units = c("1000 t", "kt", "t", "kg"),
   unreliable = c(1996, 2006),
   blank_plot = FALSE
 )

@@ -123,15 +123,31 @@ tidy_catch <- function(dat,
 #' @export
 plot_catch <- function(dat,
                        french = FALSE,
-                       ylab = en2fr("Catch", french), xlim = c(1954, 2017),
-                       units = NULL,
+                       ylab = en2fr("Catch", french),
+                       xlim = c(1954, 2017),
+                       units = c("1000 t", "kt", "t", "kg"),
                        unreliable = c(1996, 2006),
                        blank_plot = FALSE) {
+
+  # Choose best unit (or user specified)
+  unit_label <- c("1000 t" = 1e6, "kt" = 1e6, "t" = 1e3, "kg" = 1)
+
   if (is.null(units)) {
-    units <- c(
-      `1000 t` = 1000000,
-      `t` = 1000, `kg` = 1
-    )
+    max_val <- max(dat$value, na.rm = TRUE)
+    matches <- which((max_val / unit_label) >= 1)
+
+    if (length(matches) > 0) {
+      idx <- matches[which.max(unit_label[matches])] # largest matching unit
+    } else {
+      idx <- which.min(unit_label) # smallest unit if no matches
+    }
+
+    units <- names(unit_label)[[idx]]
+    scale_val <- unit_label[[idx]]
+
+  } else {
+    units <- match.arg(units)
+    scale_val <- unit_label[[units]]
   }
 
   gears <- c(
@@ -156,15 +172,15 @@ plot_catch <- function(dat,
   names(pal) <- gears
   dat$gear <- factor(dat$gear, levels = gears)
 
-  scale_val <- units[[1]]
-  ylab_gg <- paste0(ylab, " (", names(units)[1], ")")
+  ylab_gg <- paste0(ylab, " (", units, ")")
 
-  for (i in seq_along(units)) {
-    if (max(dat$value) < (1000 * units[[i]])) {
-      scale_val <- units[[i]]
-      ylab_gg <- paste0(ylab, " (", names(units)[i], ")")
-    }
-  }
+  # Does not seem necessary
+  # for (i in seq_along(units)) {
+  #   if (max(dat$value) < (1000 * units[[i]])) {
+  #     scale_val <- units[[i]]
+  #     ylab_gg <- paste0(ylab, " (", names(units)[i], ")")
+  #   }
+  # }
 
   if (!blank_plot) {
     dat <- left_join(
@@ -211,7 +227,6 @@ plot_catch <- function(dat,
   if (blank_plot) {
     g <- g + ylim(0, 1)
   }
-
   g <- g +
     theme_pbs() +
     scale_fill_manual(
@@ -222,6 +237,7 @@ plot_catch <- function(dat,
       values = pal, drop = FALSE, breaks = gears,
       labels = gears
     ) +
+    scale_y_continuous(labels = scales::comma) +
     coord_cartesian(xlim = xlim + c(-0.5, 0.5), expand = FALSE) +
     xlab("") + ylab(ylab_gg) +
     ggplot2::theme(legend.position = "bottom") +

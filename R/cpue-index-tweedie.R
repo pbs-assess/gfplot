@@ -25,6 +25,7 @@ fit_cpue_index_glmmtmb <- function(dat, formula = cpue ~ year_factor, ...) {
 #' @export
 #' @rdname fit_cpue_index_glmmtmb
 predict_cpue_index_tweedie <- function(object, center = FALSE) {
+  # Following causes NOTE in check()
   if (class(object) != "glmmTMB") stop("Class of `object` must be glmmTMB.")
     sdr <- object$sdr
     yrs <- sort(unique(object$frame$year_factor))

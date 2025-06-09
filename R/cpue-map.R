@@ -24,7 +24,7 @@
 #'   plot.
 #' @param min_cells The minimum number of cells needed before the hexagons are
 #'   shown.
-#' @param french Logical for French or English.
+#' @param french Logical. If `TRUE`, create the plot in French
 #' @param percent_excluded_xy If not `NULL`, should be a numeric vector of
 #'   length 2 corresponding to the x and y location (as fraction from the bottom
 #'   left) of text describing the percentage of fishing events excluded due to
@@ -39,6 +39,7 @@
 #'   `labels[!(labels$label %in% c("4B", "5C", "5D")),]$X <- 200`).
 #' @param plot_catch If `TRUE` plot catch instead of CPUE. If `FALSE` (default),
 #'   plot CPUE. See `dat` for data information.
+#' @param shapefile Optional shapefile to add polygon. \pkg{sf} class.
 #' @export
 #' @importFrom utils data
 #'
@@ -65,7 +66,9 @@ plot_cpue_spatial <-
            colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
            rotation_angle = 0,
            rotation_center = c(500, 5700),
-           fill_lab = ifelse(plot_catch, "Catch (t)", "CPUE (kg/hr)"),
+           fill_lab = ifelse(plot_catch,
+                             en2fr("Catch (t)", translate = french),
+                             en2fr("CPUE (kg/hr)", translate = french)),
            show_historical = FALSE,
            return_data = FALSE,
            min_cells = 1,
@@ -73,7 +76,8 @@ plot_cpue_spatial <-
            percent_excluded_xy = NULL,
            percent_excluded_text = "Fishing events excluded due to Privacy Act",
            show_majorbound = FALSE,
-           major_labels = gfplot:::boundary_labels(utm_zone, xmin = xlim[1]),
+           major_labels = boundary_labels(utm_zone, xmin = xlim[1]),
+           shapefile = NULL,
            plot_catch = FALSE) {
 
     if(plot_catch){
@@ -139,6 +143,20 @@ plot_cpue_spatial <-
     isobath_utm <- rotate_df(isobath_utm, rotation_angle, rotation_center)
     coastline_utm <- rotate_df(coastline_utm, rotation_angle, rotation_center)
 
+    if (!is.null(shapefile)) {
+      # optional shape file to highlight:
+      coords <- sf::st_coordinates(shapefile) |>
+        as.data.frame() |>
+        dplyr::mutate(X = X / 1000, Y = Y / 1000)
+      polyset <- data.frame(
+        PID = 1,              # Polygon ID
+        POS = seq_len(nrow(coords)), # Point sequence
+        X = coords[, 1],      # X-coordinates (longitude)
+        Y = coords[, 2]       # Y-coordinates (latitude)
+      )
+      shape_rotated <- rotate_df(polyset, rotation_angle, rotation_center)
+    }
+
     g <- ggplot()
 
     if (plot_hexagons) {
@@ -172,7 +190,7 @@ plot_cpue_spatial <-
     if (show_majorbound) {
       # add major management region boundaries
       majorbound <- load_boundaries(9)
-      majorbounds <- fortify(majorbound)
+      majorbounds <- ggplot2::fortify(majorbound)
       g <- g + geom_path(
         data = majorbounds,
         aes(X , Y , group = PID), colour = "grey50",
@@ -189,9 +207,18 @@ plot_cpue_spatial <-
       inherit.aes = FALSE, lwd = 0.2, fill = "grey90", col = "grey70"
     ) +
       coord_equal(xlim = xlim, ylim = ylim) +
-      theme_pbs() + labs(fill = fill_lab, colour = fill_lab, y = "Northing", x = "Easting")
+      theme_pbs() + labs(fill = fill_lab,
+                         colour = fill_lab,
+                         y = en2fr("Northing", translate = french),
+                         x = en2fr("Easting", translate = french))
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
+
+
+    if (!is.null(shapefile)) {
+      g <- g + geom_polygon(mapping = aes_string(x = "X", y = "Y", group = "PID"),
+        fill = NA, colour = "black", data = shape_rotated, lwd = 0.7)
+    }
 
     if (!is.null(percent_excluded_xy) && exists("privacy_out")) {
       excluded_fe <- round(
@@ -280,7 +307,7 @@ load_boundaries <- function(utm_zone = 9) {
   # library(PBSmapping)
   data("major", package = "PBSdata", envir = environment())
   class(major) <- "data.frame" # this seems to prevent needing to library(PBSmapping)
-  gfplot:::ll2utm(major, utm_zone = utm_zone)
+  ll2utm(major, utm_zone = utm_zone)
 }
 
 boundary_labels <- function(utm_zone = 9, xmin = NULL){
@@ -289,7 +316,7 @@ boundary_labels <- function(utm_zone = 9, xmin = NULL){
 
   labels <- attributes(major)$PolyData
   class(labels) <- "data.frame" # this seems to prevent needing to library(PBSmapping)
-  labels <-  gfplot:::ll2utm(labels, utm_zone = utm_zone)
+  labels <-  ll2utm(labels, utm_zone = utm_zone)
   labels[labels$label %in% c("4B", "5C", "5D"),]$X <- c(885, 445, 340)
   labels[labels$label %in% c("4B", "5C", "5D"),]$Y <- c(5475, 5840, 5970)
   if(!is.null(xmin)){labels[!(labels$label %in% c("4B", "5C", "5D")),]$X <- xmin + 50}

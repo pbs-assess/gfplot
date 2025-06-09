@@ -143,6 +143,7 @@ initf <- function(init_b0, n_time, n_knots, n_beta, type = "lognormal") {
 #'   in `gfplot::hbll_grid`.
 #' @param tmb_knots The number of knots to pass to `sdmTMB::sdmTMB()`.
 #' @param cell_width The cell width if a prediction grid is made on the fly.
+#' @param family Family
 #' @param ... Any other arguments to pass on to the modelling function.
 #'
 #' @examples
@@ -168,10 +169,14 @@ fit_survey_sets <- function(dat, years, survey = NULL,
                             premade_grid = NULL,
                             tmb_knots = 200,
                             cell_width = 2,
+                            family = sdmTMB::tweedie(),
                             ...) {
 
-  .d_tidy <- tidy_survey_sets(dat, survey = survey,
-    years = years, density_column = density_column)
+  .d_tidy <- tidy_survey_sets(
+    dat, 
+    survey = if (survey == "SYN QCS-HS") c("SYN QCS", "SYN HS") else survey,
+    years = years, density_column = density_column
+  )
 
   if (nrow(.d_tidy) == 0) {
     stop("No survey data for species-survey-year combination.")
@@ -228,15 +233,17 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       time <- NULL
     }
     m <- tryCatch({sdmTMB::sdmTMB(data = .d_scaled, formula = formula,
-      spde = .spde, family = sdmTMB::tweedie(link = "log"), time = time, ...)
+      mesh = .spde, family = family, time = time, ...)
     }, error = function(e) NA)
-    if (is.na(m)) { # Did not converge.
-      warning('The spatial TMB model did not converge.', call. = FALSE)
-      return(list(
-        predictions = pg, data = .d_tidy,
-        models = NA, survey = survey,
-        years = years
-      ))
+    if (length(m) == 1L) {
+      if (is.na(m)) { # Did not converge.
+        warning('The spatial TMB model did not converge.', call. = FALSE)
+        return(list(
+          predictions = pg, data = .d_tidy,
+          models = NA, survey = survey,
+          years = years
+        ))
+      }
     }
     # These are fixed station (IPHC) or they come from grids without years
     if (survey %in% c("IPHC FISS", "HBLL OUT N", "HBLL OUT S")) {
@@ -244,14 +251,14 @@ fit_survey_sets <- function(dat, years, survey = NULL,
       pg_one$year <- max(.d_scaled$year)
     } else {
       if (!"year" %in% names(pg)) pg$year <- 1L
-      pg_one <- filter(pg, year == max(pg$year)) # all the same, pick one
+      pg_one <- dplyr::filter(pg, year == max(pg$year)) # all the same, pick one
       pg <- pg_one
     }
     # FIXME: just returning last year for consistency!
-    pred <- predict(m, newdata = pg_one) # returns all years!
+    pred <- predict(m, newdata = pg_one, type = "response") # returns all years!
     pred <- pred[pred$year == max(pred$year), , drop = FALSE]
     stopifnot(identical(nrow(pg), nrow(pred)))
-    pg$combined <- exp(pred$est)
+    pg$combined <- pred$est
     pg$pos <- NA
     pg$bin <- NA
 
@@ -271,11 +278,12 @@ fit_survey_sets <- function(dat, years, survey = NULL,
 #' the map including the ability to rotate the map.
 #'
 #' @param pred_dat The `predictions` element of the output from
-#'   [fit_survey_sets()].
+#'   [fit_survey_sets()]. Must contain a year column.
 #' @param raw_dat The `data` element of the output from [fit_survey_sets()].
-#' @param fill_column The name of the column to plot. Options are `"combined"`
+#' @param fill_column The name of the column to plot. Default ptions are `"combined"`
 #'   for the combined model, `"bin"` for the binary component model, or `"pos"`
-#'   for the positive component model.
+#'   for the positive component model, but works for other variables (though some
+#'   may require changes to fill and colour scales.
 #' @param fill_scale A ggplot `scale_fill_*` object.
 #' @param colour_scale A ggplot `scale_colour_*` object. You likely want this to
 #'   match `fill_scale` unless you want the map to look strange.
@@ -379,7 +387,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
                              north_symbol_length = 30,
                              cell_size = 2, circles = FALSE,
                              french = FALSE) {
-  fill_column <- match.arg(fill_column)
+  fill_column <- fill_column[1]
   if (!extrapolate_depth) {
     pred_dat <- filter(
       pred_dat,
@@ -405,10 +413,11 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
           Y - cell_size / 2, Y - cell_size / 2,
           Y + cell_size / 2, Y + cell_size / 2
         ),
-        combined = row_dat$combined,
-        bin = row_dat$bin,
-        pos = row_dat$pos,
-        # year = row_dat$year,
+        fill_column = row_dat[fill_column],
+        # combined = row_dat$combined,
+        # bin = row_dat$bin,
+        # pos = row_dat$pos,
+        year = row_dat$year,
         id = i
       )
     }) %>% bind_rows()

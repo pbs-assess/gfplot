@@ -9,6 +9,7 @@ tidy_maturity_months(
   dat,
   months = seq(1, 12),
   usability_codes = c(0, 1, 2, 6),
+  name_convention = "corrected",
   french = FALSE
 )
 
@@ -35,6 +36,13 @@ data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
 Set to \code{NULL} to include all samples.}
+
+\item{name_convention}{Name convention defaults to "corrected"
+will return the same names as "original", but with some corrections
+in how they are applied to fish with maturity_code == 3. Use "original"
+for the 2019-2023 version. Use "updated" for a new naming scheme that
+uses "developing" and "developed" in place of "mature" and "ripe", but
+note that rosettafish and other code may need to be updated to use these.}
 
 \item{french}{Logical for French or English.}
 

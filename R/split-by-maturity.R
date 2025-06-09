@@ -22,16 +22,16 @@
 #' d_survey_sets <- gfdata::get_survey_sets("pacific cod")
 #' d_survey_samples <- gfdata::get_survey_samples("pacific cod")
 #'
-#' d_by_maturity <- split_catch_maturity(d_survey_sets, d_survey_samples,
+#' d_by_maturity <- split_catch_maturity(
+#'   d_survey_sets, d_survey_samples,
 #'   survey = c("SYN HS", "SYN QCS"),
 #'   years = NULL,
-#'   cutoff_quantile = 0.5,
 #'   plot = TRUE
 #' )
 #' }
 split_catch_maturity <- function(survey_sets, fish,
                                  split_dens_type = "density_kgpm2",
-                                 survey = c("SYN HS", "SYN QCS"),
+                                 survey = c("SYN HS", "SYN QCS", "SYN WCVI", "SYN WCHG"),
                                  years = NULL,
                                  cutoff_quantile = 0.9995,
                                  p_threshold = 0.5,
@@ -43,22 +43,9 @@ split_catch_maturity <- function(survey_sets, fish,
 
   species <- fish$species_common_name[1]
 
-  # is there enough data to split by survey?
-  fish_test <- fish %>%
-    filter(year %in% years) %>%
-    group_by(survey_abbrev)
-
-  total_maturity <- fish_test %>% mutate(maturity_levels = length(unique(maturity_code)))
-  total_levels <- unique(total_maturity$maturity_levels)
-
-  if (min(total_levels) < 3) {
-    fish <- fish %>% filter(year %in% years)
-    survey <- unique(fish$survey_abbrev)
-  } else {
-    fish <- fish %>%
-      filter(survey_abbrev %in% survey) %>%
-      filter(year %in% years)
-  }
+  fish <- fish %>%
+    filter(survey_abbrev %in% survey) %>%
+    filter(year %in% years)
 
   survey_sets <- survey_sets %>%
     filter(survey_abbrev %in% survey) %>%
@@ -71,7 +58,7 @@ split_catch_maturity <- function(survey_sets, fish,
   maturity_codes <- unique(fish$maturity_code)
 
   if (length(maturity_codes) < 3) {
-    print()
+    warning("Fewer than 3 maturity codes; returning NULL data.", call. = FALSE)
     return(list(data = survey_sets, maturity = NULL, mass_model = NULL))
   }
 
@@ -95,17 +82,17 @@ split_catch_maturity <- function(survey_sets, fish,
     levels_per_year <- unique(years_w_maturity$maturity_levels)
 
     if (max(levels_per_year) < 3) { # NA plus only one recorded maturity level is max ever recorded
-      warning("Maturity data not recorded, so catch not split.")
+      warning("Maturity data not recorded, so catch not split.", call. = FALSE)
       return(list(data = survey_sets, model = NULL))
     }
 
     if (min(levels_per_year) < 3) { # some years lack maturity data
 
       if (length(levels_per_year) < 3) {
-        warning("Maturity data not recorded, so catch not split.")
+        warning("Maturity data not recorded, so catch not split.", call. = FALSE)
         return(list(data = survey_sets, model = NULL))
       } else {
-        warning("Some years lack maturity data, but catch still split.")
+        warning("Some years lack maturity data, but catch still split.", call. = FALSE)
 
         m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
 
@@ -138,7 +125,6 @@ split_catch_maturity <- function(survey_sets, fish,
           m_fish$threshold <- lapply(m_fish$year_f, function(x) m$mat_perc[[x]]$m.p0.95)
         }
       } else {
-        # browser()
         m <- fit_mat_ogive(fish, type = "length", sample_id_re = sample_id_re)
 
         # apply global estimates to all catches
@@ -193,18 +179,19 @@ split_catch_maturity <- function(survey_sets, fish,
     m_fish$new_mass[is.na(m_fish$weight)] <- m_fish$model_mass[is.na(m_fish$weight)]
 
     # combine dataframes of female and male fish
-    fish_maturity <- rbind(f_fish, m_fish) %>% mutate(sex = ifelse(sex == 2, "F", "M"))
+    fish_maturity <- rbind(f_fish, m_fish) %>%
+      mutate(sex = ifelse(sex == 2, "F", "M"))
 
     set_maturity <- fish_maturity %>%
       group_by(fishing_event_id, adult) %>%
       mutate(maturity_mass = sum(new_mass)) %>%
-      add_tally() %>%
+      dplyr::add_tally() %>%
       rename(count = n) %>%
       ungroup()
 
     set_ratio <- set_maturity %>%
       group_by(fishing_event_id) %>%
-      add_tally() %>%
+      dplyr::add_tally() %>%
       mutate(
         est_sample_mass = sum(new_mass, na.rm = TRUE),
         mass_ratio = maturity_mass / est_sample_mass,
@@ -224,7 +211,6 @@ split_catch_maturity <- function(survey_sets, fish,
 
     sets_w_ratio <- left_join(survey_sets, set_ratio, by = "fishing_event_id")
 
-    # browser()
     # chose value to use when a sample mass ratio is not available
     if (use_median_ratio) {
       na_value <- median(sets_w_ratio$mass_ratio_mature, na.rm = TRUE)
@@ -260,8 +246,11 @@ split_catch_maturity <- function(survey_sets, fish,
           geom_point(size = 1.5, alpha = 0.35, shape = 1) +
           geom_point(aes(length, weight), shape = 16, size = 1.25, alpha = 0.65) +
           scale_color_viridis_d(begin = 0.1, end = 0.6) +
-          facet_wrap(~year) + gfplot::theme_pbs() +
-          xlab("") + ylab("Weight (open circles are estimates)") + labs(colour = "Sex") +
+          facet_wrap(~year) +
+          gfplot::theme_pbs() +
+          xlab("") +
+          ylab("Weight (open circles are estimates)") +
+          labs(colour = "Sex") +
           ggplot2::ggtitle(paste("Length-weight relationship for", species, "surveys", ssid_string, ""))
       )
     }

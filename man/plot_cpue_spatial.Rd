@@ -18,7 +18,8 @@ plot_cpue_spatial(
   colour_scale = ggplot2::scale_colour_viridis_c(trans = "sqrt", option = "D"),
   rotation_angle = 0,
   rotation_center = c(500, 5700),
-  fill_lab = ifelse(plot_catch, "Catch (t)", "CPUE (kg/hr)"),
+  fill_lab = ifelse(plot_catch, en2fr("Catch (t)", translate = french),
+    en2fr("CPUE (kg/hr)", translate = french)),
   show_historical = FALSE,
   return_data = FALSE,
   min_cells = 1,
@@ -26,7 +27,8 @@ plot_cpue_spatial(
   percent_excluded_xy = NULL,
   percent_excluded_text = "Fishing events excluded due to Privacy Act",
   show_majorbound = FALSE,
-  major_labels = gfplot:::boundary_labels(utm_zone, xmin = xlim[1]),
+  major_labels = boundary_labels(utm_zone, xmin = xlim[1]),
+  shapefile = NULL,
   plot_catch = FALSE
 )
 
@@ -73,7 +75,7 @@ plot.}
 \item{min_cells}{The minimum number of cells needed before the hexagons are
 shown.}
 
-\item{french}{Logical for French or English.}
+\item{french}{Logical. If \code{TRUE}, create the plot in French}
 
 \item{percent_excluded_xy}{If not \code{NULL}, should be a numeric vector of
 length 2 corresponding to the x and y location (as fraction from the bottom
@@ -90,6 +92,8 @@ retrieve a label dataframe. Function can be called and the output modified
 outside this function in order to customize label placement
 (e.g., \code{labels <- gfplot:::boundary_labels(utm_zone = 9)}
 \code{labels[!(labels$label \%in\% c("4B", "5C", "5D")),]$X <- 200}).}
+
+\item{shapefile}{Optional shapefile to add polygon. \pkg{sf} class.}
 
 \item{plot_catch}{If \code{TRUE} plot catch instead of CPUE. If \code{FALSE} (default),
 plot CPUE. See \code{dat} for data information.}

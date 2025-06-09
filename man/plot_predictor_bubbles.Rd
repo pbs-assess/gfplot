@@ -4,7 +4,13 @@
 \alias{plot_predictor_bubbles}
 \title{Make predictor level bubble plots}
 \usage{
-plot_predictor_bubbles(dat, variable, group_id = "fishing_event_id", ncol = 2)
+plot_predictor_bubbles(
+  dat,
+  variable,
+  group_id = "fishing_event_id",
+  ncol = 2,
+  french = FALSE
+)
 }
 \arguments{
 \item{dat}{A data frame with the columns area, year}
@@ -14,6 +20,8 @@ plot_predictor_bubbles(dat, variable, group_id = "fishing_event_id", ncol = 2)
 \item{group_id}{The events to count over (e.g. \code{"fishing_event_id"} or \code{"trip_id"})}
 
 \item{ncol}{Number of facetted columns (facets by area)}
+
+\item{french}{If \code{TRUE}, all text will appear as French in the plot}
 }
 \value{
 A ggplot object

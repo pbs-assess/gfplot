@@ -16,6 +16,7 @@ fit_survey_sets(
   premade_grid = NULL,
   tmb_knots = 200,
   cell_width = 2,
+  family = sdmTMB::tweedie(),
   ...
 )
 }
@@ -55,6 +56,8 @@ in \code{gfplot::hbll_grid}.}
 \item{tmb_knots}{The number of knots to pass to \code{sdmTMB::sdmTMB()}.}
 
 \item{cell_width}{The cell width if a prediction grid is made on the fly.}
+
+\item{family}{Family}
 
 \item{...}{Any other arguments to pass on to the modelling function.}
 }

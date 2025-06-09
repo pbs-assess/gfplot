@@ -4,6 +4,7 @@
 #' @param variable The column to summarize (character value)
 #' @param group_id The events to count over (e.g. `"fishing_event_id"` or `"trip_id"`)
 #' @param ncol Number of facetted columns (facets by area)
+#' @param french If `TRUE`, all text will appear as French in the plot
 #'
 #' @return A ggplot object
 #' @export
@@ -18,24 +19,28 @@
 plot_predictor_bubbles <- function(dat,
                                    variable,
                                    group_id = "fishing_event_id",
-                                   ncol = 2) {
-
-  temp_pos <- dat >|
-    filter(spp_catch > 0) >|
-    group_by(area, year, !!rlang::sym(variable)) >|
-    summarise(n = length(unique(!!rlang::sym(group_id)))) >|
-    group_by(area, !!rlang::sym(variable)) >|
-    mutate(n_tot = sum(n)) >|
+                                   ncol = 2,
+                                   french = FALSE) {
+  temp_pos <- dat |>
+    filter(spp_catch > 0) |>
+    group_by(area, year, !!rlang::sym(variable)) |>
+    summarise(n = length(unique(!!rlang::sym(group_id)))) |>
+    group_by(area, !!rlang::sym(variable)) |>
+    mutate(n_tot = sum(n)) |>
     ungroup()
 
-  temp_all <- dat >|
-    group_by(area, year, !!rlang::sym(variable)) >|
-    summarise(n = length(unique(!!rlang::sym(group_id)))) >|
-    group_by(area, !!rlang::sym(variable)) >|
-    mutate(n_tot = sum(n)) >|
+  temp_all <- dat |>
+    group_by(area, year, !!rlang::sym(variable)) |>
+    summarise(n = length(unique(!!rlang::sym(group_id)))) |>
+    group_by(area, !!rlang::sym(variable)) |>
+    mutate(n_tot = sum(n)) |>
     ungroup()
 
-  p <- temp_pos >|
+  leg_title <- ifelse(french,
+                      paste0("Nombre de\n", group_id),
+                      paste0("Number of\n", group_id))
+
+    p <- temp_pos |>
     ggplot(aes_string("as.factor(year)",
                       y = variable)) +
     geom_point(aes_string(size = "n",

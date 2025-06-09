@@ -35,6 +35,8 @@
 #' @param lat_bin_quantiles Quantiles for the latitude bands. Values above and
 #'   below these quantiles will be discarded.
 #' @param gear One or more gear types as a character vector.
+#' @param return_raw_data If `TRUE`, return a data.frame containing the raw
+#' data
 #'
 #' @export
 #'
@@ -61,17 +63,18 @@ tidy_cpue_index <- function(dat, species_common,
                             depth_bin_quantiles = c(0.001, 0.999),
                             min_bin_prop = 0.001,
                             lat_bin_quantiles = c(0, 1),
-                            gear = "bottom trawl") {
+                            gear = "bottom trawl",
+                            return_raw_data = FALSE) {
   pbs_areas <- gfplot::pbs_areas[grep(
     area_grep_pattern,
     gfplot::pbs_areas$major_stat_area_description
   ), ]
   names(dat) <- tolower(names(dat))
 
-  if (!"species_common_name" %in% names(dat)) {
-    dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
-  }
-
+  # if (!"species_common_name" %in% names(dat)) {
+  dat$species_common_name <- NULL
+  dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
+  # }
   dat <- dat %>% mutate(year = lubridate::year(best_date))
 
   # create possibly alternate starting date:
@@ -135,7 +138,8 @@ tidy_cpue_index <- function(dat, species_common,
       # hours_fished = mean(hours_fished, na.rm = TRUE),
       spp_catch = sum(ifelse(spp_in_row, catch, 0), na.rm = TRUE),
       best_depth = mean(best_depth, na.rm = TRUE),
-      latitude = mean(latitude, na.rm = TRUE)
+      latitude = mean(latitude, na.rm = TRUE),
+      longitude = mean(longitude, na.rm = TRUE)
     ) %>%
     ungroup()
 
@@ -165,6 +169,11 @@ tidy_cpue_index <- function(dat, species_common,
 
   # retain the data from our "fleet"
   d_retained <- semi_join(catch, fleet, by = "vessel_registration_number")
+
+
+  if (return_raw_data) {
+    return(d_retained)
+  }
 
   if (nrow(d_retained) == 0) {
     warning("No vessels passed the fleet conditions.")

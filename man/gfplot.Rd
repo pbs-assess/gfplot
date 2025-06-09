@@ -2,6 +2,7 @@
 % Please edit documentation in R/gfplot.R
 \docType{package}
 \name{gfplot}
+\alias{gfplot-package}
 \alias{gfplot}
 \title{gfplot package}
 \description{
@@ -10,4 +11,23 @@ gfplot package
 \details{
 See the README on
 \href{https://github.com/seananderson/gfplot#readme}{GitHub}
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/pbs-assess/gfplot}
+  \item Report bugs at \url{https://github.com/pbs-assess/gfplot/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Sean C. Anderson \email{sean.anderson@dfo-mpo.gc.ca}
+
+Authors:
+\itemize{
+  \item Elise A. Keppel
+  \item Andrew M. Edwards
+  \item Chris Grandin
+}
+
 }

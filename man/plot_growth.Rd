@@ -20,9 +20,9 @@ plot_growth(
   lab_y = 0.3,
   lab_x_gap = 0.3,
   lab_y_gap = 0.06,
-  col = c(Female = "#000000", Male = "#666666"),
-  pts_col = FALSE,
-  french = FALSE
+  col = c(Female = "black", Male = "grey40"),
+  french = FALSE,
+  jitter = FALSE
 )
 
 plot_vb(..., type = "vb")
@@ -67,11 +67,13 @@ plot_length_weight(
 
 \item{col}{A named character vector declaring the colors for female and male}
 
-\item{pts_col}{Logical for whether data points should be coloured to match lines.}
-
 \item{french}{Logical.}
 
+\item{jitter}{Logical, whether to jitter data points.}
+
 \item{...}{Arguments to pass to \code{\link[=plot_growth]{plot_growth()}}.}
+
+\item{pts_col}{Logical for whether data points should be coloured to match lines.}
 }
 \description{
 Plot von Bertalanffy or length-weight fits

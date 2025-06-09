@@ -21,7 +21,8 @@ tidy_cpue_index(
   depth_bin_quantiles = c(0.001, 0.999),
   min_bin_prop = 0.001,
   lat_bin_quantiles = c(0, 1),
-  gear = "bottom trawl"
+  gear = "bottom trawl",
+  return_raw_data = FALSE
 )
 }
 \arguments{
@@ -73,6 +74,9 @@ level is less than this value then that factor level will be dropped.}
 below these quantiles will be discarded.}
 
 \item{gear}{One or more gear types as a character vector.}
+
+\item{return_raw_data}{If \code{TRUE}, return a data.frame containing the raw
+data}
 }
 \description{
 This function determines the qualifying "fleet" for CPUE analyses. It is

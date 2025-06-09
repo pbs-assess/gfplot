@@ -139,13 +139,13 @@ tidy_comps <- function(dat,
                        remove_unsexed = TRUE,
                        ...) {
 
-  if(sample_type == "commercial" && !is.null(dat_catch)){
-    dat_catch <- set_fishing_year(dat_catch, ...)
-  }
-
   age_length <- match.arg(age_length)
   sample_type <- match.arg(sample_type)
   frequency_type <- match.arg(frequency_type)
+
+  if(sample_type == "commercial" && !is.null(dat_catch)){
+    dat_catch <- set_fishing_year(dat_catch, ...)
+  }
 
   if (frequency_type == "weighted" && sample_type == "survey" &&
     is.null(dat_survey_sets)) {
@@ -250,13 +250,13 @@ tidy_comps <- function(dat,
       dat <- dat %>%
         select(
           species_common_name, survey_abbrev, year, sex, age,
-          .data$length, sample_id, grouping_code, survey_id
+          .data$length, fishing_event_id, grouping_code, survey_id
         )
     } else {
       dat <- dat %>%
         select(
           species_common_name, survey_abbrev, year, sex, age,
-          .data$length, sample_id, trip_start_date, trip_id, catch_weight
+          .data$length, fishing_event_id, trip_start_date, trip_id, catch_weight
         )
     }
   }

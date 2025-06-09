@@ -58,3 +58,4 @@
 ^prediction-grids$
 ^codecov.yml$
 .github
+^\.github$

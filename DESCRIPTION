@@ -24,40 +24,37 @@ BugReports: https://github.com/pbs-assess/gfplot/issues
 Depends: 
     R (>= 3.4.0)
 Imports:
-    MASS,
-    PBSdata,
-    PBSmapping,
-    RColorBrewer,
-    TMB,
     assertthat,
     dplyr (>= 1.0.0),
     forcats,
     ggplot2 (>= 3.0.0),
+    ggrepel,
     glmmTMB,
     grid,
     lubridate,
     magrittr,
+    MASS,
     methods,
+    numform,
+    PBSdata,
+    PBSmapping,
+    RColorBrewer,
     reshape2,
     rlang,
-    tidyr,
-    tweedie,
-    ggrepel,
     rosettafish,
-    numform
+    scales,
+    tidyr,
+    TMB,
+    tweedie
 Suggests:
     akima,
     hexbin,
     knitr,
     rmarkdown,
-    testthat,
-    rgdal,
     rstan (>= 2.20.0),
-    scales,
     sdmTMB (>= 0.0.23),
-    sp
-VignetteBuilder: 
-    knitr
+    sp,
+    testthat,
 Remotes: 
     github::pbs-software/pbs-data/PBSdata,
     github::pbs-assess/sdmTMB,
@@ -65,4 +62,4 @@ Remotes:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.2
