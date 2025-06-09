@@ -21,6 +21,14 @@ plot_predictor_bubbles <- function(dat,
                                    group_id = "fishing_event_id",
                                    ncol = 2,
                                    french = FALSE) {
+
+  if(french){
+    variable_fr <- rosettafish::en2fr(variable)
+    dat <- dat |>
+      rename(!!variable_fr := !!variable)
+    variable <- variable_fr
+  }
+
   temp_pos <- dat |>
     filter(spp_catch > 0) |>
     group_by(area, year, !!rlang::sym(variable)) |>
@@ -40,6 +48,7 @@ plot_predictor_bubbles <- function(dat,
                       paste0("Nombre de\n", group_id),
                       paste0("Number of\n", group_id))
 
+
     p <- temp_pos |>
     ggplot(aes_string("as.factor(year)",
                       y = variable)) +
@@ -57,8 +66,8 @@ plot_predictor_bubbles <- function(dat,
     ggplot2::scale_x_discrete(breaks = seq(1950, 2020, 5)) +
     xlab("") +
     ylab(firstup(gsub("_", " ", variable))) +
-    labs(size = paste0("Number of\n", group_id)) +
-    labs(fill = paste0("Number of\n", group_id)) +
+    labs(size = leg_title) +
+    labs(fill = leg_title) +
     ggplot2::scale_size_continuous(range = c(0, 7),
                                    breaks = c(1, 10, 100, 500, 1000)) +
     ggplot2::scale_fill_viridis_c(trans = "log",
