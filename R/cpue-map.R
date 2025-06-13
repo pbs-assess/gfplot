@@ -67,14 +67,22 @@ plot_cpue_spatial <-
            rotation_angle = 0,
            rotation_center = c(500, 5700),
            fill_lab = ifelse(plot_catch,
-                             en2fr("Catch (t)", translate = french),
-                             en2fr("CPUE (kg/hr)", translate = french)),
+                             ifelse(french,
+                                    "Attraper (t)",
+                                    "Catch (t)"),
+                             "CPUE (kg/hr)"),
            show_historical = FALSE,
            return_data = FALSE,
            min_cells = 1,
            french = FALSE,
            percent_excluded_xy = NULL,
-           percent_excluded_text = "Fishing events excluded due to Privacy Act",
+           percent_excluded_text = ifelse(french,
+                                          paste0("Événements de pêche exclus ",
+                                                 "en raison de la loi sur la ",
+                                                 "protection des renseignements ",
+                                                 "personnels"),
+                                          paste0("Fishing events excluded ",
+                                                 "due to Privacy Act")),
            show_majorbound = FALSE,
            major_labels = boundary_labels(utm_zone, xmin = xlim[1]),
            shapefile = NULL,
@@ -131,10 +139,14 @@ plot_cpue_spatial <-
         if (nrow(gdat) < min_cells) {
           plot_hexagons <- FALSE
         } else {
-          public_dat <- compute_hexagon_xy(privacy_out$data, bin_width = bin_width, plot_catch)
+          public_dat <- compute_hexagon_xy(privacy_out$data,
+                                           bin_width = bin_width,
+                                           plot_catch)
           if (show_historical)
             public_dat_historical <-
-              compute_hexagon_xy(privacy_out_historical$data, bin_width = bin_width, plot_catch)
+              compute_hexagon_xy(privacy_out_historical$data,
+                                 bin_width = bin_width,
+                                 plot_catch)
         }
       }
     }
@@ -149,10 +161,10 @@ plot_cpue_spatial <-
         as.data.frame() |>
         dplyr::mutate(X = X / 1000, Y = Y / 1000)
       polyset <- data.frame(
-        PID = 1,              # Polygon ID
+        PID = 1,                     # Polygon ID
         POS = seq_len(nrow(coords)), # Point sequence
-        X = coords[, 1],      # X-coordinates (longitude)
-        Y = coords[, 2]       # Y-coordinates (latitude)
+        X = coords[, 1],             # X-coordinates (longitude)
+        Y = coords[, 2]              # Y-coordinates (latitude)
       )
       shape_rotated <- rotate_df(polyset, rotation_angle, rotation_center)
     }
@@ -171,8 +183,16 @@ plot_cpue_spatial <-
       }
       g <- g + geom_polygon(data = public_dat, aes_string(
         x = "X", y = "Y",
-        fill = ifelse(plot_catch, "catch", "cpue"), colour = ifelse(plot_catch, "catch", "cpue"), group = "hex_id"
-      ), inherit.aes = FALSE, lwd = 0.2) + fill_scale + colour_scale
+        fill = ifelse(plot_catch,
+                      "catch",
+                      "cpue"),
+        colour = ifelse(plot_catch,
+                        "catch",
+                        "cpue"),
+        group = "hex_id"
+      ), inherit.aes = FALSE, lwd = 0.2) +
+        fill_scale +
+        colour_scale
 
     }
 
