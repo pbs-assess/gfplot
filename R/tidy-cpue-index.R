@@ -71,10 +71,10 @@ tidy_cpue_index <- function(dat, species_common,
   ), ]
   names(dat) <- tolower(names(dat))
 
-  # if (!"species_common_name" %in% names(dat)) {
-  dat$species_common_name <- NULL
-  dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
-  # }
+  if (!"species_common_name" %in% names(dat)) {
+    dat$species_common_name <- NULL
+    dat <- inner_join(dat, gfplot::pbs_species, by = "species_code")
+  }
   dat <- dat %>% mutate(year = lubridate::year(best_date))
 
   # create possibly alternate starting date:
