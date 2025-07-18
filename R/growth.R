@@ -570,7 +570,8 @@ ann <- function(par_name, par_val, dec, x, y, col = col, french = FALSE) {
   )
   if (french) .text <- gsub("\\.", ",", .text)
 
-  softer_col <- paste0(substr(col, 1L, 7L), as.character(0.9 * 100))
+  # softer_col <- paste0(substr(col, 1L, 7L), as.character(0.9 * 100))
+  softer_col <- "grey30"
 
   ggplot2::annotate("text",
     label = .text,
