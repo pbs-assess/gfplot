@@ -3,6 +3,7 @@
 export("%>%")
 export(assign_areas)
 export(bind_samples)
+export(coord_sf_auto)
 export(fit_cpue_index_glmmtmb)
 export(fit_length_weight)
 export(fit_mat_ogive)

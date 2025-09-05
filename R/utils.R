@@ -213,3 +213,54 @@ firstup <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
 }
+
+#' Create coord_sf with automatic limits from sf object
+#'
+#' Creates a ggplot2 coord_sf object with axis limits automatically determined
+#' from an sf object's bounding box, with optional buffering and geometry
+#' simplification for performance.
+#'
+#' @param sf_obj An sf object to derive plot limits from
+#' @param xlim Optional x-axis limits as vector c(xmin, xmax) (default: NULL, uses bbox)
+#' @param ylim Optional y-axis limits as vector c(ymin, ymax) (default: NULL, uses bbox)
+#' @param buffer Buffer distance in meters (default: 1000)
+#' @param crs_buffer Coordinate system for buffering (default: 3156, BC Albers)
+#' @param simplify Simplification tolerance in meters (default: NULL, no simplification).
+#'   Only needed for complex boundaries if rendering is slow.
+#' @param ... Additional arguments passed to ggplot2::coord_sf()
+#'
+#' @return A ggplot2 coord_sf object with appropriate limits
+#' @export
+
+coord_sf_auto <- function(sf_obj, xlim = NULL, ylim = NULL, buffer = 1000,
+                          crs_buffer = 3156, simplify = NULL, ...) {
+
+  stopifnot("sf_obj must be an sf object" = inherits(sf_obj, "sf"))
+
+  # Apply buffer if specified
+  if (!is.null(buffer) && buffer > 0) {
+    crs_current <- sf::st_crs(sf_obj)
+
+    if (identical(crs_current$units, "m")) {
+      # buffer direclty if already in metres
+      sf_obj <- sf::st_buffer(sf_obj, dist = buffer)
+    } else {
+      # simplify before transformation if specified (faster)
+      if (!is.null(simplify)) {
+        sf_obj <- sf::st_simplify(sf_obj, dTolerance = simplify)
+      }
+
+      # Transform to buffering CRS, then buffer
+      sf_obj <- sf_obj |>
+        sf::st_transform(crs = crs_buffer) |>
+        sf::st_buffer(dist = buffer)
+    }
+  }
+
+  bbox <- sf::st_bbox(sf_obj)
+
+  if (is.null(xlim)) xlim <- bbox[c("xmin", "xmax")]
+  if (is.null(ylim)) ylim <- bbox[c("ymin", "ymax")]
+
+  ggplot2::coord_sf(xlim = xlim, ylim = ylim, crs = sf::st_crs(sf_obj), ...)
+}
