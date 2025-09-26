@@ -239,17 +239,17 @@ plot_cpue_spatial <-
       g <- g + geom_polygon(mapping = aes_string(x = "X", y = "Y", group = "PID"),
         fill = NA, colour = "black", data = shape_rotated, lwd = 0.7)
     }
-
     if (!is.null(percent_excluded_xy) && exists("privacy_out")) {
       excluded_fe <- round(
         privacy_out$lost_fe_ids/privacy_out$total_fe_ids * 100, 0)
       if (is.na(excluded_fe)) stop("excluded_fe was NA.", call. = FALSE)
       if (excluded_fe == 0) excluded_fe <- "< 0.5%"
-      g <- g + ggplot2::annotate("text",
+      g <- g + ggplot2::annotate("label",
         x = min(xlim) + percent_excluded_xy[1] * diff(range(xlim)),
         y = min(ylim) + percent_excluded_xy[2] * diff(range(ylim)),
         label = paste0(percent_excluded_text, ": ", excluded_fe, "%"),
-        hjust = 0, colour = "grey30", angle = 90)
+        fill = "white", label.size = 0, alpha = 0.8,
+        hjust = 0, colour = "grey20", angle = 90)
     }
 
     g
