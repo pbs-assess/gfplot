@@ -6,6 +6,8 @@
 #'   for sample ID.
 #' @param year_re If `TRUE` the model will include random intercepts
 #'   for year.
+#'@param re_by_sex If `TRUE` the model will include random intercepts for each sex in each
+#'   sample and/or year if random effects for either are included in the model.
 #' @param months A numeric vector indicating which months to include when
 #'   fitting the maturity ogive. Defaults to including all months, but not NAs.
 #'   Changing to NULL will include all data including NAs.
@@ -41,6 +43,7 @@ fit_mat_ogive <- function(dat,
                           type = c("age", "length"),
                           sample_id_re = FALSE,
                           year_re = FALSE,
+                          re_by_sex = FALSE,
                           months = seq(1, 12),
                           custom_maturity_at = NULL,
                           ageing_method_codes = NULL,
@@ -121,30 +124,52 @@ fit_mat_ogive <- function(dat,
 
   if (sample_id_re) {
     if (year_re) {
+
+      if (re_by_sex) {
       m <- glmmTMB::glmmTMB(mature ~ age_or_length * female +
-        (1 | sample_id) +
-        # (1 | survey_series_id) +
-        (1 | year),
+        (female | sample_id) +
+        (female | year),
       data = .d, family = binomial(link)
       )
+      } else{
+        m <- glmmTMB::glmmTMB(mature ~ age_or_length * female +
+          (1 | sample_id) +
+          # (1 | survey_series_id) +
+          (1 | year),
+        data = .d, family = binomial(link)
+        )
+      }
       b <- glmmTMB::fixef(m)[[1L]]
       ranef <- glmmTMB::ranef(m)
       re <- ranef$cond$year
+      re <- cbind(re,re) # hack to make re_by_sex = FALSE work with subsequent code
     } else {
-      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
+      if (re_by_sex) {
+      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (female | sample_id),
         data = .d, family = binomial(link)
       )
-
+      } else {
+        m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | sample_id),
+                              data = .d, family = binomial(link)
+        )
+      }
       b <- glmmTMB::fixef(m)[[1L]]
     }
   } else {
     if (year_re) {
-      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | year),
+      if (re_by_sex) {
+      m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (female | year),
         data = .d, family = binomial(link)
       )
+      } else {
+        m <- glmmTMB::glmmTMB(mature ~ age_or_length * female + (1 | year),
+                              data = .d, family = binomial(link)
+        )
+      }
       b <- glmmTMB::fixef(m)[[1L]]
       ranef <- glmmTMB::ranef(m)
       re <- ranef$cond$year
+      re <- cbind(re,re) # hack to make re_by_sex = FALSE work with subsequent code
     } else {
       m <- stats::glm(mature ~ age_or_length * female,
         data = .d, family = binomial(link)
@@ -193,8 +218,18 @@ fit_mat_ogive <- function(dat,
   if (year_re) {
     year_f <- as.character(nd$year)
     nd$glmm_re <- predict(m, newdata = nd, type = "response", se.fit = FALSE)
-    nd$glmm_re2 <- family(m)$linkinv(b[[1L]] + re[year_f, ] + b[[3L]] * nd$female +
-        b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+
+    if (re_by_sex) {
+    nd$glmm_re2 <- family(m)$linkinv(b[[1L]] +
+                                     re[year_f, 1] + re[year_f, 2] * nd$female +
+                                     b[[3L]] * nd$female +
+                                     b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+    }else{
+      nd$glmm_re2 <- family(m)$linkinv(b[[1L]] +
+                                         re[year_f, 1] +
+                                         b[[3L]] * nd$female +
+                                         b[[2L]] * nd$age_or_length + b[[4L]] * nd$age_or_length * nd$female)
+    }
   }
 
   nd$glmm_fe <- family(m)$linkinv(b[[1L]] + b[[3L]] * nd$female +
@@ -289,9 +324,11 @@ plot_mat_ogive <- function(object,
 
   prediction_type <- match.arg(prediction_type)
   if (prediction_type == "male") {
+    nd_re <- filter(nd_re, female == 0L)
     nd_fe <- filter(nd_fe, female == 0L)
   }
   if (prediction_type == "female") {
+    nd_re <- filter(nd_re, female == 1L)
     nd_fe <- filter(nd_fe, female == 1L)
   }
 
@@ -459,13 +496,16 @@ plot_mat_annual_ogives <- function(object,
                                    xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
                                    title =
                                      if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
-                                   rug = TRUE, rug_n = 1500, x_max = 1.75,
+                                   rug = TRUE, include_vlines = TRUE,
+                                   rug_n = 1500, x_max = 1.75,
+                                   linewidths = 1.5,
                                    prediction_type = c("all", "male", "female", "none"),
                                    french = FALSE) {
   if (object$year_re) {
     b <- glmmTMB::fixef(object$model)[[1L]]
     ranef <- glmmTMB::ranef(object$model)
     re <- ranef$cond$year
+    re <- cbind(re,re) # hack to make single and multiple factor REs work with subsequent code
   } else {
     stop("Year is not a random effect in this model; use plot_mat_ogive instead.")
   }
@@ -477,25 +517,29 @@ plot_mat_annual_ogives <- function(object,
 
   prediction_type <- match.arg(prediction_type)
   if (prediction_type == "male") {
+    nd_re <- filter(nd_fe, female == 0L)
     nd_fe <- filter(nd_fe, female == 0L)
   }
   if (prediction_type == "female") {
+    nd_re <- filter(nd_fe, female == 1L)
     nd_fe <- filter(nd_fe, female == 1L)
   }
 
   labs_year <- list()
   for (i in (unique(as.character(nd_re$year)))) {
+
+    n_years <- length((unique(as.character(nd_re$year))))
     m_perc <- data.frame(
-      p0.5 = binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5, linkinv = family(object$model)$linkinv)
+      p0.5 = binomial_perc(a = b[[1]] + re[i, 1], b = b[[2]], perc = 0.5, linkinv = family(object$model)$linkinv)
     )
-    m_perc$p0.95 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95, linkinv = family(object$model)$linkinv)
-    m_perc$p0.05 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05, linkinv = family(object$model)$linkinv)
+    m_perc$p0.95 <- binomial_perc(a = b[[1]] + re[i, 1], b = b[[2]], perc = 0.95, linkinv = family(object$model)$linkinv)
+    m_perc$p0.05 <- binomial_perc(a = b[[1]] + re[i, 1], b = b[[2]], perc = 0.05, linkinv = family(object$model)$linkinv)
 
     f_perc <- data.frame(
-      p0.5 = binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5, linkinv = family(object$model)$linkinv)
+      p0.5 = binomial_perc(a = b[[1]] + b[[3]] + re[i, 2], b = b[[2]] + b[[4]], perc = 0.5, linkinv = family(object$model)$linkinv)
     )
-    f_perc$p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95, linkinv = family(object$model)$linkinv)
-    f_perc$p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05, linkinv = family(object$model)$linkinv)
+    f_perc$p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, 2], b = b[[2]] + b[[4]], perc = 0.95, linkinv = family(object$model)$linkinv)
+    f_perc$p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, 2], b = b[[2]] + b[[4]], perc = 0.05, linkinv = family(object$model)$linkinv)
 
     labs_f <- tibble(
       p = c("05", "50", "95"),
@@ -556,13 +600,16 @@ plot_mat_annual_ogives <- function(object,
   nd_re$year <- as.factor(nd_re$year)
 
   g <- ggplot(nd_re, aes_string("age_or_length", "glmm_re2", colour = "year"))
+
+  if (include_vlines) {
   g <- g + geom_vline(
     data = filter(labs, p == "50"),
-    aes_string(xintercept = "value", colour = "year"), lwd = 0.8,
+    aes_string(xintercept = "value", colour = "year"), lwd = linewidths*0.5,
     alpha = 0.3, show.legend = FALSE
   )
-  g <- g + geom_line(size = 2, alpha = 0.5)
-  g <- g + facet_wrap(~sex, nrow = 2)
+  }
+
+  g <- g + geom_line(lwd = linewidths, alpha = 0.5)
   g <- g + scale_colour_viridis_d() +
     labs(colour = "Year") +
     coord_cartesian(
@@ -570,26 +617,39 @@ plot_mat_annual_ogives <- function(object,
       xlim = c(0, max_x)
     ) + gfplot::theme_pbs()
 
+  if (prediction_type %in% c("all", "none")) {
+    g <- g + facet_wrap(~sex, nrow = 2) +
+      ggplot2::ggtitle(title)
+  }
+
+  if (prediction_type == "female"){
+    g <- g + ggplot2::ggtitle(paste0("Famale ", tolower(title)))
+  }
+
+  if (prediction_type == "male"){
+    g <- g + ggplot2::ggtitle(paste0("Male ", tolower(title)))
+  }
+
   if (rug) {
     if (nrow(object$data) > rug_n) {
       temp <- object$data[sample(seq_len(nrow(object$data)), rug_n), , drop = FALSE]
     } else {
       temp <- object$data
     }
-    position <- if (object$type == "age") "jitter" else "identity"
+    # position <- if (object$type == "age") "jitter" else "identity"
+    position <- "jitter" # always jitter for annual ogives
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 0L),
-      sides = "b", position = position, alpha = 0.5, lty = 1, lwd = 2,
+      sides = "b", position = position, alpha = 0.5, lty = 1, lwd = linewidths*0.5,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "as.character(year)")
     )
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 1L),
-      sides = "t", position = position, alpha = 0.5, lty = 1, lwd = 2,
+      sides = "t", position = position, alpha = 0.5, lty = 1, lwd = linewidths*0.5,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "as.character(year)")
     )
   }
-  g <- g + xlab(xlab) + ylab("Probability mature") +
-    ggplot2::ggtitle(title)
+  g <- g + xlab(xlab) + ylab("Probability mature")
   g
 }
 
@@ -627,13 +687,13 @@ extract_maturity_perc_re <- function(betas, random_intercepts, model) {
   re <- random_intercepts
   out <- list()
   for (i in rownames(re)) {
-    m.p0.5 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.5, linkinv = family(model)$linkinv)
-    m.p0.95 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.95, linkinv = family(model)$linkinv)
-    m.p0.05 <- binomial_perc(a = b[[1]] + re[i, ], b = b[[2]], perc = 0.05, linkinv = family(model)$linkinv)
+    m.p0.5 <- binomial_perc(a = b[[1]] + re[i, 1], b = b[[2]], perc = 0.5, linkinv = family(model)$linkinv)
+    m.p0.95 <- binomial_perc(a = b[[1]] + re[i, 1], b = b[[2]], perc = 0.95, linkinv = family(model)$linkinv)
+    m.p0.05 <- binomial_perc(a = b[[1]] + re[i, 1], b = b[[2]], perc = 0.05, linkinv = family(model)$linkinv)
 
-    f.p0.5 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.5, linkinv = family(model)$linkinv)
-    f.p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.95, linkinv = family(model)$linkinv)
-    f.p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, ], b = b[[2]] + b[[4]], perc = 0.05, linkinv = family(model)$linkinv)
+    f.p0.5 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, 2], b = b[[2]] + b[[4]], perc = 0.5, linkinv = family(model)$linkinv)
+    f.p0.95 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, 2], b = b[[2]] + b[[4]], perc = 0.95, linkinv = family(model)$linkinv)
+    f.p0.05 <- binomial_perc(a = b[[1]] + b[[3]] + re[i, 2], b = b[[2]] + b[[4]], perc = 0.05, linkinv = family(model)$linkinv)
     out[[i]] <- list(
       m.p0.5 = m.p0.5, m.p0.95 = m.p0.95, m.p0.05 = m.p0.05,
       f.p0.5 = f.p0.5, f.p0.95 = f.p0.95, f.p0.05 = f.p0.05
