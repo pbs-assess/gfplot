@@ -101,6 +101,8 @@ plot_cpue_spatial <-
     dat <- filter(dat, year >= start_year)
     plot_hexagons <- if (nrow(dat) <= 1) FALSE else TRUE
 
+    if (!plot_hexagons && return_data) return(NULL)
+
     ll_range <- utm2ll(cbind(X = xlim, Y = ylim))
     coastline_utm <- load_coastline(
       xlim_ll = ll_range[, "X"] + c(-5, 5),
