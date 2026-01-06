@@ -264,3 +264,28 @@ coord_sf_auto <- function(sf_obj, xlim = NULL, ylim = NULL, buffer = 1000,
 
   ggplot2::coord_sf(xlim = xlim, ylim = ylim, crs = sf::st_crs(sf_obj), ...)
 }
+
+#' Rotate spatial features for plotting BC coastline
+#'
+#' Rotates sf objects using oblique Mercator projection to align BC's
+#' northwest-southeast coastline with plot axes.
+#'
+#' @param sf_obj An sf object to rotate
+#' @param angle Rotation angle in degrees (default: -40). Negative values rotate clockwise.
+#' @param lonc Central meridian longitude (default: -129)
+#'
+#' @return sf object in rotated oblique Mercator projection
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' coast <- pacea::bc_coast
+#' coast_rotated <- rotate_sf(coast, angle = -40, lonc = -129)
+#'
+#' ggplot(coast_rotated) + geom_sf()
+#' }
+rotate_sf <- function(sf_obj, angle = -40, lonc = -129) {
+  rotated_crs <- paste0("+proj=omerc +lat_0=0 +lonc=", lonc, " +gamma=", -angle)
+
+  sf_obj |> sf::st_transform(rotated_crs)
+}
