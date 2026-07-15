@@ -284,6 +284,10 @@ sd2cv <- function(.sd) {
 #' @param rug Logical indicating whether rug lines should be added.
 #' @param rug_n The number of rug lines to sample from the total number of fish.
 #' @param x_max Used in determining the right axis limit.
+#' @param include_vlines For `plot_mat_annual_ogives()`, logical indicating
+#'   whether to add vertical lines at the 50% maturity value for each year.
+#' @param linewidths For `plot_mat_annual_ogives()`, line width used for the
+#'   ogive lines, vertical lines, and rug marks.
 #' @param prediction_type The prediction lines to show. Useful if you only want
 #'   to show model fits when you have sufficient data.
 #' @param text_label_size Font size for the labels showing the age-at- values

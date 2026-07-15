@@ -11,6 +11,7 @@ fit_mat_ogive(
   type = c("age", "length"),
   sample_id_re = FALSE,
   year_re = FALSE,
+  re_by_sex = FALSE,
   months = seq(1, 12),
   custom_maturity_at = NULL,
   ageing_method_codes = NULL,
@@ -37,8 +38,10 @@ plot_mat_annual_ogives(
   xlab = if (object$type[[1]] == "age") "Age (years)" else "Length (cm)",
   title = if (object$type[[1]] == "age") "Age at maturity" else "Length at maturity",
   rug = TRUE,
+  include_vlines = TRUE,
   rug_n = 1500,
   x_max = 1.75,
+  linewidths = 1.5,
   prediction_type = c("all", "male", "female", "none"),
   french = FALSE
 )
@@ -53,6 +56,9 @@ for sample ID.}
 
 \item{year_re}{If \code{TRUE} the model will include random intercepts
 for year.}
+
+\item{re_by_sex}{If \code{TRUE} the model will include random intercepts for each sex in each
+sample and/or year if random effects for either are included in the model.}
 
 \item{months}{A numeric vector indicating which months to include when
 fitting the maturity ogive. Defaults to including all months, but not NAs.
@@ -98,6 +104,12 @@ for either age or length on the plot panel}
 sex on the panel}
 
 \item{french}{Translate to French?}
+
+\item{include_vlines}{For \code{plot_mat_annual_ogives()}, logical indicating
+whether to add vertical lines at the 50\% maturity value for each year.}
+
+\item{linewidths}{For \code{plot_mat_annual_ogives()}, line width used for the
+ogive lines, vertical lines, and rug marks.}
 }
 \description{
 Fit and plot maturity ogives
