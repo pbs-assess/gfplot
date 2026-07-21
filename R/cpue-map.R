@@ -229,10 +229,13 @@ plot_cpue_spatial <-
       inherit.aes = FALSE, linewidth = 0.2, fill = "grey90", col = "grey70"
     ) +
       coord_equal(xlim = xlim, ylim = ylim) +
-      theme_pbs() + labs(fill = fill_lab,
-                         colour = fill_lab,
-                         y = en2fr("Northing", translate = french),
-                         x = en2fr("Easting", translate = french))
+      theme_pbs() +
+      labs(y = en2fr("Northing", translate = french),
+           x = en2fr("Easting", translate = french))
+
+    if (plot_hexagons) {
+      g <- g + labs(fill = fill_lab, colour = fill_lab)
+    }
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 
