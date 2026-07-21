@@ -119,7 +119,7 @@ plot_lengths <- function(dat, xlab = "Length (cm)",
   g <- ggplot(dat, aes_string("length_bin", "proportion")) +
     geom_col(
       width = bin_size,
-      aes_string(colour = "sex", fill = "sex"), size = 0.3,
+      aes_string(colour = "sex", fill = "sex"), linewidth = 0.3,
       position = position_identity()
     ) +
     theme_pbs() +
