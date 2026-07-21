@@ -250,7 +250,7 @@ plot_cpue_spatial <-
         x = min(xlim) + percent_excluded_xy[1] * diff(range(xlim)),
         y = min(ylim) + percent_excluded_xy[2] * diff(range(ylim)),
         label = paste0(percent_excluded_text, ": ", excluded_fe, "%"),
-        fill = "white", label.size = 0, alpha = 0.8,
+        fill = "white", linewidth = 0, alpha = 0.8,
         hjust = 0, colour = "grey20", angle = 90)
     }
 
