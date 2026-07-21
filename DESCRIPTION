@@ -51,9 +51,11 @@ Suggests:
     covr,
     hexbin,
     knitr,
+    numDeriv,
     rmarkdown,
     rstan (>= 2.20.0),
     sdmTMB (>= 0.0.23),
+    sf,
     sp,
     testthat,
 Remotes: 

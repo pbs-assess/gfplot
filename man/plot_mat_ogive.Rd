@@ -104,6 +104,12 @@ for either age or length on the plot panel}
 sex on the panel}
 
 \item{french}{Translate to French?}
+
+\item{include_vlines}{For \code{plot_mat_annual_ogives()}, logical indicating
+whether to add vertical lines at the 50\% maturity value for each year.}
+
+\item{linewidths}{For \code{plot_mat_annual_ogives()}, line width used for the
+ogive lines, vertical lines, and rug marks.}
 }
 \description{
 Fit and plot maturity ogives
