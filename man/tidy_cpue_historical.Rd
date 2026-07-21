@@ -18,7 +18,7 @@ tidy_cpue_historical(
 )
 }
 \arguments{
-\item{dat}{Data from \code{\link[gfdata:get_data]{gfdata::get_cpue_historical()}}.}
+\item{dat}{Data from \code{\link[gfdata:get_cpue_historical]{gfdata::get_cpue_historical()}}.}
 
 \item{species_common}{A species common name in lowercase.}
 

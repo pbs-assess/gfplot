@@ -25,6 +25,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Sean C. Anderson \email{sean.anderson@dfo-mpo.gc.ca}
   \item Elise A. Keppel
   \item Andrew M. Edwards
   \item Chris Grandin

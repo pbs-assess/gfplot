@@ -37,8 +37,8 @@ plot_cpue_spatial(
 plot_catch_spatial(...)
 }
 \arguments{
-\item{dat}{Data from \code{\link[gfdata:get_data]{gfdata::get_cpue_spatial()}}, \code{\link[gfdata:get_data]{gfdata::get_cpue_spatial_ll()}},
-or \code{\link[gfdata:get_data]{gfdata::get_catch_spatial()}}}
+\item{dat}{Data from \code{\link[gfdata:get_cpue_spatial]{gfdata::get_cpue_spatial()}}, \code{\link[gfdata:get_cpue_spatial_ll]{gfdata::get_cpue_spatial_ll()}},
+or \code{\link[gfdata:get_catch_spatial]{gfdata::get_catch_spatial()}}}
 
 \item{start_year}{Starting year.}
 

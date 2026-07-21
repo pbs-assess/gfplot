@@ -27,8 +27,8 @@ plot_maturity_months(
 )
 }
 \arguments{
-\item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}
-or \code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
+\item{dat}{For \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}, data from \code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}}
+or \code{\link[gfdata:get_commercial_samples]{gfdata::get_commercial_samples()}} or \code{\link[=bind_samples]{bind_samples()}}. For \code{\link[=plot_maturity_months]{plot_maturity_months()}},
 data from \code{\link[=tidy_maturity_months]{tidy_maturity_months()}}.}
 
 \item{months}{A vector of months to include. Defaults to all.}

@@ -19,9 +19,9 @@ split_catch_maturity(
 )
 }
 \arguments{
-\item{survey_sets}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
+\item{survey_sets}{Data from \code{\link[gfdata:get_survey_sets]{gfdata::get_survey_sets()}}.}
 
-\item{fish}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}.}
+\item{fish}{Data from \code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}}.}
 
 \item{split_dens_type}{Which density type will be split and saved as a column providing units for
 adult_density and imm_density columns.}

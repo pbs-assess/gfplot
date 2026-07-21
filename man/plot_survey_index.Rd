@@ -32,7 +32,7 @@ plot_survey_index(
 )
 }
 \arguments{
-\item{dat}{For \code{\link[=tidy_survey_index]{tidy_survey_index()}}, data from \code{\link[gfdata:get_data]{gfdata::get_survey_index()}}. For
+\item{dat}{For \code{\link[=tidy_survey_index]{tidy_survey_index()}}, data from \code{\link[gfdata:get_survey_index]{gfdata::get_survey_index()}}. For
 \code{\link[=plot_survey_index]{plot_survey_index()}}, data from \code{\link[=tidy_survey_index]{tidy_survey_index()}}.}
 
 \item{survey}{A character vector of survey abbreviations to include.}

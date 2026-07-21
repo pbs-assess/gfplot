@@ -21,12 +21,12 @@ fit_survey_sets(
 )
 }
 \arguments{
-\item{dat}{Output from \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
+\item{dat}{Output from \code{\link[gfdata:get_survey_sets]{gfdata::get_survey_sets()}}.}
 
 \item{years}{The year to include in the model. Should be a single year.}
 
 \item{survey}{The survey abbreviation. Should match the contents of the
-column \code{survey_abbrev} in the data frame returned by \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
+column \code{survey_abbrev} in the data frame returned by \code{\link[gfdata:get_survey_sets]{gfdata::get_survey_sets()}}.}
 
 \item{density_column}{The name of the column that includes the relative
 biomass density to use. E.g. \code{"density_kgpm2"} for trawl surveys or

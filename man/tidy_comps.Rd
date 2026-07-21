@@ -38,8 +38,8 @@ tidy_comps(
 \arguments{
 \item{...}{Arguments to pass to \code{\link[=set_fishing_year]{set_fishing_year()}}}
 
-\item{dat}{The input samples data frame from \code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}} or
-\code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}.}
+\item{dat}{The input samples data frame from \code{\link[gfdata:get_commercial_samples]{gfdata::get_commercial_samples()}} or
+\code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}}.}
 
 \item{survey}{A character vector of survey names to use. These should match
 the survey abbreviations in GFBio. All of the survey listed here will be
@@ -58,7 +58,7 @@ area descriptions. The pattern \code{"*"} will return all areas. For example,
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Default to \code{NULL}, which brings in all valid ageing codes.
-See \code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
+See \code{\link[gfdata:get_age_methods]{gfdata::get_age_methods()}}.}
 
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
@@ -76,7 +76,7 @@ value or with weighted samples?}
 \item{dat_survey_sets}{A data frame from \code{gfdata::get_survey_sets(..., join_sample_ids = TRUE)}. Needed for
 weighted samples if \code{sample_type = "survey"}.}
 
-\item{dat_catch}{A data frame from \code{\link[gfdata:get_data]{gfdata::get_catch()}}. Needed for weighted samples
+\item{dat_catch}{A data frame from \code{\link[gfdata:get_catch]{gfdata::get_catch()}}. Needed for weighted samples
 if \code{sample_type = "commercial"}.}
 
 \item{remove_unsexed}{Logical}

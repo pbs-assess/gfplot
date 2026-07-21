@@ -7,9 +7,9 @@
 bind_samples(dat_comm, dat_survey)
 }
 \arguments{
-\item{dat_comm}{Output from \code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}}}
+\item{dat_comm}{Output from \code{\link[gfdata:get_commercial_samples]{gfdata::get_commercial_samples()}}}
 
-\item{dat_survey}{Output from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}}}
+\item{dat_survey}{Output from \code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}}}
 }
 \description{
 Join survey and commercial samples

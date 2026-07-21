@@ -25,14 +25,14 @@ fit_vb(
 )
 }
 \arguments{
-\item{dat}{Input data frame. Should be from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or
-\code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}}.}
+\item{dat}{Input data frame. Should be from \code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}} or
+\code{\link[gfdata:get_commercial_samples]{gfdata::get_commercial_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 
 \item{method}{\code{"mpd"} for the mode of the posterior distribution (with
-\code{\link[rstan:stanmodel-method-optimizing]{rstan::optimizing()}}) or \code{"mcmc"} for full MCMC sampling with Stan (with
-\code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}}). \code{"tmb"} for a TMB model.}
+\code{\link[rstan:optimizing]{rstan::optimizing()}}) or \code{"mcmc"} for full MCMC sampling with Stan (with
+\code{\link[rstan:sampling]{rstan::sampling()}}). \code{"tmb"} for a TMB model.}
 
 \item{downsample}{If not \code{Inf} this represents a number of fish specimens to
 sample prior to model fitting. Can be useful for large data sets that you
@@ -60,7 +60,7 @@ lengths. Can be useful for outliers. Defaults to including all data.}
 
 \item{ageing_method_codes}{A numeric vector of ageing method codes to filter
 on. Defaults to \code{NULL}, which brings in all valid ageing codes. See
-\code{\link[gfdata:lookup]{gfdata::get_age_methods()}}.}
+\code{\link[gfdata:get_age_methods]{gfdata::get_age_methods()}}.}
 
 \item{usability_codes}{An optional vector of usability codes.
 All usability codes not in this vector will be omitted.
@@ -70,8 +70,8 @@ Set to \code{NULL} to include all samples.}
 
 \item{tmb_inits}{A named list of initial parameter values for the TMB model.}
 
-\item{...}{Any other arguments to pass on to \code{\link[rstan:stanmodel-method-sampling]{rstan::sampling()}} or
-\code{\link[rstan:stanmodel-method-optimizing]{rstan::optimizing()}}.}
+\item{...}{Any other arguments to pass on to \code{\link[rstan:sampling]{rstan::sampling()}} or
+\code{\link[rstan:optimizing]{rstan::optimizing()}}.}
 }
 \description{
 For use with data for a single species.

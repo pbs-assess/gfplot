@@ -28,7 +28,7 @@ set_fishing_year(
 )
 }
 \arguments{
-\item{dat}{Input data frame. For \code{tidy_catch()} should be from \code{\link[gfdata:get_data]{gfdata::get_catch()}}.
+\item{dat}{Input data frame. For \code{tidy_catch()} should be from \code{\link[gfdata:get_catch]{gfdata::get_catch()}}.
 For \code{plot_catch()} should be from \code{tidy_catch()} or be formatted similarly.
 See details.}
 

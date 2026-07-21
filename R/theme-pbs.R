@@ -8,8 +8,7 @@
 #' @param text_col Color for text.
 #' @param panel_border_col Color for panel borders.
 #'
-#' @importFrom ggplot2 element_text element_rect element_blank theme_light theme
-#'   rel
+#' @importFrom ggplot2 element_text element_rect element_blank theme_light theme rel
 #' @importFrom grid unit
 #'
 #' @examples

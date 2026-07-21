@@ -27,9 +27,9 @@ split_catch_by_sex(
 )
 }
 \arguments{
-\item{survey_sets}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_sets()}}.}
+\item{survey_sets}{Data from \code{\link[gfdata:get_survey_sets]{gfdata::get_survey_sets()}}.}
 
-\item{fish}{Data from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or matching format where female are coded as \code{sex = 2}.}
+\item{fish}{Data from \code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}} or matching format where female are coded as \code{sex = 2}.}
 
 \item{catch_variable}{Which biomass variable will be split. Can be total weight or densities.
 Variable by this name will be saved indicating which was used.}

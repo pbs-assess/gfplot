@@ -26,7 +26,7 @@ tidy_cpue_index(
 )
 }
 \arguments{
-\item{dat}{An input data frame from \code{\link[gfdata:get_data]{gfdata::get_cpue_index()}}.}
+\item{dat}{An input data frame from \code{\link[gfdata:get_cpue_index]{gfdata::get_cpue_index()}}.}
 
 \item{species_common}{The species common name.}
 

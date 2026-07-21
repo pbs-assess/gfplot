@@ -17,8 +17,8 @@ fit_length_weight(
 )
 }
 \arguments{
-\item{dat}{Input data frame. Should be from \code{\link[gfdata:get_data]{gfdata::get_survey_samples()}} or
-\code{\link[gfdata:get_data]{gfdata::get_commercial_samples()}}.}
+\item{dat}{Input data frame. Should be from \code{\link[gfdata:get_survey_samples]{gfdata::get_survey_samples()}} or
+\code{\link[gfdata:get_commercial_samples]{gfdata::get_commercial_samples()}}.}
 
 \item{sex}{Either "male" or "female".}
 
