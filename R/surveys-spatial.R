@@ -509,10 +509,14 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     ) +
       guides(shape = "none", colour = "none") +
     labs(y = en2fr("Northing", translate = french),
-         x = en2fr("Easting", translate = french)) +
-    if (show_raw_data) labs(size = pt_label) else NULL +
-    if (show_model_predictions && !circles) labs(fill = fill_label) else NULL +
-    NULL
+         x = en2fr("Easting", translate = french))
+
+  if (show_raw_data) {
+    g <- g + labs(size = pt_label)
+  }
+  if (show_model_predictions) {
+    g <- g + labs(fill = fill_label)
+  }
 
   if (!show_legend) {
     g <- g + theme(legend.position = "none")
