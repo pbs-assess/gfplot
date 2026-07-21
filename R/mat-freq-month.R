@@ -190,7 +190,7 @@ plot_maturity_months <- function(dat,
     theme_pbs() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
     theme(panel.spacing = unit(-0.1, "lines")) +
-    labs(title = title, colour = "Sex", fill = "Sex")
+    labs(title = title)
 
   if (nrow(dat) >= 10) {
     g <- g +
@@ -205,6 +205,7 @@ plot_maturity_months <- function(dat,
         size = "none", colour = guide_legend(override.aes = list(size = 3.5)),
         fill = guide_legend(override.aes = list(size = 3.5))
       ) +
+      labs(colour = "Sex", fill = "Sex") +
       geom_text(
         data = counts,
         aes_string(

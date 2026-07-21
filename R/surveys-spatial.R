@@ -507,10 +507,12 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
       data = coast, aes_string(x = "X", y = "Y", group = "PID"),
       fill = "grey87", col = "grey70", linewidth = 0.2
     ) +
-    guides(shape = "none", colour = "none") +
-    labs(size = pt_label, fill = fill_label) +
-    ylab(en2fr("Northing", translate = french)) +
-    xlab(en2fr("Easting", translate = french))
+      guides(shape = "none", colour = "none") +
+    labs(y = en2fr("Northing", translate = french),
+         x = en2fr("Easting", translate = french)) +
+    if (show_raw_data) labs(size = pt_label) else NULL +
+    if (show_model_predictions && !circles) labs(fill = fill_label) else NULL +
+    NULL
 
   if (!show_legend) {
     g <- g + theme(legend.position = "none")
