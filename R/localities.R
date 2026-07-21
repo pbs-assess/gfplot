@@ -64,7 +64,7 @@ plot_dfo_localities <- function(localities = "all",
   g <- g + ggplot2::geom_polygon(
     data = coastline_utm,
     ggplot2::aes_string(x = "X", y = "Y", group = "PID"),
-    inherit.aes = FALSE, lwd = 0.2, fill = "grey87", col = "grey70") +
+    inherit.aes = FALSE, linewidth = 0.2, fill = "grey87", col = "grey70") +
     ggplot2::coord_equal(xlim = utm_range$X, ylim = utm_range$Y) +
     ggplot2::scale_fill_manual(na.value = "white", values = rep("grey60", 1e3)) +
     theme_pbs() + ggplot2::guides(fill = "none", colour = "none") +

@@ -138,11 +138,11 @@ plot_ages <- function(dat, max_size = 5, sex_gap = 0.2, year_increment = 2,
     labs(title = en2fr("Age frequencies", french)) +
     geom_vline(
       xintercept = seq(year_range[1], year_range[2], 1),
-      col = grid_col, lwd = 0.4
+      col = grid_col, linewidth = 0.4
     ) +
     geom_hline(
       yintercept = seq(0, age_max, 10), col = grid_col,
-      lwd = 0.4
+      linewidth = 0.4
     ) +
     coord_cartesian(
       xlim = year_range + c(-0.8 - sex_gap / 2, 0.8 + sex_gap / 2),

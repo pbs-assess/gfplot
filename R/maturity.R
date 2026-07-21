@@ -440,10 +440,10 @@ plot_mat_ogive <- function(object,
   }
 
   if (prediction_type != "none") {
-    g <- g + geom_line(size = 1.0) #lwd = 1, alpha = 0.8
+    g <- g + geom_line(linewidth = 1.0) # linewidth = 1, alpha = 0.8
     g <- g + geom_vline(
       data = filter(labs, p == "50"),
-      aes_string(xintercept = "value", colour = "sex", lty = "sex"), lwd = 0.8,
+      aes_string(xintercept = "value", colour = "sex", lty = "sex"), linewidth = 0.8,
       alpha = 0.8,
       show.legend = FALSE
     )
@@ -608,12 +608,12 @@ plot_mat_annual_ogives <- function(object,
   if (include_vlines) {
   g <- g + geom_vline(
     data = filter(labs, p == "50"),
-    aes_string(xintercept = "value", colour = "year"), lwd = linewidths*0.5,
+    aes_string(xintercept = "value", colour = "year"), linewidth = linewidths*0.5,
     alpha = 0.3, show.legend = FALSE
   )
   }
 
-  g <- g + geom_line(lwd = linewidths, alpha = 0.5)
+  g <- g + geom_line(linewidth = linewidths, alpha = 0.5)
   g <- g + scale_colour_viridis_d() +
     labs(colour = "Year") +
     coord_cartesian(
@@ -644,12 +644,12 @@ plot_mat_annual_ogives <- function(object,
     position <- "jitter" # always jitter for annual ogives
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 0L),
-      sides = "b", position = position, alpha = 0.5, lty = 1, lwd = linewidths*0.5,
+      sides = "b", position = position, alpha = 0.5, lty = 1, linewidth = linewidths*0.5,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "as.character(year)")
     )
     g <- g + ggplot2::geom_rug(
       data = filter(temp, mature == 1L),
-      sides = "t", position = position, alpha = 0.5, lty = 1, lwd = linewidths*0.5,
+      sides = "t", position = position, alpha = 0.5, lty = 1, linewidth = linewidths*0.5,
       aes_string(x = "age_or_length", y = "as.numeric(mature)", colour = "as.character(year)")
     )
   }

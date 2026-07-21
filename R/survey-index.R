@@ -199,7 +199,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
   }
 
   g <- g +
-    geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", lwd = 0.3) +
+    geom_vline(xintercept = seq(yrs[1], yrs[2]), col = "grey96", linewidth = 0.3) +
     geom_vline(xintercept = seq(mround(yrs[1], 5), yrs[2], 5), col = "grey93")
 
   if (!pjs_mode) {
@@ -215,7 +215,7 @@ plot_survey_index <- function(dat, col = brewer.pal(9, "Greys")[c(3, 7)],
     suppressMessages({
     suppressWarnings(
       g <- g +
-        geom_line(col = "#00000050", size = 0.75)
+        geom_line(col = "#00000050", linewidth = 0.75)
     )})
   } else {
     g <- g +

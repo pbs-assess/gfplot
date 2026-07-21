@@ -181,7 +181,7 @@ plot_cpue_spatial <-
           rotation_angle, rotation_center)
         g <- g + geom_polygon(data = public_dat_historical, aes_string(
           x = "X", y = "Y", group = "hex_id"
-        ), inherit.aes = FALSE, fill = "grey95", colour = "grey45", lwd = 0.2)
+        ), inherit.aes = FALSE, fill = "grey95", colour = "grey45", linewidth = 0.2)
       }
       g <- g + geom_polygon(data = public_dat, aes_string(
         x = "X", y = "Y",
@@ -192,7 +192,7 @@ plot_cpue_spatial <-
                         "catch",
                         "cpue"),
         group = "hex_id"
-      ), inherit.aes = FALSE, lwd = 0.2) +
+      ), inherit.aes = FALSE, linewidth = 0.2) +
         fill_scale +
         colour_scale
 
@@ -205,7 +205,7 @@ plot_cpue_spatial <-
             x = "X", y = "Y",
             group = "paste(PID, SID)"
           ),
-          inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+          inherit.aes = FALSE, linewidth = 0.4, col = "grey70", alpha = 0.4
         )
       })})
 
@@ -226,7 +226,7 @@ plot_cpue_spatial <-
     g <- g + geom_polygon(
       data = coastline_utm,
       aes_string(x = "X", y = "Y", group = "PID"),
-      inherit.aes = FALSE, lwd = 0.2, fill = "grey90", col = "grey70"
+      inherit.aes = FALSE, linewidth = 0.2, fill = "grey90", col = "grey70"
     ) +
       coord_equal(xlim = xlim, ylim = ylim) +
       theme_pbs() + labs(fill = fill_lab,
@@ -239,7 +239,7 @@ plot_cpue_spatial <-
 
     if (!is.null(shapefile)) {
       g <- g + geom_polygon(mapping = aes_string(x = "X", y = "Y", group = "PID"),
-        fill = NA, colour = "black", data = shape_rotated, lwd = 0.7)
+        fill = NA, colour = "black", data = shape_rotated, linewidth = 0.7)
     }
     if (!is.null(percent_excluded_xy) && exists("privacy_out")) {
       excluded_fe <- round(

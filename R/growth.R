@@ -482,7 +482,7 @@ plot_growth <- function(object_female, object_male,
   if (!no_lines) {
     g <- g + geom_line(data = line_dat, aes_string(xvar, yvar,
       colour = "sex", lty = "sex"
-    ), size = 1.0) +
+    ), linewidth = 1.0) +
       ggplot2::labs(colour = en2fr("Sex", french), lty = en2fr("Sex", french))
   }
 

@@ -505,7 +505,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     ) +
     geom_polygon(
       data = coast, aes_string(x = "X", y = "Y", group = "PID"),
-      fill = "grey87", col = "grey70", lwd = 0.2
+      fill = "grey87", col = "grey70", linewidth = 0.2
     ) +
     guides(shape = "none", colour = "none") +
     labs(size = pt_label, fill = fill_label) +
@@ -531,7 +531,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
           x = "X", y = "Y",
           group = "paste(PID, SID)"
         ),
-        inherit.aes = FALSE, lwd = 0.4, col = "grey70", alpha = 0.4
+        inherit.aes = FALSE, linewidth = 0.4, col = "grey70", alpha = 0.4
       )})})
 
   # plot circles on top of land for inlets:
@@ -548,7 +548,7 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     g <- g + ggplot2::geom_segment(
       data = north_sym,
       aes_string(x = "X", y = "Y", xend = "Xend", yend = "Yend"),
-      inherit.aes = FALSE, colour = "grey30", lwd = 0.8,
+        inherit.aes = FALSE, colour = "grey30", linewidth = 0.8,
       arrow = ggplot2::arrow(length = unit(0.7, "char"))
     )
     g <- g + ggplot2::annotate("text",
