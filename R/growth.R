@@ -453,8 +453,7 @@ plot_growth <- function(object_female, object_male,
   g <- ggplot() +
     scale_colour_manual(values = col, labels = labs) +
     ggplot2::scale_linetype_manual(values = c(1, 2), labels = labs) +
-    theme_pbs() + xlab(en2fr(xlab, french)) + ylab(en2fr(ylab, french)) +
-    ggplot2::labs(colour = en2fr("Sex", french), lty = en2fr("Sex", french))
+    theme_pbs() + xlab(en2fr(xlab, french)) + ylab(en2fr(ylab, french))
 
   if (!no_pts) {
     if (!no_lines) {
@@ -483,7 +482,8 @@ plot_growth <- function(object_female, object_male,
   if (!no_lines) {
     g <- g + geom_line(data = line_dat, aes_string(xvar, yvar,
       colour = "sex", lty = "sex"
-    ), size = 1.0)
+    ), size = 1.0) +
+      ggplot2::labs(colour = en2fr("Sex", french), lty = en2fr("Sex", french))
   }
 
   ann_func <- if (type[[1]] == "vb") ann_vb else ann_lw
