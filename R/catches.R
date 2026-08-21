@@ -74,6 +74,8 @@ tidy_catch <- function(dat,
       `BOTTOM TRAWL` = "Bottom trawl",
       `HOOK AND LINE` = "Hook and line",
       `LONGLINE` = "Hook and line",
+      `LONGLINE OR HOOK AND LINE` = "Hook and line",
+      `TRAP OR LONGLINE OR HOOK AND L` = "Hook and line",
       `MIDWATER TRAWL` = "Midwater trawl",
       `TRAP` = "Trap",
       `UNKNOWN TRAWL` = "Unknown/trawl"
