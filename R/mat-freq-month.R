@@ -195,7 +195,9 @@ plot_maturity_months <- function(dat,
   if (nrow(dat) >= 10) {
     g <- g +
       geom_vline(xintercept = seq(1, 12), col = "grey95", linewidth = 0.4) +
-      geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
+      geom_point(aes_string(
+        size = "n_scaled", group = "sex", colour = "sex", fill = "sex"
+      ),
         pch = 21, alpha = alpha
       ) +
       scale_fill_manual(values = fill_col) +

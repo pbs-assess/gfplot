@@ -511,13 +511,6 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
     labs(y = en2fr("Northing", translate = french),
          x = en2fr("Easting", translate = french))
 
-  if (show_raw_data) {
-    g <- g + labs(size = pt_label)
-  }
-  if (show_model_predictions) {
-    g <- g + labs(fill = fill_label)
-  }
-
   if (!show_legend) {
     g <- g + theme(legend.position = "none")
   }
@@ -548,6 +541,15 @@ plot_survey_sets <- function(pred_dat, raw_dat, fill_column = c("combined", "bin
       ), size = cell_size, pch = 21
     ) +
       fill_scale + colour_scale
+  }
+
+  # Add legend labels only after every optional layer has been added. In
+  # particular, the fill mapping for circular predictions is introduced above.
+  if (show_raw_data) {
+    g <- g + labs(size = pt_label)
+  }
+  if (show_model_predictions) {
+    g <- g + labs(fill = fill_label)
   }
 
   if (north_symbol) {

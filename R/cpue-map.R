@@ -183,6 +183,11 @@ plot_cpue_spatial <-
           x = "X", y = "Y", group = "hex_id"
         ), inherit.aes = FALSE, fill = "grey95", colour = "grey45", linewidth = 0.2)
       }
+      # Set titles on the scales themselves. This remains valid even when a
+      # downstream layer changes which aesthetics are present on the plot.
+      fill_scale$name <- fill_lab
+      colour_scale$name <- fill_lab
+
       g <- g + geom_polygon(data = public_dat, aes_string(
         x = "X", y = "Y",
         fill = ifelse(plot_catch,
@@ -232,10 +237,6 @@ plot_cpue_spatial <-
       theme_pbs() +
       labs(y = en2fr("Northing", translate = french),
            x = en2fr("Easting", translate = french))
-
-    if (plot_hexagons) {
-      g <- g + labs(fill = fill_lab, colour = fill_lab)
-    }
 
     g <- g + theme(legend.justification = c(1, 1), legend.position = c(1, 1))
 
