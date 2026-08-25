@@ -169,7 +169,8 @@ plot_maturity_months <- function(dat,
     group_by(month, sex) %>%
     mutate(total_month = sum(.n),
       n_scaled = ifelse(total_month >= min_fish, n_scaled, 0)) %>%
-    ungroup()
+    ungroup() %>%
+    arrange(desc(n_scaled))
 
   counts <- select(dat, sex, total_month, month_jitter) %>% unique()
   counts <- mutate(counts, y = ifelse(sex == "F",
