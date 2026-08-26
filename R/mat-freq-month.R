@@ -150,7 +150,7 @@ plot_maturity_months <- function(dat,
                                  sex_gap = 0.2,
                                  fill_col = c("M" = "grey70", "F" = "black"),
                                  line_col = c("M" = "grey70", "F" = "black"),
-                                 alpha = 0.6,
+                                 alpha = 0.8,
                                  title = "Maturity frequencies",
                                  n_label_pos = c(0.7, 1.3),
                                  min_fish = 0,
@@ -196,9 +196,7 @@ plot_maturity_months <- function(dat,
   if (nrow(dat) >= 10) {
     g <- g +
       geom_vline(xintercept = seq(1, 12), col = "grey95", linewidth = 0.4) +
-      geom_point(aes_string(
-        size = "n_scaled", group = "sex", colour = "sex", fill = "sex"
-      ),
+      geom_point(aes_string(size = "n_scaled", group = "sex", colour = "sex"),
         pch = 21, alpha = alpha
       ) +
       scale_fill_manual(values = fill_col) +
