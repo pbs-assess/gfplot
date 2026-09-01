@@ -2,43 +2,59 @@
 #'
 #' Creates a ggplot2 coord_sf object with axis limits automatically determined
 #' from an sf object's bounding box, with optional buffering and geometry
-#' simplification for performance.
+#' simplification for faster plotting. The returned coord_sf always uses
+#' `sf_obj`'s own CRS, regardless of `metric_crs`, because `coord_sf()` doesn't
+#' reproject non-`sf` layers (e.g. `geom_stars()` rasters) -- they must
+#' already match the declared CRS.
 #'
 #' @param sf_obj An sf object to derive plot limits from
 #' @param xlim Optional x-axis limits as vector c(xmin, xmax) (default: NULL, uses bbox)
 #' @param ylim Optional y-axis limits as vector c(ymin, ymax) (default: NULL, uses bbox)
 #' @param buffer Buffer distance in meters (default: 1000)
-#' @param crs_buffer Coordinate system for buffering (default: 3156, BC Albers)
+#' @param metric_crs Metric CRS (i.e., not degrees) to reproject into for
+#'   accurate buffering and simplification; only used when `sf_obj` isn't already
+#'   in metres. Default (`NULL`) auto-detects a local UTM zone from
+#'   `sf_obj`'s bounding-box centroid.
 #' @param simplify Simplification tolerance in meters (default: NULL, no simplification).
-#'   Only needed for complex boundaries if rendering is slow.
+#'   Only needed for complex boundaries if plot rendering is slow.
 #' @param ... Additional arguments passed to ggplot2::coord_sf()
 #'
 #' @return A ggplot2 coord_sf object with appropriate limits
 #' @export
 
 coord_sf_auto <- function(sf_obj, xlim = NULL, ylim = NULL, buffer = 1000,
-                          crs_buffer = 3156, simplify = NULL, ...) {
+                          metric_crs = NULL, simplify = NULL, ...) {
 
   stopifnot("sf_obj must be an sf object" = inherits(sf_obj, "sf"))
 
-  # Apply buffer if specified
-  if (!is.null(buffer) && buffer > 0) {
-    crs_current <- sf::st_crs(sf_obj)
+  crs_original <- sf::st_crs(sf_obj)
+  needs_buffer <- !is.null(buffer) && buffer > 0
 
-    if (identical(crs_current$units, "m")) {
-      # buffer direclty if already in metres
-      sf_obj <- sf::st_buffer(sf_obj, dist = buffer)
-    } else {
-      # simplify before transformation if specified (faster)
-      if (!is.null(simplify)) {
-        sf_obj <- sf::st_simplify(sf_obj, dTolerance = simplify)
-      }
+  # simplify and buffer both need metric units
+  reproject <- !identical(crs_original$units, "m") && (!is.null(simplify) || needs_buffer)
 
-      # Transform to buffering CRS, then buffer
-      sf_obj <- sf_obj |>
-        sf::st_transform(crs = crs_buffer) |>
-        sf::st_buffer(dist = buffer)
+  if (reproject) {
+    # Auto-pick a local UTM zone from the bbox centroid
+    if (is.null(metric_crs)) {
+      bbox_ll <- sf::st_bbox(sf::st_transform(sf_obj, 4326))
+      lon_mid <- mean(bbox_ll[c("xmin", "xmax")])
+      lat_mid <- mean(bbox_ll[c("ymin", "ymax")])
+      utm_zone <- floor((lon_mid + 180) / 6) + 1
+      metric_crs <- if (lat_mid >= 0) 32600 + utm_zone else 32700 + utm_zone
     }
+    sf_obj <- sf::st_transform(sf_obj, crs = metric_crs)
+  }
+
+  if (!is.null(simplify)) {
+    sf_obj <- sf::st_simplify(sf_obj, dTolerance = simplify)
+  }
+
+  if (needs_buffer) {
+    sf_obj <- sf::st_buffer(sf_obj, dist = buffer)
+  }
+
+  if (reproject) {
+    sf_obj <- sf::st_transform(sf_obj, crs = crs_original)
   }
 
   bbox <- sf::st_bbox(sf_obj)
@@ -46,7 +62,7 @@ coord_sf_auto <- function(sf_obj, xlim = NULL, ylim = NULL, buffer = 1000,
   if (is.null(xlim)) xlim <- bbox[c("xmin", "xmax")]
   if (is.null(ylim)) ylim <- bbox[c("ymin", "ymax")]
 
-  ggplot2::coord_sf(xlim = xlim, ylim = ylim, crs = sf::st_crs(sf_obj), ...)
+  ggplot2::coord_sf(xlim = xlim, ylim = ylim, crs = crs_original, ...)
 }
 
 #' Rotate spatial features for plotting BC coastline

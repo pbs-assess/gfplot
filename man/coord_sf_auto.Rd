@@ -9,7 +9,7 @@ coord_sf_auto(
   xlim = NULL,
   ylim = NULL,
   buffer = 1000,
-  crs_buffer = 3156,
+  metric_crs = NULL,
   simplify = NULL,
   ...
 )
@@ -23,10 +23,13 @@ coord_sf_auto(
 
 \item{buffer}{Buffer distance in meters (default: 1000)}
 
-\item{crs_buffer}{Coordinate system for buffering (default: 3156, BC Albers)}
+\item{metric_crs}{Metric CRS (i.e., not degrees) to reproject into for
+accurate buffering and simplification; only used when \code{sf_obj} isn't already
+in metres. Default (\code{NULL}) auto-detects a local UTM zone from
+\code{sf_obj}'s bounding-box centroid.}
 
 \item{simplify}{Simplification tolerance in meters (default: NULL, no simplification).
-Only needed for complex boundaries if rendering is slow.}
+Only needed for complex boundaries if plot rendering is slow.}
 
 \item{...}{Additional arguments passed to ggplot2::coord_sf()}
 }
@@ -36,5 +39,8 @@ A ggplot2 coord_sf object with appropriate limits
 \description{
 Creates a ggplot2 coord_sf object with axis limits automatically determined
 from an sf object's bounding box, with optional buffering and geometry
-simplification for performance.
+simplification for faster plotting. The returned coord_sf always uses
+\code{sf_obj}'s own CRS, regardless of \code{metric_crs}, since \code{coord_sf()} doesn't
+reproject non-\code{sf} layers (e.g. \code{geom_stars()} rasters) -- they must
+already match the declared CRS.
 }
